@@ -51,70 +51,102 @@ code {
 :not(pre) > code {
   background: rgba(139, 92, 246, 0.12);
   color: #c4b5fd;
-  padding: 0.15rem 0.4rem;
+  padding: 0.15rem 0.45rem;
   border-radius: 0.35rem;
-  font-size: 0.85em;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  font-size: 0.875em;
+  font-weight: 500;
+  border: 1px solid rgba(139, 92, 246, 0.25);
 }
 
-/* Typography Overrides */
+/* Typography & Markdown Styling */
 .markdown-body h1 {
-  font-size: 2.25rem;
+  font-size: 2rem;
   font-weight: 800;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   margin-bottom: 1rem;
   color: #ffffff;
   letter-spacing: -0.025em;
 }
 
 .markdown-body h2 {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  margin-top: 3rem;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
   border-bottom: 1px solid #1e2433;
   color: #a78bfa;
 }
 
 .markdown-body h3 {
-  font-size: 1.15rem;
-  font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.6rem;
   color: #e2e8f0;
 }
 
+.markdown-body h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .markdown-body p {
-  line-height: 1.75;
+  line-height: 1.8;
   margin-bottom: 1rem;
-  color: #94a3b8;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.markdown-body strong {
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .markdown-body ul, .markdown-body ol {
   margin-bottom: 1.25rem;
   padding-left: 1.5rem;
-  color: #94a3b8;
+  color: #cbd5e1;
 }
 
 .markdown-body li {
   margin-bottom: 0.5rem;
-  line-height: 1.65;
+  line-height: 1.7;
+  font-size: 0.95rem;
 }
 
+/* Callout / In Simple Words styling */
 .markdown-body blockquote {
   border-left: 4px solid #8b5cf6;
-  padding: 0.5rem 0 0.5rem 1rem;
+  padding: 1rem 1.25rem;
   margin: 1.5rem 0;
-  background: rgba(139, 92, 246, 0.05);
-  border-radius: 0 0.5rem 0.5rem 0;
-  color: #cbd5e1;
+  background: rgba(139, 92, 246, 0.08);
+  border-radius: 0 0.75rem 0.75rem 0;
+  color: #e2e8f0;
+  font-size: 0.975rem;
+  line-height: 1.75;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-left-width: 4px;
+}
+
+.markdown-body blockquote strong {
+  color: #c4b5fd;
+}
+
+.markdown-body blockquote p:last-child {
+  margin-bottom: 0;
 }
 
 .markdown-body table {
   width: 100%;
   margin: 1.5rem 0;
   border-collapse: collapse;
+  font-size: 0.9rem;
 }
 
 .markdown-body th {
@@ -135,4 +167,3 @@ code {
 .markdown-body tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.02);
 }
-

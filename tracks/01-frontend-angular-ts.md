@@ -1,832 +1,775 @@
 # Complete Master Interview Question Bank: Angular, TypeScript, JavaScript & Web Standards (1 - 235)
 
-> Comprehensive, production-tested technical interview questions and deep-dive answers covering Angular (v2 through v19+), modern TypeScript, core JavaScript internals, live coding algorithms, enterprise architecture, HTML5 semantics, and CSS3 layouts.
-
----
-
-## Table of Contents
-- [Part 1: Interview Intro & Project Experience (1 - 7)](#part-1-interview-intro--project-experience-1---7)
-- [Part 2: Angular Interview Questions (8 - 77)](#part-2-angular-interview-questions-8---77)
-- [Part 3: JavaScript Core Internals & Advanced Patterns (78 - 160)](#part-3-javascript-core-internals--advanced-patterns-78---160)
-- [Part 4: Live Coding & Client Scenarios (161 - 175)](#part-4-live-coding--client-scenarios-161---175)
-- [Part 5: HTML5 & Modern Semantics (176 - 185)](#part-5-html5--modern-semantics-176---185)
-- [Part 6: Modern CSS3, Layouts & Architecture (186 - 195)](#part-6-modern-css3-layouts--architecture-186---195)
-- [Part 7: Enterprise Architecture, Framework Internals & Performance (196 - 225)](#part-7-enterprise-architecture-framework-internals--performance-196---225)
-- [Part 8: Advanced TypeScript, Tooling & Performance (226 - 235)](#part-8-advanced-typescript-tooling--performance-226---235)
+> Simple, intuitive, and easy-to-explain technical interview questions and answers covering Angular 17-19, TypeScript, Core JavaScript internals, live coding, HTML5 semantics, and CSS3 layouts.
 
 ---
 
 ## Part 1: Interview Intro & Project Experience (1 - 7)
 
 ### 1. Give a brief introduction (keep it candid, not formal).
-**Answer:**
-"I am a Senior Frontend / Full-Stack Engineer with over X years of hands-on experience building mission-critical enterprise single-page applications. My core expertise centers on the modern Angular ecosystem, TypeScript, reactive state architectures (RxJS and Angular Signals), and performant web standards. Day-to-day, I focus not just on UI feature delivery, but on component design systems, state boundaries, bundle optimization, and robust integration with backend REST/GraphQL services. I enjoy peeling back framework abstractions to understand how the browser's rendering engine and runtime actually execute code."
+**In Simple Words:**
+Keep it natural and conversation-like: state your focus, the products you build, your primary tech stack, and what excites you about frontend architecture.
+
+**How to Explain in an Interview:**
+- "I'm a Frontend / Full-Stack Engineer specializing in the Angular and TypeScript ecosystem.
+- In my day-to-day work, I build high-performance web applications—focusing on clean component architecture, reactive state with Signals and RxJS, and fast page loads.
+- I like understanding the core platform beneath frameworks: how the browser parses HTML/CSS, the JavaScript event loop, and web performance optimization."
 
 ### 2. What is your role in your current project? Explain it.
-**Answer:**
-- **Architecture & Scaffolding**: Designing standalone component trees, modular route architectures with lazy loading and deferrable views (`@defer`), and state management topologies (Signals + RxJS / NgRx).
-- **Core Feature Development**: Delivering complex user flows—such as real-time multi-step financial workflows, interactive dashboards, and role-based access control (RBAC) surfaces.
-- **Performance & Governance**: Auditing Core Web Vitals (LCP, INP, CLS), establishing custom linting and strict TypeScript boundaries, optimizing Change Detection with `OnPush` and zoneless strategies.
-- **Cross-Functional Alignment**: Partnering with UI/UX designers to translate Figma tokens into reusable component libraries and collaborating with backend teams to establish strict OpenAPI / Swagger schema contracts.
+**In Simple Words:**
+Explain your ownership: from UI component design to backend API collaboration and performance tuning.
+
+**How to Explain in an Interview:**
+- **Architecture & Features**: I build standalone components, modular routes with lazy-loading, and manage reactive state using Angular Signals and NgRx.
+- **Performance & Quality**: I monitor Core Web Vitals (LCP, INP, CLS), optimize change detection with `OnPush`, and write unit tests with Jasmine/Jest.
+- **Cross-team Collaboration**: I work with UX designers to translate Figma design tokens into reusable components, and with backend engineers to define clear REST/GraphQL API contracts.
 
 ### 3. Any experience building APIs or server-side code? (UI role with some API work).
-**Answer:**
-"Yes. While my primary focus is frontend architecture, I regularly write and maintain backend services. I have built RESTful APIs and middleware using Node.js (Express, NestJS, Fastify) and Python (FastAPI). In modern full-stack workflows, I also handle Angular SSR / hydration with Node engines, design BFF (Backend-for-Frontend) gateway patterns to aggregate upstream microservices, implement JWT authentication flows, and manage database queries using PostgreSQL and Redis caching layers."
+**In Simple Words:**
+"Yes, I build Full-Stack and Backend-for-Frontend (BFF) layers when needed."
+
+**How to Explain in an Interview:**
+- "While my core focus is frontend, I regularly write backend services in Node.js (Express, Fastify, NestJS) and Python (FastAPI).
+- In Angular, I configure Server-Side Rendering (SSR) and hydration with Node engines.
+- I also design REST APIs, write JWT authentication middleware, and query PostgreSQL and Redis caching layers."
 
 ### 4. Did you start with Angular? Do you have core JavaScript experience? Are you comfortable coding in plain JavaScript?
-**Answer:**
-"I started with vanilla JavaScript (ES5/ES6), building DOM manipulations, AJAX wrappers, and closures from scratch before transitioning to AngularJS (1.x) and then modern Angular (2 through 19+). Being grounded in raw JavaScript is essential because frameworks are temporary abstractions over the browser platform. I am completely comfortable writing vanilla JavaScript without any library—implementing custom event emitters, deep-clone utilities, promise polyfills, intersection observers, and prototype manipulation."
+**In Simple Words:**
+"I started with core JavaScript before using frameworks, and I am 100% comfortable coding in plain vanilla JS."
+
+**How to Explain in an Interview:**
+- Frameworks come and go, but browser JavaScript is permanent.
+- I am comfortable writing vanilla JS from scratch: manipulating the DOM, creating closures, writing custom event emitters, building debounce/throttle functions, and polyfilling array methods without external libraries.
 
 ### 5. Which is the latest Angular version you have worked with?
-**Answer:**
-"I actively work with **Angular 17, 18, and 19**. In these modern versions, I utilize:
-- **Standalone Components & Directives** (eliminating legacy `NgModule` boilerplate).
-- **Angular Signals** (`signal()`, `computed()`, `effect()`, signal inputs `input()`, signal outputs `output()`, and `model()`).
-- **Built-in Control Flow Syntax** (`@if`, `@for` with mandatory `track`, `@switch`).
-- **Deferrable Views** (`@defer (on viewport; prefetch on idle)`).
-- **Experimental Zoneless Change Detection** (`provideExperimentalZonelessChangeDetection()`).
-- Modern Vite + esbuild `application` builder."
+**In Simple Words:**
+"I actively work with **Angular 17, 18, and 19**."
+
+**Key Modern Features to Mention:**
+- **Standalone Components**: No more `NgModule` boilerplate.
+- **Angular Signals**: `signal()`, `computed()`, and `effect()` for simple, fine-grained reactivity.
+- **Modern Control Flow**: Clean `@if`, `@for` (with mandatory `track`), and `@switch` syntax directly in HTML.
+- **Deferrable Views (`@defer`)**: Declarative lazy-loading of heavy components when scrolled into view.
+- **Zoneless Angular**: Experimental high-performance change detection without Zone.js overhead.
 
 ### 6. Have you worked on custom pipes and custom directives?
-**Answer:**
-"Yes, extensively:
-- **Custom Directives**: Created attribute directives for input masking, character restrictions (e.g., preventing special characters in text inputs), infinite scrolling via `IntersectionObserver`, auto-focus, and role-based element rendering via structural directives.
-- **Custom Pipes**: Built pure pipes for currency formatting across multi-tenant currencies, relative time calculation ('3 minutes ago'), file-size byte conversions, and memoized search filter transforms."
+**In Simple Words:**
+"Yes. Directives modify DOM behavior; Pipes transform displayed data."
+
+**How to Explain in an Interview:**
+- **Custom Directives**: Created attribute directives for input character masking, preventing special characters, auto-focusing elements, and infinite scrolling via `IntersectionObserver`.
+- **Custom Pipes**: Built pure pipes for currency conversion, relative time ('5 mins ago'), and byte formatting ('2.4 MB').
 
 ### 7. Do you have experience in NgRx and writing test cases?
-**Answer:**
-"Yes.
-- **NgRx**: Architected enterprise state using `@ngrx/store`, `@ngrx/effects`, `@ngrx/entity`, and the modern `@ngrx/signals` (SignalStore). I leverage selectors with memoization (`createSelector`) to slice state and decouple UI from business logic.
-- **Testing**: Proficient with Jasmine/Karma, Jest, and Vitest alongside Angular Testing Library (`render`, `screen`, `fireEvent`). I write unit tests for services, isolated pipe tests, mock HTTP calls using `HttpTestingController`, and write end-to-end tests using Playwright."
+**In Simple Words:**
+"Yes, I use NgRx for enterprise global state and write unit tests to ensure high code reliability."
+
+**How to Explain in an Interview:**
+- **NgRx**: Experienced with Actions, Reducers, Effects, Selectors, and the modern `@ngrx/signals` (SignalStore). I use memoized selectors to slice state efficiently.
+- **Testing**: I write unit tests for components and services using Jasmine/Karma, Jest, and Angular Testing Library, mocking HTTP requests via `HttpTestingController`.
 
 ---
 
 ## Part 2: Angular Interview Questions (8 - 77)
 
 ### 8. Why were client-side frameworks like Angular introduced?
-**Answer:**
-Client-side frameworks were introduced to solve the limitations of traditional server-rendered multi-page applications (MPAs) and messy jQuery-style spaghetti code:
-1. **Single Page Architecture (SPA)**: Load assets once; navigate seamlessly without full-page browser reloads.
-2. **Declarative Data Binding**: Automatically sync the data model with the DOM.
-3. **Component-Based Modularity**: Reusable, encapsulated building blocks combining template, styles, and logic.
-4. **Separation of Concerns**: Clear architectural boundaries across Controllers/Components, Services, and Views.
-5. **Built-in Enterprise Tooling**: Out-of-the-box routing, dependency injection, HTTP client, form management, and test runners.
+**In Simple Words:**
+Traditional websites reloaded the entire page on every click. Angular was introduced to create **Single Page Applications (SPAs)** that update the UI instantly without reloading the browser.
+
+**Key Benefits:**
+- **Smooth User Experience**: Page transitions are instant; only data (JSON) is fetched over the network.
+- **Component-Based**: Clean, reusable UI blocks combining HTML, CSS, and TypeScript.
+- **Automatic Sync**: Data binding automatically updates the screen whenever variables change.
 
 ### 9. How does an Angular application work?
-**Answer:**
-1. **Bootstrapping**: The browser loads `index.html`. `main.ts` is executed, calling `bootstrapApplication(RootComponent)` (or `platformBrowserDynamic().bootstrapModule(AppModule)` in legacy setups).
-2. **Dependency Injection**: The root injector compiles the dependency tree, instantiating singletons and providers.
-3. **Template Compilation & Rendering**: Angular compiles component templates into optimized JavaScript instructions (Ivy compiler) and renders HTML into the root tag `<app-root>`.
-4. **Event & Change Detection**: User interactions trigger events. Zone.js (or Signal graphs in zoneless mode) detects mutations, runs Change Detection, reconciles view bindings, and updates the real DOM.
+**In Simple Words:**
+Angular bootstraps a root component inside `index.html`, renders the template, and continuously updates the screen whenever data changes.
+
+**The 4-Step Flow:**
+1. **Entry**: Browser loads `index.html` and executes `main.ts`.
+2. **Bootstrapping**: `bootstrapApplication(AppComponent)` initializes the root component and dependency injection.
+3. **Template Rendering**: Angular compiles component templates and injects them into `<app-root>`.
+4. **Change Detection**: When user clicks or data arrives, Angular updates the affected DOM elements.
 
 ### 10. What are some of the advantages of Angular over other frameworks?
-**Answer:**
-- **Complete Batteries-Included Framework**: Routing, HTTP client, Reactive & Template forms, animations, and PWA support are first-party and maintained by Google.
-- **First-Class TypeScript**: Strict static typing and compile-time verification across both code and templates.
-- **Hierarchical Dependency Injection**: Powerful multi-level injector hierarchy enabling scoped service lifecycles.
-- **Ivy Rendering Engine**: Incremental compilation, small bundles, tree-shakeable runtime code.
-- **Automated CLI Migrations**: `ng update` automatically updates dependencies and rewrites deprecated APIs across major version leaps.
+**In Simple Words:**
+Angular is a **complete, batteries-included framework** maintained by Google.
+
+**Key Advantages:**
+- **All-in-One**: Official router, HTTP client, forms validation, and animations are built-in (no need to piece together third-party packages).
+- **TypeScript by Default**: Catch errors at compile-time instead of runtime.
+- **Dependency Injection**: Clean, modular code that is easy to test.
+- **CLI & Migrations**: `ng update` automatically updates your codebase across major versions.
 
 ### 11. What are the advantages of Angular over React?
-**Answer:**
-| Feature | Angular | React |
-| :--- | :--- | :--- |
-| **Type** | Full-fledged opinionated framework | Lightweight UI library |
-| **Ecosystem** | Integrated official solutions (Router, HTTP, Forms) | Fragmented third-party libraries |
-| **Dependency Injection** | Built-in hierarchical DI container | Prop drilling / Context API / external DI |
-| **Language** | Native TypeScript standard | JavaScript / JSX with optional TypeScript |
-| **Templates** | HTML-based templates with scoped CSS | JSX (HTML embedded in JavaScript) |
-| **Two-way Binding** | Built-in `[(ngModel)]` / `model()` | Manual handler binding (`value` + `onChange`) |
+**In Simple Words:**
+Angular is a full-fledged **framework** with standardized architecture, while React is a **UI library** that requires choosing third-party tools for routing, state, and forms.
+
+**Quick Comparison:**
+- **Angular**: Standardized structure across teams, official routing & HTTP, built-in dependency injection, native TypeScript.
+- **React**: Highly flexible, but every project chooses different libraries for routing, forms, and state, leading to inconsistent codebases.
 
 ### 12. List out differences between AngularJS and Angular?
-**Answer:**
-- **Architecture**: AngularJS (1.x) was MVC/MVVM based on `$scope` and controllers; modern Angular (2+) is entirely component-driven.
-- **Language**: AngularJS used JavaScript; Angular is built from the ground up in TypeScript.
-- **Mobile & Performance**: AngularJS lacked mobile optimization and suffered from slow digest loops; Angular uses Ivy, hierarchical Change Detection, Ahead-Of-Time (AOT) compilation, and Signals.
-- **Routing & DI**: Angular rewritten dependency injection with hierarchical injectors and modern class-based tokens.
+**In Simple Words:**
+AngularJS (v1.x) was a JavaScript MVC framework based on `$scope`. Modern Angular (v2+) is a complete TypeScript-based component framework.
+
+| Feature | AngularJS (1.x) | Modern Angular (2 - 19+) |
+| :--- | :--- | :--- |
+| **Language** | JavaScript | TypeScript |
+| **Architecture** | MVC with `$scope` | Component-based |
+| **Mobile** | Not mobile-friendly | Mobile-first & fast |
+| **Rendering** | Slow digest cycle | Ivy compiler, Signals & OnPush |
 
 ### 13. How are Angular expressions different from JavaScript expressions?
-**Answer:**
-- **Context**: Angular expressions execute in the context of the component instance, not the global `window`.
-- **Restricted Syntax**: Cannot execute `eval()`, `new`, bitwise operators `|` or `^`, or assignments with side effects in interpolation.
-- **Null Safety**: Angular templates support the safe navigation operator (`user?.address?.city`) and null coalescing.
-- **Pipes**: Angular expressions allow pipe syntax (`{{ amount | currency }}`).
+**In Simple Words:**
+Angular expressions (`{{ user.name }}`) evaluate against the **component class instance**, not the global `window` object.
+
+**Key Differences:**
+- Cannot use dangerous keywords like `eval()`, `new`, or assignment operators (`=`, `++`).
+- Supports the safe navigation operator (`user?.address?.city`) to prevent null reference errors.
+- Supports pipe operators (`{{ price | currency }}`).
 
 ### 14. What are Single Page Applications (SPA)?
-**Answer:**
-A Single Page Application is a web application that loads a single HTML shell (`index.html`) on initial request. Subsequent user interactions and navigations do not trigger full browser reloads; instead, JavaScript dynamically rewrites the DOM by fetching data payloads (JSON) from server APIs and managing browser history via the HTML5 History API (`pushState`, `replaceState`).
+**In Simple Words:**
+A web application that loads a single HTML page once. As the user navigates, JavaScript dynamically rewrites the content without requesting a full page reload from the server.
 
 ### 15. What are templates in Angular?
-**Answer:**
-Templates are the user-facing declarative view definitions written in HTML augmented with Angular template syntax (interpolation `{{ }}`, property binding `[prop]`, event binding `(event)`, two-way binding `[(model)]`, control flow `@if` / `@for`, and structural directives).
+**In Simple Words:**
+A template is the HTML file or inline string (`template: '...'`) that defines what the user sees on the screen, enhanced with Angular directives, bindings, and control flow syntax.
 
 ### 16. What are directives in Angular?
-**Answer:**
-Directives are classes with `@Directive()` metadata that add behavior to DOM elements.
-1. **Component Directives**: Directives with an attached HTML template (`@Component()`).
-2. **Structural Directives**: Manipulate DOM layout by adding or removing elements (e.g., `*ngIf`, `*ngFor`, `<ng-template>`).
-3. **Attribute Directives**: Change the appearance or behavior of an existing element (e.g., `ngClass`, `ngStyle`, or custom mask directives).
+**In Simple Words:**
+Directives are classes that attach custom behavior to DOM elements.
+
+**3 Types to Remember:**
+1. **Component Directives**: Directives with an HTML template (the most common type).
+2. **Structural Directives**: Change the DOM layout by adding or removing elements (e.g. `*ngIf`, `*ngFor`).
+3. **Attribute Directives**: Change the appearance or behavior of an existing element (e.g. `ngClass`, `ngStyle`, or custom click trackers).
 
 ### 17. Explain Components, Modules and Services in Angular.
-**Answer:**
-- **Component**: The core UI building block. Decorates a TypeScript class with `@Component({ selector, templateUrl/template, styleUrls })` holding state and view logic.
-- **Module (`NgModule`)**: Legacy organizational container that bundled related components, directives, pipes, and services. In Angular 14+, standalone components make `NgModule` optional.
-- **Service**: A reusable class decorated with `@Injectable({ providedIn: 'root' })` dedicated to business logic, state management, HTTP communication, and utility tasks.
+**In Simple Words:**
+- **Component**: The UI view (HTML + CSS + TypeScript logic).
+- **Service**: A reusable class for business logic and API calls, shared across components.
+- **Module (`NgModule`)**: A container that groups related components and services together (optional in modern Angular standalone components).
 
 ### 18. What is the scope?
-**Answer:**
-In legacy AngularJS, `$scope` was the glue object passing data between the Controller and View. In modern Angular (2+), there is no `$scope` object; the component class instance itself is the scope against which its template bindings evaluate.
+**In Simple Words:**
+In old AngularJS, `$scope` was the glue object between controller and HTML. In modern Angular, the **component class instance itself** is the scope—variables declared on the class are directly available in the template.
 
 ### 19. What is data binding in Angular?
-**Answer:**
-The mechanism that synchronizes data between the TypeScript component class and the HTML template:
-- **One-way (Source to View)**: Interpolation `{{ value }}` and Property Binding `[property]="value"`.
-- **One-way (View to Source)**: Event Binding `(click)="handleClick($event)"`.
-- **Two-way**: `[(ngModel)]="property"` or Signal-based `[(model)]="prop"`.
+**In Simple Words:**
+Data binding is the communication bridge between the TypeScript class and the HTML template.
+
+**4 Binding Types:**
+1. **Interpolation `{{ title }}`**: Sends string data from TypeScript to HTML.
+2. **Property Binding `[src]="imgUrl"`**: Sets an HTML element property from TypeScript.
+3. **Event Binding `(click)="save()"`**: Listens to user events in HTML and calls TypeScript methods.
+4. **Two-Way Binding `[(ngModel)]="name"`**: Keeps TypeScript and HTML continuously in sync.
 
 ### 20. What is two way data binding in Angular?
-**Answer:**
-Two-way data binding synchronizes state bidirectionally: template changes (e.g., typing in an input) immediately update the component variable, and component variable changes immediately re-render in the template.
-Syntax: `[(ngModel)]="username"` (the 'banana in a box' syntax), which desugars to property binding `[ngModel]="username"` plus event binding `(ngModelChange)="username = $event"`.
+**In Simple Words:**
+When you type into an input field, the TypeScript variable updates immediately; if the TypeScript variable changes, the input field updates immediately.
+**Syntax**: `[(ngModel)]="username"` (Banana in a box: `[ ]` for property in, `( )` for event out).
 
 ### 21. What are Decorators and their types in Angular?
-**Answer:**
-Decorators are functions that attach metadata to TypeScript classes, methods, accessors, properties, or parameters.
-1. **Class Decorators**: `@Component()`, `@Directive()`, `@Pipe()`, `@Injectable()`, `@NgModule()`.
-2. **Property Decorators**: `@Input()`, `@Output()`, `@ViewChild()`, `@HostBinding()`.
+**In Simple Words:**
+Decorators are functions preceded by `@` that attach metadata to TypeScript classes or properties so Angular knows how to treat them.
+
+**4 Types:**
+1. **Class Decorators**: `@Component()`, `@Directive()`, `@Pipe()`, `@Injectable()`.
+2. **Property Decorators**: `@Input()`, `@Output()`, `@ViewChild()`.
 3. **Method Decorators**: `@HostListener()`.
-4. **Parameter Decorators**: `@Inject()`, `@Optional()`, `@Self()`, `@SkipSelf()`.
+4. **Parameter Decorators**: `@Inject()`.
 
 ### 22. What are annotations in Angular?
-**Answer:**
-In TypeScript and Angular, "annotations" is an informal term often conflated with Decorators. While annotations in languages like Java simply provide static metadata, Angular Decorators are actual executable functions that modify or augment the class definition at runtime.
+**In Simple Words:**
+"Annotations" is an informal term often used interchangeably with Decorators. In TypeScript/Angular, they are actual executable Decorator functions that pass metadata to the compiler.
 
 ### 23. What are pure Pipes?
-**Answer:**
-A pure pipe (`@Pipe({ name: 'filter', pure: true })` - default) is executed **only** when Angular detects a pure change to the input value:
-- For primitive types (string, number, boolean): change in value (`===`).
-- For reference types (object, array): change in object reference (`!==`).
-Pure pipes are heavily optimized and memoized.
+**In Simple Words:**
+A pure pipe executes **only when its input value or reference changes**.
+- If passed a primitive (string, number): runs only when the value changes (`!==`).
+- If passed an object or array: runs only when the **object reference changes**, not on internal mutations.
+- **Benefit**: Extremely fast and memoized by default.
 
 ### 24. What are impure pipes?
-**Answer:**
-An impure pipe (`@Pipe({ name: 'filter', pure: false })`) executes on **every single change detection cycle**, regardless of whether the input reference changed. Useful for detecting internal mutations in arrays or objects, but can severely degrade performance if expensive calculations are run.
+**In Simple Words:**
+An impure pipe (`pure: false`) executes on **every single change detection cycle**, even if the input hasn't changed.
+- **Use case**: Detecting when an item is pushed into an existing array.
+- **Warning**: Can severely slow down the app if it performs heavy calculations.
 
 ### 25. What is Pipe transform Interface in Angular?
-**Answer:**
-`PipeTransform` is a TypeScript interface that requires implementing the `transform(value: any, ...args: any[]): any` method:
+**In Simple Words:**
+It is the TypeScript interface that every custom pipe must implement, defining the `transform(value, ...args)` method:
 ```typescript
-import { Pipe, PipeTransform } from '@angular/core';
-
 @Pipe({ name: 'truncate', standalone: true })
 export class TruncatePipe implements PipeTransform {
-  transform(value: string, limit = 20, trail = '...'): string {
-    if (!value) return '';
-    return value.length > limit ? value.substring(0, limit) + trail : value;
+  transform(value: string, limit = 20): string {
+    return value.length > limit ? value.slice(0, limit) + '...' : value;
   }
 }
 ```
 
-### 26. Write a code where you have to share data from the Parent to Child Component?
-**Answer:**
+### 26. How do you share data from Parent to Child Component?
+**In Simple Words:**
+Use `@Input()` (or modern signal input `input()`) in the child component, and property bind `[prop]="data"` in the parent component:
 ```typescript
-// Child Component
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-
-@Component({
-  selector: 'app-child',
-  standalone: true,
-  template: `
-    <p>Received: {{ message }}</p>
-    <button (click)="notifyParent()">Send Response</button>
-  `
-})
+// Child
+@Component({ selector: 'app-child', standalone: true, template: '<p>{{ text }}</p>' })
 export class ChildComponent {
-  @Input({ required: true }) message!: string;
-  @Output() response = new EventEmitter<string>();
-
-  notifyParent() {
-    this.response.emit('Hello from Child!');
-  }
+  @Input() text = '';
 }
 
-// Parent Component
-@Component({
-  selector: 'app-parent',
-  standalone: true,
-  imports: [ChildComponent],
-  template: `
-    <app-child [message]="parentMsg" (response)="onChildResponse($event)"></app-child>
-    <p>Child said: {{ childFeedback }}</p>
-  `
-})
-export class ParentComponent {
-  parentMsg = 'Data from Parent';
-  childFeedback = '';
-
-  onChildResponse(msg: string) {
-    this.childFeedback = msg;
-  }
-}
+// Parent Template
+<app-child [text]="parentMessage" />
 ```
 
 ### 27. Create a TypeScript class with a constructor and a function.
-**Answer:**
 ```typescript
-export class Employee {
-  private id: string;
-  public name: string;
-  public department: string;
+export class User {
+  constructor(public id: number, public name: string) {}
 
-  constructor(id: string, name: string, department: string) {
-    this.id = id;
-    this.name = name;
-    this.department = department;
-  }
-
-  public getEmployeeSummary(): string {
-    return `ID: ${this.id} | Name: ${this.name} | Dept: ${this.department}`;
+  greet(): string {
+    return `Hello, my name is ${this.name}!`;
   }
 }
 ```
 
-### 28. Angular by default uses client-side rendering. Can one make an Angular application render on the server side?
-**Answer:**
-Yes, using **Angular SSR** (formerly Angular Universal, now integrated via `@angular/ssr`).
-In modern Angular:
-- Run `ng add @angular/ssr`.
-- Next-gen hydration reuses the server-rendered DOM instead of destroying and re-creating it, preventing layout flicker and boosting LCP.
+### 28. Can an Angular application render on the server-side?
+**In Simple Words:**
+Yes, using **Angular SSR** (`@angular/ssr`). The server renders the initial HTML page so users see content immediately (faster LCP) and search engine bots can easily index the page for SEO.
 
 ### 29. What is Eager and Lazy loading?
-**Answer:**
-- **Eager Loading**: All components and modules are bundled in the initial payload and compiled upfront.
-- **Lazy Loading**: Route-level code splitting where bundles are only downloaded over the network when the user navigates to that specific URL path:
-```typescript
-export const routes: Routes = [
-  {
-    path: 'admin',
-    loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES)
-  },
-  {
-    path: 'profile',
-    loadComponent: () => import('./profile/profile.component').then(c => c.ProfileComponent)
-  }
-];
-```
+**In Simple Words:**
+- **Eager Loading**: Downloads all code and components upfront when the app launches.
+- **Lazy Loading**: Downloads route code on-demand **only when the user navigates to that specific route**, drastically speeding up initial page load.
 
 ### 30. What is view encapsulation in Angular?
-**Answer:**
-View Encapsulation dictates how component styles are scoped:
-1. `ViewEncapsulation.Emulated` (Default): Modifies CSS selectors by adding unique attributes (`_ngcontent-c12`) to prevent styles from leaking out.
-2. `ViewEncapsulation.ShadowDom`: Uses native browser Web Components Shadow DOM for strict isolation.
-3. `ViewEncapsulation.None`: Injects styles globally into the document head without scoping.
+**In Simple Words:**
+View encapsulation ensures that a component's CSS styles do not leak out and affect other components on the page.
+- `Emulated` (Default): Angular adds unique attributes (like `_ngcontent-c12`) to scope CSS selectors.
+- `ShadowDom`: Uses the browser's native Web Component Shadow DOM.
+- `None`: Styles become global across the entire app.
 
 ### 31. What is RxJS in Angular?
-**Answer:**
-RxJS (Reactive Extensions for JavaScript) is a reactive programming library that treats asynchronous events as streams (Observables). Angular uses RxJS across its core: HTTP requests (`HttpClient`), reactive form value streams (`valueChanges`), router events, and state management.
+**In Simple Words:**
+RxJS is a reactive library for handling asynchronous events as streams (Observables). Angular uses RxJS for HTTP requests, form value changes, and router events.
 
 ### 32. Explain string interpolation and property binding in Angular.
-**Answer:**
-- **String Interpolation `{{ expression }}`**: Embeds dynamic string expressions into the HTML text content.
-- **Property Binding `[property]="expression"`**: Binds an expression directly to a DOM element property (e.g., `[disabled]="isSubmitting"` or `[src]="imageUrl"`). It preserves non-string data types (booleans, objects, arrays).
+**In Simple Words:**
+- **String Interpolation `{{ value }}`**: Embeds text into HTML.
+- **Property Binding `[disabled]="isDisabled"`**: Sets an actual HTML property (preserves booleans and objects instead of converting everything to strings).
 
 ### 33. How are observables different from promises?
-**Answer:**
+**In Simple Words:**
+A **Promise** handles a single event; an **Observable** handles a stream of multiple events over time and can be cancelled.
+
 | Feature | Promise | Observable (RxJS) |
 | :--- | :--- | :--- |
-| **Emission** | Emits a single value then resolves | Can emit multiple values over time (stream) |
-| **Execution** | Eager (executes upon creation) | Cold/Lazy (does not execute until subscribed) |
-| **Cancellation** | Cannot be cancelled natively | Cancelled via `.unsubscribe()` or `takeUntil` |
-| **Operators** | Limited (`.then()`, `.catch()`, `.finally()`) | Rich declarative operators (`map`, `filter`, `switchMap`, `debounceTime`) |
+| **Values** | Single value | Multiple values over time |
+| **Execution** | Eager (starts immediately) | Lazy (starts only when subscribed) |
+| **Cancellation** | Cannot cancel | Easily cancel with `.unsubscribe()` |
+| **Operators** | `.then()`, `.catch()` | `map`, `filter`, `switchMap`, `debounceTime` |
 
-### 34. Explain the concept of Dependency Injection?
-**Answer:**
-Dependency Injection (DI) is a design pattern where a class requests dependencies from an external source (the Injector) rather than instantiating them directly with `new`. Angular provides a hierarchical DI container that manages the creation, caching, and lifecycle of instances.
+### 34. Explain Dependency Injection (DI) in simple words.
+**In Simple Words:**
+Instead of a component creating its own dependencies with `new Service()`, Angular's injector creates the service instance and passes (injects) it to the component.
+- **Benefit**: Makes components loosely coupled, reusable, and easy to unit test by swapping in mock services.
 
 ### 35. What are pipes in Angular? Explain with an example.
-**Answer:**
-Pipes are simple declarative functions used in templates to transform displayed values without altering the underlying data in the component.
-Example: `{{ today | date:'mediumDate' }}` transforms a Date object into 'Nov 6, 2026'.
+**In Simple Words:**
+Pipes are simple functions in HTML templates that transform the way data looks without changing the actual variable in TypeScript.
+- **Example**: `{{ 1500 | currency:'USD' }}` displays as `$1,500.00`.
 
-### 36. What exactly is a parameterized pipe?
-**Answer:**
-A pipe that accepts one or more arguments separated by colons (`:`):
-`{{ salary | currency:'USD':'symbol':'1.2-2' }}`.
+### 36. What is a parameterized pipe?
+**In Simple Words:**
+A pipe that takes extra arguments separated by colons:
+`{{ birthday | date:'dd/MM/yyyy' }}` passes `'dd/MM/yyyy'` as an argument to format the date.
 
 ### 37. What are class decorators?
-**Answer:**
-Decorators placed directly on a class definition that provide metadata to the Angular compiler: `@Component()`, `@Directive()`, `@Pipe()`, `@Injectable()`.
+**In Simple Words:**
+Decorators placed on top of a class declaration to tell Angular what kind of building block it is: `@Component()`, `@Directive()`, `@Pipe()`, or `@Injectable()`.
 
 ### 38. What are Method decorators?
-**Answer:**
-Decorators applied to a method inside a class to intercept calls or attach DOM listeners: `@HostListener('window:resize', ['$event'])`.
+**In Simple Words:**
+Decorators placed on top of a method inside a class, such as `@HostListener('click')` to listen for events on the host DOM element.
 
 ### 39. What are property decorators?
-**Answer:**
-Decorators applied to class instance properties: `@Input()`, `@Output()`, `@ViewChild()`, `@HostBinding()`.
+**In Simple Words:**
+Decorators placed on properties inside a class, such as `@Input()`, `@Output()`, and `@ViewChild()`.
 
 ### 40. What is the Component Decorator in Angular?
-**Answer:**
-A class decorator that marks a class as an Angular component and supplies configuration metadata: `selector`, `standalone`, `imports`, `templateUrl`/`template`, `styleUrls`/`styles`, `changeDetection`, `encapsulation`.
+**In Simple Words:**
+`@Component({ ... })` marks a TypeScript class as a component, linking it to its HTML selector, template, and styles.
 
 ### 41. What are lifecycle hooks in Angular? Explain a few.
-**Answer:**
-Methods called during specific phases of a component's lifecycle:
-1. `ngOnChanges()`: Called when data-bound `@Input` properties change.
-2. `ngOnInit()`: Called once after the first `ngOnChanges`; ideal for initial data fetching.
-3. `ngDoCheck()`: Custom change detection checking.
-4. `ngAfterViewInit()`: Called after the component's view and child views are fully initialized (DOM available).
-5. `ngOnDestroy()`: Cleanup logic before the component is destroyed (unsubscribing, clearing timers).
+**In Simple Words:**
+Special methods that Angular calls automatically at key moments in a component's life:
+1. `ngOnInit`: Called once after data inputs are ready; ideal for API calls.
+2. `ngOnChanges`: Called whenever `@Input()` values change.
+3. `ngAfterViewInit`: Called after the component's HTML DOM is fully rendered.
+4. `ngOnDestroy`: Called right before the component is destroyed; ideal for unsubscribing and clearing timers.
 
 ### 42. What are router links?
-**Answer:**
-An attribute directive (`routerLink="/dashboard"`) that turns elements into navigation links, updating the browser URL and routing without reloading the page.
+**In Simple Words:**
+An attribute directive `<a routerLink="/profile">` that navigates to a new route client-side without refreshing the browser page.
 
-### 43. What exactly is the router state?
-**Answer:**
-`RouterState` is a tree of activated routes (`ActivatedRoute`) representing the current state of the application routing tree, including params, queryParams, data, and fragments.
+### 43. What is the router state?
+**In Simple Words:**
+A tree representing the current routing state of the application, including the active URL, route parameters (`:id`), query parameters (`?tab=settings`), and resolved data.
 
-### 44. What does Angular Material mean?
-**Answer:**
-Angular Material is Google's official UI component library for Angular implementing Google's Material Design system with built-in accessibility (a11y), theming, and responsive design.
+### 44. What is Angular Material?
+**In Simple Words:**
+Google's official UI component library for Angular, providing accessible, beautiful, pre-built components (buttons, dialogs, tables, date pickers) following Material Design guidelines.
 
 ### 45. What is ngOnInit?
-**Answer:**
-A lifecycle hook called once after Angular has initialized all data-bound properties of a component. It is the best place to execute component setup and trigger initial HTTP requests.
+**In Simple Words:**
+The most commonly used lifecycle hook. It runs once after Angular initializes a component's inputs. It is the best place to initialize variables and make initial HTTP requests.
 
 ### 46. What is transpiling in Angular?
-**Answer:**
-The process of compiling high-level TypeScript code into standard JavaScript (ES2022) understood by modern web browsers, performed by tools like `esbuild` or `tsc`.
+**In Simple Words:**
+The process of converting modern TypeScript code into standard JavaScript that any web browser can understand and execute.
 
 ### 47. What are HTTP interceptors?
-**Answer:**
-Classes or functions that intercept and transform outgoing HTTP requests and incoming HTTP responses globally (e.g., attaching Bearer authorization tokens, global error handling, logging, caching).
+**In Simple Words:**
+Functions that sit between your application and the backend, intercepting every outgoing HTTP request and incoming response.
+- **Common uses**: Automatically adding `Authorization: Bearer <token>` headers, global error handling, and logging.
 
-### 48. What is AOT compilation? What are the advantages of AOT?
-**Answer:**
-Ahead-Of-Time (AOT) compiles Angular HTML templates and TypeScript code into efficient JavaScript during the build process, as opposed to Just-In-Time (JIT) in the browser.
-**Advantages**: Faster rendering, smaller download bundle size, template errors caught during build time, improved security (no `eval()` of templates).
+### 48. What is AOT compilation? What are its advantages?
+**In Simple Words:**
+Ahead-Of-Time (AOT) compiles HTML templates into optimized JavaScript during the build process on your computer, before the app is sent to the user's browser.
+- **Advantages**: Much faster startup in browser, catches template typos at build time, and creates smaller bundles.
 
-### 49. What is Change Detection, and how does the Change Detection Mechanism work?
-**Answer:**
-The mechanism by which Angular tracks data changes and synchronizes them with the DOM:
-- **Default Strategy**: Traverses the entire component tree from root to leaf on any browser event (clicks, timers, HTTP calls via Zone.js).
-- **OnPush Strategy**: Skips a component subtree unless its `@Input()` reference changes, an event originates from within the component, an Observable bound via `async` pipe emits, or `markForCheck()` is explicitly called.
+### 49. What is Change Detection, and how does it work?
+**In Simple Words:**
+The process by which Angular checks if component data has changed and updates the HTML DOM accordingly.
+- **Default Strategy**: Traverses the entire component tree from top to bottom on any event (click, timer, HTTP response).
+- **OnPush Strategy**: Skips checking a component unless its `@Input()` reference changes, a signal updates, or an event fires from inside that component.
 
 ### 50. What is a bootstrapping module?
-**Answer:**
-In NgModule-based applications, the root module (`AppModule`) decorated with `@NgModule({ bootstrap: [AppComponent] })` passed to `bootstrapModule()` in `main.ts` to launch the app.
+**In Simple Words:**
+In legacy `NgModule` apps, it is the root module (`AppModule`) passed to `bootstrapModule()` in `main.ts` to start the app. In modern Angular 17+, we bootstrap the root component directly with `bootstrapApplication(AppComponent)`.
 
 ### 51. Explain MVVM architecture.
-**Answer:**
-Model-View-ViewModel architecture:
-- **Model**: Business entities and data structures.
-- **View**: The HTML template rendering the user interface.
-- **ViewModel**: The TypeScript component class exposing data and command handlers to the view while keeping view logic separate from data access.
+**In Simple Words:**
+- **Model**: The data and business entities (interfaces, API models).
+- **View**: The HTML template displayed on screen.
+- **ViewModel**: The TypeScript component class that holds state and methods to connect the Model to the View.
 
-### 52. How do you choose an element from a component template?
-**Answer:**
-1. Template Reference Variable: `<input #searchInput>`
-2. In TypeScript: `@ViewChild('searchInput') inputRef!: ElementRef<HTMLInputElement>;`
-3. Access: `this.inputRef.nativeElement.focus();`
+### 52. How do you select an element from a component template?
+**In Simple Words:**
+Use a template reference variable `#myInput` in HTML, and query it in TypeScript with `@ViewChild('myInput')`:
+```typescript
+@ViewChild('myInput') inputRef!: ElementRef<HTMLInputElement>;
+// Focus element: this.inputRef.nativeElement.focus();
+```
 
-### 53. How does one share data between components in Angular?
-**Answer:**
-1. Parent to Child: `@Input()` or `input()`.
-2. Child to Parent: `@Output()` with `EventEmitter` or `output()`.
-3. Sibling / Unrelated: Shared singleton Service with Signals or RxJS `BehaviorSubject`.
-4. Template access: `@ViewChild()` or Content Projection (`<ng-content>`).
-5. Global Store: NgRx / SignalStore.
+### 53. How do you share data between components in Angular?
+**In Simple Words:**
+1. **Parent to Child**: `@Input()` or `input()`.
+2. **Child to Parent**: `@Output()` with `EventEmitter`.
+3. **Unrelated Components**: A shared singleton Service with Signals or RxJS `BehaviorSubject`.
+4. **Projected Content**: `<ng-content>`.
 
 ### 54. How do you deal with errors in observables?
-**Answer:**
-Using RxJS error-handling operators:
-- `catchError()`: Intercepts an error, logs it, and returns a fallback Observable or re-throws.
-- `retry()` / `retryWhen()`: Resubscribes to the source Observable a specified number of times with optional backoff.
-- `EMPTY`: Silently terminates the stream cleanly.
+**In Simple Words:**
+Use RxJS error-handling operators inside `.pipe()`:
+- `catchError(err => of(fallbackData))`: Catches error and returns a safe fallback.
+- `retry(3)`: Automatically retries the request up to 3 times before failing.
 
-### 55. How can I include SASS into an Angular project?
-**Answer:**
-Configure `angular.json`:
-```json
-"schematics": {
-  "@schematics/angular:component": {
-    "style": "scss"
-  }
-}
-```
-Or create a project using `ng new my-app --style=scss`.
+### 55. How do you include SASS/SCSS into an Angular project?
+**In Simple Words:**
+Create the project with `ng new my-app --style=scss`, or configure `"style": "scss"` in `angular.json`.
 
-### 56. What happens when you use the script tag within a template?
-**Answer:**
-Angular treats `<script>` tags inside templates as unsafe and strips them out automatically via its built-in DomSanitizer to prevent Cross-Site Scripting (XSS) attacks.
+### 56. What happens if you use a <script> tag in an Angular template?
+**In Simple Words:**
+Angular's built-in sanitizer automatically strips `<script>` tags out to prevent Cross-Site Scripting (XSS) attacks.
 
 ### 57. What are Angular Signals and how do they differ from RxJS Observables?
-**Answer:**
-- **Signals**: Synchronous reactive primitives introduced in Angular 16. A signal is a getter that holds a value (`signal(10)`), notifies dependents when updated (`set()`, `update()`), and automatically tracks dependencies in `computed()` and `effect()`. Signals do not require manual unsubscriptions.
-- **RxJS Observables**: Asynchronous event streams that deliver multiple values over time, requiring subscriptions, cancellation management, and pipeline operators.
+**In Simple Words:**
+**Signals** are Angular's modern reactive primitives for synchronous state. Unlike Observables, you don't need to manually subscribe or unsubscribe—Angular automatically tracks dependencies and updates the DOM with fine-grained precision.
+- **Signals**: For local UI state (`count = signal(0)`).
+- **RxJS**: For async event streams (HTTP, WebSockets).
 
-### 58. What are Standalone Components, and how do they eliminate NgModules?
-**Answer:**
-Components configured with `standalone: true` (default in Angular 17+). They directly declare their own dependencies via their `imports: [...]` array, completely eliminating the need for boilerplate `NgModule` declarations.
+### 58. What are Standalone Components?
+**In Simple Words:**
+Components configured with `standalone: true` (default in Angular 17+). They import their own dependencies directly via `imports: [...]`, completely eliminating the need for `NgModule`.
 
-### 59. Explain the built-in Control Flow syntax (@if, @for, @switch) vs structural directives (*ngIf, *ngFor).
-**Answer:**
-- Built into the Angular compiler (no `CommonModule` import required).
-- `@for` mandates a `track` expression (preventing common list re-rendering bugs).
-- Up to 90% faster template type-checking and lower bundle size.
+### 59. Explain the modern Control Flow syntax (@if, @for, @switch).
+**In Simple Words:**
+Replaces old structural directives (`*ngIf`, `*ngFor`) with clean, fast, built-in template syntax:
 ```html
-@if (user.isLoggedIn) {
-  <app-profile [user]="user" />
+@if (isLoggedIn) {
+  <app-dashboard />
 } @else {
   <app-login />
 }
 
-@for (item of items; track item.id) {
-  <li>{{ item.name }}</li>
+@for (user of users; track user.id) {
+  <p>{{ user.name }}</p>
 } @empty {
-  <p>No items found.</p>
+  <p>No users found.</p>
 }
 ```
 
-### 60. What is the difference between Reactive Forms and Template-Driven Forms?
-**Answer:**
-- **Reactive Forms**: Synchronous, programmatic, scalable, defined in TypeScript (`FormGroup`, `FormControl`, `FormBuilder`). Complete control over validation, testable without DOM.
-- **Template-Driven Forms**: Asynchronous, directives-based in HTML (`[(ngModel)]`, `ngForm`). Simpler for basic forms, but harder to unit test and maintain.
+### 60. Reactive Forms vs Template-Driven Forms.
+**In Simple Words:**
+- **Reactive Forms**: Defined programmatically in TypeScript (`FormGroup`, `FormControl`). Robust, scalable, type-safe, and easy to unit test.
+- **Template-Driven Forms**: Defined directly in HTML using `[(ngModel)]`. Quick for simple forms, but harder to test.
 
 ### 61. What are Route Guards and Functional Guards?
-**Answer:**
-Route Guards control navigation access (`canActivate`, `canDeactivate`, `canMatch`). Modern Angular uses **Functional Guards** instead of class-based guards:
+**In Simple Words:**
+Guards determine whether a user is allowed to navigate to or leave a route. Modern Angular uses simple **Functional Guards**:
 ```typescript
-export const authGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
   const router = inject(Router);
-  return authService.isAuthenticated() ? true : router.createUrlTree(['/login']);
+  return auth.isLoggedIn() ? true : router.parseUrl('/login');
 };
 ```
 
 ### 62. Explain Content Projection with <ng-content>.
-**Answer:**
-Content projection allows a component to insert external HTML elements into placeholders inside its own template:
+**In Simple Words:**
+Content projection lets a parent component pass custom HTML into a child component's template (like slots):
 ```html
-<!-- Card Component -->
+<!-- Child Card Component -->
 <div class="card">
-  <div class="header"><ng-content select="[card-header]"></ng-content></div>
-  <div class="body"><ng-content></ng-content></div>
+  <ng-content></ng-content>
 </div>
+
+<!-- Parent Usage -->
+<app-card><h2>Custom Projected Header</h2></app-card>
 ```
 
-### 63. What are the key flattening operators in RxJS (switchMap, mergeMap, concatMap, exhaustMap)?
-**Answer:**
-- `switchMap`: Cancels the previous inner observable when a new value arrives (ideal for autocomplete/search).
-- `mergeMap`: Runs all inner observables concurrently without cancellation.
-- `concatMap`: Queues inner observables sequentially, waiting for each to complete.
-- `exhaustMap`: Ignores new incoming values while the current inner observable is running (ideal for login/submit buttons).
+### 63. RxJS Flattening Operators: switchMap, mergeMap, concatMap, exhaustMap.
+**In Simple Words:**
+- `switchMap`: Cancels the previous request when a new one arrives (perfect for search/autocomplete).
+- `mergeMap`: Runs all requests concurrently (no cancellation).
+- `concatMap`: Queues requests in order, waiting for each to finish.
+- `exhaustMap`: Ignores new clicks while the current request is running (perfect for submit buttons).
 
 ### 64. How do you prevent memory leaks in Angular subscriptions?
-**Answer:**
-1. Using the `async` pipe in templates (handles subscription and unsubscription automatically).
-2. Using the `takeUntilDestroyed()` operator (Angular 16+).
-3. Using `takeUntil(destroy$)` with `Subject` in `ngOnDestroy`.
-4. Using `Subscription.add()` and unsubscribing in `ngOnDestroy`.
+**In Simple Words:**
+1. Use the `async` pipe in templates (handles unsubscription automatically).
+2. Use the `takeUntilDestroyed()` operator in TypeScript (Angular 16+).
+3. Use Signals instead of Observables for UI state.
 
-### 65. What is Deferrable Views (@defer) and how does it improve initial bundle performance?
-**Answer:**
-`@defer` enables declarative lazy-loading of template sections:
+### 65. What are Deferrable Views (@defer)?
+**In Simple Words:**
+A declarative feature in Angular 17+ that automatically lazy-loads component bundles when a condition is met (such as scrolling into view):
 ```html
-@defer (on viewport; prefetch on idle) {
+@defer (on viewport) {
   <app-heavy-chart />
 } @placeholder {
-  <div class="skeleton">Chart Loading Placeholder</div>
-} @loading (minimum 500ms) {
-  <app-spinner />
-} @error {
-  <p>Failed to load chart.</p>
+  <div>Loading chart placeholder...</div>
 }
 ```
-The JavaScript bundle for `<app-heavy-chart>` is completely extracted from the main bundle and loaded on-demand.
 
-### 66. What is the difference between @ViewChild, @ViewChildren, @ContentChild, and @ContentChildren?
-**Answer:**
-- `@ViewChild` / `@ViewChildren`: Queries elements or components within the component's **own template**.
-- `@ContentChild` / `@ContentChildren`: Queries projected elements passed into `<ng-content>`.
+### 66. @ViewChild vs @ContentChild.
+**In Simple Words:**
+- `@ViewChild`: Queries elements located inside the component's **own template**.
+- `@ContentChild`: Queries elements **projected** into the component from the outside via `<ng-content>`.
 
-### 67. How does the Angular Hierarchical Dependency Injection system work?
-**Answer:**
-Angular has two injector hierarchies:
-1. **EnvironmentInjector**: Root, Platform, and Route-scoped injectors.
-2. **ElementInjector**: Created at each DOM element hosting a component/directive.
-Angular resolution walks upward from the ElementInjector to parent elements, then through the EnvironmentInjector up to Root.
+### 67. How does Angular's Hierarchical Dependency Injection work?
+**In Simple Words:**
+Angular has an injector tree. When a component asks for a service, Angular looks at the component's own element injector; if not found, it checks parent components up the tree, and finally checks the root injector.
 
-### 68. How do toSignal and toObservable facilitate RxJS and Signals interoperability?
-**Answer:**
-- `toSignal(observable$)`: Converts an RxJS stream into an Angular Signal, subscribing and cleaning up automatically.
-- `toObservable(signal)`: Creates an Observable stream from an Angular Signal that emits whenever the signal value changes.
+### 68. What are toSignal and toObservable?
+**In Simple Words:**
+Bridges between RxJS and Signals:
+- `toSignal(obs$)`: Converts an RxJS stream into an Angular Signal.
+- `toObservable(sig)`: Converts an Angular Signal into an RxJS Observable stream.
 
-### 69. What is Zoneless Angular and how does it improve application efficiency?
-**Answer:**
-Zoneless Angular removes `zone.js` monkey-patching of browser APIs. Change Detection is triggered precisely by Signal updates or explicit notification (`ChangeDetectorRef.markForCheck()`), resulting in smaller bundle size, faster startup, and clearer stack traces.
+### 69. What is Zoneless Angular?
+**In Simple Words:**
+Angular without `zone.js`. Instead of checking the whole app whenever any browser event occurs, Angular updates only when Signals change or when explicitly notified, resulting in faster performance and smaller bundles.
 
-### 70. What is the difference between inject() and constructor-based Dependency Injection?
-**Answer:**
-`inject(Service)` allows injecting dependencies during constructor execution or property initialization without declaring constructor parameters, enabling composable functional utilities (functional guards, custom hooks).
+### 70. inject() vs Constructor Injection.
+**In Simple Words:**
+`inject(Service)` is modern functional dependency injection. It allows injecting services directly inside field initializers or functional guards without declaring them in a constructor parameter.
 
-### 71. What are Signal-based inputs, outputs, and model bindings?
-**Answer:**
-- `input()`: Reactive read-only signal input (`name = input<string>('')`).
-- `output()`: Modern signal-compatible event emitter (`save = output<User>()`).
-- `model()`: Creates a two-way signal binding between parent and child (`count = model<number>(0)`).
+### 71. What are Signal-based inputs, outputs, and models?
+**In Simple Words:**
+Modern Angular 17+ APIs replacing decorators:
+- `name = input<string>('')`: Read-only signal input.
+- `saved = output<User>()`: Signal-friendly event output.
+- `value = model<number>(0)`: Two-way binding signal.
 
-### 72. How does the Angular Image Directive (NgOptimizedImage) improve Core Web Vitals?
-**Answer:**
-Enforces responsive `srcset`, prevents layout shift via automatic width/height attributes, generates resource hints (`priority` adds `fetchpriority="high"` for LCP images), and integrates with image CDNs.
+### 72. How does NgOptimizedImage improve performance?
+**In Simple Words:**
+The `ngSrc` directive automatically prevents layout shift (CLS) by enforcing dimensions, generates responsive `srcset`, and sets `fetchpriority="high"` for the largest above-the-fold image (LCP).
 
-### 73. What is Hydration in Angular SSR, and what is Event Replaying?
-**Answer:**
-- **Non-destructive Hydration**: Reuses server-rendered DOM nodes rather than clearing and re-rendering them.
-- **Event Replaying**: Captures user events (clicks, inputs) that occurred before hydration finished and replays them once JavaScript is interactive.
+### 73. What is Hydration in Angular SSR?
+**In Simple Words:**
+Instead of destroying server-rendered HTML and re-creating the DOM in the browser (which causes a flicker), Angular **hydrates** the existing DOM, attaching event listeners seamlessly.
 
-### 74. What are Custom Form Controls with ControlValueAccessor?
-**Answer:**
-`ControlValueAccessor` is the interface bridging Angular forms API and native DOM elements:
-Requires: `writeValue(val)`, `registerOnChange(fn)`, `registerOnTouched(fn)`, `setDisabledState(isDisabled)`.
+### 74. What is ControlValueAccessor?
+**In Simple Words:**
+The bridge interface that allows custom UI components (like a custom star-rating component) to work seamlessly with Angular Reactive Forms (`formControlName`).
 
-### 75. How do you implement Route Preloading Strategies in Angular?
-**Answer:**
-Preloads lazy modules in the background after initial bundle load:
-- `PreloadAllModules`: Preloads all lazy routes.
-- Custom Preloading Strategy: Checks route data flags (e.g., `data: { preload: true }`).
+### 75. What are Route Preloading Strategies?
+**In Simple Words:**
+After the initial page loads, Angular can download lazy-loaded route bundles in the background (`PreloadAllModules`) so future user navigations are instant.
 
-### 76. What is the difference between @HostBinding, @HostListener, and the host property in @Component metadata?
-**Answer:**
-`@HostBinding` and `@HostListener` bind properties and events to the host DOM element. In modern Angular, using the `host: { '[class.active]': 'isActive', '(click)': 'onClick()' }` property in `@Component` metadata is preferred because it avoids decorator runtime overhead.
+### 76. @HostBinding vs @HostListener vs host property.
+**In Simple Words:**
+- `@HostBinding`: Binds a property (like a CSS class) to the host DOM element.
+- `@HostListener`: Listens to an event (like `click`) on the host DOM element.
+- Modern best practice uses the `host: { '[class.active]': 'isActive' }` object in `@Component` metadata to avoid decorator overhead.
 
-### 77. What are Dynamic Components and how are they created using ViewContainerRef?
-**Answer:**
-Components instantiated programmatically at runtime:
-```typescript
-const container = this.viewContainerRef;
-container.clear();
-const compRef = container.createComponent(DynamicModalComponent);
-compRef.setInput('title', 'Confirmation');
-```
+### 77. What are Dynamic Components?
+**In Simple Words:**
+Components created programmatically at runtime using `ViewContainerRef.createComponent(ModalComponent)` rather than writing them directly in HTML templates.
 
 ---
 
 ## Part 3: JavaScript Core Internals & Advanced Patterns (78 - 160)
 
-### 78. What are the different data types present in JavaScript?
-**Answer:**
+### 78. What are the different data types in JavaScript?
+**In Simple Words:**
 - **7 Primitives**: `string`, `number`, `bigint`, `boolean`, `undefined`, `symbol`, `null`.
-- **Reference Types**: `Object` (including `Array`, `Function`, `Date`, `RegExp`, `Map`, `Set`).
+- **Reference Types**: `Object` (including Arrays, Functions, Dates, Maps, Sets).
 
 ### 79. Explain Hoisting in JavaScript.
-**Answer:**
-Hoisting is JavaScript's default behavior of moving variable and function declarations to the top of their containing scope during the compilation phase:
-- `var` is hoisted and initialized with `undefined`.
-- `function` declarations are hoisted with their complete implementation.
-- `let` and `const` are hoisted but remain uninitialized in the **Temporal Dead Zone (TDZ)** until their declaration line is executed.
+**In Simple Words:**
+JavaScript moves variable and function declarations to the top of their scope before executing code.
+- `var`: Hoisted and given `undefined`.
+- `let` and `const`: Hoisted into the **Temporal Dead Zone (TDZ)**; accessing them before declaration throws `ReferenceError`.
+- Function Declarations: Fully hoisted with their body.
 
-### 80. Why do we use the word "debugger" in JavaScript?
-**Answer:**
-The `debugger;` statement acts as a programmatic breakpoint. If browser developer tools are open, execution pauses immediately at that line, allowing inspection of variables and call stack.
+### 80. Why do we use the "debugger" keyword?
+**In Simple Words:**
+It acts as a code breakpoint. If browser DevTools are open, JavaScript execution pauses at that line so you can inspect variables and the call stack.
 
 ### 81. Difference between "==" and "===" operators.
-**Answer:**
-- `==` (Loose Equality): Performs type coercion if the operands are of different types before comparing values.
-- `===` (Strict Equality): Compares both value and type without coercion.
+**In Simple Words:**
+- `==` (Loose): Converts types automatically before comparing (`'5' == 5` is true).
+- `===` (Strict): Checks both value and type without conversion (`'5' === 5` is false).
 
-### 82. Difference between var and let keyword in JavaScript.
-**Answer:**
+### 82. Difference between var and let keyword.
+**In Simple Words:**
 - `var`: Function-scoped, can be re-declared, hoisted with `undefined`.
-- `let`: Block-scoped (`{}`), cannot be re-declared in same scope, hoisted into TDZ.
+- `let`: Block-scoped (`{}`), cannot be re-declared in the same scope, stays in TDZ until declared.
 
-### 83. Explain Implicit Type Coercion in JavaScript.
-**Answer:**
-Automatic conversion of values from one data type to another:
-- String coercion: `1 + '2' === '12'`.
-- Number coercion: `'6' / '2' === 3`, `+'5' === 5`, `true + 1 === 2`.
-- Boolean coercion in conditionals: `0`, `""`, `null`, `undefined`, `NaN` coerce to `false`.
+### 83. Explain Implicit Type Coercion.
+**In Simple Words:**
+JavaScript automatically converts one type into another behind the scenes:
+- `1 + '2' === '12'` (Number converted to String).
+- `'6' / '2' === 3` (String converted to Number).
 
-### 84. Is JavaScript a statically typed or a dynamically typed language?
-**Answer:**
-Dynamically typed: Variable types are determined and checked at runtime rather than compile-time. A variable can hold a number and later be assigned a string.
+### 84. Is JavaScript statically typed or dynamically typed?
+**In Simple Words:**
+Dynamically typed: Variable types are determined at runtime. A variable can hold a number and later hold a string.
 
-### 85. What is NaN property in JavaScript?
-**Answer:**
-`NaN` stands for "Not-a-Number", representing a computational error resulting from an undefined or unrepresentable numerical operation (`'abc' / 2`). Type of `NaN` is `'number'`. `NaN !== NaN`; check using `Number.isNaN(val)`.
+### 85. What is the NaN property?
+**In Simple Words:**
+Stands for "Not-a-Number", representing an invalid mathematical result (e.g. `'abc' / 2`). Its type is `'number'`. `NaN !== NaN`; check using `Number.isNaN(val)`.
 
-### 86. Explain passed by value and passed by reference.
-**Answer:**
-- **Primitives**: Passed by value (a copy of the actual value is passed into functions; mutating it does not affect the original).
-- **Objects/Arrays**: Passed by value of the reference (the reference address is copied; mutating object properties modifies the original object, but reassigning the variable does not replace the original reference).
+### 86. Pass by value vs Pass by reference.
+**In Simple Words:**
+- **Primitives** are passed by value: A fresh copy of the data is passed.
+- **Objects/Arrays** are passed by reference: The memory address is passed. Modifying an object property inside a function changes the original object outside.
 
-### 87. What is an Immediately Invoked Function in JavaScript?
-**Answer:**
-An IIFE is a function that executes immediately upon definition:
-```javascript
-(function() {
-  const privateToken = 'secret';
-  // Scoped variables do not leak into global namespace
-})();
-```
+### 87. What is an IIFE (Immediately Invoked Function Expression)?
+**In Simple Words:**
+A function that runs as soon as it is defined: `(function() { ... })();`. Used to create private scope so variables don't pollute the global window.
 
-### 88. What do you mean by strict mode in JavaScript and its characteristics?
-**Answer:**
-Enforced by `'use strict';`:
-- Prevents accidental global variables (`x = 10;` throws ReferenceError).
-- Throws errors on non-writable properties.
-- Disallows duplicate parameter names (`function(a, a) {}`).
-- Makes `this` inside standard functions `undefined` instead of `window`.
+### 88. What is strict mode in JavaScript?
+**In Simple Words:**
+Enabled by `'use strict';`. Catches common bugs by throwing errors on accidental globals (`x = 10`), preventing duplicate function parameters, and making `this` undefined in standard functions.
 
-### 89. Explain Higher Order Functions in JavaScript.
-**Answer:**
-A function that accepts one or more functions as arguments, or returns a function as its result (e.g., `map()`, `filter()`, `reduce()`, function decorators).
+### 89. Explain Higher Order Functions.
+**In Simple Words:**
+A function that takes another function as an argument, or returns a function (e.g. `map()`, `filter()`, `reduce()`).
 
-### 90. Explain "this" keyword.
-**Answer:**
-`this` refers to the object executing the current function:
-1. **Default Binding**: Global object (`window` or `undefined` in strict mode).
-2. **Implicit Binding**: Object before the dot (`obj.method()` -> `this` is `obj`).
-3. **Explicit Binding**: Set via `call()`, `apply()`, or `bind()`.
-4. **New Binding**: Newly constructed object in constructor functions.
-5. **Arrow Functions**: Lexically inherits `this` from enclosing scope.
+### 90. Explain the "this" keyword.
+**In Simple Words:**
+`this` refers to the object that is currently executing the function:
+1. `obj.method()`: `this` is `obj`.
+2. Alone in global: `this` is `window`.
+3. Inside `call`/`apply`/`bind`: `this` is the explicitly provided object.
+4. Inside Arrow Function: `this` is inherited from the surrounding code.
 
-### 91. What do you mean by Self Invoking Functions?
-**Answer:**
-Another term for IIFEs (Immediately Invoked Function Expressions) that invoke themselves without an explicit call by name.
+### 91. What are Self Invoking Functions?
+**In Simple Words:**
+Another name for IIFEs—functions that execute automatically without being called by name.
 
-### 92. Explain call(), apply(), and bind() methods.
-**Answer:**
-- `fn.call(thisArg, arg1, arg2)`: Invokes `fn` immediately with provided `this` and comma-separated arguments.
-- `fn.apply(thisArg, [args])`: Invokes `fn` immediately with provided `this` and an array of arguments.
-- `fn.bind(thisArg, arg1)`: Returns a **new function** with `this` permanently bound.
+### 92. Explain call(), apply(), and bind().
+**In Simple Words:**
+Methods to explicitly set the `this` context:
+- `fn.call(obj, arg1, arg2)`: Calls function immediately with comma-separated arguments.
+- `fn.apply(obj, [args])`: Calls function immediately with an array of arguments.
+- `fn.bind(obj)`: Returns a **new function** with `this` permanently set.
 
-### 93. What is the difference between exec() and test() methods in JavaScript?
-**Answer:**
-- `regex.test(str)`: Returns boolean `true` or `false` indicating match existence.
-- `regex.exec(str)`: Returns an array with match details, capture groups, and index, or `null`.
+### 93. exec() vs test() in Regular Expressions.
+**In Simple Words:**
+- `regex.test(str)`: Returns boolean `true` or `false`.
+- `regex.exec(str)`: Returns an array with match details and capture groups, or `null`.
 
-### 94. What is currying in JavaScript?
-**Answer:**
-Transforming a function with multiple arguments `fn(a, b, c)` into a sequence of functions each taking a single argument `fn(a)(b)(c)`.
+### 94. What is Currying?
+**In Simple Words:**
+Transforming a function that takes multiple arguments `f(a, b, c)` into a chain of functions that each take one argument: `f(a)(b)(c)`.
 
-### 95. What are some advantages of using External JavaScript?
-**Answer:**
-Separation of HTML and JavaScript logic, browser caching of `.js` files, cleaner code, and code reusability across multiple pages.
+### 95. Advantages of External JavaScript.
+**In Simple Words:**
+Separates HTML and logic, enables browser caching of `.js` files, and makes code reusable across multiple pages.
 
-### 96. Explain Scope and Scope Chain in JavaScript.
-**Answer:**
-- **Scope**: Current context of execution determining visibility of identifiers (Global, Function, Block).
-- **Scope Chain**: When a variable is referenced, the JS engine searches the local scope; if not found, it traverses outer parent lexical scopes up to the global scope.
+### 96. Explain Scope and Scope Chain.
+**In Simple Words:**
+Scope defines where variables are accessible (Global, Function, or Block `{}`). When a variable is accessed, JavaScript looks in the current scope; if not found, it traverses outer parent scopes (Scope Chain) up to Global.
 
 ### 97. Explain Closures in JavaScript.
-**Answer:**
-A closure is the combination of a function bundled together with references to its surrounding lexical environment, allowing an inner function to access an outer function's scope even after the outer function has returned.
+**In Simple Words:**
+A closure gives an inner function access to an outer function's variables, even after the outer function has finished executing.
+```javascript
+function makeCounter() {
+  let count = 0;
+  return () => ++count; // Closures over count
+}
+const counter = makeCounter();
+counter(); // 1
+counter(); // 2
+```
 
-### 98. Mention some advantages of JavaScript.
-**Answer:**
-Runs natively in all browsers, supports asynchronous and event-driven architecture, vast ecosystem (npm), cross-platform (Node.js, mobile via React Native), rich UI interactivity.
+### 98. Mention advantages of JavaScript.
+**In Simple Words:**
+Runs natively in all browsers, non-blocking asynchronous event loop, massive ecosystem (npm), and works across frontend, backend (Node.js), and mobile.
 
 ### 99. What are object prototypes?
-**Answer:**
-Every JavaScript object has an internal `[[Prototype]]` link. When a property or method is accessed on an object and not found, JavaScript searches up the Prototype Chain until it reaches `Object.prototype` or `null`.
+**In Simple Words:**
+Every JavaScript object has an internal link to a prototype object. If a property is not found on an object, JavaScript looks up the Prototype Chain until it finds it or hits `null`.
 
 ### 100. What are callbacks?
-**Answer:**
-A function passed as an argument to another function, intended to be executed after the parent function has completed an operation (frequently asynchronous).
+**In Simple Words:**
+A function passed into another function to be called later after an asynchronous task (like a timer or network request) finishes.
 
-### 101. What are the types of errors in JavaScript?
-**Answer:**
-`SyntaxError`, `ReferenceError`, `TypeError`, `RangeError`, `URIError`, `EvalError`.
+### 101. What are the common error types in JavaScript?
+**In Simple Words:**
+`SyntaxError` (invalid syntax), `ReferenceError` (variable doesn't exist), `TypeError` (calling a non-function or reading property of null/undefined).
 
 ### 102. What is memoization?
-**Answer:**
-An optimization technique that speeds up programs by caching the results of expensive pure function calls and returning the cached result when the same inputs occur again.
+**In Simple Words:**
+An optimization technique that caches the return value of an expensive function call so future calls with the same inputs return the cached answer instantly.
 
-### 103. What is recursion in a programming language?
-**Answer:**
-A programming pattern where a function calls itself directly or indirectly to solve smaller instances of the same problem until a base condition is met.
+### 103. What is recursion?
+**In Simple Words:**
+A function that calls itself until it reaches a base stopping condition.
 
-### 104. What is the use of a constructor function in JavaScript?
-**Answer:**
-Used with the `new` keyword to create and initialize multiple instances of an object with shared properties and prototype methods.
+### 104. What is a constructor function?
+**In Simple Words:**
+A function used with the `new` keyword to create multiple object instances sharing properties and prototype methods.
 
-### 105. What is DOM?
-**Answer:**
-Document Object Model: A tree-like programmatic representation of an HTML document where every node represents an element, attribute, or piece of text, accessible via JavaScript.
+### 105. What is the DOM?
+**In Simple Words:**
+Document Object Model: A tree representation of HTML elements that JavaScript can inspect, style, and manipulate.
 
-### 106. Which method is used to retrieve a character from a certain index?
-**Answer:**
-`str.charAt(index)` or `str.at(index)` (which supports negative indices) or bracket notation `str[index]`.
+### 106. How do you get a character at a specific index?
+**In Simple Words:**
+`str.charAt(index)` or `str.at(index)` (which supports negative indices like `str.at(-1)` for the last character).
 
-### 107. What do you mean by BOM?
-**Answer:**
-Browser Object Model: Provides objects representing the browser environment beyond the document (e.g., `window`, `navigator`, `location`, `history`, `screen`).
+### 107. What is the BOM?
+**In Simple Words:**
+Browser Object Model: Browser objects outside the page document, like `window`, `navigator`, `history`, and `location`.
 
-### 108. What is the distinction between client-side and server-side JavaScript?
-**Answer:**
-- **Client-Side (Browser)**: Has access to DOM, BOM, LocalStorage, Fetch; restricted from direct OS filesystem and network socket access.
-- **Server-Side (Node.js)**: Has access to filesystem (`fs`), OS threads, raw sockets, process signals; lacks DOM/window.
+### 108. Client-side vs Server-side JavaScript.
+**In Simple Words:**
+- **Client-Side (Browser)**: Has access to DOM, `window`, LocalStorage; cannot access server files or raw OS network sockets.
+- **Server-Side (Node.js)**: Has access to filesystem (`fs`), database drivers, OS threads; has no DOM or `window`.
 
 ### 109. What are arrow functions?
-**Answer:**
-Compact ES6 function expressions (`() => {}`):
-- Do not have their own `this`, `arguments`, `super`, or `new.target`.
-- Cannot be used as constructor functions with `new`.
+**In Simple Words:**
+Compact function expressions `() => {}` that do not bind their own `this`, `arguments`, or `super`. They inherit `this` from their outer lexical context.
 
-### 110. What do you mean by prototype design pattern?
-**Answer:**
-A design pattern where objects serve as prototypes to create new objects via cloning or delegation (`Object.create()`), avoiding class overhead.
+### 110. What is the Prototype Design Pattern?
+**In Simple Words:**
+Creating new objects by cloning or delegating to an existing prototype object (`Object.create(proto)`) instead of defining classes.
 
-### 111. Differences between declaring variables using var, let and const.
-**Answer:**
-- `var`: Function-scoped, re-declarable, mutable, hoisted with `undefined`.
-- `let`: Block-scoped, non-re-declarable in same scope, mutable, TDZ.
-- `const`: Block-scoped, non-re-declarable, immutable binding (must be initialized immediately; object properties can still mutate).
+### 111. Differences: var, let, and const.
+**In Simple Words:**
+- `var`: Function-scoped, can be re-declared and updated, hoisted with `undefined`.
+- `let`: Block-scoped, can be updated but not re-declared in the same block, TDZ.
+- `const`: Block-scoped, cannot be updated or re-declared, must be initialized immediately.
 
-### 112. What is the rest parameter and spread operator?
-**Answer:**
-- **Rest Parameter (`...args`)**: Gathers remaining function arguments into a genuine array.
-- **Spread Operator (`...arr`)**: Expands an iterable into individual elements.
+### 112. Rest Parameter vs Spread Operator.
+**In Simple Words:**
+Both use `...`:
+- **Rest (`...args`)**: Gathers multiple arguments into a single array inside function parameters.
+- **Spread (`...arr`)**: Expands an array into individual values inside a function call or new array.
 
-### 113. In JavaScript, how many different methods can you make an object?
-**Answer:**
-1. Object Literal: `{ a: 1 }`
-2. Constructor Function: `new Person()`
-3. ES6 Class: `new User()`
+### 113. How many ways can you create an object in JavaScript?
+**In Simple Words:**
+1. Object literal `{ a: 1 }`
+2. Constructor function `new Person()`
+3. ES6 Class `new User()`
 4. `Object.create(proto)`
-5. `Object.assign({}, source)`
-6. Factory Function returning an object.
+5. Factory function returning an object.
 
-### 114. What is the use of promises in JavaScript?
-**Answer:**
-An abstraction representing the eventual completion (or failure) of an asynchronous operation and its resulting value, avoiding nested callback hell.
+### 114. What are Promises in JavaScript?
+**In Simple Words:**
+An object representing the eventual completion (or failure) of an asynchronous task, replacing messy nested callback hell.
 
 ### 115. What are classes in JavaScript?
-**Answer:**
-Syntactic sugar over JavaScript's existing prototype-based inheritance model, providing clearer syntax for constructors, methods, getters/setters, and inheritance via `extends`.
+**In Simple Words:**
+Syntactic sugar over JavaScript's existing prototype-based inheritance, providing a cleaner way to write constructors, methods, and `extends`.
 
 ### 116. What are generator functions?
-**Answer:**
-Functions declared with `function*` that can be paused mid-execution using `yield` and resumed using `.next()`, returning an iterator object `{ value, done }`.
+**In Simple Words:**
+Functions written with `function*` that can pause execution using `yield` and resume using `.next()`, returning `{ value, done }`.
 
-### 117. Explain WeakSet in JavaScript.
-**Answer:**
-A Set collection holding only weakly held objects:
-- Objects can be garbage collected if there are no other references to them.
-- Not iterable (no `.size`, no `forEach()`).
+### 117. What is a WeakSet?
+**In Simple Words:**
+A Set that stores only objects and holds them weakly. If there are no other references to an object in memory, it gets garbage-collected.
 
 ### 118. Why do we use callbacks?
-**Answer:**
-To handle asynchronous events (I/O, timer completion, network requests) non-blockingly without freezing the browser's single main thread.
+**In Simple Words:**
+To handle asynchronous tasks (like user clicks or API calls) without freezing the browser's single main thread.
 
-### 119. Explain WeakMap in JavaScript.
-**Answer:**
-A key-value map where keys must be objects and are held weakly. If an object key is dereferenced elsewhere, the entry is automatically garbage-collected.
+### 119. What is a WeakMap?
+**In Simple Words:**
+A Map where keys must be objects and are held weakly, allowing automatic garbage collection when keys are deleted elsewhere.
 
 ### 120. What is Object Destructuring?
-**Answer:**
-An ES6 expression unpacking properties from objects into distinct variables: `const { name, age } = user;`.
+**In Simple Words:**
+Extracting properties from an object into distinct variables in one line: `const { name, age } = user;`.
 
-### 121. Difference between prototypal and classical inheritance.
-**Answer:**
-- **Classical**: Classes are blueprints; instances are created by copying class definitions.
-- **Prototypal**: Objects inherit directly from other objects through prototype delegation links.
+### 121. Prototypal vs Classical Inheritance.
+**In Simple Words:**
+- **Classical**: Classes are blueprints; objects are instantiated by copying class structures.
+- **Prototypal**: Objects inherit directly from other objects via prototype reference links.
 
-### 122. What is a Temporal Dead Zone?
-**Answer:**
-The phase between the start of a block scope and the line where a `let` or `const` variable is declared. Accessing the variable within the TDZ throws a `ReferenceError`.
+### 122. What is the Temporal Dead Zone (TDZ)?
+**In Simple Words:**
+The zone between the start of a block and the line where a `let` or `const` is declared. Accessing the variable inside this zone throws a `ReferenceError`.
 
-### 123. What do you mean by JavaScript Design Patterns?
-**Answer:**
-Standardized architectural solutions to recurring software engineering problems: Singleton, Factory, Observer/Pub-Sub, Module, Strategy, and Decorator.
+### 123. What are JavaScript Design Patterns?
+**In Simple Words:**
+Proven solutions to recurring coding problems: Singleton, Factory, Pub-Sub (Observer), Module, and Strategy patterns.
 
-### 124. Is JavaScript a pass-by-reference or pass-by-value language?
-**Answer:**
-JavaScript is strictly **pass-by-value**. When passing an object, the value passed is the copy of the memory address reference.
+### 124. Is JavaScript pass-by-reference or pass-by-value?
+**In Simple Words:**
+JavaScript is strictly **pass-by-value**. When you pass an object, the "value" passed is the copy of the reference address.
 
-### 125. Difference between Async/Await and Generators usage to achieve the same functionality.
-**Answer:**
-Async/Await is built specifically for Promise resolution and runs automatically via the runtime. Generators require an external runner (like `co`) to automatically step through yielded promises.
+### 125. Async/Await vs Generators.
+**In Simple Words:**
+Async/Await is built specifically for Promises and runs automatically. Generators pause on `yield` and require manual calling of `.next()` or a runner function.
 
-### 126. What are the primitive data types in JavaScript?
-**Answer:**
+### 126. What are the 7 primitive data types?
+**In Simple Words:**
 `string`, `number`, `bigint`, `boolean`, `undefined`, `symbol`, `null`.
 
-### 127. What is the role of deferred scripts in JavaScript?
-**Answer:**
-`<script defer src="...">` downloads the script in parallel with HTML parsing, but delays execution until the entire HTML document is parsed, executing in document order before `DOMContentLoaded`.
+### 127. What is the role of deferred scripts?
+**In Simple Words:**
+`<script defer src="...">` downloads the script in the background while HTML is being parsed, and executes only after HTML parsing completes, in document order.
 
-### 128. What has to be done in order to put Lexical Scoping into practice?
-**Answer:**
-Define functions nested inside outer functions. Inner functions retain access to their outer lexical scopes naturally based on where they were authored in the source code.
+### 128. What is Lexical Scoping?
+**In Simple Words:**
+Inner functions have access to variables in outer parent functions based on where functions were written in the source code.
 
-### 129. What is the purpose of the nested closure check()() code?
-**Answer:**
-Illustrates currying and private state persistence across invocations where the outer call returns an inner function that closes over outer variables.
+### 129. Purpose of nested closure check()() code.
+**In Simple Words:**
+Currying and function chaining where the first call configures parameters and returns an inner function that evaluates the final result.
 
-### 130. Output prediction: setTimeout scoping and event loop order.
+### 130. Event Loop Output Prediction:
 ```javascript
 console.log('1');
 setTimeout(() => console.log('2'), 0);
@@ -835,16 +778,16 @@ console.log('4');
 ```
 **Output**: `1, 4, 3, 2` (Synchronous -> Microtasks -> Macrotasks).
 
-### 131. Output prediction: Object keys coercion.
+### 131. Object Keys Coercion Prediction:
 ```javascript
 const a = {}, b = { key: 'b' }, c = { key: 'c' };
 a[b] = 123;
 a[c] = 456;
 console.log(a[b]);
 ```
-**Output**: `456`. Object keys coerce to string `'[object Object]'`. Both `a[b]` and `a[c]` write to `a['[object Object]']`.
+**Output**: `456`. Object keys coerce to string `'[object Object]'`, so both `a[b]` and `a[c]` set the exact same key.
 
-### 132. Output prediction: Nested IIFE hoisting with var x = 21.
+### 132. Nested IIFE Hoisting with var x = 21:
 ```javascript
 var x = 21;
 var girl = function () {
@@ -853,28 +796,25 @@ var girl = function () {
 };
 girl();
 ```
-**Output**: `undefined`. Inside `girl()`, local `var x` is hoisted to the top of the function and initialized with `undefined`.
+**Output**: `undefined`. The local `var x` inside `girl()` is hoisted to the top of the function and initialized with `undefined`.
 
-### 133. Output prediction: hero.getPower context loss.
+### 133. Context Loss Prediction:
 ```javascript
-const hero = {
-  power: 99,
-  getPower() { return this.power; }
-};
+const hero = { power: 99, getPower() { return this.power; } };
 const fn = hero.getPower;
 console.log(fn());
 ```
-**Output**: `undefined` (or error in strict mode). When assigned to `fn`, the implicit `hero` binding is lost; `this` defaults to global.
+**Output**: `undefined`. Calling `fn()` loses the implicit `hero` context; `this` falls back to global window.
 
-### 134. Output prediction: Loop timer closures.
+### 134. Loop Timer Closures Prediction:
 ```javascript
 for (var i = 0; i < 3; i++) {
   setTimeout(() => console.log(i), 100);
 }
 ```
-**Output**: `3, 3, 3`. `var` is function-scoped; all callbacks share the single mutated `i`. Fix: replace `var` with `let`.
+**Output**: `3, 3, 3`. `var` is function-scoped; all timers share the same final `i = 3`. Fix: change `var` to `let`.
 
-### 135. Write a function that performs binary search on a sorted array.
+### 135. Binary Search implementation:
 ```javascript
 function binarySearch(arr, target) {
   let left = 0, right = arr.length - 1;
@@ -888,7 +828,7 @@ function binarySearch(arr, target) {
 }
 ```
 
-### 136. Implement right rotation of array by r positions.
+### 136. Right rotate array by r positions:
 ```javascript
 function rotateRight(arr, r) {
   const k = r % arr.length;
@@ -896,24 +836,23 @@ function rotateRight(arr, r) {
 }
 ```
 
-### 137. Code for dynamically inserting new nodes in the DOM.
+### 137. Dynamically insert new DOM node:
 ```javascript
 const parent = document.getElementById('container');
 const newElement = document.createElement('div');
-newElement.className = 'card-item';
-newElement.textContent = 'Dynamically Inserted Item';
+newElement.textContent = 'Dynamic Node';
 parent.appendChild(newElement);
 ```
 
-### 138. Check if two strings are anagrams.
+### 138. Check if two strings are anagrams:
 ```javascript
 function isAnagram(s1, s2) {
-  const clean = s => s.toLowerCase().replace(/[^a-z0-9]/g, '').split('').sort().join('');
-  return clean(s1) === clean(s2);
+  const format = s => s.toLowerCase().replace(/[^a-z0-9]/g, '').split('').sort().join('');
+  return format(s1) === format(s2);
 }
 ```
 
-### 139. Find number of vowels in a string.
+### 139. Count vowels in a string:
 ```javascript
 function countVowels(str) {
   const matches = str.match(/[aeiou]/gi);
@@ -921,51 +860,51 @@ function countVowels(str) {
 }
 ```
 
-### 140. Turn an Object into an Array.
+### 140. Turn an Object into an Array:
 ```javascript
-const obj = { a: 1, b: 2 };
-Object.keys(obj);    // ['a', 'b']
-Object.values(obj);  // [1, 2]
-Object.entries(obj); // [['a', 1], ['b', 2]]
+const user = { name: 'Alex', age: 28 };
+Object.keys(user);   // ['name', 'age']
+Object.values(user); // ['Alex', 28]
+Object.entries(user);// [['name', 'Alex'], ['age', 28]]
 ```
 
-### 141. Output prediction: let vs var in setTimeout loop.
-With `let`, a new block scope binding is created per iteration: `0, 1, 2`.
+### 141. let vs var in setTimeout loop:
+With `let`, a new block scope binding is created for every loop iteration, logging `0, 1, 2` as expected.
 
-### 142. What is the Event Loop, and how do Microtasks and Macrotasks differ?
-- **Call Stack**: Executes synchronous frames.
-- **Microtask Queue**: Promises (`.then`), `queueMicrotask`, `MutationObserver`. Drains **completely** after every stack execution before the next render.
-- **Macrotask Queue**: `setTimeout`, `setInterval`, I/O, UI rendering events. Executes one task per tick.
+### 142. What is the Event Loop?
+**In Simple Words:**
+The Event Loop checks if the Call Stack is empty. If it is empty, it runs all waiting **Microtasks** (Promises), and then picks the next **Macrotask** (`setTimeout`).
 
-### 143. Difference between shallow copy and deep copy, and how to achieve each?
-- **Shallow Copy**: Copies first-level properties; nested references are shared (`{ ...obj }`, `Object.assign()`).
-- **Deep Copy**: Clones all nested objects recursively (`structuredClone(obj)` or custom recursive cloning).
+### 143. Shallow Copy vs Deep Copy:
+- **Shallow Copy (`{ ...obj }`)**: Copies only the top-level properties; nested objects share the same memory reference.
+- **Deep Copy (`structuredClone(obj)`)**: Recursively copies all nested objects into fresh memory.
 
-### 144. Debouncing and Throttling.
-- **Debounce**: Delays execution until $N$ ms have elapsed since the *last* invocation (search inputs).
-- **Throttle**: Guarantees execution at most once every $N$ ms (scroll, resize).
+### 144. Debouncing vs Throttling:
+- **Debounce**: Waits until $N$ ms of silence after the *last* event before firing (search box typing).
+- **Throttle**: Executes at most once every $N$ ms (scrolling, window resizing).
 
-### 145. Event Bubbling, Event Capturing, and Event Delegation.
-- **Capturing (Trickling)**: Event travels down from `window` to the target.
-- **Bubbling**: Event bubbles up from target to `window`.
-- **Delegation**: Attaching a single listener to a parent element to handle events on dynamic children via `e.target`.
+### 145. Event Bubbling vs Capturing vs Delegation:
+- **Capturing**: Event travels down from window to target.
+- **Bubbling**: Event travels up from target to window.
+- **Delegation**: Attaching one listener to a parent element to handle events on dynamic children via `e.target`.
 
-### 146. Proxy and Reflect objects in JavaScript.
-`Proxy` wraps an object to intercept fundamental operations (`get`, `set`, `deleteProperty`). `Reflect` provides standard methods to forward intercepted operations to target objects cleanly.
+### 146. Proxy and Reflect:
+`Proxy` wraps an object to intercept operations (`get`, `set`). `Reflect` provides standard methods to forward intercepted operations to target objects cleanly.
 
-### 147. Differences between Promise combinators.
-- `Promise.all`: Rejects immediately if any promise rejects; resolves array of all when all resolve.
-- `Promise.allSettled`: Waits for all to complete; never rejects early; returns array of `{ status, value/reason }`.
-- `Promise.race`: Settles as soon as the first promise settles (resolves or rejects).
-- `Promise.any`: Resolves as soon as the first promise fulfills; rejects if all reject (`AggregateError`).
+### 147. Promise.all vs allSettled vs race vs any:
+- `Promise.all`: Fails fast if any promise rejects; succeeds when all resolve.
+- `Promise.allSettled`: Waits for all to finish; never fails fast; returns status of each.
+- `Promise.race`: Resolves or rejects as soon as the first promise settles.
+- `Promise.any`: Resolves on the first fulfilled promise; rejects only if all fail.
 
-### 148. Differences between Map, Set, WeakMap, and WeakSet.
-`Map` allows arbitrary keys (objects, primitives). `Set` stores unique values. `WeakMap`/`WeakSet` accept only objects as keys/values, allow garbage collection, and are non-iterable.
+### 148. Map, Set, WeakMap, WeakSet:
+`Map` allows keys of any type; `Set` stores unique values; `WeakMap`/`WeakSet` accept only objects as keys/values and allow automatic garbage collection.
 
-### 149. What are Web Workers and when should they be used?
-Web Workers run JavaScript in a separate OS thread without blocking the browser UI main thread. Used for heavy CPU tasks (image processing, large data parsing).
+### 149. What are Web Workers?
+**In Simple Words:**
+Background scripts running on a separate thread, ideal for CPU-heavy tasks without freezing the browser UI main thread.
 
-### 150. Implement custom Array.prototype.myMap and Array.prototype.myReduce.
+### 150. Custom Array.prototype.myMap:
 ```javascript
 Array.prototype.myMap = function(callback) {
   const result = [];
@@ -974,18 +913,9 @@ Array.prototype.myMap = function(callback) {
   }
   return result;
 };
-
-Array.prototype.myReduce = function(callback, initialValue) {
-  let acc = initialValue !== undefined ? initialValue : this[0];
-  let startIndex = initialValue !== undefined ? 0 : 1;
-  for (let i = startIndex; i < this.length; i++) {
-    if (i in this) acc = callback(acc, this[i], i, this);
-  }
-  return acc;
-};
 ```
 
-### 151. Flatten a deeply nested array without Array.prototype.flat.
+### 151. Flatten nested array without flat():
 ```javascript
 function flatten(arr) {
   return arr.reduce((acc, val) => 
@@ -993,50 +923,40 @@ function flatten(arr) {
 }
 ```
 
-### 152. Memory Leaks in JavaScript: Common causes.
-1. Accidental global variables (`window.leak = ...`).
-2. Forgotten timers or intervals (`setInterval`).
-3. Uncleared event listeners on detached DOM elements.
-4. Stale closures holding references to large objects.
+### 152. Memory Leaks in JavaScript:
+Accidental global variables, forgotten intervals (`setInterval`), uncleared event listeners on removed DOM nodes, and detached closures.
 
-### 153. How does V8 optimize JavaScript execution (Hidden Classes & Inline Caching)?
-V8 assigns hidden classes (Shapes) based on property creation order. Initializing properties in identical order allows V8 to use Inline Caching (IC) for fast direct property offset access.
+### 153. V8 Hidden Classes & Inline Caching:
+V8 optimizes property access by assigning objects with the same properties in the same order to identical Hidden Classes (Shapes), enabling fast cached memory lookups.
 
-### 154. How does the AbortController API work?
-Provides a signal to cancel ongoing async tasks:
+### 154. AbortController API:
+Used to cancel fetch requests and DOM listeners cleanly: `controller.abort()`.
+
+### 155. WeakRef and FinalizationRegistry:
+`WeakRef` holds a reference to an object without preventing garbage collection. `FinalizationRegistry` runs a callback when an object is garbage-collected.
+
+### 156. Deep Clone handling circular references:
 ```javascript
-const controller = new AbortController();
-fetch('/api/data', { signal: controller.signal });
-controller.abort(); // Immediately cancels network request
-```
-
-### 155. WeakRef and FinalizationRegistry.
-`WeakRef` creates a reference to an object without preventing garbage collection. `FinalizationRegistry` registers a callback to trigger after an object has been garbage collected.
-
-### 156. Robust deep clone handling circular references without structuredClone.
-```javascript
-function deepClone(obj, hash = new WeakMap()) {
+function deepClone(obj, map = new WeakMap()) {
   if (obj === null || typeof obj !== 'object') return obj;
-  if (hash.has(obj)) return hash.get(obj);
-  const clone = Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
-  hash.set(obj, clone);
-  for (const key of Reflect.ownKeys(obj)) {
-    clone[key] = deepClone(obj[key], hash);
-  }
-  return clone;
+  if (map.has(obj)) return map.get(obj);
+  const copy = Array.isArray(obj) ? [] : {};
+  map.set(obj, copy);
+  for (const k of Object.keys(obj)) copy[k] = deepClone(obj[k], map);
+  return copy;
 }
 ```
 
-### 157. Polyfill for Promise.all.
+### 157. Polyfill for Promise.all:
 ```javascript
 function promiseAll(promises) {
   return new Promise((resolve, reject) => {
     const results = [];
     let completed = 0;
     if (promises.length === 0) return resolve(results);
-    promises.forEach((p, index) => {
+    promises.forEach((p, i) => {
       Promise.resolve(p).then(val => {
-        results[index] = val;
+        results[i] = val;
         completed++;
         if (completed === promises.length) resolve(results);
       }, reject);
@@ -1045,51 +965,34 @@ function promiseAll(promises) {
 }
 ```
 
-### 158. Implement a Pub/Sub (Event Emitter) pattern.
+### 158. Pub/Sub (Event Emitter) Class:
 ```javascript
 class EventEmitter {
   constructor() { this.events = {}; }
-  on(event, listener) {
-    (this.events[event] = this.events[event] || []).push(listener);
-    return () => this.off(event, listener);
-  }
-  off(event, listener) {
-    if (!this.events[event]) return;
-    this.events[event] = this.events[event].filter(l => l !== listener);
-  }
-  emit(event, ...args) {
-    (this.events[event] || []).forEach(l => l(...args));
-  }
+  on(event, fn) { (this.events[event] = this.events[event] || []).push(fn); }
+  emit(event, ...args) { (this.events[event] || []).forEach(fn => fn(...args)); }
+  off(event, fn) { this.events[event] = (this.events[event] || []).filter(l => l !== fn); }
 }
 ```
 
-### 159. Output prediction: Tricky coercion.
-```javascript
-[] + [];    // ""
-[] + {};    // "[object Object]"
-{} + [];    // 0 (when parsed as block statement) or "[object Object]"
-```
+### 159. Output prediction: Coercion:
+`[] + []` is `""`. `[] + {}` is `"[object Object]"`.
 
-### 160. Implement an LRU Cache in JavaScript.
+### 160. LRU Cache implementation:
 ```javascript
 class LRUCache {
-  constructor(capacity) {
-    this.capacity = capacity;
-    this.map = new Map(); // JavaScript Map retains insertion order
-  }
+  constructor(capacity) { this.cap = capacity; this.map = new Map(); }
   get(key) {
     if (!this.map.has(key)) return -1;
     const val = this.map.get(key);
     this.map.delete(key);
-    this.map.set(key, val); // Move to most recently used
+    this.map.set(key, val);
     return val;
   }
-  put(key, value) {
+  put(key, val) {
     if (this.map.has(key)) this.map.delete(key);
-    else if (this.map.size >= this.capacity) {
-      this.map.delete(this.map.keys().next().value); // Evict oldest
-    }
-    this.map.set(key, value);
+    else if (this.map.size >= this.cap) this.map.delete(this.map.keys().next().value);
+    this.map.set(key, val);
   }
 }
 ```
@@ -1098,437 +1001,317 @@ class LRUCache {
 
 ## Part 4: Live Coding & Client Scenarios (161 - 175)
 
-### 161. Live Coding: Reverse word order and capitalize 3rd letter of each word without replace().
+### 161. Reverse word order and capitalize 3rd letter of each word without replace():
 ```javascript
 function reverseAndCapitalize(sentence) {
-  const words = sentence.trim().split(/\s+/).reverse();
-  const transformed = words.map(word => {
+  return sentence.trim().split(/\s+/).reverse().map(word => {
     if (word.length < 3) return word;
     return word.slice(0, 2) + word[2].toUpperCase() + word.slice(3);
-  });
-  return transformed.join(' ');
+  }).join(' ');
 }
 ```
 
-### 162. Live Coding: Given [1, 2, 3, 4, 5, 6], insert 7 after 3 and remove 5.
+### 162. Given [1, 2, 3, 4, 5, 6], insert 7 after 3 and remove 5:
 ```javascript
 const arr = [1, 2, 3, 4, 5, 6];
-// Insert 7 after 3: 3 is at index 2, so insert at index 3
-arr.splice(3, 0, 7); // [1, 2, 3, 7, 4, 5, 6]
-// Find and remove 5:
+arr.splice(3, 0, 7); // Inserts 7 at index 3
 const idx5 = arr.indexOf(5);
-if (idx5 !== -1) arr.splice(idx5, 1);
+if (idx5 !== -1) arr.splice(idx5, 1); // Removes 5
 // Result: [1, 2, 3, 7, 4, 6]
 ```
 
-### 163. Live Coding: Restrict characters (@, <, >) in an input field via Angular Directive.
+### 163. Restrict characters (@, <, >) in input via Angular Directive:
 ```typescript
-import { Directive, HostListener } from '@angular/core';
-
-@Directive({
-  selector: '[appRestrictChars]',
-  standalone: true
-})
+@Directive({ selector: '[appRestrictChars]', standalone: true })
 export class RestrictCharsDirective {
-  private forbidden = /[@<>]/;
-
   @HostListener('keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent) {
-    if (this.forbidden.test(event.key)) {
-      event.preventDefault();
-    }
-  }
-
-  @HostListener('paste', ['$event'])
-  onPaste(event: ClipboardEvent) {
-    const pasteData = event.clipboardData?.getData('text') || '';
-    if (this.forbidden.test(pasteData)) {
-      event.preventDefault();
-    }
+  onKey(e: KeyboardEvent) {
+    if (/[@<>]/.test(e.key)) e.preventDefault();
   }
 }
 ```
 
-### 164. Live Coding: Character frequency map (case-insensitive) for "HelloAbinash".
+### 164. Character frequency map for "HelloAbinash":
 ```javascript
-function charFrequency(str) {
-  const freq = {};
-  for (const char of str.toLowerCase()) {
-    freq[char] = (freq[char] || 0) + 1;
-  }
-  return freq;
+function charFreq(str) {
+  const map = {};
+  for (const c of str.toLowerCase()) map[c] = (map[c] || 0) + 1;
+  return map;
 }
-// For 'HelloAbinash': { h: 2, e: 1, l: 2, o: 1, a: 2, b: 1, i: 1, n: 1, s: 1 }
 ```
 
-### 165. Scope Output Prediction: var, let, const in if block.
-```javascript
-if (true) {
-  var a = 20;
-  let b = 30;
-  const c = 40;
-}
-console.log(a); // 20 (var escapes block scope)
-console.log(b); // ReferenceError: b is not defined
-```
+### 165. Scope output prediction inside if (true):
+`var` leaks out of the block to the function/global scope. `let` and `const` remain block-scoped.
 
-### 166. Live Coding (Morgan Stanley): Build nested menu tree from flat JSON array.
+### 166. Build nested menu tree from flat JSON array:
 ```javascript
 function buildTree(items) {
-  const itemMap = new Map();
-  const rootNodes = [];
-
-  for (const item of items) {
-    itemMap.set(item.id, { ...item, children: [] });
-  }
-
-  for (const item of items) {
-    const node = itemMap.get(item.id);
-    if (item.parentId === null || !itemMap.has(item.parentId)) {
-      rootNodes.push(node);
-    } else {
-      itemMap.get(item.parentId).children.push(node);
-    }
-  }
-
-  return rootNodes;
+  const map = new Map(), roots = [];
+  items.forEach(item => map.set(item.id, { ...item, children: [] }));
+  items.forEach(item => {
+    const node = map.get(item.id);
+    if (!item.parentId || !map.has(item.parentId)) roots.push(node);
+    else map.get(item.parentId).children.push(node);
+  });
+  return roots;
 }
 ```
 
-### 167. Tree Follow-ups: Why add empty children array? Why copy with `...item`?
-- **Empty children array**: Guarantees consumers can safely access `.children.length` without checking for `null`/`undefined`.
-- **Shallow copy `{ ...item }`**: Avoids mutating the original input array objects, preventing accidental side-effects.
+### 167. Tree Follow-ups: Why add empty children? Why shallow copy?
+- `children: []` ensures safe property access without null checks.
+- `{ ...item }` avoids mutating original input data.
 
-### 168. Single Login API: Summary popup vs full profile derivation.
-Use **Angular Signals** (`computed()`) or RxJS `map()` to derive a lightweight summary object synchronously from the master profile state without triggering redundant API calls.
+### 168. Single Login API: Summary popup vs full profile derivation:
+Use Angular Signals (`computed()`) or RxJS `map()` to derive a lightweight summary object synchronously without extra API calls.
 
-### 169. Dashboard Journey Tracking: SendBeacon, batching, and cache architecture.
-Use `navigator.sendBeacon(url, data)` to guarantee analytics delivery during page unloads without blocking navigation. Batch events in memory and flush periodically or upon visibility change.
+### 169. Dashboard Journey Tracking:
+Use `navigator.sendBeacon()` to send analytics data reliably during page close without blocking navigation.
 
-### 170. Custom Dashboard Persistence: Cheapest practical approach.
-Persist user column layout, widget coordinates, and theme preferences to `localStorage` immediately, and debounce sync to a user-settings database endpoint.
+### 170. Custom Dashboard Persistence:
+Save layout coordinates to `localStorage` immediately, and debounce sync to the server.
 
-### 171. Default vs OnPush Change Detection: Will mutating an object property trigger OnPush?
-**No**. `OnPush` only checks object reference equality (`prevInput !== currentInput`). In-place mutation keeps the same reference, so `OnPush` components will skip rendering until a new reference is emitted or an internal event fires.
+### 171. OnPush Change Detection: Will mutating an object property trigger OnPush?
+**No**. `OnPush` only checks object reference equality (`!==`). In-place mutations keep the same reference, so Angular skips re-rendering.
 
-### 172. Bootstrapping Custom Component: Can we bootstrap DashboardComponent instead of AppComponent?
-**Yes**. In `main.ts`, simply supply `bootstrapApplication(DashboardComponent)` or configure `bootstrap: [DashboardComponent]` in `AppModule`.
+### 172. Can we bootstrap DashboardComponent instead of AppComponent?
+**Yes**, simply pass `DashboardComponent` to `bootstrapApplication(DashboardComponent)` in `main.ts`.
 
-### 173. RxJS & State Management: Managing unsubscriptions, multi-async pipe re-renders.
-Use `shareReplay(1)` to multicasting a single HTTP response across multiple `async` pipes in the template, preventing duplicated network requests.
+### 173. RxJS multi-async pipe re-renders:
+Use `shareReplay(1)` to multicast a single HTTP response across multiple template async pipes.
 
-### 174. Signals vs RxJS Decision: When to use which?
-- Use **Signals** for synchronous UI state, local component state, derived values (`computed`), and fine-grained DOM updates.
-- Use **RxJS** for asynchronous streaming, complex event timing, web sockets, debouncing, and cancelable HTTP calls.
+### 174. Signals vs RxJS:
+- **Signals**: For synchronous UI state and fine-grained DOM updates.
+- **RxJS**: For async event streaming, debouncing, and web sockets.
 
-### 175. Route Guards: What does canDeactivate do and what are its return types?
-`canDeactivate` determines if a user can leave the current route (e.g., warning about unsaved form changes). Return types: `boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree>`.
+### 175. canDeactivate Guard:
+Determines whether a user is allowed to leave a route (e.g. warning about unsaved form changes). Returns `boolean | UrlTree | Observable | Promise`.
 
 ---
 
 ## Part 5: HTML5 & Modern Semantics (176 - 185)
 
-### 176. Semantic HTML elements: Accessibility & SEO.
-Elements like `<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<footer>` give structural meaning to screen readers and search bots, creating accessibility trees and rich search snippets.
+### 176. Semantic HTML elements:
+`<header>`, `<nav>`, `<main>`, `<article>`, `<footer>` give structural meaning to screen readers for accessibility and improve search engine indexing.
 
-### 177. Script execution: `<script>`, `<script async>`, and `<script defer>`.
-- `<script>`: Blocks HTML parsing; downloads and executes immediately.
+### 177. Script tags: regular vs async vs defer:
+- `<script>`: Blocks HTML parsing; executes immediately.
 - `<script async>`: Downloads in parallel; executes immediately when ready (can execute out of order).
-- `<script defer>`: Downloads in parallel; executes after HTML parsing completes in exact document order.
+- `<script defer>`: Downloads in parallel; executes after HTML parsing finishes, in exact document order.
 
-### 178. Storage comparison: localStorage, sessionStorage, Cookies.
+### 178. localStorage vs sessionStorage vs Cookies:
 - `localStorage`: 5-10MB, persistent until explicitly cleared, client-only.
-- `sessionStorage`: 5MB, persists only for browser tab session, client-only.
-- `cookies`: 4KB, sent to server with every HTTP request, configurable with `HttpOnly`, `Secure`, `SameSite`.
+- `sessionStorage`: 5MB, clears when browser tab closes, client-only.
+- `cookies`: 4KB, sent with every HTTP request, supports `HttpOnly` security flag.
 
-### 179. Custom HTML data-* attributes.
-- In HTML: `<div data-user-id="42">`
-- In JS: `element.dataset.userId`
-- In CSS: `div::after { content: attr(data-user-id); }`
+### 179. Custom HTML data-* attributes:
+Access in JS via `element.dataset.userId`; style in CSS via `[data-user-id="42"]`.
 
-### 180. Web Workers vs Service Workers.
-- **Web Workers**: Dedicated to running background CPU-intensive calculations.
-- **Service Workers**: Network proxies running between the browser and network, enabling offline caching, PWAs, and push notifications.
+### 180. Web Workers vs Service Workers:
+- **Web Worker**: Runs background CPU tasks on a separate thread without freezing UI.
+- **Service Worker**: Network proxy between browser and network for offline caching and PWAs.
 
-### 181. Canvas API vs SVG.
-- **Canvas (Pixel/Raster)**: Best for high-frequency frame updates (games, real-time particle simulations).
-- **SVG (Vector/DOM-based)**: Best for resolution-independent icons, UI charts, scalable diagrams, and CSS-styleable graphics.
+### 181. Canvas vs SVG:
+- **Canvas (Pixel/Raster)**: High performance for 60fps games and thousands of moving particles.
+- **SVG (Vector/DOM)**: Scalable, styleable with CSS, accessible; best for icons and charts.
 
-### 182. Responsive images: `<picture>`, `srcset`, and `sizes`.
-`<picture>` enables art direction (serving different aspect ratios per breakpoint). `srcset` and `sizes` provide alternative pixel resolutions for the browser to pick based on device DPI.
+### 182. Responsive Images: picture vs srcset:
+`<picture>` for art direction (swapping formats/ratios); `srcset` for resolution density switching.
 
-### 183. HTML <template> and <slot> elements.
-`<template>` holds markup not rendered until cloned via JavaScript. `<slot>` defines projection insertion points inside Web Component Shadow DOM trees.
+### 183. template and slot tags:
+`<template>` holds inert HTML not rendered until cloned; `<slot>` defines content insertion points in Web Components.
 
-### 184. Rendering approaches: CSR, SSR, and SSG.
-- **CSR**: Blank HTML shell; JS builds the DOM in the browser.
-- **SSR**: Server generates full HTML on every request.
-- **SSG**: HTML pre-compiled at build time and served via CDN.
+### 184. CSR vs SSR vs SSG:
+- **CSR**: Blank HTML shell; browser JS builds DOM.
+- **SSR**: Server renders full HTML on each request.
+- **SSG**: Pre-rendered HTML at build time, hosted on CDN.
 
-### 185. ARIA accessibility roles and properties.
-`role`, `aria-label`, `aria-live="polite"` provide accessibility semantics when native HTML cannot, communicating state to screen readers.
+### 185. ARIA accessibility attributes:
+`role`, `aria-label`, and `aria-live` provide accessibility information when native HTML elements cannot.
 
 ---
 
 ## Part 6: Modern CSS3, Layouts & Architecture (186 - 195)
 
-### 186. Fixed vs Sticky positioning.
-- `position: fixed`: Positioned relative to the viewport; removed from document flow.
-- `position: sticky`: Behaves like `relative` until a scroll threshold is crossed, then sticks within its parent container.
+### 186. position: fixed vs sticky:
+- `fixed`: Stays in place relative to the viewport.
+- `sticky`: Scrolls normally until it reaches a scroll threshold, then sticks within its parent container.
 
-### 187. CSS Box Model: content-box vs border-box.
-- `content-box`: `width = content`. (Padding and border add extra size).
-- `border-box`: `width = content + padding + border`. Layout math is predictable.
+### 187. CSS Box Model: content-box vs border-box:
+- `content-box`: `width = content only` (padding and border add extra size).
+- `border-box`: `width = content + padding + border` (predictable layout math).
 
-### 188. Flexbox (1D) vs CSS Grid (2D).
-- Flexbox: 1-dimensional (row OR column); content-driven layouts.
-- Grid: 2-dimensional (rows AND columns simultaneously); structural design systems.
+### 188. Flexbox (1D) vs Grid (2D):
+Flexbox aligns items along a single axis (row OR column); Grid aligns items along rows AND columns simultaneously.
 
-### 189. CSS Specificity calculation.
-Score: `(Inline styles, IDs, Classes/Attributes/Pseudo-classes, Elements/Pseudo-elements)`.
-`!important` overrides normal specificity.
+### 189. Specificity calculation:
+Inline styles > IDs > Classes/Attributes/Pseudo-classes > Elements.
 
-### 190. CSS Custom Properties vs SCSS Variables.
-CSS variables (`--var`) are dynamic at runtime in the browser DOM, inherited through cascades, and changeable via JavaScript. SCSS variables are statically compiled to fixed values during build.
+### 190. CSS Variables vs SCSS Variables:
+CSS variables (`var(--color)`) live in the DOM at runtime and can be changed with JavaScript; SCSS variables are compiled to fixed values at build time.
 
-### 191. 3 modern ways to center an element.
-```css
-/* 1. Flexbox */
-.parent { display: flex; justify-content: center; align-items: center; }
+### 191. 3 modern ways to center an element:
+1. `display: grid; place-items: center;`
+2. `display: flex; justify-content: center; align-items: center;`
+3. Absolute positioning with `top: 50%; left: 50%; transform: translate(-50%, -50%);`
 
-/* 2. Grid */
-.parent { display: grid; place-items: center; }
+### 192. CSS units: rem, em, dvh, svh:
+`rem` is relative to root font size; `em` is relative to parent font; `dvh` adapts dynamically as mobile address bars expand and collapse.
 
-/* 3. Absolute positioning with transform */
-.child { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-```
+### 193. Stacking Context triggers:
+`opacity < 1`, `transform !== none`, `filter !== none`, `isolation: isolate`.
 
-### 192. CSS units comparison.
-`px` (absolute), `em` (relative to parent font), `rem` (relative to root font), `vw`/`vh` (viewport percent), `dvh`/`svh` (dynamic and small viewport units accounting for mobile address bars).
+### 194. Container Queries (@container) vs Media Queries:
+Media queries look at the entire browser viewport; Container queries look at the width of the parent component.
 
-### 193. Stacking Context triggers beyond z-index.
-Triggered by: `opacity < 1`, `transform !== none`, `filter !== none`, `contain: paint`, `will-change`.
-
-### 194. CSS Container Queries (@container) vs Media Queries.
-Media queries evaluate the entire viewport; Container queries evaluate the dimensions of the immediate parent container, enabling truly responsive component libraries.
-
-### 195. CSS @layer and :has() selector.
-- `@layer`: Explicitly defines cascade priority layers regardless of selector specificity.
-- `:has()`: The parent selector; targets an element based on its descendant state (`form:has(input:invalid)`).
+### 195. CSS @layer and :has():
+- `@layer`: Controls CSS priority cascade regardless of specificity.
+- `:has()`: The parent selector (e.g. `form:has(input:invalid)`).
 
 ---
 
-## Part 7: Enterprise Architecture, Framework Internals & Performance (196 - 225)
+## Part 7: Enterprise Architecture & Performance (196 - 225)
 
-### 196. Declarations, imports, exports, and providers in NgModule.
-- `declarations`: Components, directives, pipes belonging to this module.
-- `imports`: Other modules whose exported components are needed.
-- `exports`: Subset of declarations made available to importing modules.
-- `providers`: Services injected into this module's injector.
+### 196. Declarations, imports, exports, and providers in NgModule:
+- `declarations`: Components and pipes belonging to this module.
+- `imports`: Other modules needed.
+- `exports`: Components made public to other modules.
+- `providers`: Services injected into this module.
 
-### 197. Angular Router navigation & LocationStrategy.
-Navigates using `PathLocationStrategy` (HTML5 `pushState`) without reloading the page, or `HashLocationStrategy` (`/#/path`) for legacy servers without rewrite support.
+### 197. Angular LocationStrategy:
+`PathLocationStrategy` uses HTML5 `pushState` for clean URLs (`/dashboard`); `HashLocationStrategy` uses hash fragments (`/#/dashboard`).
 
-### 198. Custom Validators in Reactive Forms.
-- **Synchronous**: Returns `ValidationErrors | null`.
-- **Asynchronous**: Returns `Observable<ValidationErrors | null> | Promise<ValidationErrors | null>`.
+### 198. Custom Validators in Reactive Forms:
+Functions that return `ValidationErrors | null` for synchronous validation or `Observable<ValidationErrors | null>` for async validation.
 
-### 199. NgZone (run vs runOutsideAngular).
-- `run()`: Executes code inside Angular zone, triggering change detection.
-- `runOutsideAngular()`: Bypasses Zone.js for high-frequency events (canvas rendering, mousemove) to avoid unnecessary change detection passes.
+### 199. NgZone (run vs runOutsideAngular):
+`runOutsideAngular()` runs high-frequency code (like mousemove or canvas animation) without triggering change detection.
 
-### 200. trackBy in *ngFor / track in @for.
-Identifies list items uniquely. Prevents Angular from destroying and recreating all DOM nodes when an array is reordered or updated.
+### 200. trackBy in *ngFor / track in @for:
+Prevents Angular from destroying and re-creating all DOM items when a list changes, reusing existing elements.
 
-### 201. Subject types in RxJS.
-- `Subject`: Multicast; no initial value; subscribers only receive values emitted after subscription.
-- `BehaviorSubject`: Holds a current value; immediately emits current value upon subscription.
-- `ReplaySubject`: Buffers $N$ past emissions and replays them to new subscribers.
-- `AsyncSubject`: Emits only the last value upon completion.
+### 201. Subject types in RxJS:
+- `Subject`: Multicast; no initial value.
+- `BehaviorSubject`: Stores a current value; emits current value immediately to new subscribers.
+- `ReplaySubject`: Replays the last $N$ emitted values to new subscribers.
 
-### 202. ElementRef, TemplateRef, ViewRef, and ComponentRef.
+### 202. ElementRef vs TemplateRef vs ViewContainerRef:
 - `ElementRef`: Wrapper around native DOM element.
-- `TemplateRef`: Represents embedded `<ng-template>`.
-- `ViewRef`: Represents a view container.
-- `ComponentRef`: Handle to a dynamically instantiated component.
+- `TemplateRef`: Represents an embedded `<ng-template>`.
+- `ViewContainerRef`: Container where dynamic components can be attached.
 
-### 203. HTTP Interceptor caching.
-Intercepts requests, checks an in-memory `Map` cache; if found, returns `of(new HttpResponse({ body: cached }))`; otherwise forwards and caches response.
+### 203. HTTP Interceptor Caching:
+Checks an in-memory Map before forwarding requests; returns cached responses immediately.
 
-### 204. APP_INITIALIZER vs ENVIRONMENT_INITIALIZER.
-- `APP_INITIALIZER`: Blocks application bootstrapping until returned promise/observable resolves.
-- `ENVIRONMENT_INITIALIZER`: Runs when an EnvironmentInjector is created (modern standalone setup).
+### 204. APP_INITIALIZER vs ENVIRONMENT_INITIALIZER:
+`APP_INITIALIZER` runs and blocks app bootstrap until resolved; `ENVIRONMENT_INITIALIZER` runs when an EnvironmentInjector is created.
 
-### 205. Multi-tab synchronization in Angular.
-Implemented using `BroadcastChannel` API or listening to `window.addEventListener('storage', ...)`.
+### 205. Multi-tab synchronization:
+Implemented using `BroadcastChannel` or `window.addEventListener('storage', ...)`.
 
-### 206. null vs undefined.
-`null` is an intentional assignment representing no value (`typeof null === 'object'`). `undefined` is a variable declared but not yet assigned (`typeof undefined === 'undefined'`).
+### 206. null vs undefined:
+`null` is an intentional assignment of no value (`typeof === 'object'`); `undefined` means a variable has been declared but not assigned a value (`typeof === 'undefined'`).
 
-### 207. Event delegation benefits.
-Attaches 1 listener instead of 1,000 listeners, saving memory and automatically supporting dynamically inserted child elements.
+### 207. Why Event Delegation is preferred:
+Attaches 1 listener to the parent instead of hundreds to children, saving memory.
 
-### 208. Object.freeze() vs Object.seal().
-- `freeze()`: Makes object completely read-only (cannot add, delete, or modify properties).
-- `seal()`: Prevents adding or deleting properties, but existing writable properties can still be modified.
+### 208. Object.freeze() vs seal():
+`freeze()` makes an object completely read-only. `seal()` prevents adding or deleting keys, but allows editing existing values.
 
-### 209. Microtasks vs Macrotasks execution order.
-Call stack -> All microtasks in queue -> Browser render -> One macrotask -> Repeat.
+### 209. Microtasks vs Macrotasks execution order:
+Call Stack -> Microtasks (Promises) -> Render -> 1 Macrotask (`setTimeout`).
 
-### 210. Generator functions: yield vs return.
-`yield` pauses execution and emits a value with `{ done: false }`. `return` terminates the generator with `{ done: true }`.
+### 210. Generator functions: yield vs return:
+`yield` pauses execution and produces a value; `return` permanently terminates the generator.
 
-### 211. window vs document vs screen.
-- `window`: Global browser tab execution environment.
-- `document`: The DOM tree of the loaded page.
-- `screen`: Physical monitor display specs.
+### 211. window vs document vs screen:
+`window` is the browser tab; `document` is the HTML page DOM; `screen` is the physical monitor.
 
-### 212. Detect circular references in an object.
-```javascript
-function hasCircularReference(obj) {
-  const seen = new WeakSet();
-  function detect(val) {
-    if (val && typeof val === 'object') {
-      if (seen.has(val)) return true;
-      seen.add(val);
-      for (const k in val) {
-        if (detect(val[k])) return true;
-      }
-    }
-    return false;
-  }
-  return detect(obj);
-}
-```
+### 212. Detect circular references:
+Use a `WeakSet` to track visited objects during recursive traversal.
 
-### 213. Map vs standard JavaScript Object.
-`Map` maintains insertion order, supports any type for keys, has constant-time `.size`, and avoids prototype key pollution.
+### 213. Map vs Object:
+`Map` maintains insertion order, accepts any type for keys, has a direct `.size` property, and avoids prototype pollution.
 
-### 214. Service Worker lifecycle events.
-`install` -> `activate` -> `fetch` / `message`.
+### 214. Service Worker lifecycle:
+`install` -> `activate` -> `fetch`.
 
-### 215. Tagged Template Literals.
-Functions passed a template literal, receiving raw strings array and interpolated values array as arguments (`styled.div` pattern).
+### 215. Tagged Template Literals:
+Functions called with template literals, receiving raw strings array and interpolated values array (`styled.div` pattern).
 
-### 216. Critical Rendering Path (CRP) optimization.
-HTML parsing -> DOM tree + CSSOM tree -> Render Tree -> Layout -> Paint. Optimized by minifying CSS/JS, inlining critical CSS, deferring scripts.
+### 216. Critical Rendering Path:
+HTML -> DOM + CSSOM -> Render Tree -> Layout -> Paint. Optimize by minifying assets and inlining critical CSS.
 
-### 217. Reflow vs Repaint & Layout Thrashing.
-- **Reflow**: Recalculating geometry of elements.
-- **Repaint**: Redrawing pixels without changing geometry.
-- **Thrashing**: Rapid interleaved reads and writes to layout properties (e.g., `offsetWidth` followed by `style.width`).
+### 217. Reflow vs Repaint:
+Reflow recalculates geometry (slow); Repaint redraws colors/pixels (faster).
 
-### 218. CSS content-visibility property.
-`content-visibility: auto` skips rendering of off-screen elements until they approach the viewport, boosting initial load speed on large pages.
+### 218. content-visibility: auto:
+Skips rendering of off-screen content until user scrolls near it, drastically speeding up initial page load.
 
-### 219. CSS Grid auto-fit vs auto-fill.
-`auto-fill` creates empty column tracks to fill space; `auto-fit` collapses empty tracks and expands existing columns to fill available space.
+### 219. auto-fit vs auto-fill in CSS Grid:
+`auto-fit` collapses empty tracks to expand existing items; `auto-fill` keeps empty tracks.
 
-### 220. display: none vs visibility: hidden.
-- `display: none`: Removes element completely from layout and accessibility tree.
-- `visibility: hidden`: Hides element visually, but preserves its occupied space in document layout.
+### 220. display: none vs visibility: hidden:
+`display: none` removes element from document flow; `visibility: hidden` hides visually but preserves its layout space.
 
-### 221. Responsive Images: `<picture>` vs `srcset`.
-`<picture>` for art direction (swapping formats/ratios); `srcset` for resolution density switching.
+### 221. Responsive Images (picture vs srcset):
+`<picture>` for swapping formats and aspect ratios; `srcset` for serving different pixel resolutions.
 
-### 222. Why CSS transforms and opacity animations are GPU-accelerated.
-They do not trigger Reflow or Repaint; the browser composites them directly on separate GPU layers.
+### 222. GPU-Accelerated animations:
+`transform` and `opacity` bypass layout and repaint; composited directly on the GPU.
 
-### 223. CSS Container Queries (@container) vs Media Queries.
-Container queries respond to the component container's width, enabling portable component design systems independent of viewport size.
+### 223. Container Queries vs Media Queries:
+Container queries respond to the component container width, making components portable anywhere on screen.
 
-### 224. CSS :has() parent selector.
-Enables selecting a parent element based on its children's state or existence: `a:has(img) { border: none; }`.
+### 224. CSS :has() parent selector:
+Allows styling a parent based on its child elements: `article:has(img) { ... }`.
 
-### 225. BFC (Block Formatting Context) vs IFC (Inline Formatting Context).
-- **BFC**: Box layout area where margins do not collapse across boundaries and floats are contained.
-- **IFC**: Formatting context where inline elements sit horizontally side-by-side until line wraps.
+### 225. BFC (Block Formatting Context):
+Area where elements are laid out and floats are contained; created with `display: flow-root`.
 
 ---
 
 ## Part 8: Advanced TypeScript, Tooling & Performance (226 - 235)
 
-### 226. What is the difference between any, unknown, and never in TypeScript?
-**Answer:**
-- `any`: Disables all type checking. Can be assigned to anything and called arbitrarily.
-- `unknown`: Type-safe counterpart of `any`. Must be narrowed using type guards (`typeof`, `instanceof`) before performing operations.
-- `never`: Represents values that never occur (e.g., a function that always throws an exception or an infinite loop).
+### 226. any vs unknown vs never in TypeScript:
+- `any`: Disables type checking (unsafe).
+- `unknown`: Type-safe alternative to `any`; must be narrowed with `typeof` before use.
+- `never`: Represents values that never happen (functions that throw or infinite loops).
 
-### 227. How do TypeScript Utility Types prevent state mutation bugs?
-**Answer:**
+### 227. TypeScript Utility Types:
 - `Partial<T>`: Makes all properties optional.
-- `Pick<T, K>`: Constructs a type picking specified keys.
-- `Omit<T, K>`: Constructs a type omitting specified keys.
-- `Readonly<T>`: Enforces compile-time immutability, preventing state mutation bugs.
-- `Record<K, T>`: Constructs mapped dictionary structures.
+- `Pick<T, K>`: Extracts specific keys.
+- `Omit<T, K>`: Removes specific keys.
+- `Readonly<T>`: Prevents property mutation.
 
-### 228. How does Angular's modern application builder (Vite + esbuild) differ from the legacy Webpack builder?
-**Answer:**
-- **Development**: Uses Vite's native ESM dev server with pre-bundling via esbuild, providing near-instant hot module replacement (HMR).
-- **Production**: Uses esbuild for compilation, achieving 3x to 5x faster production build times and smaller bundle outputs compared to legacy Webpack pipelines.
+### 228. Angular modern application builder (Vite + esbuild):
+Uses Vite for instant HMR during development and esbuild for 3-5x faster production builds compared to legacy Webpack.
 
-### 229. What is INP (Interaction to Next Paint), why did it replace FID, and how do you optimize it?
-**Answer:**
-INP measures page responsiveness by tracking the latency of all user interactions (clicks, key presses) throughout the entire page lifecycle, replacing First Input Delay (FID), which only measured the very first interaction.
-**Optimization**: Break long tasks using `scheduler.yield()`, avoid synchronous layout recalculations, and offload CPU tasks to Web Workers.
+### 229. INP (Interaction to Next Paint):
+Measures responsiveness to all user interactions across the entire page visit. Optimize by breaking long JavaScript tasks with `scheduler.yield()`.
 
-### 230. Where should JWTs and session tokens be stored in a Single Page Application, and why is localStorage vulnerable?
-**Answer:**
-- **Best Practice**: Store tokens in **HttpOnly, Secure, SameSite=Strict Cookies**. JavaScript cannot read `HttpOnly` cookies, completely shielding tokens from Cross-Site Scripting (XSS) extraction.
-- **LocalStorage Risk**: Any third-party script or injected XSS payload can execute `localStorage.getItem('token')` and exfiltrate user credentials.
+### 230. Where to store JWT tokens in SPAs:
+Store in **HttpOnly, Secure, SameSite Cookies** to prevent Cross-Site Scripting (XSS) attacks from stealing tokens.
 
-### 231. How do you implement Stale-While-Revalidate caching using Angular Service Workers?
-**Answer:**
-In `ngsw-config.json`, configure a `performance` data group strategy:
-```json
-{
-  "name": "api-cache",
-  "urls": ["/api/v1/products/**"],
-  "cacheConfig": {
-    "maxSize": 100,
-    "maxAge": "1h",
-    "strategy": "performance"
-  }
-}
-```
-The Service Worker returns cached data immediately while fetching fresh data in the background.
+### 231. Stale-While-Revalidate caching:
+Service Worker returns cached data immediately while fetching fresh data in the background.
 
-### 232. What is IndexedDB and when should you choose it over localStorage?
-**Answer:**
-IndexedDB is a transactional, asynchronous, indexed NoSQL database in the browser capable of storing hundreds of megabytes of structured data (blobs, objects). Choose IndexedDB over `localStorage` when storing large datasets or when synchronous `localStorage` operations would freeze the main thread.
+### 232. IndexedDB vs localStorage:
+IndexedDB is an async NoSQL database in the browser capable of storing hundreds of megabytes without blocking the main thread.
 
-### 233. How does Clickjacking work, and how do X-Frame-Options and CSP frame-ancestors prevent it?
-**Answer:**
-Clickjacking embeds a malicious transparent `<iframe>` over a legitimate UI button, tricking the user into clicking unintended actions. Prevented by headers:
-- `X-Frame-Options: DENY`
-- `Content-Security-Policy: frame-ancestors 'none'`
+### 233. Clickjacking prevention:
+Prevented using `Content-Security-Policy: frame-ancestors 'none'` and `X-Frame-Options: DENY`.
 
-### 234. What is scheduler.yield() and how does it prevent main-thread freezing?
-**Answer:**
-`scheduler.yield()` is a modern browser API that pauses the current JavaScript execution, yields control back to the browser main thread to process pending user input and render frames, and then resumes execution immediately.
+### 234. scheduler.yield():
+Pauses long-running JavaScript execution, yielding control back to the browser main thread to render frames and handle user clicks.
 
-### 235. How do you write generic typed Angular components using standalone Signal inputs?
-**Answer:**
+### 235. Generic standalone Angular components with Signals:
 ```typescript
-import { Component, input } from '@angular/core';
-
 @Component({
-  selector: 'app-data-table',
+  selector: 'app-list',
   standalone: true,
-  template: `
-    <table>
-      @for (row of data(); track trackKey()(row)) {
-        <tr>
-          <td>{{ row }}</td>
-        </tr>
-      }
-    </table>
-  `
+  template: '@for (item of data(); track item.id) { <p>{{ item }}</p> }'
 })
-export class DataTableComponent<T> {
+export class ListComponent<T extends { id: any }> {
   data = input.required<T[]>();
-  trackKey = input.required<(item: T) => any>();
 }
 ```
-In template: `<app-data-table [data]="users" [trackKey]="userTracker" />` where `T` is automatically inferred as `User`.
-

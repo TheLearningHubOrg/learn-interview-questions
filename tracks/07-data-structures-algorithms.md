@@ -1,70 +1,58 @@
 # Data Structures & Algorithms (DSA) Master Interview Question Bank: Blind 75, NeetCode & Core Patterns (1 - 100)
 
-> Comprehensive, production-tested algorithmic problem bank covering problem-solving frameworks, Big-O asymptotic analysis, Arrays, Two Pointers, Sliding Window, Monotonic Stacks, Linked Lists, Binary Search, Trees, Tries, Heaps, Backtracking, Graphs, and Dynamic Programming with optimal TypeScript/JavaScript implementations.
-
----
-
-## Table of Contents
-- [Part 1: Intro, Approach & Complexity Analysis (1 - 5)](#part-1-intro-approach--complexity-analysis-1---5)
-- [Part 2: Arrays, Strings & Hash Maps (6 - 18)](#part-2-arrays-strings--hash-maps-6---18)
-- [Part 3: Two Pointers & Sliding Window (19 - 28)](#part-3-two-pointers--sliding-window-19---28)
-- [Part 4: Stacks & Queues (29 - 36)](#part-4-stacks--queues-29---36)
-- [Part 5: Linked Lists (37 - 45)](#part-5-linked-lists-37---45)
-- [Part 6: Binary Search (46 - 52)](#part-6-binary-search-46---52)
-- [Part 7: Trees & Tries (53 - 65)](#part-7-trees--tries-53---65)
-- [Part 8: Heaps & Priority Queues (66 - 72)](#part-8-heaps--priority-queues-66---72)
-- [Part 9: Backtracking (73 - 79)](#part-9-backtracking-73---79)
-- [Part 10: Graphs (BFS, DFS, Topological Sort & Union-Find) (80 - 90)](#part-10-graphs-bfs-dfs-topological-sort--union-find-80---90)
-- [Part 11: 1D & 2D Dynamic Programming (91 - 100)](#part-11-1d--2d-dynamic-programming-91---100)
+> Simple, intuitive, and easy-to-explain algorithmic problem bank covering problem-solving frameworks, Big-O asymptotic analysis, Arrays, Two Pointers, Sliding Window, Monotonic Stacks, Linked Lists, Binary Search, Trees, Tries, Heaps, Backtracking, Graphs, and Dynamic Programming with optimal implementations.
 
 ---
 
 ## Part 1: Intro, Approach & Complexity Analysis (1 - 5)
 
 ### 1. Problem-Solving Framework for Live Coding Interviews.
-**Answer:**
-1. **Clarify & Scope (2-3 mins)**: Ask about input ranges, negative numbers, duplicates, memory bounds, and empty inputs.
-2. **Brute Force First (2 mins)**: State the naive approach, state its time/space complexity ($O(N^2)$), and identify bottlenecks.
-3. **Optimize & Pattern Match (3-5 mins)**: Identify the right data structure (Hash Map for $O(1)$ lookup, Two Pointers for sorted arrays, Monotonic Stack for next greater element).
+**In Simple Words:**
+Follow a structured 6-step framework during a live coding interview:
+1. **Clarify Inputs & Edge Cases (2 mins)**: Ask about negative numbers, duplicates, empty inputs, and expected data volume.
+2. **State Brute Force (2 mins)**: Explain the naive approach first ($O(N^2)$) to show baseline thinking before jumping to code.
+3. **Propose Optimal Pattern (3 mins)**: Identify the right data structure (Hash Map for $O(1)$ lookup, Two Pointers for sorted arrays, Monotonic Stack for next greater).
 4. **Dry Run on Example (2 mins)**: Step through test cases manually with pen and paper before typing code.
 5. **Clean Code (10-15 mins)**: Write modular, readable code with descriptive variable names.
-6. **Edge Cases & Verification (3 mins)**: Walk through null, empty, single-element, and extreme inputs.
+6. **Edge Cases & Complexity (3 mins)**: Walk through null, empty, single-element arrays and state Big-O time and space.
 
 ### 2. Asymptotic Notation & Amortized Complexity.
-**Answer:**
-- **Big-O ($O$)**: Mathematical upper bound (worst-case execution scenario).
-- **Big-$\Omega$ ($\Omega$)**: Mathematical lower bound (best-case execution scenario).
+**In Simple Words:**
+- **Big-O ($O$)**: Upper bound / worst-case execution time.
+- **Big-$\Omega$ ($\Omega$)**: Lower bound / best-case execution time.
 - **Big-$\Theta$ ($\Theta$)**: Tight bound (upper and lower bounds match within constant factors).
 - **Amortized Analysis**: Average time per operation over a long sequence. For dynamic array resizing (e.g., doubling capacity on overflow), single resize is $O(N)$, but occurs so infrequently that the amortized cost per append is strictly $O(1)$.
 
 ### 3. The Master Theorem.
-**Answer:**
-Solves recurrences of the form $T(n) = aT(n/b) + f(n)$:
-Let $c_{crit} = \log_b a$:
-1. If $f(n) = O(n^{c_{crit} - \epsilon})$, then $T(n) = \Theta(n^{c_{crit}})$.
-2. If $f(n) = \Theta(n^{c_{crit}} \log^k n)$, then $T(n) = \Theta(n^{c_{crit}} \log^{k+1} n)$.
-3. If $f(n) = \Omega(n^{c_{crit} + \epsilon})$, then $T(n) = \Theta(f(n))$.
-*Fails when*: $a < 1$, $b$ is non-constant, or $f(n)$ is non-polynomial ($2^n$).
+**In Simple Words:**
+Solves divide-and-conquer recurrences of the form $T(n) = aT(n/b) + f(n)$:
+- Compare $f(n)$ against $n^{\log_b a}$:
+1. If work at leaves dominates ($f(n) < n^{\log_b a}$): $T(n) = \Theta(n^{\log_b a})$.
+2. If work is evenly distributed ($f(n) = n^{\log_b a} \log^k n$): $T(n) = \Theta(n^{\log_b a} \log^{k+1} n)$.
+3. If work at root dominates ($f(n) > n^{\log_b a}$): $T(n) = \Theta(f(n))$.
+*Fails when*: $a < 1$, $b$ is not constant, or $f(n)$ is non-polynomial (e.g. $2^n$).
 
 ### 4. Space Complexity: Call Stack vs Heap.
-**Answer:**
-Recursion allocates stack frames on the Call Stack for local variables and return addresses. Deep recursion of depth $N$ consumes $O(N)$ stack memory, risking `StackOverflowError` if $N > 10^4$. Iterative approaches allocate memory on the heap (e.g., dynamic queues), which is bounded only by available RAM.
+**In Simple Words:**
+- **Call Stack**: Used for function recursion. Each recursive call adds a stack frame. Deep recursion of depth $N$ consumes $O(N)$ stack memory, risking `StackOverflowError` if $N > 10^4$.
+- **Heap Memory**: Used for dynamic data structures (`new Map()`, `new Array()`, iterative queues). Bounded only by total system RAM.
 
 ### 5. Constraint-Based Pattern Recognition.
-**Answer:**
+**In Simple Words:**
+Use problem constraints ($N$) to instantly deduce the required time complexity:
 - $N \le 20$: Backtracking, Bitmask DP ($O(2^N)$ or $O(N!)$).
 - $N \le 10^3$: $O(N^2)$ DP, Nested Loops.
 - $N \le 10^5$: $O(N \log N)$ Sorting, Binary Search, Heaps, Divide & Conquer.
 - $N \le 10^6$: $O(N)$ Hash Map, Sliding Window, Two Pointers, Monotonic Stack.
-- $N \ge 10^9$: $O(\log N)$ or $O(1)$ Math, Binary Search on Answer.
+- $N \ge 10^9$: $O(\log N)$ Binary Search on Answer, or $O(1)$ Math.
 
 ---
 
 ## Part 2: Arrays, Strings & Hash Maps (6 - 18)
 
 ### 6. Two Sum.
-**Problem**: Find two numbers that add up to target.
-**Optimal**: Hash Map storing complement.
+**In Simple Words:**
+Iterate through numbers and check if `target - current` already exists in a Hash Map. If yes, return their indices; otherwise store `current -> index`.
 - **Time**: $O(N)$ | **Space**: $O(N)$
 ```typescript
 function twoSum(nums: number[], target: number): number[] {
@@ -79,7 +67,8 @@ function twoSum(nums: number[], target: number): number[] {
 ```
 
 ### 7. Longest Consecutive Sequence.
-**Optimal**: Store in Set. Only start sequence from numbers that have no left neighbor (`!set.has(num - 1)`).
+**In Simple Words:**
+Put all numbers in a Set. Only start counting a sequence if `num - 1` does NOT exist in the set (meaning `num` is the start of a streak). Then increment `num + 1` while present in the set.
 - **Time**: $O(N)$ | **Space**: $O(N)$
 ```typescript
 function longestConsecutive(nums: number[]): number {
@@ -87,8 +76,7 @@ function longestConsecutive(nums: number[]): number {
   let maxLen = 0;
   for (const num of set) {
     if (!set.has(num - 1)) {
-      let current = num;
-      let streak = 1;
+      let current = num, streak = 1;
       while (set.has(current + 1)) { current++; streak++; }
       maxLen = Math.max(maxLen, streak);
     }
@@ -98,7 +86,8 @@ function longestConsecutive(nums: number[]): number {
 ```
 
 ### 8. Group Anagrams.
-**Optimal**: Character frequency count or sorted string as hash key.
+**In Simple Words:**
+Sort each word's characters alphabetically to create a canonical key. Group words with the same sorted key together into a Hash Map.
 - **Time**: $O(N \cdot K \log K)$ | **Space**: $O(N \cdot K)$
 ```typescript
 function groupAnagrams(strs: string[]): string[][] {
@@ -113,7 +102,8 @@ function groupAnagrams(strs: string[]): string[][] {
 ```
 
 ### 9. Product of Array Except Self.
-**Optimal**: Two-pass prefix and suffix product array without division.
+**In Simple Words:**
+Do two passes without division: first compute running prefix products from left to right; then multiply by running suffix products from right to left.
 - **Time**: $O(N)$ | **Space**: $O(1)$ auxiliary
 ```typescript
 function productExceptSelf(nums: number[]): number[] {
@@ -133,7 +123,8 @@ function productExceptSelf(nums: number[]): number[] {
 ```
 
 ### 10. Maximum Subarray (Kadane’s Algorithm).
-**Optimal**: Track max ending at current index.
+**In Simple Words:**
+Iterate through the array keeping track of `currentSum`. At each element, decide whether to add it to `currentSum` or start a new subarray fresh from `nums[i]`.
 - **Time**: $O(N)$ | **Space**: $O(1)$
 ```typescript
 function maxSubArray(nums: number[]): number {
@@ -147,7 +138,8 @@ function maxSubArray(nums: number[]): number {
 ```
 
 ### 11. Subarray Sum Equals K.
-**Optimal**: Prefix sum with hash map storing frequency of seen prefix sums.
+**In Simple Words:**
+Use running prefix sums and a Hash Map storing frequencies of seen prefix sums. At each step, check if `sum - k` has been seen before.
 - **Time**: $O(N)$ | **Space**: $O(N)$
 ```typescript
 function subarraySum(nums: number[], k: number): number {
@@ -163,167 +155,257 @@ function subarraySum(nums: number[], k: number): number {
 ```
 
 ### 12. Best Time to Buy and Sell Stock (I & II).
-- **I (Single Transaction)**: Track minimum price so far and maximum profit ($O(N)$ time, $O(1)$ space).
-- **II (Multiple Transactions)**: Greedy accumulation: add every positive price difference `prices[i] - prices[i-1]`.
+**In Simple Words:**
+- **I (Single Transaction)**: Track `minPrice` so far and maximize `price - minPrice` ($O(N)$ time, $O(1)$ space).
+- **II (Multiple Transactions)**: Greedy approach: whenever tomorrow's price is higher than today's, take the profit immediately: `profit += prices[i] - prices[i-1]`.
 
 ### 13. Longest Common Prefix.
-Horizontal scan comparing characters column by column across all strings until mismatch occurs ($O(S)$ time where $S$ is sum of characters).
+**In Simple Words:**
+Pick the first string as a prefix. For each subsequent string, shrink prefix from the end until `string.startsWith(prefix)` is true.
+- **Time**: $O(S)$ where $S$ is sum of all characters | **Space**: $O(1)$
 
 ### 14. String Encode and Decode.
-Encode as `length + '#' + word` (e.g., `4#word5#hello`). Decoding reads length up to `#` delimiter and extracts slice, preventing delimiter collision.
+**In Simple Words:**
+Encode a list of strings by prefixing each string with its length and a delimiter (e.g., `["lint","code"]` -> `"4#lint4#code"`). On decode, read the integer length up to `#` and slice the exact character count, avoiding delimiter collision!
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 15. Rotate Array.
-Reverse entire array, reverse first $K$ elements, reverse remaining $N - K$ elements ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+To rotate an array right by $K$ steps in $O(1)$ memory:
+1. Reverse the entire array.
+2. Reverse the first $K$ elements.
+3. Reverse the remaining $N - K$ elements.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 16. Next Permutation.
-1. Find largest index $i$ where `nums[i] < nums[i+1]`.
-2. Find largest index $j > i$ where `nums[j] > nums[i]`.
+**In Simple Words:**
+1. Find first index $i$ from right where `nums[i] < nums[i+1]`.
+2. Find first index $j$ from right where `nums[j] > nums[i]`.
 3. Swap `nums[i]` and `nums[j]`.
-4. Reverse subarray from $i+1$ to end ($O(N)$ time, $O(1)$ space).
+4. Reverse everything after index $i$ ($O(N)$ time, $O(1)$ space).
 
 ### 17. Merge Intervals.
-Sort intervals by `start` time. Iterate and merge with previous interval if `current.start <= prev.end` ($O(N \log N)$ time).
+**In Simple Words:**
+Sort intervals by start time. Iterate through intervals: if the current interval starts before or at the end of the previous one (`curr.start <= prev.end`), merge them by updating `prev.end = max(prev.end, curr.end)`.
+- **Time**: $O(N \log N)$ | **Space**: $O(N)$
 
 ### 18. Insert Interval.
-Push all intervals ending before new interval starts. Merge overlapping intervals with new interval. Push remaining intervals ($O(N)$ time).
+**In Simple Words:**
+1. Add all intervals ending before the new interval starts.
+2. Merge all overlapping intervals into the new interval by taking `min(start)` and `max(end)`.
+3. Add all remaining intervals that start after the merged interval.
+- **Time**: $O(N)$ | **Space**: $O(N)$
 
 ---
 
 ## Part 3: Two Pointers & Sliding Window (19 - 28)
 
 ### 19. Valid Palindrome.
-Two pointers moving towards center, ignoring non-alphanumeric characters and comparing lowercase values ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+Place two pointers at the start and end of the string. Skip non-alphanumeric characters, compare lowercase values, and move inward until they cross.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 20. Two Sum II (Input Array Is Sorted).
-Left pointer at index 0, right pointer at $N-1$. If sum < target, `left++`; if sum > target, `right--` ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+Left pointer at 0, right pointer at $N-1$. If `nums[l] + nums[r] < target`, increment `l`; if greater, decrement `r`.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 21. 3Sum.
-Sort array. Loop index $i$; run Two Pointers on remaining array. Skip duplicate values for $i$, $left$, and $right$ ($O(N^2)$ time).
+**In Simple Words:**
+Sort the array. Loop index $i$ from 0 to $N-1$. For each $i$, run Two Pointers (`left = i + 1, right = N - 1`) looking for `-(nums[i])`. Skip duplicate values for $i$, $left$, and $right$.
+- **Time**: $O(N^2)$ | **Space**: $O(1)$ auxiliary
 
 ### 22. Container With Most Water.
-Pointers at both ends. Calculate `area = min(h[l], h[r]) * (r - l)`. Greedily move pointer with the smaller height inwards ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+Pointers at both ends of the array. Calculate `area = min(h[l], h[r]) * (r - l)`. Greedily move the pointer pointing to the shorter vertical line inward (because moving the taller line can never increase area).
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 23. Trapping Rain Water.
-Two pointers tracking `leftMax` and `rightMax`. Water trapped at current pointer is bounded by the smaller of the two max boundaries ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+Two pointers tracking `leftMax` and `rightMax`. Water trapped at current position is strictly determined by `min(leftMax, rightMax) - height[i]`. Move the pointer with the smaller max inward.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 24. Longest Substring Without Repeating Characters.
-Sliding window with hash map storing last seen index of each character. Advance left boundary past duplicate ($O(N)$ time, $O(\min(N, \Sigma))$ space).
+**In Simple Words:**
+Sliding window with a Hash Map storing each character's last seen index. When a duplicate is seen within the current window, move the left pointer to `lastSeenIndex + 1`.
+- **Time**: $O(N)$ | **Space**: $O(\min(N, \Sigma))$
 
 ### 25. Longest Repeating Character Replacement.
-Sliding window maintaining count of most frequent character in window. If `windowLength - maxFreq > k`, shrink window from left ($O(N)$ time).
+**In Simple Words:**
+Sliding window maintaining character frequencies and `maxFreq` in window. If `windowSize - maxFreq > k`, the window is invalid; shrink from left.
+- **Time**: $O(N)$ | **Space**: $O(26) = O(1)$
 
 ### 26. Minimum Window Substring.
-Track target character counts. Expand right boundary until valid window found; contract left boundary while maintaining validity, updating minimum window ($O(N + M)$ time).
+**In Simple Words:**
+Expand right pointer until all characters from the target string are contained in the window. Then shrink left pointer to find the minimal valid window, updating minimum length.
+- **Time**: $O(N + M)$ | **Space**: $O(1)$
 
 ### 27. Permutation in String.
-Fixed-size sliding window of length equal to pattern string. Track frequency matching; update counts as window slides ($O(N)$ time).
+**In Simple Words:**
+Fixed-size sliding window of length equal to `s1`. Track character frequencies. If frequency map of window matches `s1`, return true. Slide window one character at a time.
+- **Time**: $O(N)$ | **Space**: $O(26) = O(1)$
 
 ### 28. Sliding Window Maximum.
-Maintain a **Monotonic Decreasing Deque** storing indices whose values are in descending order. Front of deque always holds maximum element index of current window ($O(N)$ time, $O(K)$ space).
+**In Simple Words:**
+Maintain a **Monotonic Decreasing Deque** of array indices. The front of the deque always holds the index of the maximum element in the current window. Pop smaller elements from the back before inserting; remove expired indices from front.
+- **Time**: $O(N)$ | **Space**: $O(K)$
 
 ---
 
 ## Part 4: Stacks & Queues (29 - 36)
 
 ### 29. Valid Parentheses.
-Push opening brackets onto stack. When encountering closing bracket, pop top of stack and verify match ($O(N)$ time, $O(N)$ space).
+**In Simple Words:**
+Push opening brackets `'(', '{', '['` onto a stack. When a closing bracket arrives, pop the top of the stack and verify that it matches. Stack must be empty at the end.
+- **Time**: $O(N)$ | **Space**: $O(N)$
 
 ### 30. Min Stack.
-Maintain a primary stack and an auxiliary min-stack storing the minimum element up to that level ($O(1)$ push, pop, top, getMin).
+**In Simple Words:**
+Maintain an auxiliary `minStack` alongside the main stack. When pushing a value $X$, push $\min(X, \text{currentMin})$ onto `minStack`. Popping pops from both. `getMin()` returns `minStack.top()` in $O(1)$.
+- **Time**: $O(1)$ for all operations | **Space**: $O(N)$
 
 ### 31. Evaluate Reverse Polish Notation.
-Iterate tokens: push numbers to stack; when operator encountered, pop top two operands, evaluate, and push result back ($O(N)$ time).
+**In Simple Words:**
+Iterate tokens: push numbers onto stack. When encountering an operator (`+`, `-`, `*`, `/`), pop the top two numbers, apply the operation, and push the result back.
+- **Time**: $O(N)$ | **Space**: $O(N)$
 
 ### 32. Daily Temperatures.
-Use a **Monotonic Decreasing Stack** storing indices of temperatures. When a warmer temperature is encountered, pop indices and record difference ($O(N)$ time).
+**In Simple Words:**
+Use a **Monotonic Decreasing Stack** storing indices of temperatures. When a warmer temperature is found, pop previous colder indices and record the index difference.
+- **Time**: $O(N)$ | **Space**: $O(N)$
 
 ### 33. Largest Rectangle in Histogram.
-Monotonic increasing stack of indices. When height decreases, pop stack and calculate rectangle area with popped height as minimum bar ($O(N)$ time).
+**In Simple Words:**
+Use a Monotonic Increasing Stack of indices. When a shorter bar is encountered, pop previous bars and compute rectangle areas using the popped bar's height as the bottleneck.
+- **Time**: $O(N)$ | **Space**: $O(N)$
 
 ### 34. Implement Queue using Stacks.
-Use two stacks: `inputStack` for pushing, `outputStack` for popping. Transfer elements only when `outputStack` is empty ($O(1)$ amortized pop/peek).
+**In Simple Words:**
+Use two stacks: `inStack` for pushes, `outStack` for pops. To dequeue or peek, if `outStack` is empty, pop everything from `inStack` into `outStack`.
+- **Time**: $O(1)$ amortized | **Space**: $O(N)$
 
 ### 35. Generate Parentheses.
-Backtracking maintaining counts of `open` and `close` brackets. Add open if `open < n`; add close if `close < open`.
+**In Simple Words:**
+Backtracking with two counters: `openCount` and `closeCount`. You can add `'('` if `openCount < n`; you can add `')'` if `closeCount < openCount`.
+- **Time**: $O(\frac{4^n}{\sqrt{n}})$ (Catalan number) | **Space**: $O(N)$
 
 ### 36. Car Fleet.
-Sort cars by starting position descending. Calculate time to reach target (`(target - pos) / speed`). If a car's time is $\le$ time of car in front, it joins the fleet ($O(N \log N)$ time).
+**In Simple Words:**
+Sort cars by starting position descending (closest to target first). Compute time to reach target `(target - pos) / speed`. If a car behind takes less or equal time, it catches up and merges into the fleet ahead.
+- **Time**: $O(N \log N)$ | **Space**: $O(N)$
 
 ---
 
 ## Part 5: Linked Lists (37 - 45)
 
 ### 37. Reverse a Linked List.
-Iterative with three pointers: `prev = null, curr = head`. While `curr`: store `next = curr.next`, set `curr.next = prev`, advance `prev = curr, curr = next` ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+Iterate with 3 pointers: `prev = null, curr = head`. Temporarily store `next = curr.next`, point `curr.next = prev`, then shift `prev = curr, curr = next`.
+- **Time**: $O(N)$ | **Space**: $O(1)$
+```typescript
+function reverseList(head: ListNode | null): ListNode | null {
+  let prev: ListNode | null = null, curr = head;
+  while (curr) {
+    const next = curr.next;
+    curr.next = prev;
+    prev = curr;
+    curr = next;
+  }
+  return prev;
+}
+```
 
 ### 38. Merge Two Sorted Lists.
-Create a dummy head node. Compare heads of both lists, attach smaller node to tail, and advance pointer ($O(N + M)$ time, $O(1)$ space).
+**In Simple Words:**
+Create a dummy node. Compare the head values of both lists; attach the smaller node to `tail.next` and advance that list's pointer.
+- **Time**: $O(N + M)$ | **Space**: $O(1)$
 
 ### 39. Linked List Cycle (Floyd’s Tortoise and Hare).
-Slow pointer moves 1 step; fast pointer moves 2 steps. If they meet, cycle exists. Reset slow to head; move both 1 step to locate cycle start ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+Slow pointer moves 1 step; fast pointer moves 2 steps. If there is a cycle, they will meet. To find the cycle entry node: reset slow to head, then advance both pointers 1 step at a time until they meet again.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 40. Remove Nth Node From End of List.
-Fast pointer advances $N$ nodes ahead. Then advance slow and fast pointers together until fast reaches end. Delete `slow.next` ($O(N)$ single-pass, $O(1)$ space).
+**In Simple Words:**
+Advance a `fast` pointer $N$ nodes ahead. Then advance both `slow` and `fast` together until `fast` hits the last node. `slow.next = slow.next.next` deletes the target node.
+- **Time**: $O(N)$ single pass | **Space**: $O(1)$
 
 ### 41. Reorder List ($L_0 \to L_n \to L_1 \to L_{n-1} \dots$).
+**In Simple Words:**
 1. Find middle with slow/fast pointers.
-2. Reverse second half of list.
-3. Merge first half and reversed second half alternately ($O(N)$ time, $O(1)$ space).
+2. Reverse second half of the list.
+3. Merge first half and reversed second half alternately.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 42. Copy List with Random Pointer.
-Interweave cloned nodes directly next to original nodes (`A -> A' -> B -> B'`). Set random pointers `curr.next.random = curr.random.next`. Unweave clones into separate list ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+1. Clone each node and insert it directly next to the original node (`A -> A' -> B -> B'`).
+2. Set clone random pointers: `curr.next.random = curr.random.next`.
+3. Separate original and cloned lists.
+- **Time**: $O(N)$ | **Space**: $O(1)$ auxiliary
 
 ### 43. Add Two Numbers.
-Traverse lists node by node, maintaining `carry`. Create new nodes with `(val1 + val2 + carry) % 10` ($O(\max(N, M))$ time).
+**In Simple Words:**
+Traverse both lists node by node maintaining a `carry`. At each position, create a new node with `(v1 + v2 + carry) % 10` and update `carry = Math.floor(sum / 10)`.
+- **Time**: $O(\max(N, M))$ | **Space**: $O(\max(N, M))$
 
 ### 44. Find the Duplicate Number.
-Treat array as a linked list where `nums[i]` is pointer to next node. Run Floyd's cycle detection algorithm ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+Treat array values as pointers in a linked list where `nums[i]` points to index `nums[i]`. Because a duplicate exists, a cycle is guaranteed. Run Floyd's Tortoise and Hare algorithm to find the entry point.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 45. Merge K Sorted Lists.
-Insert heads of all $K$ lists into a Min-Heap. Repeatedly extract minimum node, attach to merged list, and push its next node into heap ($O(N \log K)$ time).
+**In Simple Words:**
+Insert the head node of all $K$ lists into a Min-Heap. Repeatedly extract the minimum node, attach it to the result list, and push its `next` node into the heap.
+- **Time**: $O(N \log K)$ | **Space**: $O(K)$
 
 ---
 
 ## Part 6: Binary Search (46 - 52)
 
 ### 46. Binary Search on Sorted Boundaries.
-```typescript
-function binarySearch(nums: number[], target: number): number {
-  let low = 0, high = nums.length - 1;
-  while (low <= high) {
-    const mid = low + Math.floor((high - low) / 2); // Avoid integer overflow
-    if (nums[mid] === target) return mid;
-    if (nums[mid] < target) low = mid + 1;
-    else high = mid - 1;
-  }
-  return -1;
-}
-```
+**In Simple Words:**
+Maintain `low` and `high`. Calculate `mid = low + Math.floor((high - low) / 2)`. If `nums[mid] === target`, return `mid`; if smaller, search right (`low = mid + 1`); else search left (`high = mid - 1`).
+- **Time**: $O(\log N)$ | **Space**: $O(1)$
 
 ### 47. Search a 2D Matrix.
-Treat $M \times N$ matrix as a flat virtual 1D array of length $M \cdot N$. Map index to matrix coordinates: `row = Math.floor(mid / N)`, `col = mid % N` ($O(\log(M \cdot N))$ time).
+**In Simple Words:**
+Treat an $M \times N$ matrix as a single flattened 1D array of length $M \cdot N$. Use standard binary search with coordinate mapping: `row = Math.floor(mid / N)`, `col = mid % N`.
+- **Time**: $O(\log(M \cdot N))$ | **Space**: $O(1)$
 
 ### 48. Search in Rotated Sorted Array.
-Find `mid`. At least one half (`left..mid` or `mid..right`) is guaranteed sorted. Check if target lies within sorted half; adjust boundaries accordingly ($O(\log N)$ time).
+**In Simple Words:**
+Find `mid`. At least one half (`left..mid` or `mid..right`) is guaranteed to be normally sorted. Check if `target` falls inside the sorted half; adjust boundaries accordingly.
+- **Time**: $O(\log N)$ | **Space**: $O(1)$
 
 ### 49. Find Minimum in Rotated Sorted Array.
-Compare `nums[mid]` with `nums[right]`. If `nums[mid] > nums[right]`, min is in right half (`low = mid + 1`); else in left half (`high = mid`) ($O(\log N)$ time).
+**In Simple Words:**
+Compare `nums[mid]` with `nums[right]`. If `nums[mid] > nums[right]`, the inflection point is in the right half (`low = mid + 1`); otherwise it is in the left half (`high = mid`).
+- **Time**: $O(\log N)$ | **Space**: $O(1)$
 
 ### 50. Koko Eating Bananas.
-Binary search on answer range $[1, \max(piles)]$. Check if Koko can eat all bananas within $H$ hours at speed $K$ ($O(N \log(\max))$ time).
+**In Simple Words:**
+Binary search on the answer range $[1, \max(piles)]$. For each candidate speed $K$, calculate total hours required. If total hours $\le H$, try smaller speed (`high = mid`); else try larger speed (`low = mid + 1`).
+- **Time**: $O(N \log(\max(piles)))$ | **Space**: $O(1)$
 
 ### 51. Time Based Key-Value Store.
-Store key-values in Map of arrays sorted by timestamp. Query using binary search (`upper_bound`) to find the latest timestamp $\le$ queried timestamp.
+**In Simple Words:**
+Store values in a Map where each key maps to an array of `{ timestamp, value }` sorted by time. To get a value at timestamp $T$, perform binary search (`upper_bound`) to find the latest timestamp $\le T$.
+- **Time**: $O(\log N)$ get, $O(1)$ set | **Space**: $O(N)$
 
 ### 52. Median of Two Sorted Arrays.
-Binary search on the smaller array partition so that combined left half elements are $\le$ combined right half elements ($O(\log(\min(M, N)))$ time).
+**In Simple Words:**
+Binary search on the partition of the smaller array so that the combined left partition contains half the elements and `leftA <= rightB && leftB <= rightA`.
+- **Time**: $O(\log(\min(M, N)))$ | **Space**: $O(1)$
 
 ---
 
 ## Part 7: Trees & Tries (53 - 65)
 
 ### 53. Invert / Flip Binary Tree.
-Swap left and right children recursively:
+**In Simple Words:**
+Recursively swap `root.left` and `root.right` for every node in the tree.
+- **Time**: $O(N)$ | **Space**: $O(H)$
 ```typescript
 function invertTree(root: TreeNode | null): TreeNode | null {
   if (!root) return null;
@@ -335,172 +417,266 @@ function invertTree(root: TreeNode | null): TreeNode | null {
 ```
 
 ### 54. Maximum Depth of Binary Tree.
-DFS recursion: `1 + max(depth(left), depth(right))` ($O(N)$ time).
+**In Simple Words:**
+Base case: if node is null, return 0. Otherwise return `1 + Math.max(maxDepth(root.left), maxDepth(root.right))`.
+- **Time**: $O(N)$ | **Space**: $O(H)$
 
 ### 55. Diameter of Binary Tree.
-At each node, calculate path through node: `leftDepth + rightDepth`. Track global maximum ($O(N)$ time).
+**In Simple Words:**
+At each node, compute the longest path passing through that node: `leftDepth + rightDepth`. Maintain a global maximum across all nodes.
+- **Time**: $O(N)$ | **Space**: $O(H)$
 
 ### 56. Balanced Binary Tree.
-Return height if balanced; return -1 if subtree height difference $> 1$ ($O(N)$ bottom-up DFS).
+**In Simple Words:**
+Bottom-up DFS: return the height of each subtree. If the difference between left and right subtree heights exceeds 1, return -1 to signal imbalance immediately.
+- **Time**: $O(N)$ | **Space**: $O(H)$
 
 ### 57. Same Tree & Symmetric Tree.
-- Same Tree: `p.val === q.val && isSame(p.left, q.left) && isSame(p.right, q.right)`.
-- Symmetric: Mirror comparison `isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left)`.
+**In Simple Words:**
+- **Same Tree**: Both null -> true. Values match and `isSame(p.left, q.left) && isSame(p.right, q.right)`.
+- **Symmetric Tree**: Mirror comparison `isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left)`.
 
 ### 58. Subtree of Another Tree.
-Check if current tree matches subRoot with `isSameTree()`; otherwise search recursively in `root.left` or `root.right`.
+**In Simple Words:**
+At each node of the main tree, check if `isSameTree(root, subRoot)` is true. If not, search recursively in `root.left` or `root.right`.
+- **Time**: $O(N \cdot M)$ | **Space**: $O(H)$
 
-### 59. Lowest Common Ancestor of a BST & Binary Tree.
-- BST: If both $P, Q < root$, move left; if both $> root$, move right; otherwise current node is LCA ($O(H)$ time).
-- Binary Tree: Post-order DFS. If left and right return non-null, current node is LCA.
+### 59. Lowest Common Ancestor (LCA) of BST & Binary Tree.
+**In Simple Words:**
+- **BST**: If both nodes are smaller than root, go left; if both greater, go right; otherwise current root is the LCA ($O(H)$ time).
+- **Binary Tree**: Post-order DFS. If left and right child calls both return non-null, current node is the LCA.
 
 ### 60. Binary Tree Level Order Traversal.
-BFS with Queue. Process nodes level-by-level using queue length snapshot at start of each iteration ($O(N)$ time).
+**In Simple Words:**
+Use a Queue (BFS). In each iteration, take the current snapshot of `queue.length` to process all nodes of that depth level together.
+- **Time**: $O(N)$ | **Space**: $O(N)$
 
 ### 61. Binary Tree Right Side View.
-Level-order BFS taking the last element of each level, or Reverse Preorder DFS (`root, right, left`) picking the first node seen at each depth.
+**In Simple Words:**
+BFS level-order traversal taking the last node of each level array, or Reverse Preorder DFS (`root -> right -> left`) recording the first node visited at each depth level.
+- **Time**: $O(N)$ | **Space**: $O(N)$
 
 ### 62. Validate Binary Search Tree.
-DFS passing valid ancestral range constraints `(min, max)`. Verify `min < node.val < max` for all nodes.
+**In Simple Words:**
+DFS passing down valid boundaries `(min, max)`. At each node, check that `min < node.val < max`. When going left, update `max = node.val`; when going right, update `min = node.val`.
+- **Time**: $O(N)$ | **Space**: $O(H)$
 
 ### 63. Kth Smallest Element in a BST.
-Iterative in-order traversal (`left, node, right`) using a stack; decrement $K$ at each visit; return value when $K = 0$ ($O(H + K)$ time).
+**In Simple Words:**
+Perform an in-order traversal (`left -> root -> right`), which visits BST nodes in ascending sorted order. Decrement $K$ at each visit; when $K = 0$, you have found the answer.
+- **Time**: $O(H + K)$ | **Space**: $O(H)$
 
 ### 64. Construct Tree from Preorder & Inorder Traversal.
-First element of preorder is root. Locate root in inorder array to determine left and right subtree sizes. Recursively build subtrees.
+**In Simple Words:**
+The first element of preorder is always the root. Locate that value in the inorder array: elements to the left belong to the left subtree, elements to the right belong to the right subtree. Recursively build both.
+- **Time**: $O(N)$ with hash map for inorder indices | **Space**: $O(N)$
 
 ### 65. Implement Trie (Prefix Tree).
-Tree where each node contains an array/map of 26 child references and an `isEndOfWord` flag. Insert, search, and startsWith execute in $O(L)$ time where $L$ is word length.
+**In Simple Words:**
+A tree where each node has a map/array of 26 child characters and a boolean `isEnd`.
+- `insert(word)`: Follow or create character branches, mark last node `isEnd = true`.
+- `search(word)`: Follow branches; return true only if all chars found and `isEnd === true`.
+- `startsWith(prefix)`: Follow branches; return true if prefix path exists.
+- **Time**: $O(L)$ for all operations | **Space**: $O(\text{total chars})$
 
 ---
 
 ## Part 8: Heaps & Priority Queues (66 - 72)
 
 ### 66. Kth Largest Element in an Array.
-- Min-Heap of size $K$: Store elements in heap. When size exceeds $K$, pop min. Heap top is $K$-th largest ($O(N \log K)$).
-- QuickSelect: Partitioning algorithm achieving $O(N)$ average time.
+**In Simple Words:**
+Maintain a **Min-Heap of size K**. Push elements into heap; when size exceeds $K$, pop the minimum. At the end, the top of the Min-Heap is the $K$-th largest element.
+- **Time**: $O(N \log K)$ | **Space**: $O(K)$
 
 ### 67. Top K Frequent Elements.
-Count frequencies with hash map. Group numbers into buckets where `bucket[freq]` stores list of numbers with that frequency (Bucket Sort in $O(N)$ time).
+**In Simple Words:**
+Count frequencies in a Hash Map. Use **Bucket Sort**: create an array of lists where `bucket[frequency]` stores numbers with that count. Iterate buckets backwards from $N$ down to 1 to pick top $K$.
+- **Time**: $O(N)$ | **Space**: $O(N)$
 
 ### 68. Find Median from Data Stream.
-Maintain two heaps:
-- `maxHeap` for lower half of numbers.
-- `minHeap` for upper half of numbers.
-Keep heap sizes balanced ($|size_1 - size_2| \le 1$). Median is top of larger heap or average of both tops ($O(\log N)$ add, $O(1)$ find).
+**In Simple Words:**
+Use two heaps:
+- `maxHeap`: stores the smaller half of numbers.
+- `minHeap`: stores the larger half of numbers.
+Balance heap sizes so $|size_1 - size_2| \le 1$. Median is either the top of the larger heap, or the average of both tops.
+- **Time**: $O(\log N)$ insert, $O(1)$ findMedian | **Space**: $O(N)$
 
 ### 69. Task Scheduler.
-Greedy math: $(maxFreq - 1) \times (n + 1) + count(maxFreqTasks)$. Return maximum of formula and total task count.
+**In Simple Words:**
+Find the most frequent task with frequency $M$. The minimum idle slots needed is $(M - 1) \times (n + 1) + \text{count of tasks with freq } M$. Return $\max(\text{formula}, \text{total tasks})$.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 70. Design Twitter.
-Store followers in hash set. On `getNewsFeed()`, perform multi-way merge on the recent 10 tweets of followed users using a Max-Heap ($O(F \log K)$).
+**In Simple Words:**
+Maintain a map of user followees. To generate news feed, use a Max-Heap to do a $K$-way merge on the 10 most recent tweets posted by all followees.
+- **Time**: $O(F \log K)$ where $F$ is number of followees | **Space**: $O(U + T)$
 
 ### 71. Reorganize String.
-Count character frequencies. Push to Max-Heap. Pop most frequent char, place in string, hold it, pop second char, place, and re-insert first char to prevent adjacent duplicates.
+**In Simple Words:**
+Count character frequencies and put in a Max-Heap. Repeatedly extract the most frequent character, place it, hold it in a temp variable, place the second most frequent character, then re-insert the held character.
+- **Time**: $O(N \log 26) = O(N)$ | **Space**: $O(1)$
 
 ### 72. Minimum Cost to Connect Sticks.
-Insert all stick lengths into a Min-Heap. Repeatedly extract two smallest sticks, add their sum to total cost, and re-insert sum into heap ($O(N \log N)$ time).
+**In Simple Words:**
+Greedy approach using a Min-Heap. Repeatedly extract the two smallest sticks, add their sum to the running cost, and push the combined stick back into the heap until 1 stick remains.
+- **Time**: $O(N \log N)$ | **Space**: $O(N)$
 
 ---
 
 ## Part 9: Backtracking (73 - 79)
 
 ### 73. Subsets (Power Set).
-Generate all $2^N$ subsets. At each index, branch: either include `nums[i]` or exclude it.
+**In Simple Words:**
+At each index $i$, branch into two recursive choices: either include `nums[i]` in the current subset, or exclude it.
+- **Time**: $O(N \cdot 2^N)$ | **Space**: $O(N)$
 
 ### 74. Combination Sum.
-Backtrack trying candidates from `start` index. Subtract candidate from target. If target is 0, add combination. Allow reuse by passing same index.
+**In Simple Words:**
+Backtracking: at each index, try candidates from `start` to end. Subtract chosen number from target. If target becomes 0, save combination. Since numbers can be reused, keep index `i` on recursive call.
+- **Time**: $O(2^{\text{target}})$ | **Space**: $O(\text{target})$
 
 ### 75. Permutations.
-Generate all $N!$ permutations by swapping or tracking `used` boolean array.
+**In Simple Words:**
+Generate all $N!$ orderings. Maintain a `used` boolean array or swap elements in-place. At each recursion level, pick an unused number, recurse, then unmark it (backtrack).
+- **Time**: $O(N \cdot N!)$ | **Space**: $O(N)$
 
 ### 76. Subsets II.
-Sort array. When excluding a number at a recursion level, skip all subsequent duplicate numbers (`nums[i] === nums[i-1]`) to prevent duplicate subsets.
+**In Simple Words:**
+Sort the array first. When excluding a number at a recursion level, skip all adjacent duplicate numbers (`nums[i] === nums[i-1]`) to prevent identical duplicate subsets.
+- **Time**: $O(N \cdot 2^N)$ | **Space**: $O(N)$
 
 ### 77. Word Search in Grid.
-DFS from matching start characters. Mark current cell as visited in-place (`grid[r][c] = '#'`), explore 4 directions, and restore character on backtrack ($O(M \cdot N \cdot 4^L)$ time).
+**In Simple Words:**
+DFS from cells matching the first character. Mark current cell as visited in-place (`board[r][c] = '#'`), explore 4 directions for `word[k+1]`, and restore the character on backtrack.
+- **Time**: $O(M \cdot N \cdot 4^L)$ | **Space**: $O(L)$
 
 ### 78. Palindrome Partitioning.
-Backtracking: iterate substring from `start` to `end`. If substring is palindrome, add to path and recursively partition remaining string.
+**In Simple Words:**
+At each step, slice prefix `s[start..i]`. If the prefix is a valid palindrome, add it to current partition path and recursively partition remaining substring `s[i+1..]`.
+- **Time**: $O(N \cdot 2^N)$ | **Space**: $O(N)$
 
 ### 79. N-Queens.
-Place queens row by row. Track occupied columns, positive diagonals (`r + c`), and negative diagonals (`r - c`) using sets to prune invalid branches.
+**In Simple Words:**
+Place queens row by row. Track occupied columns, positive diagonals (`r + c`), and negative diagonals (`r - c`) using Hash Sets to prune invalid board positions immediately.
+- **Time**: $O(N!)$ | **Space**: $O(N)$
 
 ---
 
 ## Part 10: Graphs (BFS, DFS, Topological Sort & Union-Find) (80 - 90)
 
 ### 80. Number of Islands.
-Traverse grid. When `'1'` is found, increment count and launch BFS/DFS to sink the connected island by setting cells to `'0'` ($O(M \cdot N)$ time).
+**In Simple Words:**
+Iterate through the 2D grid. When you encounter `'1'`, increment island count and launch BFS/DFS to sink all connected land cells by flipping them to `'0'`.
+- **Time**: $O(M \cdot N)$ | **Space**: $O(M \cdot N)$
 
 ### 81. Clone Graph.
-DFS/BFS using a hash map to map original node pointers to their cloned counterparts, preventing infinite recursion on cycles ($O(V + E)$ time).
+**In Simple Words:**
+DFS or BFS traversal using a Hash Map mapping `originalNode -> clonedNode`. If a neighbor is already cloned in the map, return it immediately to handle cycles safely.
+- **Time**: $O(V + E)$ | **Space**: $O(V)$
 
 ### 82. Rotting Oranges.
-Multi-Source BFS: enqueue all initially rotten oranges with timestamp 0. Pop queue, infect adjacent fresh oranges, decrement fresh count, and record max minutes ($O(M \cdot N)$ time).
+**In Simple Words:**
+Multi-source BFS: enqueue all initially rotten oranges at minute 0. Pop from queue, rot adjacent fresh oranges, decrement fresh orange count, and track maximum elapsed minutes.
+- **Time**: $O(M \cdot N)$ | **Space**: $O(M \cdot N)$
 
 ### 83. Pacific Atlantic Water Flow.
-Reverse BFS/DFS starting from ocean boundary cells flowing uphill (`height[next] >= height[curr]`). Coordinates visited from both oceans satisfy criteria.
+**In Simple Words:**
+Reverse BFS/DFS: start from ocean boundary cells and flow uphill (`height[next] >= height[curr]`). Coordinates visited by water flowing from both Pacific and Atlantic boundaries are the solution.
+- **Time**: $O(M \cdot N)$ | **Space**: $O(M \cdot N)$
 
 ### 84. Course Schedule (I & II).
-Topological Sort using **Kahn’s Algorithm (In-degree BFS)**:
-1. Build adjacency list and compute in-degrees of all nodes.
-2. Enqueue all nodes with in-degree 0.
-3. Dequeue node, decrement in-degree of neighbors. If neighbor in-degree hits 0, enqueue.
-4. If processed count $< V$, graph contains a cycle.
+**In Simple Words:**
+Topological Sort using **Kahn's Algorithm (In-degree BFS)**:
+1. Compute in-degrees of all courses and build adjacency list.
+2. Enqueue courses with in-degree 0 (no prerequisites).
+3. Dequeue course, decrement in-degree of dependent courses. If any in-degree reaches 0, enqueue it.
+4. If total processed courses $< V$, a cycle exists!
+- **Time**: $O(V + E)$ | **Space**: $O(V + E)$
 
 ### 85. Connected Components & Disjoint Set Union (DSU).
+**In Simple Words:**
 Implement Union-Find with **Path Compression** and **Union by Rank**:
-`find(x)` compresses parent pointers; `union(x, y)` merges smaller rank tree under larger. Connects components in near $O(1)$ amortized time ($\alpha(N)$).
+- `find(x)`: Flattens tree pointers directly to root.
+- `union(x, y)`: Attaches smaller depth tree under larger depth tree. Runs in near $O(1)$ amortized time ($\alpha(N)$).
 
 ### 86. Redundant Connection.
-Iterate edges. If `find(u) === find(v)`, edge forms a cycle and is the redundant connection; otherwise `union(u, v)`.
+**In Simple Words:**
+Iterate through edges using Union-Find. If `find(u) === find(v)`, adding this edge creates a cycle and is the redundant connection! Otherwise call `union(u, v)`.
+- **Time**: $O(N \cdot \alpha(N))$ | **Space**: $O(N)$
 
 ### 87. Word Ladder.
-Shortest transformation sequence via BFS: enqueue `(beginWord, 1)`. For current word, mutate each character 'a' through 'z'; if in word set, enqueue and delete from set ($O(N \cdot L \cdot 26)$ time).
+**In Simple Words:**
+Shortest path BFS: enqueue `[beginWord, 1]`. For the current word, try changing each character 'a' through 'z'. If the new word is in `wordSet`, enqueue `[newWord, steps + 1]` and delete it from `wordSet`.
+- **Time**: $O(N \cdot L \cdot 26)$ | **Space**: $O(N \cdot L)$
 
 ### 88. Network Delay Time (Dijkstra’s Algorithm).
-Min-Heap priority queue storing `(time, node)`. Pop smallest time, relax adjacent edges, and push updated times ($O((V + E) \log V)$ time).
+**In Simple Words:**
+Min-Heap priority queue storing `[time, node]`. Repeatedly extract smallest time, relax adjacent edges, and push updated travel times. Return max time across all nodes.
+- **Time**: $O((V + E) \log V)$ | **Space**: $O(V + E)$
 
 ### 89. Cheapest Flights Within K Stops.
-Modified Bellman-Ford algorithm run for $K + 1$ iterations, or Dijkstra tracking stops in priority queue ($O(K \cdot E)$ time).
+**In Simple Words:**
+Bellman-Ford algorithm run for $K + 1$ iterations. Maintain a copy of the previous price array to avoid using more than $K$ stops in a single iteration.
+- **Time**: $O(K \cdot E)$ | **Space**: $O(V)$
 
 ### 90. Alien Dictionary.
-Compare adjacent words to find first differing character, establishing directed edges (`char1 -> char2`). Run Topological Sort. If cycle exists, return `""`.
+**In Simple Words:**
+Compare adjacent words in dictionary order to find the first differing character, creating directed edges (`char1 -> char2`). Run Topological Sort on character graph. If a cycle exists, return `""`.
+- **Time**: $O(C)$ total characters | **Space**: $O(V + E)$
 
 ---
 
 ## Part 11: 1D & 2D Dynamic Programming (91 - 100)
 
 ### 91. Climbing Stairs.
-$dp[i] = dp[i-1] + dp[i-2]$. Optimized to two variables $a, b$ ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+To reach step $i$, you can come from step $i-1$ or step $i-2$. Exactly like Fibonacci: $dp[i] = dp[i-1] + dp[i-2]$. Optimize to two variables $a, b$.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 92. Min Cost Climbing Stairs.
-$dp[i] = cost[i] + \min(dp[i-1], dp[i-2])$ ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+Cost to reach step $i$ is $cost[i] + \min(dp[i-1], dp[i-2])$. Optimize with two variables storing minimum cost of previous two steps.
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 93. House Robber (I & II).
-- I: `rob = max(prevRob, prevNotRob + num)`.
-- II (Circular): Run House Robber I twice: once excluding first house (`1..N-1`), once excluding last house (`0..N-2`).
+**In Simple Words:**
+- **I**: At each house: `rob = max(prevRob, prevNotRob + houseValue)` ($O(N)$ time, $O(1)$ space).
+- **II (Circular)**: First and last houses are neighbors. Run House Robber I twice: once on `houses[0..N-2]` and once on `houses[1..N-1]`, and take the maximum.
 
 ### 94. Coin Change.
-Bottom-up tabulation: initialize `dp` array of size `amount + 1` with $\infty$, `dp[0] = 0`.
-`dp[i] = min(dp[i], dp[i - coin] + 1)` ($O(\text{amount} \cdot \text{coins})$ time).
+**In Simple Words:**
+Bottom-up DP table of size `amount + 1` filled with $\infty$, with `dp[0] = 0`. For each amount from 1 to `amount`, `dp[i] = min(dp[i], dp[i - coin] + 1)`.
+- **Time**: $O(\text{amount} \cdot \text{coins})$ | **Space**: $O(\text{amount})$
 
 ### 95. Longest Increasing Subsequence (LIS).
-Patience sorting / Binary search: maintain an array `tails`. For each number, binary search to find insertion point. If greater than all, append; otherwise replace ($O(N \log N)$ time, $O(N)$ space).
+**In Simple Words:**
+Patience Sorting / Binary Search: maintain a `tails` array. For each number, binary search for its position in `tails`. If larger than all, append it; otherwise overwrite the existing number. Length of `tails` is the LIS.
+- **Time**: $O(N \log N)$ | **Space**: $O(N)$
 
 ### 96. Word Break.
-$dp[i]$ indicates if `s[0..i]` can be segmented. For each $i$, check all prefixes $j < i$ where $dp[j] == \text{true}$ and `s[j..i] \in \text{dict}$ ($O(N^2 \cdot K)$ time).
+**In Simple Words:**
+Boolean array `dp[i]` indicating whether `s[0..i]` can be segmented. For each $i$, check all prefixes $j < i$: if `dp[j] === true` and `s[j..i]` is in the dictionary, set `dp[i] = true`.
+- **Time**: $O(N^2 \cdot K)$ | **Space**: $O(N)$
 
 ### 97. Unique Paths.
-$dp[r][c] = dp[r-1][c] + dp[r][c-1]$. Space optimized to single 1D row array ($O(M \cdot N)$ time, $O(N)$ space).
+**In Simple Words:**
+Paths to cell $(r, c)$ equal paths from top plus paths from left: $dp[r][c] = dp[r-1][c] + dp[r][c-1]$. Optimize to a single 1D row array of size $N$.
+- **Time**: $O(M \cdot N)$ | **Space**: $O(N)$
 
 ### 98. Longest Common Subsequence (LCS).
-If `s1[i] === s2[j]`, `dp[i][j] = 1 + dp[i-1][j-1]`; else `max(dp[i-1][j], dp[i][j-1])` ($O(M \cdot N)$ time and space).
+**In Simple Words:**
+2D DP: If characters match (`s1[i] === s2[j]`), `dp[i][j] = 1 + dp[i-1][j-1]`. If they differ, `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`.
+- **Time**: $O(M \cdot N)$ | **Space**: $O(M \cdot N)$
 
 ### 99. Best Time to Buy and Sell Stock with Cooldown.
-State machine with 3 states: `held`, `sold` (cooldown), and `reset`. Transition between states based on daily prices ($O(N)$ time, $O(1)$ space).
+**In Simple Words:**
+State machine with 3 states:
+- `held`: holding stock (`max(prevHeld, prevReset - price)`).
+- `sold`: sold stock today, enters 1-day cooldown (`prevHeld + price`).
+- `reset`: in cooldown or empty (`max(prevReset, prevSold)`).
+- **Time**: $O(N)$ | **Space**: $O(1)$
 
 ### 100. 0/1 Knapsack & Partition Equal Subset Sum.
-Check if array can partition into target sum `total / 2`. 1D DP boolean array traversed backwards from target down to num: `dp[s] = dp[s] || dp[s - num]` ($O(N \cdot \text{sum})$ time, $O(\text{sum})$ space).
-
+**In Simple Words:**
+Check if array can partition into target sum `total / 2`. Use a 1D boolean DP array traversed backwards from `target` down to `num`: `dp[s] = dp[s] || dp[s - num]`.
+- **Time**: $O(N \cdot \text{target})$ | **Space**: $O(\text{target})$

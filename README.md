@@ -100,6 +100,40 @@
 
 ---
 
+## 💻 Interactive Next.js Web Application
+
+This repository includes a full-fledged **Next.js 14 App Router** web portal providing an interactive study experience with Markdown rendering, instant search, copyable code blocks, and responsive layouts.
+
+### 🚀 Running Locally
+
+```bash
+# Clone the repository
+git clone https://github.com/TheLearningHubOrg/learn-interview-questions.git
+cd learn-interview-questions
+
+# Install dependencies
+npm install
+
+# Start local Next.js development server
+npm run dev
+# -> Open http://localhost:3000 in your browser
+
+# Build production static bundle
+npm run build
+
+# Start production server
+npm run start
+```
+
+### ⚡ Web App Features
+- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 745+ questions with live filtering and jump links.
+- **Table of Contents Sidebar**: Sticky scroll-spy outline for every track.
+- **Code Block Utilities**: One-click code copying and language tags.
+- **Server-Side Generation (SSG)**: Zero runtime markdown overhead with pre-rendered pages.
+- **Sleek Dark Theme**: Built with Tailwind CSS, custom obsidian color scales, and smooth transitions.
+
+---
+
 ## 🎯 How to Use This Question Bank
 1. **Targeted Track Review**: Jump straight into the track corresponding to your upcoming technical round (e.g., Frontend System Design, Backend API Deep-Dive, Cloud Architecture, or Live Coding DSA).
 2. **Mock Interview Simulation**: Practice explaining questions candidly out loud using the structured answers, code snippets, and comparative tables.
@@ -120,3 +154,4 @@ Contributions, enhancements, and additional real-world interview scenarios are w
 ## 📄 License
 This project is open-source software licensed under the [MIT License](LICENSE).
 Part of **[The Learning Hub Org](https://github.com/TheLearningHubOrg)**.
+

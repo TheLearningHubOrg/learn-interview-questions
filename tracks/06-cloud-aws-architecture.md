@@ -396,3 +396,4 @@ Serverless event bus that ingests and routes events using JSON schema pattern ma
 2. **Pilot Light**: Core data replicated continuously; minimal compute infrastructure kept off until disaster occurs.
 3. **Warm Standby**: Scaled-down version of full environment running continuously in secondary region.
 4. **Multi-Region Active-Active**: Highest cost, lowest RTO/RPO (near zero). Workloads served simultaneously from multiple regions.
+

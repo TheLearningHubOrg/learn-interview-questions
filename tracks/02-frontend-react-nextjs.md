@@ -998,3 +998,4 @@ Enable `output: 'standalone'` in `next.config.js`. Next.js automatically traces 
 
 ### 160. Monitoring production Core Web Vitals in Next.js.
 Use the built-in `useReportWebVitals` hook to stream real-user metric (RUM) payloads (LCP, CLS, INP, TTFB) to analytics endpoints or monitoring platforms (Datadog, OpenTelemetry).
+

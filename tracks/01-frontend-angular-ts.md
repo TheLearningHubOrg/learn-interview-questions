@@ -1531,3 +1531,4 @@ export class DataTableComponent<T> {
 }
 ```
 In template: `<app-data-table [data]="users" [trackKey]="userTracker" />` where `T` is automatically inferred as `User`.
+

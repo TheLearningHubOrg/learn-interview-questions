@@ -437,3 +437,4 @@ Node.js uses a single event loop thread with non-blocking I/O, consuming ~30MB R
 **Answer:**
 - **Bun**: Built in Zig with JavaScriptCore engine. Blazingly fast startup, built-in package manager, bundled test runner, and native TypeScript support.
 - **Deno**: Built in Rust with V8. Emphasizes secure-by-default sandbox permissions, Web standard APIs, built-in tooling, and native TypeScript compilation.
+

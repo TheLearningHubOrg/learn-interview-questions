@@ -5,8 +5,8 @@ import { getGlobalSearchIndex } from '@/lib/tracks';
 import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
-  title: 'Master Full-Stack, Cloud & Core JavaScript Interview Question Bank (1,260+ Questions)',
-  description: 'Comprehensive, production-tested interview question bank with 1,260+ questions covering Core JavaScript Internals, Angular, React, Next.js, TypeScript, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
+  title: 'Master Full-Stack, Cloud, React & Core JavaScript Interview Question Bank (1,450+ Questions)',
+  description: 'Comprehensive, production-tested interview question bank with 1,450+ questions covering Core React, React 18/19, Core JavaScript Internals, Angular, TypeScript, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
   keywords: [
     'javascript interview questions',
     'core javascript',

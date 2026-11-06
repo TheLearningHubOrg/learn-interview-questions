@@ -49,14 +49,14 @@ export const TRACKS: TrackMeta[] = [
     id: '02',
     sectionNumber: 2,
     slug: 'react-nextjs',
-    title: 'Full-Stack Frontend Master: React 18/19, Next.js, Modern Web & Core JS',
-    shortTitle: 'React & Next.js',
-    description: 'Deep dive into React 19 Actions, Server Components (RSC), Next.js App Router, SSR/SSG/ISR, streaming hydration, and web performance.',
-    questionCount: 160,
+    title: 'Complete Master Interview: React 18/19, Hooks, Redux, React Router & Next.js',
+    shortTitle: 'React & Modern Frontend (353 Qs)',
+    description: 'The definitive 353 React interview questions covering Core React, JSX, Virtual DOM, Fiber, Hooks, Context, Redux Toolkit, React Router v6, SSR, and React 19 Actions.',
+    questionCount: 353,
     filename: '02-frontend-react-nextjs.md',
     badgeColor: 'from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/30',
     iconName: 'Atom',
-    tags: ['React 19', 'Next.js App Router', 'RSC', 'Server Actions', 'SSR/ISR', 'Tailwind']
+    tags: ['React 19', 'Hooks', 'Fiber', 'Server Actions', 'Redux Toolkit', 'React Router v6', 'SSR']
   },
   {
     id: '03',

@@ -1,12 +1,12 @@
 # The Master Full-Stack, Cloud & Core JavaScript Interview Question Bank 🚀
 
-> **1,260+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Core JavaScript Internals, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
+> **1,450+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Core React, React 18/19, Core JavaScript Internals, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
 [![Curriculum: 8 Tracks](https://img.shields.io/badge/Tracks-8%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1260+](https://img.shields.io/badge/Questions-1260%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Questions: 1450+](https://img.shields.io/badge/Questions-1450%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -15,18 +15,32 @@
 | Track | Focus Tech Stack | Questions | Link |
 | :--- | :--- | :---: | :--- |
 | **Track 1: Frontend Angular & TS** | Angular 17-19, TypeScript, RxJS, Signals, Core JS, HTML5, Modern CSS | **235** | [Open Track 1](tracks/01-frontend-angular-ts.md) |
-| **Track 2: Frontend React & Next.js** | React 18/19, Next.js App Router, Server Components, SSR/SSG/ISR, Modern Web | **160** | [Open Track 2](tracks/02-frontend-react-nextjs.md) |
+| **Track 2: Complete React Master** | Sudheer Jonna 353 Qs: React 18/19, JSX, Fiber, Hooks, Redux, Router v6, SSR | **353** | [Open Track 2](tracks/02-frontend-react-nextjs.md) |
 | **Track 3: Databases & System Design** | PostgreSQL, MySQL, ACID, Indexing, MongoDB, DynamoDB, Redis, Scalability | **60** | [Open Track 3](tracks/03-backend-databases-system-design.md) |
 | **Track 4: Backend Python** | Python 3.12+, CPython Internals, AsyncIO, FastAPI, SQLAlchemy 2.0, Celery | **65** | [Open Track 4](tracks/04-backend-python.md) |
 | **Track 5: Backend Node.js** | Node.js Runtime, V8, Libuv Event Loop, Streams, Buffers, Express, Fastify | **60** | [Open Track 5](tracks/05-backend-nodejs.md) |
 | **Track 6: AWS Cloud Architecture** | AWS Well-Architected, VPC, Fargate, Lambda, S3, Aurora, IAM, KMS, SQS | **65** | [Open Track 6](tracks/06-cloud-aws-architecture.md) |
 | **Track 7: Data Structures & Algorithms** | Blind 75, NeetCode 150 Patterns, Two Pointers, Trees, Graphs, DP | **100** | [Open Track 7](tracks/07-data-structures-algorithms.md) |
 | **Track 8: Core JavaScript Internals** | Sudheer Jonna 518 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **518** | [Open Track 8](tracks/08-frontend-javascript.md) |
-| **TOTAL** | **Full-Stack, Cloud & Core JavaScript Mastery** | **1,263** | — |
+| **TOTAL** | **Full-Stack, Cloud & Core JavaScript Mastery** | **1,456** | — |
 
 ---
 
 ## 📚 Curriculum Breakdown
+
+### ⚛️ [Track 2: Complete React Master (1 - 356)](tracks/02-frontend-react-nextjs.md)
+1. **Core React, JSX & Component Architecture (Q1 - Q78)**: React evolution from XHP/FaxJS, JSX transpilation, Virtual DOM, React Fiber scheduling, controlled vs uncontrolled components, reconciliation, fragments, portals, static type checking, synthetic events, prop validation, inline styles, error boundaries.
+2. **React Router & Navigation (Q79 - Q89)**: React Router v6 architecture, `<BrowserRouter>`, `<Routes>`, programmatic navigation with `useNavigate`, `push` vs `replace`, query parameters, 404 fallback routing.
+3. **React Internationalization (Q90 - Q95)**: React Intl (`IntlProvider`, `FormattedMessage`, `FormattedNumber`), pluralization, currency formatting, locale switching.
+4. **React Testing & Jest (Q96 - Q101)**: Shallow Renderer, TestRenderer, Jest test runner, parallel execution, snapshot testing, mocking dependencies.
+5. **React Redux State Management (Q102 - Q135)**: Flux vs Redux unidirectional flow, 3 Core Principles, pure reducers, `useSelector` & `useDispatch`, Redux Thunk vs Redux Saga generators, Redux DevTools time-travel debugging, Reselect memoization.
+6. **React Native Architecture (Q136 - Q139)**: Native views vs HTML DOM, bridge architecture, Hermes JS engine, mobile test tools.
+7. **Supported Libraries, Styling & Integrations (Q140 - Q152)**: Reselect selectors, Flow vs TypeScript, Styled Components CSS-in-JS, Relay GraphQL fragments, DevTools troubleshooting.
+8. **Advanced React Patterns, Portals & Performance (Q153 - Q264)**: Render hijacking, code splitting with `React.lazy` and `<Suspense>`, windowing with `react-window`, Context API default values, diffing algorithm rules, refs usage, React 18 Automatic Batching, React StrictMode double rendering, immutable state array updates.
+9. **React Hooks Deep Dive (Q265 - Q319)**: `useState` vs `useReducer`, `useContext`, `useEffect` dependency array & cleanup mechanics, `useLayoutEffect` DOM measurements, `useRef` mutable containers, `useMemo` vs `useCallback`, Custom Hooks, `useId`, `useTransition`, `useDeferredValue`, `useSyncExternalStore`, `useInsertionEffect`.
+10. **Modern React 18, React 19 & Next.js Patterns (320 - 356)**: React 18 Concurrent Rendering, React 19 Actions, `use()` hook for promises & context, Server Actions, `useOptimistic`, `useFormStatus`, React Compiler (React Forget), Streaming SSR (`renderToPipeableStream`), Next.js App Router vs Pages Router, Server Components vs Client Components.
+
+---
 
 ### 🟨 [Track 8: Core JavaScript Master (1 - 518)](tracks/08-frontend-javascript.md)
 1. **Core Objects, Prototypes, Functions & Scope (Q1 - Q50)**: Ways to create objects, prototype chains, `call`/`apply`/`bind`, Map vs Object, arrow functions, currying, pure functions, `let` vs `var`, TDZ, IIFE, memoization, hoisting, closures, scopes, service workers, IndexedDB, cookies & web storage.

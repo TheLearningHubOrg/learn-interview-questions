@@ -36,12 +36,12 @@ export function TrackCard({ track }: TrackCardProps) {
   const IconComponent = ICON_MAP[track.iconName] || Code2;
 
   return (
-    <div className="group relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl bg-card border border-border hover:border-purple-500/40 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/5 hover:-translate-y-1">
+    <div className="group relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl bg-card border border-border hover:border-purple-400/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1">
       <div>
         {/* Header Icon + Question Pill */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2.5">
-            <div className={`p-2.5 rounded-xl border bg-gradient-to-br ${track.badgeColor}`}>
+            <div className={`p-2.5 rounded-xl border ${track.badgeColor} shadow-sm`}>
               <IconComponent className="h-5 w-5" />
             </div>
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -49,14 +49,14 @@ export function TrackCard({ track }: TrackCardProps) {
             </span>
           </div>
 
-          <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-muted text-foreground border border-border group-hover:border-purple-500/30 group-hover:text-purple-400 transition-colors">
+          <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-muted text-foreground border border-border group-hover:border-purple-400/40 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
             {track.questionCount} Questions
           </span>
         </div>
 
         {/* Title */}
         <Link href={`/sections/${track.slug}/1`} className="block">
-          <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-purple-400 transition-colors mb-2 line-clamp-2">
+          <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors mb-2 line-clamp-2">
             {track.title}
           </h3>
         </Link>
@@ -71,7 +71,7 @@ export function TrackCard({ track }: TrackCardProps) {
           {track.tags.slice(0, 4).map((tag) => (
             <span
               key={tag}
-              className="text-[11px] px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border"
+              className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border"
             >
               {tag}
             </span>
@@ -88,9 +88,9 @@ export function TrackCard({ track }: TrackCardProps) {
       <div className="pt-4 border-t border-border flex items-center justify-between gap-3">
         <Link
           href={`/sections/${track.slug}`}
-          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors py-1 px-2 rounded-lg hover:bg-muted"
+          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors py-1.5 px-2.5 rounded-lg hover:bg-muted"
         >
-          <List className="h-3.5 w-3.5 text-purple-400" />
+          <List className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
           <span>All Questions</span>
         </Link>
 

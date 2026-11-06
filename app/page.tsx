@@ -60,26 +60,26 @@ export default async function HomePage() {
       />
 
       {/* Background Radial Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-purple-600/15 via-indigo-600/5 to-transparent blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-purple-500/10 via-indigo-500/5 to-transparent dark:from-purple-600/15 dark:via-indigo-600/5 blur-3xl pointer-events-none -z-10" />
 
       {/* Hero Section */}
       <section className="pt-16 pb-12 sm:pt-24 sm:pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Release Tag */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold mb-6 sm:mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 text-xs font-bold mb-6 sm:mb-8 animate-in fade-in slide-in-from-top-4 duration-500 shadow-sm dark:shadow-none">
           <Sparkles className="h-3.5 w-3.5" />
           <span>The Complete 2026 Master Interview Engineering Edition</span>
         </div>
 
         {/* Hero Title */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-foreground tracking-tight leading-[1.15] mb-6">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-foreground tracking-tight leading-[1.15] mb-6">
           Master Full-Stack & Cloud <br />
-          <span className="bg-gradient-to-r from-purple-500 via-violet-400 to-indigo-500 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-purple-700 via-indigo-600 to-violet-700 dark:from-purple-400 dark:via-violet-300 dark:to-indigo-400 bg-clip-text text-transparent">
             Technical Interviews
           </span>
         </h1>
 
         {/* Hero Subtitle */}
-        <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed mb-8 sm:mb-10">
+        <p className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed mb-8 sm:mb-10 font-normal">
           Over <span className="font-bold text-foreground">{totalQuestions}+ battle-tested interview questions</span> and architectural deep-dives across Frontend, Backend, Databases, AWS Cloud Architecture, and Algorithms. Built for Senior, Lead, and Staff Software Engineers.
         </p>
 
@@ -98,7 +98,7 @@ export default async function HomePage() {
             href="https://github.com/TheLearningHubOrg/learn-interview-questions"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm bg-card hover:bg-card-hover border border-border text-foreground transition-all active:scale-95"
+            className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm bg-card hover:bg-card-hover border border-border text-foreground transition-all shadow-sm dark:shadow-none active:scale-95"
           >
             <Github className="h-4 w-4" />
             <span>Star on GitHub</span>
@@ -108,20 +108,20 @@ export default async function HomePage() {
         {/* Metric Badges Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-sm">
-            <p className="text-2xl sm:text-4xl font-extrabold text-purple-400 mb-1">{totalQuestions}+</p>
-            <p className="text-xs text-muted-foreground font-medium">Master Questions</p>
+            <p className="text-2xl sm:text-4xl font-black text-purple-600 dark:text-purple-400 mb-1">{totalQuestions}+</p>
+            <p className="text-xs text-muted-foreground font-semibold">Master Questions</p>
           </div>
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-sm">
-            <p className="text-2xl sm:text-4xl font-extrabold text-cyan-400 mb-1">{tracks.length}</p>
-            <p className="text-xs text-muted-foreground font-medium">Specialized Tracks</p>
+            <p className="text-2xl sm:text-4xl font-black text-cyan-700 dark:text-cyan-400 mb-1">{tracks.length}</p>
+            <p className="text-xs text-muted-foreground font-semibold">Specialized Tracks</p>
           </div>
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-sm">
-            <p className="text-2xl sm:text-4xl font-extrabold text-emerald-400 mb-1">100%</p>
-            <p className="text-xs text-muted-foreground font-medium">Code Examples</p>
+            <p className="text-2xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400 mb-1">100%</p>
+            <p className="text-xs text-muted-foreground font-semibold">Code Examples</p>
           </div>
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-sm">
-            <p className="text-2xl sm:text-4xl font-extrabold text-amber-400 mb-1">MIT</p>
-            <p className="text-xs text-muted-foreground font-medium">Open Source</p>
+            <p className="text-2xl sm:text-4xl font-black text-amber-700 dark:text-amber-400 mb-1">MIT</p>
+            <p className="text-xs text-muted-foreground font-semibold">Open Source</p>
           </div>
         </div>
       </section>
@@ -130,11 +130,11 @@ export default async function HomePage() {
       <section id="tracks" className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-4">
           <div>
-            <div className="flex items-center gap-2 text-purple-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 text-xs font-bold uppercase tracking-wider mb-2">
               <Layers className="h-4 w-4" />
               <span>Curriculum Tracks</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-bold text-foreground tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight">
               Select Your Preparation Track
             </h2>
           </div>
@@ -152,10 +152,10 @@ export default async function HomePage() {
       </section>
 
       {/* Study Framework Section */}
-      <section className="py-16 sm:py-20 border-t border-border bg-card/30">
+      <section className="py-16 sm:py-20 border-t border-border bg-muted/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl sm:text-3xl font-black text-foreground mb-4">
               Engineered for Senior & Staff Interview Success
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -164,8 +164,8 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            <div className="p-6 rounded-2xl bg-card border border-border">
-              <div className="h-10 w-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4">
+            <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-purple-50 border border-purple-200 dark:bg-purple-500/10 dark:border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-4 shadow-sm">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <h3 className="text-base font-bold text-foreground mb-2">Framework & Runtime Internals</h3>
@@ -174,8 +174,8 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-card border border-border">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
+            <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 flex items-center justify-center text-emerald-700 dark:text-emerald-400 mb-4 shadow-sm">
                 <Database className="h-5 w-5" />
               </div>
               <h3 className="text-base font-bold text-foreground mb-2">Real-World Production Scenarios</h3>
@@ -184,8 +184,8 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-card border border-border">
-              <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4">
+            <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-cyan-50 border border-cyan-200 dark:bg-cyan-500/10 dark:border-cyan-500/20 flex items-center justify-center text-cyan-700 dark:text-cyan-400 mb-4 shadow-sm">
                 <Code2 className="h-5 w-5" />
               </div>
               <h3 className="text-base font-bold text-foreground mb-2">Live Coding & Algorithms</h3>

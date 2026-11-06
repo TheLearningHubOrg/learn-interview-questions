@@ -99,13 +99,13 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href={`/sections/${track.slug}`}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-500/40 text-foreground transition-all group font-semibold text-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all group font-semibold text-xs shadow-sm dark:shadow-none"
             >
               <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
               <span>Section Overview</span>
             </Link>
             <span className="text-border hidden sm:inline">•</span>
-            <span className="hidden sm:inline px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-semibold text-xs">
+            <span className="hidden sm:inline px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 font-bold text-xs">
               Section {track.sectionNumber}: {track.shortTitle}
             </span>
           </div>
@@ -115,13 +115,13 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={() => toggleStudied(question.number)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none ${
                 isCurrentStudied
-                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30 shadow-sm'
-                  : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-500/30'
+                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
               }`}
             >
-              <CheckCircle2 className={`h-3.5 w-3.5 ${isCurrentStudied ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+              <CheckCircle2 className={`h-3.5 w-3.5 ${isCurrentStudied ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`} />
               <span>{isCurrentStudied ? 'Studied' : 'Mark as Studied'}</span>
             </button>
 
@@ -129,10 +129,10 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={() => setIsGridOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-500/40 text-foreground transition-all text-xs font-medium"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all text-xs font-semibold shadow-sm dark:shadow-none"
               title="Jump to question (Press G)"
             >
-              <Grid className="h-3.5 w-3.5 text-purple-400" />
+              <Grid className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
               <span className="hidden sm:inline">Jump</span>
             </button>
 
@@ -140,11 +140,11 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={handleCopyLink}
-              className="p-1.5 rounded-lg bg-card border border-border hover:border-purple-500/40 text-muted-foreground hover:text-foreground transition-all"
+              className="p-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-muted-foreground hover:text-foreground transition-all shadow-sm dark:shadow-none"
               title="Copy Direct Question Link"
               aria-label="Copy Direct Question Link"
             >
-              {copiedLink ? <Check className="h-4 w-4 text-emerald-400" /> : <Share2 className="h-4 w-4" />}
+              {copiedLink ? <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> : <Share2 className="h-4 w-4" />}
             </button>
           </div>
         </div>
@@ -159,20 +159,20 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               <p className="text-xs font-bold text-foreground">
                 Question {question.number} of {totalInTrack}
               </p>
-              <p className="text-[11px] text-muted-foreground truncate max-w-xs sm:max-w-md">
+              <p className="text-[11px] text-muted-foreground truncate max-w-xs sm:max-w-md font-medium">
                 {question.part}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-48">
-            <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+            <div className="flex-1 h-2 rounded-full bg-slate-200 dark:bg-muted overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-300"
+                className="h-full bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-xs font-mono text-purple-400 font-bold w-9 text-right shrink-0">
+            <span className="text-xs font-mono text-purple-600 dark:text-purple-400 font-bold w-9 text-right shrink-0">
               {progressPercent}%
             </span>
           </div>
@@ -180,17 +180,17 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
       </div>
 
       {/* Main Single Question & Answer Card */}
-      <article className="p-5 sm:p-8 md:p-10 rounded-2xl bg-card border border-border shadow-xl mb-8 animate-in fade-in duration-200">
+      <article className="p-5 sm:p-8 md:p-10 rounded-2xl bg-card border border-border shadow-sm dark:shadow-xl mb-8 animate-in fade-in duration-200">
         {/* Question Header */}
         <div className="pb-5 sm:pb-6 mb-6 border-b border-border">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded text-[11px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20">
               {track.shortTitle}
             </span>
             <span className="text-xs text-muted-foreground">•</span>
-            <span className="text-xs text-muted-foreground font-medium">{question.part}</span>
+            <span className="text-xs text-muted-foreground font-semibold">{question.part}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-foreground tracking-tight leading-snug">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug">
             {question.title}
           </h1>
         </div>
@@ -253,22 +253,22 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         {prevQuestion ? (
           <Link
             href={`/sections/${track.slug}/${prevQuestion.number}`}
-            className="p-4 sm:p-5 rounded-xl bg-card border border-border hover:border-purple-500/40 hover:bg-card-hover transition-all group flex items-start gap-3.5"
+            className="p-4 sm:p-5 rounded-xl bg-card border border-border hover:border-purple-400 hover:bg-card-hover transition-all group flex items-start gap-3.5 shadow-sm dark:shadow-none"
           >
-            <div className="p-2 rounded-lg bg-muted border border-border group-hover:border-purple-500/30 text-purple-400 shrink-0 mt-0.5">
+            <div className="p-2 rounded-lg bg-muted border border-border group-hover:border-purple-300 dark:group-hover:border-purple-500/30 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5">
               <ChevronLeft className="h-4 w-4 transform group-hover:-translate-x-0.5 transition-transform" />
             </div>
             <div className="overflow-hidden min-w-0">
-              <span className="text-[11px] font-semibold text-muted-foreground block mb-0.5">
+              <span className="text-[11px] font-bold text-muted-foreground block mb-0.5">
                 Previous Question ({prevQuestion.number})
               </span>
-              <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-400 transition-colors line-clamp-1">
+              <p className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1">
                 {prevQuestion.title}
               </p>
             </div>
           </Link>
         ) : (
-          <div className="p-4 rounded-xl border border-dashed border-border flex items-center justify-center text-xs text-muted-foreground">
+          <div className="p-4 rounded-xl border border-dashed border-border flex items-center justify-center text-xs text-muted-foreground font-medium">
             First question of Section {track.sectionNumber}
           </div>
         )}
@@ -276,29 +276,29 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         {nextQuestion ? (
           <Link
             href={`/sections/${track.slug}/${nextQuestion.number}`}
-            className="p-4 sm:p-5 rounded-xl bg-card border border-border hover:border-purple-500/40 hover:bg-card-hover transition-all group flex items-start justify-between gap-3.5 text-right"
+            className="p-4 sm:p-5 rounded-xl bg-card border border-border hover:border-purple-400 hover:bg-card-hover transition-all group flex items-start justify-between gap-3.5 text-right shadow-sm dark:shadow-none"
           >
             <div className="overflow-hidden flex-1 min-w-0">
-              <span className="text-[11px] font-semibold text-muted-foreground block mb-0.5">
+              <span className="text-[11px] font-bold text-muted-foreground block mb-0.5">
                 Next Question ({nextQuestion.number})
               </span>
-              <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-400 transition-colors line-clamp-1">
+              <p className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1">
                 {nextQuestion.title}
               </p>
             </div>
-            <div className="p-2 rounded-lg bg-muted border border-border group-hover:border-purple-500/30 text-purple-400 shrink-0 mt-0.5">
+            <div className="p-2 rounded-lg bg-muted border border-border group-hover:border-purple-300 dark:group-hover:border-purple-500/30 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5">
               <ChevronRight className="h-4 w-4 transform group-hover:translate-x-0.5 transition-transform" />
             </div>
           </Link>
         ) : (
-          <div className="p-4 rounded-xl border border-dashed border-emerald-500/30 bg-emerald-500/10 flex items-center justify-center text-xs text-emerald-400 font-semibold">
+          <div className="p-4 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-xs text-emerald-700 dark:text-emerald-400 font-bold">
             🎉 Section Completed!
           </div>
         )}
       </div>
 
       {/* Keyboard Shortcut Hint */}
-      <div className="mt-8 text-center text-xs text-muted-foreground hidden sm:block">
+      <div className="mt-8 text-center text-xs text-muted-foreground hidden sm:block font-medium">
         <span>Tip: Use </span>
         <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border text-foreground font-mono text-[11px]">←</kbd>
         <span> and </span>
@@ -311,7 +311,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
       {/* Question Palette Modal (Number Grid 1 to N) */}
       {isGridOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 dark:bg-black/75 backdrop-blur-sm animate-in fade-in duration-150"
           onClick={() => setIsGridOpen(false)}
         >
           <div
@@ -320,8 +320,8 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
           >
             <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-border mb-4">
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
-                  <Grid className="h-4 w-4 text-purple-400" />
+                <h3 className="text-sm sm:text-base font-extrabold text-foreground flex items-center gap-2">
+                  <Grid className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   <span>Section {track.sectionNumber}: Question Jump Palette</span>
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -356,14 +356,14 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
                         isCurrent
                           ? 'bg-purple-600 text-white shadow-md shadow-purple-600/40 ring-2 ring-purple-400'
                           : isStudied
-                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25'
-                          : 'bg-muted hover:bg-card-hover border border-border text-foreground hover:border-purple-500/30'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30 dark:hover:bg-emerald-500/25'
+                          : 'bg-muted hover:bg-card-hover border border-border text-foreground hover:border-purple-400/50'
                       }`}
                       title={`Q${q.number}: ${q.title}`}
                     >
                       <span>{q.number}</span>
                       {isStudied && !isCurrent && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 absolute bottom-1" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 absolute bottom-1" />
                       )}
                     </button>
                   );
@@ -371,13 +371,13 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               </div>
             </div>
 
-            <div className="pt-3 sm:pt-4 border-t border-border mt-4 flex items-center justify-between text-xs text-muted-foreground">
+            <div className="pt-3 sm:pt-4 border-t border-border mt-4 flex items-center justify-between text-xs text-muted-foreground font-medium">
               <div className="flex items-center gap-3 sm:gap-4">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-purple-600" /> Current
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" /> Studied
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Studied
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-border" /> Unread

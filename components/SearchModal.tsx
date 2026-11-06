@@ -55,7 +55,7 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-12 sm:pt-20 px-3 sm:px-4 bg-slate-900/40 dark:bg-black/75 backdrop-blur-sm animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div 
@@ -64,7 +64,7 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
       >
         {/* Search Input Bar */}
         <div className="p-3.5 sm:p-4 border-b border-border flex items-center gap-3">
-          <Search className="h-5 w-5 text-purple-400 shrink-0" />
+          <Search className="h-5 w-5 text-purple-600 dark:text-purple-400 shrink-0" />
           <input
             type="text"
             value={query}
@@ -83,7 +83,7 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
               <X className="h-4 w-4" />
             </button>
           )}
-          <kbd className="hidden sm:inline-block px-2 py-0.5 text-xs bg-muted border border-border rounded text-muted-foreground font-mono">
+          <kbd className="hidden sm:inline-block px-2 py-0.5 text-xs bg-muted border border-border rounded text-muted-foreground font-mono font-semibold">
             ESC
           </kbd>
         </div>
@@ -101,15 +101,15 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
                 key={`${item.trackSlug}-${item.questionNumber}-${idx}`}
                 onClick={() => handleSelect(item)}
                 className={`w-full text-left p-3 sm:p-3.5 rounded-xl flex items-start justify-between gap-3 sm:gap-4 transition-colors group ${
-                  idx === selectedIndex ? 'bg-purple-500/10 border border-purple-500/30' : 'hover:bg-card-hover'
+                  idx === selectedIndex ? 'bg-purple-100 text-purple-900 border border-purple-200 dark:bg-purple-500/10 dark:text-foreground dark:border-purple-500/30' : 'hover:bg-card-hover'
                 }`}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 shrink-0">
                       Q{item.questionNumber}
                     </span>
-                    <span className="text-xs text-muted-foreground font-medium truncate">
+                    <span className="text-xs text-muted-foreground font-semibold truncate">
                       {item.trackShortTitle}
                     </span>
                     <span className="text-xs text-muted-foreground/60 hidden sm:inline">•</span>
@@ -117,11 +117,11 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
                       {item.part}
                     </span>
                   </div>
-                  <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-400 transition-colors line-clamp-2">
+                  <p className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
                     {item.title}
                   </p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-2" />
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-2" />
               </button>
             ))
           )}
@@ -132,7 +132,7 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
           <span>{filtered.length} questions displayed</span>
           <div className="flex items-center gap-2">
             <span>Press</span>
-            <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-[11px]">↵ Enter</kbd>
+            <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-[11px] font-semibold">↵ Enter</kbd>
             <span>to open</span>
           </div>
         </div>

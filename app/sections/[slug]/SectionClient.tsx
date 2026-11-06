@@ -49,44 +49,44 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       {/* Breadcrumbs */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-6 flex-wrap">
-        <Link href="/" className="hover:text-purple-400 transition-colors">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-6 flex-wrap font-medium">
+        <Link href="/" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
           Home
         </Link>
         <ChevronRight className="h-3.5 w-3.5 opacity-60" />
-        <Link href="/#tracks" className="hover:text-purple-400 transition-colors">
+        <Link href="/#tracks" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
           Tracks
         </Link>
         <ChevronRight className="h-3.5 w-3.5 opacity-60" />
-        <span className="text-foreground font-semibold">
+        <span className="text-foreground font-bold">
           Section {track.sectionNumber}: {track.shortTitle}
         </span>
       </div>
 
       {/* Section Header Card */}
-      <div className="p-6 sm:p-10 rounded-2xl bg-card border border-border mb-10 shadow-xl relative overflow-hidden transition-colors">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-0" />
+      <div className="p-6 sm:p-10 rounded-2xl bg-card border border-border mb-10 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 dark:bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-0" />
         
         <div className="relative z-10">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20">
                 Section {track.sectionNumber} of {allTracks.length}
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-foreground border border-border">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-muted text-foreground border border-border">
                 {track.questionCount} Questions (1 Per Page)
               </span>
             </div>
 
-            <div className="text-xs text-muted-foreground font-medium">
+            <div className="text-xs text-muted-foreground font-semibold">
               Section {track.sectionNumber} of {allTracks.length}
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight mb-3">
+          <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">
             {track.title}
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl mb-8">
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl mb-8 font-normal">
             {track.description}
           </p>
 
@@ -109,7 +109,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={`Search ${questions.length} questions in this track...`}
-                className="w-full pl-9 pr-4 py-3 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/40"
+                className="w-full pl-9 pr-4 py-3 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-400 shadow-sm dark:shadow-none"
               />
             </div>
           </div>
@@ -125,7 +125,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
             <button
               type="button"
               onClick={() => setQuery('')}
-              className="text-purple-400 hover:underline font-semibold"
+              className="text-purple-600 dark:text-purple-400 hover:underline font-bold"
             >
               Clear search
             </button>
@@ -136,20 +136,20 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
               <Link
                 key={q.number}
                 href={`/sections/${track.slug}/${q.number}`}
-                className="p-4 rounded-xl bg-card border border-border hover:border-purple-500/40 hover:bg-card-hover transition-all flex items-center justify-between gap-4 group"
+                className="p-4 rounded-xl bg-card border border-border hover:border-purple-400 hover:bg-card-hover transition-all flex items-center justify-between gap-4 group shadow-sm dark:shadow-none"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="w-9 h-9 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold text-xs flex items-center justify-center shrink-0">
+                  <span className="w-9 h-9 rounded-lg bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 font-bold text-xs flex items-center justify-center shrink-0">
                     Q{q.number}
                   </span>
                   <div className="min-w-0">
-                    <span className="text-[11px] text-muted-foreground block mb-0.5 truncate">{q.part}</span>
-                    <p className="text-sm font-semibold text-foreground group-hover:text-purple-400 transition-colors line-clamp-1">
+                    <span className="text-[11px] text-muted-foreground block mb-0.5 truncate font-medium">{q.part}</span>
+                    <p className="text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1">
                       {q.title}
                     </p>
                   </div>
                 </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-purple-400 shrink-0 transform group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 shrink-0 transform group-hover:translate-x-1 transition-transform" />
               </Link>
             ))}
           </div>
@@ -161,10 +161,10 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
             <div key={partTitle} className="space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-border">
                 <h2 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-purple-400" />
+                  <Layers className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   <span>{partTitle}</span>
                 </h2>
-                <span className="text-xs text-muted-foreground font-semibold">
+                <span className="text-xs text-muted-foreground font-bold">
                   {partQuestions.length} Questions
                 </span>
               </div>
@@ -174,17 +174,17 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
                   <Link
                     key={q.number}
                     href={`/sections/${track.slug}/${q.number}`}
-                    className="p-4 rounded-xl bg-card border border-border hover:border-purple-500/40 hover:bg-card-hover transition-all flex items-start justify-between gap-3 group"
+                    className="p-4 rounded-xl bg-card border border-border hover:border-purple-400 hover:bg-card-hover transition-all flex items-start justify-between gap-3 group shadow-sm dark:shadow-none"
                   >
                     <div className="flex items-start gap-3 min-w-0">
-                      <span className="w-8 h-8 rounded-lg bg-muted text-foreground border border-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-500 transition-all">
+                      <span className="w-8 h-8 rounded-lg bg-muted text-foreground border border-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all">
                         {q.number}
                       </span>
-                      <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-400 transition-colors line-clamp-2">
+                      <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
                         {q.title}
                       </p>
                     </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-purple-400 shrink-0 mt-1 transform group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 shrink-0 mt-1 transform group-hover:translate-x-1 transition-transform" />
                   </Link>
                 ))}
               </div>

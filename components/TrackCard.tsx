@@ -8,6 +8,7 @@ import {
   Cpu, 
   Cloud, 
   Code2, 
+  FileCode,
   ArrowRight,
   Play,
   List
@@ -22,6 +23,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Cpu,
   Cloud,
   Code2,
+  FileCode,
 };
 
 interface TrackCardProps {

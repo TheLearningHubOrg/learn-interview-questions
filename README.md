@@ -1,12 +1,12 @@
-# The Master Full-Stack & Cloud Interview Question Bank 🚀
+# The Master Full-Stack, Cloud & Core JavaScript Interview Question Bank 🚀
 
-> **745+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
+> **1,260+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Core JavaScript Internals, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
-[![Curriculum: 7 Tracks](https://img.shields.io/badge/Tracks-7%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 745+](https://img.shields.io/badge/Questions-745%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Curriculum: 8 Tracks](https://img.shields.io/badge/Tracks-8%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
+[![Questions: 1260+](https://img.shields.io/badge/Questions-1260%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -21,11 +21,24 @@
 | **Track 5: Backend Node.js** | Node.js Runtime, V8, Libuv Event Loop, Streams, Buffers, Express, Fastify | **60** | [Open Track 5](tracks/05-backend-nodejs.md) |
 | **Track 6: AWS Cloud Architecture** | AWS Well-Architected, VPC, Fargate, Lambda, S3, Aurora, IAM, KMS, SQS | **65** | [Open Track 6](tracks/06-cloud-aws-architecture.md) |
 | **Track 7: Data Structures & Algorithms** | Blind 75, NeetCode 150 Patterns, Two Pointers, Trees, Graphs, DP | **100** | [Open Track 7](tracks/07-data-structures-algorithms.md) |
-| **TOTAL** | **Full-Stack & Cloud Engineering Mastery** | **745+** | — |
+| **Track 8: Core JavaScript Internals** | Sudheer Jonna 518 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **518** | [Open Track 8](tracks/08-frontend-javascript.md) |
+| **TOTAL** | **Full-Stack, Cloud & Core JavaScript Mastery** | **1,263** | — |
 
 ---
 
 ## 📚 Curriculum Breakdown
+
+### 🟨 [Track 8: Core JavaScript Master (1 - 518)](tracks/08-frontend-javascript.md)
+1. **Core Objects, Prototypes, Functions & Scope (Q1 - Q50)**: Ways to create objects, prototype chains, `call`/`apply`/`bind`, Map vs Object, arrow functions, currying, pure functions, `let` vs `var`, TDZ, IIFE, memoization, hoisting, closures, scopes, service workers, IndexedDB, cookies & web storage.
+2. **Promises, Callbacks, Async & Strict Mode (Q51 - Q100)**: Web workers, Promise states, callback hell, SSE, promise chaining, `Promise.all()`, strict mode, `typeof`, `null` vs `undefined`, `window` vs `document`, event flow, bubbling & capturing, SOP, compiled vs interpreted, case-sensitivity.
+3. **DOM, Event Flow, Timers & Browser APIs (Q101 - Q170)**: `preventDefault()` vs `stopPropagation()`, single-threaded model, event delegation, ECMAScript vs JS, `clearTimeout` / `clearInterval`, URL location properties, loops, polyfills, tree shaking, regex patterns, breakpoints.
+4. **Prototypes, Object Methods & Event Loop (Q171 - Q250)**: `Object.freeze` vs `Object.seal`, `Object.is()`, `Object.assign()`, Proxy objects, WeakSet & WeakMap, accessors, getters & setters, error objects, Intl API, iterators, event loop, call stack & event queue.
+5. **ES6+ Modern Syntax, Classes, Modules & Destructuring (Q251 - Q325)**: Comma operator, TypeScript differences, class constructors & `super()`, prototype getters/setters, non-extensible objects, minification & obfuscation, constraint validation, ES6 features, template literals, destructuring, typed arrays.
+6. **Async Internals, Memory, Microtasks & Web APIs (Q326 - Q400)**: PostMessage security, JS paradigms, `~~` operator, `ArrayBuffer`, shallow vs deep copy, mixins, reflow vs repaint, AJAX, zero timeout, microtask queues, observables & RxJS.
+7. **Execution Context, Functional JS & V8 Engine (Q401 - Q460)**: Babel, Node.js concurrency, `this` keyword, memory leak causes, V8 optimization (hidden classes, inline caching), HOFs, ASI, compose & pipe functions.
+8. **Modern JavaScript APIs, WeakRef, Proxy & Performance (Q461 - Q518)**: Lexical scope, dark mode detection, `requestAnimationFrame`, `globalThis`, shadowing, `structuredClone`, `Promise.any()`, BigInt, private class fields, Array `.at()`, top-level await, WeakRef & FinalizationRegistry, Temporal API, Symbols, AbortController, Intersection Observer, Mutation Observer, Atomics API, bundle size optimization.
+
+---
 
 ### 🔷 [Track 1: Angular, TypeScript, HTML, CSS & Core JS (1 - 235)](tracks/01-frontend-angular-ts.md)
 1. **Interview Intro & Project Experience (Q1 - Q7)**: Real-world UI/Full-stack candidate introductions, daily architecture scope, plain JS comfort, Angular 17-19 versions.

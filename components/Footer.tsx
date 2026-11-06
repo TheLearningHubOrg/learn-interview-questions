@@ -19,6 +19,7 @@ export function Footer() {
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
             <Link href="/" className="hover:text-purple-400 transition-colors">Home</Link>
+            <Link href="/tracks/javascript" className="hover:text-purple-400 transition-colors">JavaScript</Link>
             <Link href="/tracks/angular-ts" className="hover:text-purple-400 transition-colors">Angular Track</Link>
             <Link href="/tracks/react-nextjs" className="hover:text-purple-400 transition-colors">React Track</Link>
             <Link href="/tracks/databases" className="hover:text-purple-400 transition-colors">Databases</Link>

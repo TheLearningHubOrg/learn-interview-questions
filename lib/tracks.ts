@@ -122,6 +122,19 @@ export const TRACKS: TrackMeta[] = [
     badgeColor: 'from-purple-500/20 to-indigo-500/20 text-purple-400 border-purple-500/30',
     iconName: 'Code2',
     tags: ['Blind 75', 'NeetCode', 'Two Pointers', 'Graphs', 'Dynamic Programming', 'Trees']
+  },
+  {
+    id: '08',
+    sectionNumber: 8,
+    slug: 'javascript',
+    title: 'Core JavaScript Master: Prototypes, Closures, Event Loop, ES6+ & Web APIs',
+    shortTitle: 'JavaScript Internals (518 Qs)',
+    description: 'The definitive 518 JavaScript interview questions covering Object prototypes, closures, event loop, Promises, ES6-ES2024, Web APIs, DOM, and performance.',
+    questionCount: 518,
+    filename: '08-frontend-javascript.md',
+    badgeColor: 'from-yellow-500/20 to-amber-500/20 text-yellow-400 border-yellow-500/30',
+    iconName: 'FileCode',
+    tags: ['JavaScript', 'ES6+', 'Prototypes', 'Event Loop', 'Closures', 'Promises', 'Web APIs', 'V8']
   }
 ];
 

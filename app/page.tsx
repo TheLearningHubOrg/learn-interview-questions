@@ -54,7 +54,7 @@ export default async function HomePage() {
             className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:-translate-y-0.5 transition-all"
           >
             <BookOpen className="h-4 w-4" />
-            <span>Explore All 7 Tracks</span>
+            <span>Explore All {tracks.length} Tracks</span>
             <ArrowRight className="h-4 w-4 ml-1" />
           </Link>
 

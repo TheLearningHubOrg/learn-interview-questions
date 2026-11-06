@@ -2630,7 +2630,7 @@ While navigating you can pass props to the `history` object:
 ```javascript
 this.props.history.push({
 pathname: "/template",
-search: "?name=sudheer",
+search: "?name=alex",
 state: { detail: response.data },
 });
 ```
@@ -7174,7 +7174,7 @@ Let's exaplain the usage of `useMemo` hook with an example of user search and it
 import React, { useState, useMemo } from 'react';
 
 const users = [
- { id: 1, name: 'Sudheer' },
+ { id: 1, name: 'Alex' },
  { id: 2, name: 'Brendon' },
  { id: 3, name: 'Charlie' },
  { id: 4, name: 'Dary' },
@@ -7266,7 +7266,7 @@ In this example, `a => a + 1` is an **updater function**. React queues these upd
 
 In many cases, such as setting state based on user input or assigning static values, you don’t need the updater function:
 ```js
-setName('Sudheer');
+setName('Alex');
 ```
 
 ### 274. Can useState take a function as an initial value?
@@ -7306,8 +7306,8 @@ The `useState` hook accepts different types of values.
 But you needs to be cautious with **reference types (objects/arrays)** because React compares old and new values **by reference**, so direct mutations won't trigger a re-render.
 For example, the correct and wrong ways of state updates as shown below, 
 ```js
-user.name = "Sudheer"; //wrong way
-setUser(prev => ({ ...prev, name: 'Sudheer' })); //correct way
+user.name = "Alex"; //wrong way
+setUser(prev => ({ ...prev, name: 'Alex' })); //correct way
 ```
 
 ### 276. What happens if you call useState conditionally?
@@ -7786,7 +7786,7 @@ function Dashboard() {
 function App() {
  return (
    <ThemeContext.Provider value="dark">
-     <UserContext.Provider value={{ name: 'Sudheer' }}>
+     <UserContext.Provider value={{ name: 'Alex' }}>
        <Dashboard />
      </UserContext.Provider>
    </ThemeContext.Provider>
@@ -10077,8 +10077,8 @@ Without memoization, computing `total` inline inside `useSelector` would return 
 // Un-normalized — posts are duplicated wherever they appear
 {
 posts: [
-  { id: 1, title: "Post 1", author: { id: 1, name: "Sudheer" } },
-  { id: 2, title: "Post 2", author: { id: 1, name: "Sudheer" } },
+  { id: 1, title: "Post 1", author: { id: 1, name: "Alex" } },
+  { id: 2, title: "Post 2", author: { id: 1, name: "Alex" } },
 ];
 }
 
@@ -10093,7 +10093,7 @@ posts: {
 },
 users: {
   ids: [1],
-  entities: { 1: { id: 1, name: "Sudheer" } },
+  entities: { 1: { id: 1, name: "Alex" } },
 },
 }
 ```

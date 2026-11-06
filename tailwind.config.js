@@ -9,11 +9,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#090a0f',
-        foreground: '#f1f5f9',
-        card: '#11131a',
-        'card-hover': '#161922',
-        border: '#1e2330',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: {
+          DEFAULT: 'var(--card)',
+          hover: 'var(--card-hover)',
+        },
+        border: 'var(--border)',
+        muted: {
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
+        },
         primary: {
           50: '#f5f3ff',
           100: '#ede9fe',
@@ -35,4 +41,3 @@ module.exports = {
   },
   plugins: [],
 };
-

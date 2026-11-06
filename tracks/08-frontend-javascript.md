@@ -12,7 +12,7 @@ There are many ways to create objects in javascript as mentioned below:
 
    ```javascript
    var object = {
-     name: "Sudheer",
+     name: "Alex",
      age: 34,
    };
    ```
@@ -76,7 +76,7 @@ There are many ways to create objects in javascript as mentioned below:
      this.name = name;
      this.age = 21;
    }
-   var object = new Person("Sudheer");
+   var object = new Person("Alex");
    ```
 5. **Function constructor with prototype:**
 
@@ -84,7 +84,7 @@ There are many ways to create objects in javascript as mentioned below:
 
    ```javascript
    function Person() {}
-   Person.prototype.name = "Sudheer";
+   Person.prototype.name = "Alex";
    var object = new Person();
    ```
 
@@ -141,7 +141,7 @@ There are many ways to create objects in javascript as mentioned below:
      }
    }
 
-   var object = new Person("Sudheer");
+   var object = new Person("Alex");
    ```
 
 8. **Singleton pattern:**
@@ -154,7 +154,7 @@ There are many ways to create objects in javascript as mentioned below:
     let instance;
 
     function createInstance() {
-      return { name: "Sudheer" };
+      return { name: "Alex" };
     }
 
     return {
@@ -1680,7 +1680,7 @@ promise.then((val) => console.log(val)); // Logs: 'Value 1'
 
 ### 63. What is callback in callback
 
-You can nest one callback inside in another callback to execute the actions sequentially one by one. This is known as callbacks in callbacks. Beware, too many levels of nesting lead to [Callback hell](https://github.com/sudheerj/javascript-interview-questions?tab=readme-ov-file#what-is-a-callback-hell)
+You can nest one callback inside in another callback to execute the actions sequentially one by one. This is known as callbacks in callbacks. Beware, too many levels of nesting lead to [Callback hell](#what-is-a-callback-hell)
 
 ```javascript
 loadScript("/script1.js", function (script) {
@@ -4202,7 +4202,7 @@ The Proxy object is used to define custom behavior for fundamental operations su
   //Example1:
 
   const person = {
-    name: "Sudheer Jonna",
+    name: "Alex Morgan",
     age: 35,
   };
 
@@ -5337,7 +5337,7 @@ TypeScript is a typed superset of JavaScript created by Microsoft that adds opti
     return "Hello, " + name;
   }
 
-  let user = "Sudheer";
+  let user = "Alex";
 
   console.log(greeting(user));
   ```
@@ -7201,7 +7201,7 @@ new User('Alex').sayHi(); // 'Hi Alex'
   Object.assign(Person.prototype, canEat, canWalk, canRead);
 
   // Use it
-  const person = new Person("Sudheer");
+  const person = new Person("Alex");
   person.eat();  // Output: Eating...
   person.walk(); // Output: Walking...
   person.read(); // Output: Reading...
@@ -8760,7 +8760,7 @@ The `console.group()` can be used to group related log messages to be able to ea
 
  ```js
  console.group("User Details");
- console.log("name: Sudheer Jonna");
+ console.log("name: Alex Morgan");
  console.log("job: Software Developer");
 
  // Nested Group
@@ -9466,8 +9466,8 @@ function Person(name) {
   this.name = name;
 }
 
-const p1 = new Person('Sudheer');
-console.log(p1.name); // Sudheer
+const p1 = new Person('Alex');
+console.log(p1.name); // Alex
 ```
 - When used with new, this refers to the newly created object.
 

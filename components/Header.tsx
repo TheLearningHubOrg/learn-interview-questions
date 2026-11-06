@@ -1,83 +1,202 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, Github, Sparkles, Layers } from 'lucide-react';
+import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
+import { TRACKS } from '@/lib/tracks';
 
 interface HeaderProps {
   onOpenSearch?: () => void;
 }
 
 export function Header({ onOpenSearch }: HeaderProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close mobile drawer on escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-violet-400 p-[1px] shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-200">
-            <div className="h-full w-full bg-background rounded-xl flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-purple-400" />
+    <>
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
+          {/* Brand */}
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-violet-400 p-[1px] shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-200">
+              <div className="h-full w-full bg-background rounded-xl flex items-center justify-center">
+                <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-purple-400" />
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-base sm:text-lg tracking-tight text-white group-hover:text-purple-300 transition-colors">
-                InterviewHub
-              </span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                PRO
-              </span>
+            <div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="font-bold text-sm sm:text-base tracking-tight text-foreground group-hover:text-purple-400 transition-colors">
+                  InterviewHub
+                </span>
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  PRO
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground hidden sm:block">The Learning Hub Org</p>
             </div>
-            <p className="text-xs text-slate-400 hidden sm:block">The Learning Hub Org</p>
-          </div>
-        </Link>
-
-        {/* Center: Search Trigger */}
-        <div className="flex-1 max-w-md mx-4 hidden md:block">
-          <button
-            onClick={onOpenSearch}
-            className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-card/60 border border-border text-slate-400 hover:text-slate-200 hover:border-purple-500/40 hover:bg-card/90 transition-all text-sm group"
-          >
-            <div className="flex items-center gap-2">
-              <Search className="h-4 w-4 text-slate-400 group-hover:text-purple-400 transition-colors" />
-              <span>Search 1,450+ interview questions...</span>
-            </div>
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[11px] font-mono bg-border rounded text-slate-400">
-              ⌘K
-            </kbd>
-          </button>
-        </div>
-
-        {/* Right Links */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onOpenSearch}
-            className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-card transition-colors"
-            aria-label="Search"
-          >
-            <Search className="h-5 w-5" />
-          </button>
-
-          <Link
-            href="/#tracks"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-slate-300 hover:text-white hover:bg-card border border-transparent hover:border-border transition-all"
-          >
-            <Layers className="h-3.5 w-3.5 text-purple-400" />
-            <span>Tracks</span>
           </Link>
 
-          <a
-            href="https://github.com/TheLearningHubOrg/learn-interview-questions"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 hover:border-purple-500/50 transition-all"
-          >
-            <Github className="h-4 w-4" />
-            <span className="hidden sm:inline">GitHub</span>
-          </a>
+          {/* Center: Search Trigger (Tablet & Desktop) */}
+          <div className="flex-1 max-w-md mx-2 sm:mx-4 hidden md:block">
+            <button
+              type="button"
+              onClick={onOpenSearch}
+              className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-500/40 hover:bg-card-hover transition-all text-sm group"
+            >
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground group-hover:text-purple-400 transition-colors" />
+                <span className="text-xs sm:text-sm">Search 1,500+ interview questions...</span>
+              </div>
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[11px] font-mono bg-muted border border-border rounded text-muted-foreground">
+                ⌘K
+              </kbd>
+            </button>
+          </div>
+
+          {/* Right Action Icons & Toggles */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Mobile Search Button */}
+            <button
+              type="button"
+              onClick={onOpenSearch}
+              className="md:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-colors"
+              aria-label="Search questions"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+
+            {/* Desktop Tracks link */}
+            <Link
+              href="/#tracks"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-muted-foreground hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-all"
+            >
+              <Layers className="h-3.5 w-3.5 text-purple-400" />
+              <span>Tracks</span>
+            </Link>
+
+            {/* Light / Dark Mode Toggle */}
+            <ThemeToggle />
+
+            {/* GitHub Stars */}
+            <a
+              href="https://github.com/TheLearningHubOrg/learn-interview-questions"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Star on GitHub"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600/10 text-purple-400 border border-purple-500/20 hover:bg-purple-600/20 hover:border-purple-500/40 transition-all"
+            >
+              <Github className="h-4 w-4" />
+              <span>GitHub</span>
+            </a>
+
+            {/* Mobile Menu Hamburger */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              className="md:hidden p-2 rounded-lg border border-border bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+              aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Mobile Drawer / Slide-Over Menu */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-50 md:hidden bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div
+            className="fixed inset-y-0 right-0 w-full max-w-xs bg-background border-l border-border p-6 shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center text-white">
+                    <BookOpen className="h-4 w-4" />
+                  </div>
+                  <span className="font-bold text-base text-foreground">InterviewHub</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground"
+                  aria-label="Close Menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Mobile Search Button in Drawer */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenSearch?.();
+                }}
+                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-6 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground text-sm font-medium"
+              >
+                <Search className="h-4 w-4 text-purple-400" />
+                <span>Search 1,500+ questions...</span>
+              </button>
+
+              {/* Tracks List */}
+              <div className="space-y-1">
+                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider px-2 mb-2">
+                  All 8 Study Tracks
+                </p>
+                {TRACKS.map((t) => (
+                  <Link
+                    key={t.slug}
+                    href={`/sections/${t.slug}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-card border border-transparent hover:border-border text-xs font-semibold text-foreground transition-all group"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="w-5 h-5 rounded-md bg-purple-500/10 text-purple-400 flex items-center justify-center text-[10px] font-bold shrink-0">
+                        {t.sectionNumber}
+                      </span>
+                      <span className="truncate">{t.shortTitle}</span>
+                    </div>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile Footer Area */}
+            <div className="pt-6 mt-6 border-t border-border space-y-3">
+              <div className="flex items-center justify-between px-2">
+                <span className="text-xs text-muted-foreground font-medium">Theme Mode</span>
+                <ThemeToggle />
+              </div>
+              <a
+                href="https://github.com/TheLearningHubOrg/learn-interview-questions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold bg-card border border-border text-foreground hover:bg-card-hover transition-colors"
+              >
+                <Github className="h-4 w-4" />
+                <span>Star on GitHub</span>
+                <ExternalLink className="h-3 w-3 text-muted-foreground" />
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
-

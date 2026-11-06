@@ -36,14 +36,14 @@ export const TRACKS: TrackMeta[] = [
     id: '01',
     sectionNumber: 1,
     slug: 'angular-ts',
-    title: 'Complete Master Interview: Angular, TypeScript, JavaScript & Web Standards',
-    shortTitle: 'Angular & TypeScript',
-    description: 'Comprehensive 235 questions covering Angular 17-19, Signals, Control Flow, @defer, RxJS, Core JS internals, live coding, and HTML5/CSS3.',
-    questionCount: 235,
+    title: 'Complete Master Interview: Angular Architecture, Signals, RxJS & NgRx',
+    shortTitle: 'Angular & Signals (283 Qs)',
+    description: 'The definitive 283 Angular interview questions covering Angular 2-19, TypeScript, Standalone Components, Signals, Control Flow, Directives, Pipes, Dependency Injection, RxJS, and NgRx.',
+    questionCount: 283,
     filename: '01-frontend-angular-ts.md',
     badgeColor: 'from-red-500/20 to-pink-500/20 text-red-400 border-red-500/30',
     iconName: 'Shield',
-    tags: ['Angular 19', 'TypeScript', 'Signals', 'RxJS', 'JavaScript', 'HTML5', 'CSS3']
+    tags: ['Angular 19', 'Signals', 'TypeScript', 'RxJS', 'NgRx', 'Directives', 'Routing', 'Forms']
   },
   {
     id: '02',

@@ -1,12 +1,12 @@
-# The Master Full-Stack, Cloud & Core JavaScript Interview Question Bank 🚀
+# The Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Question Bank 🚀
 
-> **1,450+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Core React, React 18/19, Core JavaScript Internals, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
+> **1,500+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
 [![Curriculum: 8 Tracks](https://img.shields.io/badge/Tracks-8%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1450+](https://img.shields.io/badge/Questions-1450%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Questions: 1500+](https://img.shields.io/badge/Questions-1500%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -14,15 +14,15 @@
 
 | Track | Focus Tech Stack | Questions | Link |
 | :--- | :--- | :---: | :--- |
-| **Track 1: Frontend Angular & TS** | Angular 17-19, TypeScript, RxJS, Signals, Core JS, HTML5, Modern CSS | **235** | [Open Track 1](tracks/01-frontend-angular-ts.md) |
-| **Track 2: Complete React Master** | Sudheer Jonna 353 Qs: React 18/19, JSX, Fiber, Hooks, Redux, Router v6, SSR | **353** | [Open Track 2](tracks/02-frontend-react-nextjs.md) |
+| **Track 1: Complete Angular Master** | Enterprise Bank: 283 Qs: Angular 2-19, Signals, Control Flow, Directives, DI, RxJS, NgRx | **283** | [Open Track 1](tracks/01-frontend-angular-ts.md) |
+| **Track 2: Complete React Master** | Full Stack Bank: 353 Qs: React 18/19, JSX, Fiber, Hooks, Redux, Router v6, SSR | **353** | [Open Track 2](tracks/02-frontend-react-nextjs.md) |
 | **Track 3: Databases & System Design** | PostgreSQL, MySQL, ACID, Indexing, MongoDB, DynamoDB, Redis, Scalability | **60** | [Open Track 3](tracks/03-backend-databases-system-design.md) |
 | **Track 4: Backend Python** | Python 3.12+, CPython Internals, AsyncIO, FastAPI, SQLAlchemy 2.0, Celery | **65** | [Open Track 4](tracks/04-backend-python.md) |
 | **Track 5: Backend Node.js** | Node.js Runtime, V8, Libuv Event Loop, Streams, Buffers, Express, Fastify | **60** | [Open Track 5](tracks/05-backend-nodejs.md) |
 | **Track 6: AWS Cloud Architecture** | AWS Well-Architected, VPC, Fargate, Lambda, S3, Aurora, IAM, KMS, SQS | **65** | [Open Track 6](tracks/06-cloud-aws-architecture.md) |
 | **Track 7: Data Structures & Algorithms** | Blind 75, NeetCode 150 Patterns, Two Pointers, Trees, Graphs, DP | **100** | [Open Track 7](tracks/07-data-structures-algorithms.md) |
-| **Track 8: Core JavaScript Internals** | Sudheer Jonna 518 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **518** | [Open Track 8](tracks/08-frontend-javascript.md) |
-| **TOTAL** | **Full-Stack, Cloud & Core JavaScript Mastery** | **1,456** | — |
+| **Track 8: Core JavaScript Internals** | Core Language Bank: 518 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **518** | [Open Track 8](tracks/08-frontend-javascript.md) |
+| **TOTAL** | **Full-Stack, Cloud & Core JavaScript Mastery** | **1,504** | — |
 
 ---
 
@@ -54,25 +54,17 @@
 
 ---
 
-### 🔷 [Track 1: Angular, TypeScript, HTML, CSS & Core JS (1 - 235)](tracks/01-frontend-angular-ts.md)
-1. **Interview Intro & Project Experience (Q1 - Q7)**: Real-world UI/Full-stack candidate introductions, daily architecture scope, plain JS comfort, Angular 17-19 versions.
-2. **Angular Comprehensive Master Bank (Q8 - Q77)**: Ivy engine, Signals (`signal`, `computed`, `effect`, `model`), Built-in Control Flow (`@if`, `@for`, `@switch`), Deferrable Views (`@defer`), Standalone architecture, Zoneless change detection, Hierarchical DI, Custom Directives, Content Projection, RxJS flattening operators (`switchMap`, `exhaustMap`).
-3. **JavaScript Internals & Core Language (Q78 - Q160)**: V8 engine, Hidden Classes, Inline Caches, Event Loop (Microtask vs Macrotask), Execution Contexts, Closures, Currying, Polyfills (`myMap`, `myReduce`, `Promise.all`), Event Bubbling/Delegation, LRU Cache, WeakMap, WeakRef, AbortController.
-4. **Live Coding & Client Scenarios (Q161 - Q175)**: Word reversal, array manipulation without mutation, Angular character restriction directives, character frequency maps, flat-to-nested tree transformation in $O(N)$, Morgan Stanley interview problem, OnPush immutability gotchas.
-5. **HTML5 & Modern Web Semantics (Q176 - Q185)**: Accessible landmarks, `<script async>` vs `<script defer>`, storage tiers (Cookies vs LocalStorage vs SessionStorage), Web Workers vs Service Workers, `<picture>` vs `srcset`.
-6. **Modern CSS3, Layouts & Architecture (Q186 - Q195)**: Fixed vs Sticky positioning, Stacking Context triggers, CSS Variables vs SCSS, Container Queries (`@container`), Cascade Layers (`@layer`), Parent selector (`:has()`).
-7. **Enterprise Architecture & Performance (Q196 - Q225)**: NgZone bypass (`runOutsideAngular`), TrackBy optimization, RxJS Subject types (`BehaviorSubject`, `ReplaySubject`), Critical Rendering Path (CRP), Layout Thrashing prevention, `content-visibility: auto`.
-8. **Advanced TypeScript & Web Tooling (Q226 - Q235)**: `any` vs `unknown` vs `never`, Utility Types (`Partial`, `Pick`, `Omit`, `Readonly`), Vite + esbuild builder vs Webpack, Interaction to Next Paint (INP) optimization, `scheduler.yield()`, generic standalone Signal components.
-
----
-
-### ⚛️ [Track 2: React, Next.js, Modern Web & Core JS (1 - 160)](tracks/02-frontend-react-nextjs.md)
-1. **Intro & Candid Experience (Q1 - Q10)**: Day-to-day architecture responsibilities, React vs Angular trade-offs, debugging severe LCP/INP bottlenecks, state management philosophy (URL state, Server Cache, Client UI state).
-2. **HTML5 & Modern Web Semantics (Q11 - Q35)**: Microdata & JSON-LD, native `<dialog>` showModal top-layer, ContentEditable pitfalls, web font optimization (FOIT vs FOUT), `rel="noopener noreferrer"`.
-3. **Modern CSS3, Architecture & Performance (Q36 - Q60)**: Modern viewport units (`dvh`, `svh`), CSS Subgrid, fluid typography with `clamp()`, zero-runtime CSS (Tailwind) vs runtime CSS-in-JS, Cumulative Layout Shift (CLS) prevention with `aspect-ratio`.
-4. **JavaScript Core & Advanced Patterns (Q61 - Q95)**: Event Loop deep-dive, shallow vs deep cloning, Debounce & Throttle from scratch, Pub/Sub Event Emitter class, LRU Cache, infinite currying, `scheduler.yield()`.
-5. **React 18 & 19 Architecture, Hooks & State (Q96 - Q130)**: React Fiber reconciliation engine, Hook rules & call-stack ordering, Concurrent React (`startTransition`, `useTransition`, `useDeferredValue`), React 19 Actions (`useActionState`, `useFormStatus`, `use()`, Server Actions), Hydration mismatch troubleshooting, Zustand vs Redux Toolkit.
-6. **Next.js (App Router & Pages Router), SSR & Full-Stack Patterns (Q131 - Q160)**: App Router vs Pages Router, React Server Components (RSC) vs Client Components ('use client'), Rendering modes (CSR, SSR, SSG, ISR), Routing conventions (`layout`, `template`, `loading`, `error`), Route Handlers (`route.ts`), Extended fetch caching, Edge Middleware, Parallel & Intercepting routes, Partial Prerendering (PPR), standalone Docker deployment.
+### 🔷 [Track 1: Complete Angular Master (1 - 283)](tracks/01-frontend-angular-ts.md)
+1. **Core Angular Architecture, TypeScript & Components (Q1 - Q30)**: Angular vs AngularJS, TypeScript fundamentals, architecture overview, components & directives, lifecycle hooks (`ngOnInit`, `ngOnChanges`, `ngOnDestroy`), data binding & interpolation, template statements & expressions.
+2. **Templates, Directives, Pipes & View Encapsulation (Q31 - Q60)**: Custom directives, pure vs impure pipes, ViewEncapsulation modes (Emulated, ShadowDom, None), template reference variables (`#var`), content projection (`<ng-content>`), ViewChild & ContentChild queries.
+3. **Services, Dependency Injection & Hierarchical Injectors (Q61 - Q90)**: `@Injectable()`, `providedIn: 'root'`, hierarchical injector trees, injection tokens, multi-providers, factory providers, singleton services.
+4. **Angular Forms: Template-Driven & Reactive Forms (Q91 - Q120)**: `FormControl`, `FormGroup`, `FormArray`, built-in & custom validators, async validators, cross-field validation, valueChanges observables.
+5. **Angular Routing, Guards & Navigation (Q121 - Q150)**: Router configuration, route parameters & query params, router outlets, Route Guards (`CanActivateFn`, `CanDeactivateFn`, `ResolveFn`), lazy loading modules and standalone routes.
+6. **HTTP Client, Interceptors & RxJS Observables (Q151 - Q180)**: `HttpClient`, HTTP interceptors (`HttpInterceptorFn`), error handling with `catchError`, retry logic, RxJS Subject vs BehaviorSubject vs ReplaySubject, flattening operators (`switchMap`, `mergeMap`, `concatMap`, `exhaustMap`).
+7. **Angular Animations, Internationalization & Service Workers (Q181 - Q210)**: BrowserAnimationsModule, trigger, state, transition, animate, i18n tooling, Service Worker PWA support, Web Workers integration.
+8. **Angular Ivy, Universal (SSR) & Security (Q211 - Q240)**: Ivy compiler benefits, differential loading, Angular Universal / SSR hydration, XSS prevention, DomSanitizer, CSP configuration.
+9. **Angular CLI, Testing, Schematics & Modern Tooling (Q241 - Q270)**: Angular CLI commands, Karma & Jasmine unit tests, component fixture testing, mocking services, custom Schematics, ESLint migration, standalone components.
+10. **Modern Angular 17-19, Signals & NgRx State Management (Q271 - Q283)**: Angular Signals (`signal`, `computed`, `effect`), built-in Control Flow (`@if`, `@for`, `@switch`), Deferrable Views (`@defer`), NgRx architecture (Store, Actions, Reducers, Effects, Selectors).
 
 ---
 

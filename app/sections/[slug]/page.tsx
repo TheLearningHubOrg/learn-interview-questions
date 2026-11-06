@@ -18,10 +18,29 @@ export async function generateMetadata({ params }: SectionPageProps): Promise<Me
   const track = await getTrackBySlug(params.slug);
   if (!track) return { title: 'Section Not Found' };
 
+  const pageUrl = `https://learn-interview-questions.vercel.app/sections/${track.slug}`;
+  const title = `Section ${track.sectionNumber}: ${track.shortTitle} (${track.questionCount} Questions)`;
+  const description = `${track.title}. Complete master track with ${track.questionCount} questions, 1-per-page routing, and code examples.`;
+
   return {
-    title: `Section ${track.sectionNumber}: ${track.shortTitle} (${track.questionCount} Questions) | The Learning Hub Org`,
-    description: track.description,
+    title,
+    description,
     keywords: track.tags,
+    alternates: {
+      canonical: pageUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: pageUrl,
+      type: 'website',
+      siteName: 'InterviewHub PRO',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   };
 }
 
@@ -36,4 +55,3 @@ export default async function SectionPage({ params }: SectionPageProps) {
 
   return <SectionClient track={track} questions={questions} allTracks={allTracks} />;
 }
-

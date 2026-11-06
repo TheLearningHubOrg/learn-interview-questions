@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SearchModal } from '@/components/SearchModal';
-import { QuestionIndexItem } from '@/lib/tracks';
+import { QuestionIndexItem } from '@/lib/tracks-meta';
 
 interface ClientShellProps {
   children: React.ReactNode;

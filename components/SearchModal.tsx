@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, X, ArrowRight, BookOpen, Hash } from 'lucide-react';
-import { QuestionIndexItem } from '@/lib/tracks';
+import { QuestionIndexItem } from '@/lib/tracks-meta';
 
 interface SearchModalProps {
   isOpen: boolean;

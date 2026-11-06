@@ -15,7 +15,7 @@ import {
   Play,
   List
 } from 'lucide-react';
-import { TrackMeta } from '@/lib/tracks';
+import { TrackMeta } from '@/lib/tracks-meta';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Shield,

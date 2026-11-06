@@ -18,7 +18,7 @@ import {
   ChevronRight,
   Share2
 } from 'lucide-react';
-import { QuestionViewData } from '@/lib/tracks';
+import { QuestionViewData } from '@/lib/tracks-meta';
 import { CodeBlock } from '@/components/CodeBlock';
 
 interface QuestionViewerProps {

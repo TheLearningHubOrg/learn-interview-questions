@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
-import { TRACKS } from '@/lib/tracks';
+import { TRACKS } from '@/lib/tracks-meta';
 
 interface HeaderProps {
   onOpenSearch?: () => void;

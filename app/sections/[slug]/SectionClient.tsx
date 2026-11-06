@@ -11,7 +11,7 @@ import {
   Layers,
   Sparkles
 } from 'lucide-react';
-import { TrackMeta, ParsedQuestion } from '@/lib/tracks';
+import { TrackMeta, ParsedQuestion } from '@/lib/tracks-meta';
 
 interface SectionClientProps {
   track: TrackMeta;

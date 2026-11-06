@@ -3,6 +3,7 @@ import './globals.css';
 import { ClientShell } from '@/components/ClientShell';
 import { getGlobalSearchIndex } from '@/lib/tracks';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://learn-interview-questions.vercel.app'),
@@ -87,6 +88,7 @@ export default async function RootLayout({
       <body className="bg-background text-foreground min-h-screen">
         <ClientShell searchIndex={searchIndex}>{children}</ClientShell>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

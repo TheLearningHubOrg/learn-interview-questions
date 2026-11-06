@@ -3,6 +3,7 @@ import path from 'path';
 
 export interface TrackMeta {
   id: string;
+  sectionNumber: number;
   slug: string;
   title: string;
   shortTitle: string;
@@ -14,9 +15,26 @@ export interface TrackMeta {
   tags: string[];
 }
 
+export interface ParsedQuestion {
+  number: number;
+  title: string;
+  part: string;
+  content: string;
+}
+
+export interface QuestionViewData {
+  track: TrackMeta;
+  question: ParsedQuestion;
+  allQuestions: { number: number; title: string; part: string }[];
+  prevQuestion: { number: number; title: string } | null;
+  nextQuestion: { number: number; title: string } | null;
+  totalInTrack: number;
+}
+
 export const TRACKS: TrackMeta[] = [
   {
     id: '01',
+    sectionNumber: 1,
     slug: 'angular-ts',
     title: 'Complete Master Interview: Angular, TypeScript, JavaScript & Web Standards',
     shortTitle: 'Angular & TypeScript',
@@ -29,6 +47,7 @@ export const TRACKS: TrackMeta[] = [
   },
   {
     id: '02',
+    sectionNumber: 2,
     slug: 'react-nextjs',
     title: 'Full-Stack Frontend Master: React 18/19, Next.js, Modern Web & Core JS',
     shortTitle: 'React & Next.js',
@@ -41,6 +60,7 @@ export const TRACKS: TrackMeta[] = [
   },
   {
     id: '03',
+    sectionNumber: 3,
     slug: 'databases',
     title: 'Full-Stack & Backend Database Master: SQL, NoSQL, Redis & System Design',
     shortTitle: 'Databases & System Design',
@@ -53,6 +73,7 @@ export const TRACKS: TrackMeta[] = [
   },
   {
     id: '04',
+    sectionNumber: 4,
     slug: 'python',
     title: 'Full-Stack & Backend Python Master: FastAPI, AsyncIO, Core & Internals',
     shortTitle: 'Python & FastAPI',
@@ -65,6 +86,7 @@ export const TRACKS: TrackMeta[] = [
   },
   {
     id: '05',
+    sectionNumber: 5,
     slug: 'nodejs',
     title: 'Full-Stack & Backend Node.js Master: Express, Fastify, Libuv, Streams & Architecture',
     shortTitle: 'Node.js & Libuv',
@@ -77,6 +99,7 @@ export const TRACKS: TrackMeta[] = [
   },
   {
     id: '06',
+    sectionNumber: 6,
     slug: 'aws',
     title: 'Full-Stack & Cloud Architecture AWS Master: Well-Architected, Serverless & Security',
     shortTitle: 'AWS Cloud Architecture',
@@ -89,6 +112,7 @@ export const TRACKS: TrackMeta[] = [
   },
   {
     id: '07',
+    sectionNumber: 7,
     slug: 'dsa',
     title: 'Data Structures & Algorithms Master: Blind 75, NeetCode & Core Patterns',
     shortTitle: 'DSA & Algorithms',
@@ -119,43 +143,115 @@ export async function getTrackContent(filename: string): Promise<string> {
   }
 }
 
+export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestion[] {
+  const lines = markdown.split('\n');
+  const questions: ParsedQuestion[] = [];
+  let currentPart = 'General';
+  let currentQ: { number: number; title: string; part: string } | null = null;
+  let currentContent: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('## Part ') || line.startsWith('## PART ')) {
+      currentPart = line.replace(/^##\s+/, '').trim();
+    } else if (line.startsWith('### ')) {
+      const match = line.match(/^### (\d+)\.\s*(.+)$/);
+      if (match) {
+        if (currentQ) {
+          questions.push({
+            number: currentQ.number,
+            title: currentQ.title,
+            part: currentQ.part,
+            content: currentContent.join('\n').trim()
+          });
+        }
+        currentQ = {
+          number: parseInt(match[1], 10),
+          title: match[2].trim(),
+          part: currentPart
+        };
+        currentContent = [];
+        continue;
+      }
+    }
+    if (currentQ) {
+      currentContent.push(line);
+    }
+  }
+
+  if (currentQ) {
+    questions.push({
+      number: currentQ.number,
+      title: currentQ.title,
+      part: currentQ.part,
+      content: currentContent.join('\n').trim()
+    });
+  }
+
+  return questions;
+}
+
+const questionsCache = new Map<string, ParsedQuestion[]>();
+
+export async function getTrackQuestions(slug: string): Promise<ParsedQuestion[]> {
+  if (questionsCache.has(slug)) {
+    return questionsCache.get(slug)!;
+  }
+  const track = await getTrackBySlug(slug);
+  if (!track) return [];
+  const content = await getTrackContent(track.filename);
+  const questions = parseTrackQuestionsFromMarkdown(content);
+  questionsCache.set(slug, questions);
+  return questions;
+}
+
+export async function getQuestionData(slug: string, questionNumber: number): Promise<QuestionViewData | null> {
+  const track = await getTrackBySlug(slug);
+  if (!track) return null;
+
+  const questions = await getTrackQuestions(slug);
+  const index = questions.findIndex(q => q.number === questionNumber);
+  if (index === -1) return null;
+
+  const currentQ = questions[index];
+  const prevQ = index > 0 ? { number: questions[index - 1].number, title: questions[index - 1].title } : null;
+  const nextQ = index < questions.length - 1 ? { number: questions[index + 1].number, title: questions[index + 1].title } : null;
+
+  return {
+    track,
+    question: currentQ,
+    allQuestions: questions.map(q => ({ number: q.number, title: q.title, part: q.part })),
+    prevQuestion: prevQ,
+    nextQuestion: nextQ,
+    totalInTrack: questions.length
+  };
+}
+
 export interface QuestionIndexItem {
   trackSlug: string;
   trackShortTitle: string;
+  sectionNumber: number;
   questionNumber: number;
   title: string;
   part: string;
-  id: string;
 }
 
 export async function getGlobalSearchIndex(): Promise<QuestionIndexItem[]> {
   const items: QuestionIndexItem[] = [];
   
   for (const track of TRACKS) {
-    const content = await getTrackContent(track.filename);
-    const lines = content.split('\n');
-    let currentPart = 'General';
-    
-    for (const line of lines) {
-      if (line.startsWith('## Part ') || line.startsWith('## PART ')) {
-        currentPart = line.replace(/^##\s+/, '').trim();
-      } else if (line.startsWith('### ')) {
-        const titleMatch = line.replace(/^###\s+/, '').trim();
-        const numMatch = titleMatch.match(/^(\d+)\.\s*(.*)/);
-        if (numMatch) {
-          items.push({
-            trackSlug: track.slug,
-            trackShortTitle: track.shortTitle,
-            questionNumber: parseInt(numMatch[1], 10),
-            title: numMatch[2] || titleMatch,
-            part: currentPart,
-            id: titleMatch.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-          });
-        }
-      }
+    const questions = await getTrackQuestions(track.slug);
+    for (const q of questions) {
+      items.push({
+        trackSlug: track.slug,
+        trackShortTitle: track.shortTitle,
+        sectionNumber: track.sectionNumber,
+        questionNumber: q.number,
+        title: q.title,
+        part: q.part
+      });
     }
   }
   
   return items;
 }
-

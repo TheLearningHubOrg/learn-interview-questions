@@ -48,7 +48,7 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
 
   const handleSelect = (item: QuestionIndexItem) => {
     onClose();
-    router.push(`/tracks/${item.trackSlug}#${item.id}`);
+    router.push(`/sections/${item.trackSlug}/${item.questionNumber}`);
   };
 
   if (!isOpen) return null;
@@ -99,10 +99,9 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-500/20 text-purple-300">
-                      {item.trackShortTitle}
+                      Section {item.sectionNumber}: {item.trackShortTitle}
                     </span>
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                      <Hash className="h-3 w-3" />
+                    <span className="text-[11px] text-slate-400 flex items-center gap-1 font-mono font-bold">
                       Q{item.questionNumber}
                     </span>
                     <span className="text-[11px] text-slate-400 truncate max-w-[200px]">
@@ -123,11 +122,10 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
         <div className="p-3 bg-background/50 border-t border-border flex items-center justify-between text-xs text-slate-400">
           <span>{filtered.length} matching questions</span>
           <div className="flex items-center gap-2">
-            <span>Click question to jump directly</span>
+            <span>Click question to open its dedicated page</span>
           </div>
         </div>
       </div>
     </div>
   );
 }
-

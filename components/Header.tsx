@@ -55,7 +55,7 @@ export function Header({ onOpenSearch }: HeaderProps) {
             >
               <div className="flex items-center gap-2">
                 <Search className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" />
-                <span className="text-xs sm:text-sm font-medium">Search 1,500+ interview questions...</span>
+                <span className="text-xs sm:text-sm font-medium">Search 1,600+ interview questions...</span>
               </div>
               <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[11px] font-mono bg-muted border border-border rounded text-muted-foreground font-semibold">
                 ⌘K

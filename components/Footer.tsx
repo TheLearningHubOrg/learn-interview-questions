@@ -20,7 +20,7 @@ export function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-muted-foreground">
             <Link href="/" className="hover:text-purple-400 transition-colors">Home</Link>
             <Link href="/sections/angular-ts" className="hover:text-purple-400 transition-colors">Angular (283 Qs)</Link>
-            <Link href="/sections/react-nextjs" className="hover:text-purple-400 transition-colors">React (353 Qs)</Link>
+            <Link href="/sections/react-nextjs" className="hover:text-purple-400 transition-colors">React (445 Qs)</Link>
             <Link href="/sections/javascript" className="hover:text-purple-400 transition-colors">JavaScript (518 Qs)</Link>
             <Link href="/sections/databases" className="hover:text-purple-400 transition-colors">Databases</Link>
             <Link href="/sections/python" className="hover:text-purple-400 transition-colors">Python</Link>

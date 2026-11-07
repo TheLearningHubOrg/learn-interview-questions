@@ -8,10 +8,10 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://learn-interview-questions.vercel.app'),
   title: {
-    default: 'Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Bank (1,500+ Questions)',
+    default: 'Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Bank (1,600+ Questions)',
     template: '%s | InterviewHub PRO',
   },
-  description: 'Comprehensive, battle-tested engineering interview question bank with 1,500+ questions and answers covering Angular 2-19, React 18/19, Core JavaScript Internals, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
+  description: 'Comprehensive, battle-tested engineering interview question bank with 1,600+ questions and answers covering Angular 2-19, React 18/19, Core JavaScript Internals, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
   keywords: [
     'interview questions',
     'javascript interview questions',
@@ -47,13 +47,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://learn-interview-questions.vercel.app',
     siteName: 'InterviewHub PRO - The Learning Hub Org',
-    title: 'Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Bank (1,500+ Qs)',
-    description: '1,500+ production-tested questions with 100% code coverage across Angular, React, Core JS, Databases, Python, Node.js, AWS Cloud, and DSA.',
+    title: 'Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Bank (1,600+ Qs)',
+    description: '1,600+ production-tested questions with 100% code coverage across Angular, React, Core JS, Databases, Python, Node.js, AWS Cloud, and DSA.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Bank',
-    description: '1,500+ production-tested engineering interview questions with 100% code examples.',
+    description: '1,600+ production-tested engineering interview questions with 100% code examples.',
     creator: '@TheLearningHub',
   },
 };

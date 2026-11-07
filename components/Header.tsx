@@ -150,13 +150,13 @@ export function Header({ onOpenSearch }: HeaderProps) {
                 className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-6 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground text-sm font-medium shadow-sm dark:shadow-none"
               >
                 <Search className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                <span>Search 1,500+ questions...</span>
+                <span>Search 1,600+ questions...</span>
               </button>
 
               {/* Tracks List */}
               <div className="space-y-1">
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider px-2 mb-2">
-                  All 8 Study Tracks
+                  All 9 Study Tracks
                 </p>
                 {TRACKS.map((t) => (
                   <Link

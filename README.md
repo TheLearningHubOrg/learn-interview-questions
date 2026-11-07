@@ -1,12 +1,12 @@
 # The Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Question Bank 🚀
 
-> **1,600+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
+> **1,640+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
-[![Curriculum: 8 Tracks](https://img.shields.io/badge/Tracks-8%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1600+](https://img.shields.io/badge/Questions-1600%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Curriculum: 9 Tracks](https://img.shields.io/badge/Tracks-8%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
+[![Questions: 1640+](https://img.shields.io/badge/Questions-1600%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -22,7 +22,8 @@
 | **Track 6: AWS Cloud Architecture** | AWS Well-Architected, VPC, Fargate, Lambda, S3, Aurora, IAM, KMS, SQS | **65** | [Open Track 6](tracks/06-cloud-aws-architecture.md) |
 | **Track 7: Data Structures & Algorithms** | Multi-Language: Python 3, Java, C++, TypeScript (Blind 75, NeetCode 150) | **100** | [Open Track 7](tracks/07-data-structures-algorithms.md) |
 | **Track 8: Core JavaScript Internals** | Core Language Bank: 521 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **521** | [Open Track 8](tracks/08-frontend-javascript.md) |
-| **TOTAL** | **Full-Stack, Cloud & Core JavaScript Mastery** | **1,599** | — |
+| **Track 9: Behavioral, HR & Leadership** | General Intro, STAR Method (S-T-A-R), Incident Post-Mortems, Culture, Negotiation | **50** | [Open Track 9](tracks/09-general-behavioral-hr.md) |
+| **TOTAL** | **Full-Stack, Cloud, Algorithms & Behavioral Mastery** | **1,649** | — |
 
 ---
 

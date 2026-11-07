@@ -21,12 +21,13 @@ export function Footer() {
             <Link href="/" className="hover:text-purple-400 transition-colors">Home</Link>
             <Link href="/sections/angular-ts" className="hover:text-purple-400 transition-colors">Angular (283 Qs)</Link>
             <Link href="/sections/react-nextjs" className="hover:text-purple-400 transition-colors">React (445 Qs)</Link>
-            <Link href="/sections/javascript" className="hover:text-purple-400 transition-colors">JavaScript (518 Qs)</Link>
+            <Link href="/sections/javascript" className="hover:text-purple-400 transition-colors">JavaScript (521 Qs)</Link>
             <Link href="/sections/databases" className="hover:text-purple-400 transition-colors">Databases</Link>
             <Link href="/sections/python" className="hover:text-purple-400 transition-colors">Python</Link>
             <Link href="/sections/nodejs" className="hover:text-purple-400 transition-colors">Node.js</Link>
             <Link href="/sections/aws" className="hover:text-purple-400 transition-colors">AWS Cloud</Link>
             <Link href="/sections/dsa" className="hover:text-purple-400 transition-colors">DSA Patterns</Link>
+            <Link href="/sections/behavioral-hr" className="hover:text-purple-400 transition-colors">Behavioral & HR (50 Qs)</Link>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">

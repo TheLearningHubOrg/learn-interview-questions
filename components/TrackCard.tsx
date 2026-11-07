@@ -12,6 +12,7 @@ import {
   Cloud, 
   Code2, 
   FileCode,
+  Users,
   ArrowRight,
   Play,
   List
@@ -28,6 +29,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Cloud,
   Code2,
   FileCode,
+  Users,
 };
 
 interface TrackCardProps {

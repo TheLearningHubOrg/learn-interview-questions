@@ -141,5 +141,18 @@ export const TRACKS: TrackMeta[] = [
     badgeColor: 'bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-500/15 dark:text-yellow-400 dark:border-yellow-500/30',
     iconName: 'FileCode',
     tags: ['JavaScript', 'ES6+', 'Prototypes', 'Event Loop', 'Closures', 'Promises', 'Web APIs', 'V8']
+  },
+  {
+    id: '09',
+    sectionNumber: 9,
+    slug: 'behavioral-hr',
+    title: 'General Behavioral, HR & Engineering Leadership Master: The STAR Framework (50 Qs)',
+    shortTitle: 'Behavioral & Leadership (50 Qs)',
+    description: 'The definitive 50 behavioral and leadership interview questions with battle-tested STAR method response templates, blameless post-mortems, and salary negotiation.',
+    questionCount: 50,
+    filename: '09-general-behavioral-hr.md',
+    badgeColor: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-400 dark:border-rose-500/30',
+    iconName: 'Users',
+    tags: ['STAR Method', 'Behavioral', 'Leadership', 'HR', 'Conflict Resolution', 'Post-Mortems', 'Culture', 'Negotiation']
   }
 ];

@@ -6,26 +6,83 @@
 
 ## Part 1: Candid Database Experience & Intro Scenarios (1 - 5)
 
-### 1. Walk me through your database experience.
+### 1. What is a Database Management System (DBMS), and what are the foundational differences between Relational (SQL) and Non-Relational (NoSQL) databases?
 **In Simple Words:**
-"In production, I have worked with **PostgreSQL**, **MySQL**, **MongoDB**, **Redis**, and **DynamoDB**.
-My decision framework is simple:
-- **PostgreSQL**: My default for transactional data, ACID guarantees, relational queries, and JSONB flexibility.
-- **MongoDB**: For flexible document schemas and nested polymorphic entities.
-- **Redis**: For fast in-memory caching, distributed rate limiting, and session stores.
-- **DynamoDB**: For serverless architectures requiring predictable single-digit millisecond latency at scale."
+A **Database Management System (DBMS)** is specialized system software designed to store, manage, query, and enforce integrity and security guarantees over data.
+
+The two primary database paradigms are:
+1. **Relational Databases (RDBMS / SQL)** (e.g., PostgreSQL, MySQL):
+   - **Data Model**: Tabular relations organized into fixed schemas with rows (tuples) and columns (attributes).
+   - **Guarantees**: Strict **ACID** (Atomicity, Consistency, Isolation, Durability) guarantees for critical transactional workloads.
+   - **Queries**: Standardized Structured Query Language (SQL) utilizing relational algebra (Joins, Aggregations, Grouping).
+   - **Scaling**: Scaled primarily **vertically** (upgrading CPU/RAM), complemented by read replicas and table partitioning.
+   - **Best For**: Financial ledgers, payment transactions, enterprise ERPs, and complex relational entities.
+
+2. **Non-Relational Databases (NoSQL)** (e.g., MongoDB, Redis, DynamoDB):
+   - **Data Models**: Document stores (MongoDB), Key-Value caches (Redis), Wide-Column stores (Cassandra), Graph stores (Neo4j).
+   - **Guarantees**: Built around **BASE** (Basically Available, Soft-state, Eventual consistency), trading strict immediate consistency for high availability and partition tolerance (CAP theorem).
+   - **Schema**: Flexible / dynamic schema; polymorphic data and nested arrays stored directly in a single record.
+   - **Scaling**: Native **horizontal scaling** (automatic sharding and partition distribution across clusters).
+   - **Best For**: Real-time event streams, high-speed caching, user sessions, polymorphic catalogs, and distributed IoT data.
 
 ```sql
--- Example production setup in PostgreSQL:
+-- 1. Relational SQL Schema: Enforcing relational integrity via foreign keys and constraints
+CREATE TABLE accounts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  account_holder VARCHAR(100) NOT NULL,
+  balance NUMERIC(12, 2) NOT NULL CHECK (balance >= 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ACID Transaction: Both updates succeed together or both roll back (Atomicity)
+BEGIN;
+UPDATE accounts SET balance = balance - 150.00 WHERE id = 'c7a8b411-...' AND balance >= 150.00;
+UPDATE accounts SET balance = balance + 150.00 WHERE id = 'f9d3e822-...';
+COMMIT;
+```
+
+```javascript
+// 2. Non-Relational NoSQL (MongoDB Document): Nested aggregate retrieved in a single read
+db.orders.insertOne({
+  orderId: "ord_10892",
+  userId: "usr_4401",
+  items: [
+    { sku: "KEY-01", name: "Mechanical Keyboard", price: 129.99, qty: 1 },
+    { sku: "CBL-02", name: "Braided Type-C Cable", price: 14.99, qty: 2 }
+  ],
+  shippingAddress: {
+    street: "123 Technology Way",
+    city: "Seattle",
+    state: "WA",
+    postalCode: "98101"
+  },
+  status: "CONFIRMED",
+  createdAt: new Date()
+});
+```
+
+### 2. Walk me through your production database architecture experience and database selection criteria.
+**In Simple Words:**
+"In production, I have architected and operated **PostgreSQL**, **MySQL**, **MongoDB**, **Redis**, and **DynamoDB**.
+My database selection framework is guided by access patterns and consistency requirements:
+- **PostgreSQL**: My default standard for transactional services, relational integrity, ACID compliance, and JSONB flexibility.
+- **MongoDB**: For polymorphic documents and aggregates where entities are frequently read and written as complete nested units.
+- **Redis**: For ultra-low-latency in-memory caching, distributed locks, session stores, and rate limiters.
+- **DynamoDB**: For serverless architectures requiring predictable single-digit millisecond latency at arbitrary scale."
+
+```sql
+-- Production PostgreSQL table with UUIDs, indexing, and JSONB document storage:
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
   metadata JSONB NOT NULL DEFAULT '{}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_users_metadata_gin ON users USING GIN (metadata);
 ```
 
-### 2. How do you handle schema migrations without downtime?
+### 3. How do you handle schema migrations without downtime?
 **In Simple Words:**
 Use the **Expand/Contract Pattern**:
 1. **Expand**: Add new columns as nullable, and create new indexes concurrently (`CREATE INDEX CONCURRENTLY` in Postgres to avoid table locks).
@@ -46,7 +103,7 @@ UPDATE users SET phone_number = phone WHERE phone_number IS NULL AND id IN (SELE
 ALTER TABLE users DROP COLUMN phone;
 ```
 
-### 3. Describe a severe database performance issue you resolved.
+### 4. Describe a severe database performance issue you resolved.
 **How to Explain in an Interview:**
 - **Problem**: Primary PostgreSQL CPU hit 100% and connection pool exhaustion caused 504 errors.
 - **Root Cause**: Running `EXPLAIN ANALYZE` revealed a sequential scan across 15M rows due to a missing composite index on a foreign key join.
@@ -61,24 +118,6 @@ SELECT * FROM orders WHERE user_id = 'c8b21...' ORDER BY created_at DESC LIMIT 1
 -- Resolution:
 CREATE INDEX CONCURRENTLY idx_orders_user_created ON orders (user_id, created_at DESC);
 -- New plan: Index Scan using idx_orders_user_created (cost=0.43..8.45 rows=10)
-```
-
-### 4. Relational normalized schema vs flexible document collections:
-**In Simple Words:**
-- Choose **Relational (3NF)** when data has complex many-to-many relationships and transactions need atomicity across multiple tables.
-- Choose **Document (MongoDB)** when data is accessed together as a single aggregate (e.g. an Order containing its Items and Shipping Address).
-
-```json
-// Document Model (MongoDB - single read aggregate):
-{
-  "_id": "order_123",
-  "userId": "user_456",
-  "items": [
-    { "productId": "prod_1", "qty": 2, "price": 29.99 },
-    { "productId": "prod_2", "qty": 1, "price": 49.99 }
-  ],
-  "shippingAddress": { "city": "Seattle", "zip": "98101" }
-}
 ```
 
 ### 5. Strategy for database security and connection pooling:

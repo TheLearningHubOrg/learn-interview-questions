@@ -79,7 +79,7 @@ The greeter method allows only string type as argument.
 ### 4. Write a pictorial diagram of Angular architecture?
 
 The main building blocks of an Angular application are shown in the diagram below:-
-![ScreenShot](images/architecture.png)
+![ScreenShot](/images/architecture.png)
 
 #### Practical Code Example
 
@@ -274,7 +274,7 @@ The NgModule decorator has five important (among all) options:
 Angular application goes through an entire set of processes or has a lifecycle right from its initiation to the end of the application.
 The representation of lifecycle in pictorial representation as follows,
 
-![ScreenShot](images/lifecycle.png)
+![ScreenShot](/images/lifecycle.png)
 
 The description of each lifecycle method is as below,
 1. **ngOnChanges:** When the value of a data bound property changes, then this method is called.
@@ -523,13 +523,13 @@ During application bootstrapping angular creates a few more injectors, above the
 #### NullInjector()
 At the very top, the next parent injector in the hierarchy is the `NullInjector()`.The responsibility of this injector is to throw the error if something tries to find dependencies there, unless you've used `@Optional()` because ultimately, everything ends at the `NullInjector()` and it returns an error or, in the case of `@Optional()`, `null`.
 
-![Screenshot](images/hierarchy%20diagram.png)
+![Screenshot](/images/hierarchy%20diagram.png)
 
 
 #### ElementInjector
 Angular creates `ElementInjector` hierarchies implicitly for each DOM element. `ElementInjector` injector is being created for any tag that matches the angular component, or any tag on which directive is applied, and you can configure it in component and directive annotations inside the provider's property, thus, it creates its own hierarchy likewise the upper one.
 
-![Screenshot](images/element%20injector%20hieracrhy.png)
+![Screenshot](/images/element%20injector%20hieracrhy.png)
 
 #### Practical Code Example
 
@@ -1243,7 +1243,7 @@ Below are the steps in an order about custom elements functionality,
 4. **Instance provides content with data binding and change detection:** The content with in template is rendered using the component and DOM data.
 The flow chart of the custom elements functionality would be as follows,
 
-![CustomElement](images/customElement.png)
+![CustomElement](/images/customElement.png)
 
 #### Practical Code Example
 
@@ -1262,7 +1262,7 @@ Transforming components to custom elements involves **two** major steps,
 2. **Register element class with browser:** It uses `customElements.define()` JS function, to register the configured constructor and its associated custom-element tag with the browser's `CustomElementRegistry`. When the browser encounters the tag for the registered element, it uses the constructor to create a custom-element instance.
 
 The detailed structure would be as follows,
-![CreateElement](images/createElement.png)
+![CreateElement](/images/createElement.png)
 
 #### Practical Code Example
 
@@ -2401,15 +2401,15 @@ Basically there are 3 main features provided by Angular Language Service,
 
 1. **Autocompletion:** Autocompletion can speed up your development time by providing you with contextual possibilities and hints as you type with in an interpolation and elements.
 
-    ![ScreenShot](images/language-completion.gif)
+    ![ScreenShot](/images/language-completion.gif)
 
 2. **Error checking:** It can also warn you of mistakes in your code.
 
-    ![ScreenShot](images/language-error.gif)
+    ![ScreenShot](/images/language-error.gif)
 
 3. **Navigation:** Navigation allows you to hover a component, directive, module and then click and press F12 to go directly to its definition.
 
-    ![ScreenShot](images/language-navigation.gif)
+    ![ScreenShot](/images/language-navigation.gif)
 
 #### Practical Code Example
 
@@ -4281,7 +4281,7 @@ Below are the steps to be followed to use declaration elements.
 
 If you do import `BrowserModule` into a lazy loaded feature module, Angular returns an error telling you to use `CommonModule` instead. Because BrowserModule’s providers are for the entire app so it should only be in the root module, not in feature module. Whereas Feature modules only need the common directives in CommonModule.
 
-![ScreenShot](images/browser-module-error.gif)
+![ScreenShot](/images/browser-module-error.gif)
 
 #### Practical Code Example
 

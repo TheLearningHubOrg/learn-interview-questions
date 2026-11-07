@@ -6,43 +6,66 @@
 
 ## Part 1: Intro, Candid Experience & Architecture (1 - 5)
 
-### 1. Walk me through your hands-on experience building backend microservices, REST APIs, and realtime services in Node.js.
+### 1. What is Node.js, and how does its single-threaded, event-driven, non-blocking I/O runtime work?
 **In Simple Words:**
-"I am a Senior Backend and Full-Stack Engineer with extensive experience building high-throughput services using Node.js, TypeScript, and modern frameworks including **Express**, **Fastify**, and **NestJS**. I have architected event-driven microservices handling millions of events daily, implemented real-time bidirectional WebSocket systems with Redis Pub/Sub, designed streaming file transformation pipelines using Node.js Streams, and integrated PostgreSQL, MongoDB, and Redis data layers. I place major focus on Event Loop latency monitoring, graceful process shutdowns, memory leak avoidance, and strict schema validation."
+Node.js is an open-source, cross-platform JavaScript runtime environment built on Google Chrome's **V8 JavaScript engine** and the **Libuv C library**, created by Ryan Dahl in 2009. It enables JavaScript to run directly on server operating systems outside the browser.
+
+**Core Architectural Mechanics:**
+1. **Single JavaScript Thread**: User JavaScript code runs on a single main thread, eliminating thread synchronization bugs, deadlocks, and thread-per-connection memory overhead.
+2. **Non-Blocking Asynchronous I/O**: Network sockets, HTTP requests, and disk operations are non-blocking. When an I/O operation begins, Node.js offloads the operation to the operating system kernel via Libuv abstractions (`epoll` on Linux, `kqueue` on macOS, `IOCP` on Windows).
+3. **Libuv Event Loop**: The Event Loop continuously coordinates execution through phases:
+   - *Timers* (`setTimeout`, `setInterval`)
+   - *Pending Callbacks* (I/O callbacks)
+   - *Poll* (retrieves new I/O events)
+   - *Check* (`setImmediate`)
+   - *Close Callbacks* (`socket.on('close')`)
+   *(Microtasks from `process.nextTick` and resolved `Promise` callbacks drain between every phase).*
+4. **Libuv Thread Pool**: For operations where OS asynchronous primitives do not exist (file system I/O, DNS lookup, crypto hashes, compression), Libuv uses an internal worker thread pool (default 4 threads, configurable up to 1024 via `UV_THREADPOOL_SIZE`).
 
 ```typescript
-// Modern Fastify server setup with TypeScript:
+// Demonstrating non-blocking asynchronous I/O vs synchronous blocking:
+import fs from 'fs/promises';
+
+async function nonBlockingWorkflow() {
+  console.log('1. Initiating asynchronous non-blocking file read...');
+  
+  // Non-blocking: Libuv offloads to worker thread pool, main thread remains free
+  const readPromise = fs.readFile('package.json', 'utf8');
+  
+  console.log('2. Main thread continues immediately to handle other operations!');
+  
+  const data = await readPromise;
+  console.log(`3. File read complete: ${JSON.parse(data).name} (runtime uptime: ${process.uptime()}s)`);
+}
+
+nonBlockingWorkflow();
+```
+
+### 2. Walk me through your hands-on experience building backend microservices and APIs in Node.js, and how you choose between Express, Fastify, and NestJS.
+**In Simple Words:**
+"I am a Senior Backend and Full-Stack Engineer with extensive experience building high-throughput services using Node.js, TypeScript, and modern frameworks including **Express**, **Fastify**, and **NestJS**. I have architected event-driven microservices handling millions of events daily, implemented real-time bidirectional WebSocket systems with Redis Pub/Sub, designed streaming file transformation pipelines using Node.js Streams, and integrated PostgreSQL, MongoDB, and Redis data layers.
+
+Framework selection criteria:
+- **Express**: The battle-tested industry standard. Best when team familiarity, vast ecosystem middleware compatibility, and straightforward lightweight setups are preferred.
+- **Fastify**: High-throughput microservices. Delivers up to 2x higher throughput than Express via compile-time JSON schema serialization (`fast-json-stringify`) and Radix Tree routing (`find-my-way`).
+- **NestJS**: Large enterprise teams requiring an opinionated, TypeScript-first framework with built-in Dependency Injection, modular architecture, and microservice transport adapters (gRPC, RabbitMQ, Kafka)."
+
+```typescript
+// Modern Fastify server setup with compile-time schema serialization:
 import Fastify from 'fastify';
 
 const server = Fastify({ logger: true });
 
-server.get('/health', async () => ({ status: 'ok', uptime: process.uptime() }));
+server.get('/health', async () => ({
+  status: 'ok',
+  uptime: process.uptime(),
+  memory: process.memoryUsage().heapUsed
+}));
 
 const start = async () => {
   await server.listen({ port: 3000, host: '0.0.0.0' });
 };
 start();
-```
-
-### 2. How do you design and structure enterprise Node.js projects?
-**In Simple Words:**
-I adhere to **Layered Architecture (Controller-Service-Repository)** with Clean Architecture boundaries:
-- **Presentation Layer (Controllers/Routes)**: Handles HTTP request parsing, DTO validation using Zod, and returns HTTP responses.
-- **Domain & Service Layer**: Contains business rules, orchestration, domain entities, and domain exceptions; completely decoupled from HTTP frameworks.
-- **Data Access Layer (Repositories)**: Encapsulates database queries (Prisma, TypeORM, Drizzle, or raw SQL clients).
-- **Cross-Cutting Concerns**: Centralized middleware for authentication, correlation ID propagation (`AsyncLocalStorage`), error handling, and structured logging.
-
-```typescript
-// Service Layer decoupling business logic from HTTP controller:
-export class UserService {
-  constructor(private userRepo: UserRepository) {}
-
-  async registerUser(dto: CreateUserDTO): Promise<User> {
-    const existing = await this.userRepo.findByEmail(dto.email);
-    if (existing) throw new ConflictError('Email already registered');
-    return this.userRepo.create(dto);
-  }
-}
 ```
 
 ### 3. Describe a critical production incident or performance bottleneck you resolved in Node.js.
@@ -67,24 +90,25 @@ app.post('/invoice', async (req, res) => {
 });
 ```
 
-### 4. How do you decide between choosing Express, Fastify, or NestJS?
+### 4. How do you design and structure enterprise Node.js projects?
 **In Simple Words:**
-- **Express**: The battle-tested industry standard. Best when team familiarity, vast third-party middleware compatibility, and straightforward lightweight setups are preferred.
-- **Fastify**: High-throughput microservices. Delivers up to 2x higher throughput than Express via compile-time JSON schema serialization (`fast-json-stringify`) and Radix Tree routing (`find-my-way`).
-- **NestJS**: Large enterprise teams requiring an opinionated, TypeScript-first framework with built-in Dependency Injection, modular architecture, and microservice transport adapters (gRPC, RabbitMQ, Kafka).
+I adhere to **Layered Architecture (Controller-Service-Repository)** with Clean Architecture boundaries:
+- **Presentation Layer (Controllers/Routes)**: Handles HTTP request parsing, DTO validation using Zod, and returns HTTP responses.
+- **Domain & Service Layer**: Contains business rules, orchestration, domain entities, and domain exceptions; completely decoupled from HTTP frameworks.
+- **Data Access Layer (Repositories)**: Encapsulates database queries (Prisma, TypeORM, Drizzle, or raw SQL clients).
+- **Cross-Cutting Concerns**: Centralized middleware for authentication, correlation ID propagation (`AsyncLocalStorage`), error handling, and structured logging.
 
 ```typescript
-// Fastify compile-time schema route for maximum throughput:
-fastify.get('/user/:id', {
-  schema: {
-    response: {
-      200: {
-        type: 'object',
-        properties: { id: { type: 'string' }, name: { type: 'string' } }
-      }
-    }
+// Service Layer decoupling business logic from HTTP controller:
+export class UserService {
+  constructor(private userRepo: UserRepository) {}
+
+  async registerUser(dto: CreateUserDTO): Promise<User> {
+    const existing = await this.userRepo.findByEmail(dto.email);
+    if (existing) throw new ConflictError('Email already registered');
+    return this.userRepo.create(dto);
   }
-}, async (request) => ({ id: request.params.id, name: 'Alice' }));
+}
 ```
 
 ### 5. What is your strategy for automated backend testing in Node.js?
@@ -98,13 +122,11 @@ fastify.get('/user/:id', {
 import request from 'supertest';
 import { app } from '../src/app';
 
-describe('POST /api/users', () => {
-  it('creates user with status 201', async () => {
-    const res = await request(app)
-      .post('/api/users')
-      .send({ email: 'test@example.com', name: 'Tester' });
-    expect(res.status).toBe(201);
-    expect(res.body.email).toBe('test@example.com');
+describe('GET /health', () => {
+  it('should return 200 OK with runtime status', async () => {
+    const res = await request(app).get('/health');
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('ok');
   });
 });
 ```

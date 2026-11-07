@@ -370,7 +370,7 @@ In class components, the components extending _`React.PureComponent`_ instead of
 
 _State_ of a component is an object that holds some information that may change over the lifetime of the component. The important point is whenever the state object changes, the component re-renders. It is always recommended to make our state as simple as possible and minimize the number of stateful components.
 
-![state](images/state.jpg)
+![state](/images/state.jpg)
 
 Let's take an example of **User** component with `message` state. Here, **useState** hook has been used to add state to the User component and it returns an array with current state and function to update it.
 
@@ -732,17 +732,17 @@ The _Virtual DOM_ works in five simple steps.
 **2. State or Props Change**  
  When the component's state or props change, React creates a new Virtual DOM reflecting the updated UI. However, it doesn't immediately update the Real DOM; instead, it works in memory to prepare for an efficient update.
         
-![vdom](images/vdom1.png)
+![vdom](/images/vdom1.png)
 
 **3. Diffing Algorithm**  
  React then compares the new Virtual DOM with the previous one using a process called diffing. It determines what has changed between the two versions and identifies the minimal set of updates needed.
 
-![vdom2](images/vdom2.png)  
+![vdom2](/images/vdom2.png)  
 
 **4. Reconciliation**  
  Based on the diffing results, React decides which parts of the Real DOM should be updated. It avoids re-rendering the entire DOM and instead updates only the elements that actually changed.
  
-![vdom3](images/vdom3.png)
+![vdom3](/images/vdom3.png)
 
 **5. Efficient DOM Updates**  
  This entire process—working with the Virtual DOM, diffing, and selective updating—makes the UI rendering much faster and more efficient than manipulating the Real DOM directly.
@@ -3266,7 +3266,7 @@ Flux operates using **four key components**, each with a specific responsibility
 
 The workflow between dispatcher, stores and views components with distinct inputs and outputs as follows:
 
-![flux](images/flux.png)
+![flux](/images/flux.png)
 
 #### Practical Code Example
 
@@ -5049,7 +5049,7 @@ Apart from error messages and javascript stack, React16 will display the compone
 
 For example, BuggyCounter component displays the component stack trace as below,
 
-![stacktrace](images/error_boundary.png)
+![stacktrace](/images/error_boundary.png)
 
 #### Practical Code Example
 
@@ -11794,11 +11794,11 @@ The component lifecycle has three distinct lifecycle phases:
 
     React 16.3+ Phases (or an [interactive version](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/))
 
-    ![phases 16.4+](images/phases16.4.png)
+    ![phases 16.4+](/images/phases16.4.png)
 
     Before React 16.3
 
-    ![phases 16.2](images/phases.png)
+    ![phases 16.2](/images/phases.png)
 
     
 

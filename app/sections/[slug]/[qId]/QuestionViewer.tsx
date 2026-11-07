@@ -20,10 +20,63 @@ import {
 } from 'lucide-react';
 import { QuestionViewData } from '@/lib/tracks-meta';
 import { CodeBlock } from '@/components/CodeBlock';
+import { MultiLangCodeTabs, LanguageBlock } from '@/components/MultiLangCodeTabs';
+
+function parseQuestionContent(content: string) {
+  const langRegex = /####\s+(Python 3|Python|Java|C\+\+|TypeScript|Go|Rust)\s*\n+```(\w+)\n([\s\S]*?)```/gi;
+  const blocks: LanguageBlock[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = langRegex.exec(content)) !== null) {
+    blocks.push({
+      label: match[1].trim(),
+      lang: match[2].trim().toLowerCase(),
+      code: match[3].trim(),
+    });
+  }
+
+  if (blocks.length > 1) {
+    const firstHeaderIdx = content.search(/####\s+(Python 3|Python|Java|C\+\+|TypeScript)/i);
+    const explanation = firstHeaderIdx !== -1 ? content.slice(0, firstHeaderIdx).trim() : content;
+    return { isMultiLang: true, explanation, blocks };
+  }
+
+  return { isMultiLang: false, explanation: content, blocks: [] };
+}
 
 interface QuestionViewerProps {
   data: QuestionViewData;
 }
+
+
+const renderMarkdownImage = ({ src, alt, ...props }: any) => {
+  if (!src) return null;
+  let resolvedSrc = src;
+  if (resolvedSrc.startsWith('images/')) {
+    resolvedSrc = '/' + resolvedSrc;
+  } else if (resolvedSrc.startsWith('./images/')) {
+    resolvedSrc = resolvedSrc.replace(/^\.\//, '/');
+  }
+  return (
+    <figure className="my-6 flex flex-col items-center">
+      <div className="overflow-hidden rounded-xl border border-border bg-card p-2 sm:p-3 shadow-md max-w-full">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={resolvedSrc}
+          alt={alt || 'Interview reference diagram'}
+          loading="lazy"
+          className="rounded-lg object-contain max-h-[550px] w-auto max-w-full mx-auto"
+          {...props}
+        />
+      </div>
+      {alt && alt !== 'ScreenShot' && alt !== 'Screenshot' && (
+        <figcaption className="mt-2 text-center text-xs text-muted-foreground italic font-medium">
+          {alt}
+        </figcaption>
+      )}
+    </figure>
+  );
+};
 
 export function QuestionViewer({ data }: QuestionViewerProps) {
   const router = useRouter();
@@ -197,54 +250,97 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
 
         {/* Answer Content with Syntax-Highlighted Markdown */}
         <div className="markdown-body">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeSlug, [rehypeHighlight, { detect: true, ignoreMissing: true }]]}
-            components={{
-              pre({ children }) {
-                // Pass children cleanly to avoid pre > div invalid HTML
-                return <>{children}</>;
-              },
-              code({ className, children, ...props }) {
-                const match = /language-(\w+)/.exec(className || '');
-                const isInline = !match;
+          {(() => {
+            const parsed = parseQuestionContent(question.content);
+            if (parsed.isMultiLang) {
+              return (
+                <>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeSlug, [rehypeHighlight, { detect: true, ignoreMissing: true }]]}
+                    components={{
+                      img: renderMarkdownImage,
+                      table({ children }) {
+                        return (
+                          <div className="table-wrapper">
+                            <table>{children}</table>
+                          </div>
+                        );
+                      },
+                    }}
+                  >
+                    {parsed.explanation}
+                  </ReactMarkdown>
 
-                if (isInline) {
-                  return (
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  );
-                }
-
-                // Block code: extract raw text content for copy button
-                const extractRawText = (node: any): string => {
-                  if (typeof node === 'string') return node;
-                  if (Array.isArray(node)) return node.map(extractRawText).join('');
-                  if (node?.props?.children) return extractRawText(node.props.children);
-                  return '';
-                };
-
-                const rawCode = extractRawText(children).replace(/\n$/, '');
-                const lang = match ? match[1] : '';
-
-                return (
-                  <CodeBlock language={lang} codeString={rawCode}>
-                    {children}
-                  </CodeBlock>
-                );
-              },
-              table({ children }) {
-                return (
-                  <div className="table-wrapper">
-                    <table>{children}</table>
+                  {/* Multi-Language Interactive Code IDE */}
+                  <div className="mt-8 pt-4 border-t border-border/60">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-foreground tracking-wide">Multi-Language Solutions</span>
+                        <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold border border-purple-500/20">
+                          Python 3 • Java • C++ • TypeScript
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-muted-foreground font-medium">Switch tabs or choose All</span>
+                    </div>
+                    <MultiLangCodeTabs blocks={parsed.blocks} />
                   </div>
-                );
-              },
-            }}
-          >
-            {question.content}
-          </ReactMarkdown>
+                </>
+              );
+            }
+
+            return (
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeSlug, [rehypeHighlight, { detect: true, ignoreMissing: true }]]}
+                components={{
+                  pre({ children }) {
+                    // Pass children cleanly to avoid pre > div invalid HTML
+                    return <>{children}</>;
+                  },
+                  code({ className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || '');
+                    const isInline = !match;
+
+                    if (isInline) {
+                      return (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+
+                    // Block code: extract raw text content for copy button
+                    const extractRawText = (node: any): string => {
+                      if (typeof node === 'string') return node;
+                      if (Array.isArray(node)) return node.map(extractRawText).join('');
+                      if (node?.props?.children) return extractRawText(node.props.children);
+                      return '';
+                    };
+
+                    const rawCode = extractRawText(children).replace(/\n$/, '');
+                    const lang = match ? match[1] : '';
+
+                    return (
+                      <CodeBlock language={lang} codeString={rawCode}>
+                        {children}
+                      </CodeBlock>
+                    );
+                  },
+                  img: renderMarkdownImage,
+                      table({ children }) {
+                    return (
+                      <div className="table-wrapper">
+                        <table>{children}</table>
+                      </div>
+                    );
+                  },
+                }}
+              >
+                {question.content}
+              </ReactMarkdown>
+            );
+          })()}
         </div>
       </article>
 

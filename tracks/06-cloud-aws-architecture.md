@@ -6,9 +6,57 @@
 
 ## Part 1: Intro, Architecture & Well-Architected Framework (1 - 5)
 
-### 1. Give a candid walkthrough of your hands-on experience designing, provisioning, and deploying production workloads on AWS.
+### 1. What is Cloud Computing, and how is the AWS Global Infrastructure structured (Regions, Availability Zones, and Edge Locations)?
 **In Simple Words:**
-"I am a Senior Cloud & Full-Stack Architect with deep hands-on experience designing resilient, multi-region architectures on AWS. I provision immutable infrastructure using Terraform and AWS CDK, designing secure VPC topologies across multiple Availability Zones. My workloads span containerized microservices running on **ECS Fargate** and **EKS**, event-driven serverless pipelines built with **AWS Lambda**, **SQS**, and **EventBridge**, and relational databases on **Amazon Aurora PostgreSQL** paired with DynamoDB and ElastiCache Redis. I focus heavily on security, least-privilege IAM roles, envelope encryption via KMS, and continuous FinOps cost governance."
+**Cloud Computing** is the on-demand delivery of IT computing power, database storage, applications, and networking resources over the internet with pay-as-you-go pricing, replacing capital expenditure (CapEx) of physical on-premise hardware with operational expenditure (OpEx).
+
+**The AWS Global Infrastructure Architecture:**
+1. **AWS Regions**: Separate geographic locations across the globe (e.g., `us-east-1` N. Virginia, `eu-west-1` Ireland). Each Region is completely isolated from other Regions to achieve maximum fault tolerance and stability.
+2. **Availability Zones (AZs)**: Each AWS Region is composed of multiple (at least 3) isolated locations known as Availability Zones. An AZ consists of one or more discrete physical data centers with redundant power, cooling, and low-latency optical networking. Multi-AZ deployments protect against physical data center outages.
+3. **Edge Locations & Local Zones**: Global Points of Presence (PoPs) located in major metropolitan areas worldwide. Powered by **Amazon CloudFront** (CDN) and **Amazon Route 53** (DNS), Edge Locations cache content close to end users to deliver sub-millisecond latencies.
+4. **AWS Shared Responsibility Model**:
+   - **Security OF the Cloud (AWS)**: Physical hardware, global data centers, virtualization hypervisors, and managed service infrastructure.
+   - **Security IN the Cloud (Customer)**: Customer data, IAM identities, firewall/security group configurations, OS patching on EC2, and encryption.
+
+```hcl
+# Terraform: Multi-AZ provider configuration and Availability Zone data query:
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+# Fetch all available Availability Zones in the region dynamically:
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+output "primary_az" {
+  value = data.aws_availability_zones.available.names[0] # e.g. "us-east-1a"
+}
+output "secondary_az" {
+  value = data.aws_availability_zones.available.names[1] # e.g. "us-east-1b"
+}
+```
+
+### 2. Give a candid walkthrough of your hands-on experience designing, provisioning, and deploying production workloads on AWS, and how you apply the Well-Architected Framework.
+**In Simple Words:**
+"I am a Senior Cloud & Full-Stack Architect with deep hands-on experience designing resilient, multi-region architectures on AWS. I provision immutable infrastructure using Terraform and AWS CDK, designing secure VPC topologies across multiple Availability Zones. My workloads span containerized microservices running on **ECS Fargate** and **EKS**, event-driven serverless pipelines built with **AWS Lambda**, **SQS**, and **EventBridge**, and relational databases on **Amazon Aurora PostgreSQL** paired with DynamoDB and ElastiCache Redis.
+
+I evaluate every architectural design against the **6 Pillars of the AWS Well-Architected Framework**:
+1. **Operational Excellence**: Automating deployments (IaC), monitoring health, and continuously improving.
+2. **Security**: Protecting data and identity via Defense-in-Depth, least-privilege IAM, and encryption at rest/transit.
+3. **Reliability**: Self-healing systems, Multi-AZ high availability, and automated failover.
+4. **Performance Efficiency**: Sizing compute right, using serverless where appropriate, and adopting ARM Graviton processors.
+5. **Cost Optimization**: Eliminating idle waste, using Savings Plans/Spot, and setting budget alarms.
+6. **Sustainability**: Minimizing idle compute and reducing carbon footprint."
 
 ```typescript
 // AWS CDK: Provisioning a production VPC with Public, Private, and Isolated subnets:
@@ -29,28 +77,6 @@ export class NetworkStack extends Construct {
       ]
     });
   }
-}
-```
-
-### 2. What are the 6 Pillars of the AWS Well-Architected Framework, and how do you evaluate architectural trade-offs against them?
-**In Simple Words:**
-1. **Operational Excellence**: Automating deployments (IaC), monitoring health, and continuously improving.
-2. **Security**: Protecting data and identity via Defense-in-Depth, least-privilege IAM, and encryption at rest/transit.
-3. **Reliability**: Self-healing systems, Multi-AZ high availability, and automated failover.
-4. **Performance Efficiency**: Sizing compute right, using serverless where appropriate, and adopting ARM Graviton processors.
-5. **Cost Optimization**: Eliminating idle waste, using Savings Plans/Spot, and setting budget alarms.
-6. **Sustainability**: Minimizing idle compute and reducing carbon footprint.
-- *Trade-off Example*: Balancing Cost vs Reliability by choosing Multi-AZ synchronous replication for core transactional databases while keeping ephemeral test environments Single-AZ.
-
-```hcl
-# Terraform: Enforcing encryption and Multi-AZ reliability in RDS:
-resource "aws_db_instance" "prod_database" {
-  identifier        = "production-postgres"
-  engine            = "postgres"
-  instance_class    = "db.r6g.xlarge" # AWS Graviton (Performance & Cost)
-  multi_az          = true             # Reliability Pillar
-  storage_encrypted = true             # Security Pillar
-  kms_key_id        = aws_kms_key.db_key.arn
 }
 ```
 
@@ -98,25 +124,24 @@ CheckoutFunction:
 **In Simple Words:**
 - **Cost Allocation Tags**: Enforce mandatory tags (`Environment`, `Team`, `CostCenter`) via AWS Organizations SCPs.
 - **Compute Savings Plans**: Commit to consistent hourly compute across Lambda, Fargate, and EC2 for up to 66% discounts.
-- **Graviton Migration**: Switch EC2, RDS, and Lambda to AWS Graviton (ARM64) for ~20-40% better price-performance.
-- **S3 Lifecycle Policies**: Transition objects automatically to Intelligent-Tiering or Glacier Deep Archive after 30-90 days.
+- **S3 Lifecycle Rules**: Transition infrequently accessed objects from Standard to Intelligent-Tiering or Glacier Flexible Retrieval.
+- **Right-Sizing & Graviton**: Upgrade x86 instances to ARM64 AWS Graviton3/4 processors for up to 25% better price-performance.
 
-```hcl
-# S3 Lifecycle policy to reduce storage costs by up to 80%:
-resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
-  bucket = aws_s3_bucket.data_archive.id
-  rule {
-    id     = "archive_old_data"
-    status = "Enabled"
-    transition {
-      days          = 30
-      storage_class = "INTELLIGENT_TIERING"
+```json
+// AWS IAM SCP: Enforcing Cost Allocation Tags on resource creation:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "EnforceEnvironmentTag",
+      "Effect": "Deny",
+      "Action": ["ec2:RunInstances", "rds:CreateDBInstance"],
+      "Resource": "*",
+      "Condition": {
+        "Null": { "aws:RequestTag/Environment": "true" }
+      }
     }
-    transition {
-      days          = 90
-      storage_class = "GLACIER"
-    }
-  }
+  ]
 }
 ```
 

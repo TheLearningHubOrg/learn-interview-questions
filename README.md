@@ -20,9 +20,9 @@
 | **Track 4: Backend Python** | Python 3.12+, CPython Internals, AsyncIO, FastAPI, SQLAlchemy 2.0, Celery | **65** | [Open Track 4](tracks/04-backend-python.md) |
 | **Track 5: Backend Node.js** | Node.js Runtime, V8, Libuv Event Loop, Streams, Buffers, Express, Fastify | **60** | [Open Track 5](tracks/05-backend-nodejs.md) |
 | **Track 6: AWS Cloud Architecture** | AWS Well-Architected, VPC, Fargate, Lambda, S3, Aurora, IAM, KMS, SQS | **65** | [Open Track 6](tracks/06-cloud-aws-architecture.md) |
-| **Track 7: Data Structures & Algorithms** | Blind 75, NeetCode 150 Patterns, Two Pointers, Trees, Graphs, DP | **100** | [Open Track 7](tracks/07-data-structures-algorithms.md) |
-| **Track 8: Core JavaScript Internals** | Core Language Bank: 518 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **518** | [Open Track 8](tracks/08-frontend-javascript.md) |
-| **TOTAL** | **Full-Stack, Cloud & Core JavaScript Mastery** | **1,596** | — |
+| **Track 7: Data Structures & Algorithms** | Multi-Language: Python 3, Java, C++, TypeScript (Blind 75, NeetCode 150) | **100** | [Open Track 7](tracks/07-data-structures-algorithms.md) |
+| **Track 8: Core JavaScript Internals** | Core Language Bank: 521 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **521** | [Open Track 8](tracks/08-frontend-javascript.md) |
+| **TOTAL** | **Full-Stack, Cloud & Core JavaScript Mastery** | **1,599** | — |
 
 ---
 
@@ -43,7 +43,7 @@
 
 ---
 
-### 🟨 [Track 8: Core JavaScript Master (1 - 518)](tracks/08-frontend-javascript.md)
+### 🟨 [Track 8: Core JavaScript Master (1 - 521)](tracks/08-frontend-javascript.md)
 1. **Core Objects, Prototypes, Functions & Scope (Q1 - Q50)**: Ways to create objects, prototype chains, `call`/`apply`/`bind`, Map vs Object, arrow functions, currying, pure functions, `let` vs `var`, TDZ, IIFE, memoization, hoisting, closures, scopes, service workers, IndexedDB, cookies & web storage.
 2. **Promises, Callbacks, Async & Strict Mode (Q51 - Q100)**: Web workers, Promise states, callback hell, SSE, promise chaining, `Promise.all()`, strict mode, `typeof`, `null` vs `undefined`, `window` vs `document`, event flow, bubbling & capturing, SOP, compiled vs interpreted, case-sensitivity.
 3. **DOM, Event Flow, Timers & Browser APIs (Q101 - Q170)**: `preventDefault()` vs `stopPropagation()`, single-threaded model, event delegation, ECMAScript vs JS, `clearTimeout` / `clearInterval`, URL location properties, loops, polyfills, tree shaking, regex patterns, breakpoints.
@@ -51,7 +51,7 @@
 5. **ES6+ Modern Syntax, Classes, Modules & Destructuring (Q251 - Q325)**: Comma operator, TypeScript differences, class constructors & `super()`, prototype getters/setters, non-extensible objects, minification & obfuscation, constraint validation, ES6 features, template literals, destructuring, typed arrays.
 6. **Async Internals, Memory, Microtasks & Web APIs (Q326 - Q400)**: PostMessage security, JS paradigms, `~~` operator, `ArrayBuffer`, shallow vs deep copy, mixins, reflow vs repaint, AJAX, zero timeout, microtask queues, observables & RxJS.
 7. **Execution Context, Functional JS & V8 Engine (Q401 - Q460)**: Babel, Node.js concurrency, `this` keyword, memory leak causes, V8 optimization (hidden classes, inline caching), HOFs, ASI, compose & pipe functions.
-8. **Modern JavaScript APIs, WeakRef, Proxy & Performance (Q461 - Q518)**: Lexical scope, dark mode detection, `requestAnimationFrame`, `globalThis`, shadowing, `structuredClone`, `Promise.any()`, BigInt, private class fields, Array `.at()`, top-level await, WeakRef & FinalizationRegistry, Temporal API, Symbols, AbortController, Intersection Observer, Mutation Observer, Atomics API, bundle size optimization.
+8. **Modern JavaScript APIs, WeakRef, Proxy & Performance (Q461 - Q521)**: Lexical scope, dark mode detection, `requestAnimationFrame`, `globalThis`, shadowing, `structuredClone`, `Promise.any()`, BigInt, private class fields, Array `.at()`, top-level await, WeakRef & FinalizationRegistry, Temporal API, Symbols, AbortController, Intersection Observer, Mutation Observer, Atomics API, bundle size optimization.
 
 ---
 
@@ -105,7 +105,7 @@
 
 ---
 
-### 🧠 [Track 7: Data Structures & Algorithms (1 - 100)](tracks/07-data-structures-algorithms.md)
+### 🧠 [Track 7: Data Structures & Algorithms (1 - 100) — Multi-Language: Python 3 • Java • C++ • TypeScript](tracks/07-data-structures-algorithms.md)
 1. **Intro & Approach (Q1 - Q5)**: Step-by-step interview problem-solving framework, Big-O / Big-$\Omega$ / Big-$\Theta$ asymptotic notation, Master Theorem, recursion stack vs heap memory bounds, constraint-based pattern recognition.
 2. **Arrays, Strings & Hash Maps (Q6 - Q18)**: Two Sum ($O(N)$), Longest Consecutive Sequence ($O(N)$), Group Anagrams, Product of Array Except Self ($O(1)$ space), Kadane’s Algorithm for Maximum Subarray, Subarray Sum Equals K (prefix sums), Next Permutation, Merge & Insert Intervals.
 3. **Two Pointers & Sliding Window (Q19 - Q28)**: Valid Palindrome, Two Sum II (sorted array), 3Sum ($O(N^2)$), Container With Most Water, Trapping Rain Water ($O(1)$ space), Longest Substring Without Repeating Characters, Minimum Window Substring ($O(N+M)$), Sliding Window Maximum (Monotonic Deque).

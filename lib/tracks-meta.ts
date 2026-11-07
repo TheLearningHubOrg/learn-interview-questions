@@ -122,12 +122,12 @@ export const TRACKS: TrackMeta[] = [
     slug: 'dsa',
     title: 'Data Structures & Algorithms Master: Blind 75, NeetCode & Core Patterns (Multi-Language)',
     shortTitle: 'DSA Patterns (Multi-Lang)',
-    description: '100 core problems from Blind 75 and NeetCode 150 with complete multi-language implementations in Python 3, Java, C++, and TypeScript across Arrays, Trees, Graphs, and DP.',
+    description: '100 core problems from Blind 75 and NeetCode 150 with complete multi-language implementations in Python 3, JavaScript, TypeScript, Java, and C++ across Arrays, Trees, Graphs, and DP.',
     questionCount: 100,
     filename: '07-data-structures-algorithms.md',
     badgeColor: 'bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-500/15 dark:text-purple-400 dark:border-purple-500/30',
     iconName: 'Code2',
-    tags: ['Python 3', 'Java', 'C++', 'TypeScript', 'Blind 75', 'NeetCode', 'Graphs', 'DP']
+    tags: ['Python 3', 'JavaScript', 'TypeScript', 'Java', 'C++', 'Blind 75', 'NeetCode', 'Graphs', 'DP']
   },
   {
     id: '08',

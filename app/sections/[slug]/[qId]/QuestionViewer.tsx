@@ -23,20 +23,25 @@ import { CodeBlock } from '@/components/CodeBlock';
 import { MultiLangCodeTabs, LanguageBlock } from '@/components/MultiLangCodeTabs';
 
 function parseQuestionContent(content: string) {
-  const langRegex = /####\s+(Python 3|Python|Java|C\+\+|TypeScript|Go|Rust)\s*\n+```(\w+)\n([\s\S]*?)```/gi;
+  const langRegex = /####\s+(Python 3|Python|JavaScript|JS|TypeScript|TS|Java|C\+\+|Go|Rust)\s*\n+```(\w+)\n([\s\S]*?)```/gi;
   const blocks: LanguageBlock[] = [];
   let match: RegExpExecArray | null;
 
   while ((match = langRegex.exec(content)) !== null) {
+    let label = match[1].trim();
+    if (label.toLowerCase() === 'js') label = 'JavaScript';
+    if (label.toLowerCase() === 'ts') label = 'TypeScript';
+    if (label.toLowerCase() === 'python') label = 'Python 3';
+
     blocks.push({
-      label: match[1].trim(),
+      label,
       lang: match[2].trim().toLowerCase(),
       code: match[3].trim(),
     });
   }
 
   if (blocks.length > 1) {
-    const firstHeaderIdx = content.search(/####\s+(Python 3|Python|Java|C\+\+|TypeScript)/i);
+    const firstHeaderIdx = content.search(/####\s+(Python 3|Python|JavaScript|JS|TypeScript|TS|Java|C\+\+)/i);
     const explanation = firstHeaderIdx !== -1 ? content.slice(0, firstHeaderIdx).trim() : content;
     return { isMultiLang: true, explanation, blocks };
   }
@@ -278,7 +283,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-foreground tracking-wide">Multi-Language Solutions</span>
                         <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold border border-purple-500/20">
-                          Python 3 • Java • C++ • TypeScript
+                          Python 3 • JavaScript • TypeScript • Java • C++
                         </span>
                       </div>
                       <span className="text-[11px] text-muted-foreground font-medium">Switch tabs or choose All</span>

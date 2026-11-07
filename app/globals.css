@@ -10,10 +10,10 @@
   --border: #e2e8f0;
   --muted: #f1f5f9;
   --muted-foreground: #475569;
-  --code-bg: #0d1117;
-  --code-header-bg: #161b22;
-  --code-border: #30363d;
-  --code-text: #e6edf3;
+  --code-bg: #f8fafc;
+  --code-header-bg: #f1f5f9;
+  --code-border: #e2e8f0;
+  --code-text: #1e293b;
 }
 
 .dark {
@@ -80,73 +80,145 @@ code, pre, kbd {
 }
 
 /* Syntax Highlighting Tokens (highlight.js) */
+/* Light Mode (Default) - Crisp GitHub Light Syntax Palette */
 .hljs {
-  color: #e6edf3;
+  color: #24292f;
   background: transparent;
 }
 
 .hljs-keyword,
 .hljs-operator,
 .hljs-selector-tag {
-  color: #ff7b72;
+  color: #cf222e;
   font-weight: 600;
 }
 
 .hljs-string,
 .hljs-regexp,
 .hljs-template-tag {
-  color: #a5d6ff;
+  color: #0a3069;
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: #8b949e;
+  color: #6e7781;
   font-style: italic;
 }
 
 .hljs-title,
 .hljs-title.function_,
 .hljs-function {
-  color: #d2a8ff;
+  color: #8250df;
   font-weight: 600;
 }
 
 .hljs-number,
 .hljs-literal {
-  color: #79c0ff;
+  color: #0550ae;
 }
 
 .hljs-type,
 .hljs-class,
 .hljs-title.class_ {
-  color: #ffa657;
+  color: #953800;
   font-weight: 600;
 }
 
 .hljs-attr,
 .hljs-attribute {
-  color: #7ee787;
+  color: #116329;
 }
 
 .hljs-tag {
-  color: #7ee787;
+  color: #116329;
 }
 
 .hljs-name {
-  color: #7ee787;
+  color: #116329;
 }
 
 .hljs-built_in,
 .hljs-symbol {
-  color: #ffa657;
+  color: #953800;
 }
 
 .hljs-variable,
 .hljs-params {
-  color: #e6edf3;
+  color: #24292f;
 }
 
 .hljs-punctuation {
+  color: #57606a;
+}
+
+/* Dark Mode - Vibrant GitHub Dark Syntax Palette */
+.dark .hljs {
+  color: #e6edf3;
+  background: transparent;
+}
+
+.dark .hljs-keyword,
+.dark .hljs-operator,
+.dark .hljs-selector-tag {
+  color: #ff7b72;
+  font-weight: 600;
+}
+
+.dark .hljs-string,
+.dark .hljs-regexp,
+.dark .hljs-template-tag {
+  color: #a5d6ff;
+}
+
+.dark .hljs-comment,
+.dark .hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.dark .hljs-title,
+.dark .hljs-title.function_,
+.dark .hljs-function {
+  color: #d2a8ff;
+  font-weight: 600;
+}
+
+.dark .hljs-number,
+.dark .hljs-literal {
+  color: #79c0ff;
+}
+
+.dark .hljs-type,
+.dark .hljs-class,
+.dark .hljs-title.class_ {
+  color: #ffa657;
+  font-weight: 600;
+}
+
+.dark .hljs-attr,
+.dark .hljs-attribute {
+  color: #7ee787;
+}
+
+.dark .hljs-tag {
+  color: #7ee787;
+}
+
+.dark .hljs-name {
+  color: #7ee787;
+}
+
+.dark .hljs-built_in,
+.dark .hljs-symbol {
+  color: #ffa657;
+}
+
+.dark .hljs-variable,
+.dark .hljs-params {
+  color: #e6edf3;
+}
+
+.dark .hljs-punctuation {
   color: #8b949e;
 }
 

@@ -65,28 +65,34 @@ export function MultiLangCodeTabs({ blocks }: MultiLangCodeTabsProps) {
   const getLangIcon = (label: string) => {
     const l = label.toLowerCase();
     if (l.includes('python')) return '🐍';
-    if (l.includes('java') && !l.includes('script')) return '☕';
+    if (l.includes('javascript') || l === 'js') return '🟨';
+    if (l.includes('typescript') || l === 'ts') return '🔷';
+    if (l.includes('java')) return '☕';
     if (l.includes('c++') || l.includes('cpp')) return '⚡';
-    if (l.includes('typescript') || l.includes('ts')) return '🔷';
+    if (l.includes('go')) return '🐹';
+    if (l.includes('rust')) return '🦀';
     return '💻';
   };
 
   return (
-    <div className="my-6 rounded-xl overflow-hidden border border-[#1e2330] bg-[#0b0d14] shadow-xl text-left">
+    <div className="my-6 rounded-xl overflow-hidden border border-border bg-card shadow-sm dark:shadow-xl text-left transition-colors">
       {/* Tab Navigation Header Bar */}
-      <div className="flex flex-wrap items-center justify-between px-3 py-2 bg-[#121520] border-b border-[#1e2330] gap-2 select-none">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-3 py-2 bg-muted/70 dark:bg-[#121520] border-b border-border gap-2 select-none min-w-0 transition-colors">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
           {/* Mac-style traffic dots */}
-          <div className="flex items-center gap-1.5 hidden sm:flex" aria-hidden="true">
+          <div className="flex items-center gap-1.5 hidden md:flex shrink-0" aria-hidden="true">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
           </div>
 
-          <span className="h-3 w-px bg-slate-700/60 hidden sm:inline-block" />
+          <span className="h-3 w-px bg-border hidden md:inline-block shrink-0" />
 
-          {/* Language Tabs */}
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5">
+          {/* Horizontally Scrollable Language Tabs */}
+          <div 
+            className="flex items-center gap-1.5 overflow-x-auto scrollbar-thin py-0.5 min-w-0 flex-1 scroll-smooth touch-pan-x"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
             {blocks.map((b) => {
               const isActive = activeLabel === b.label;
               return (
@@ -94,13 +100,13 @@ export function MultiLangCodeTabs({ blocks }: MultiLangCodeTabsProps) {
                   key={b.label}
                   type="button"
                   onClick={() => selectLanguage(b.label)}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
                     isActive
-                      ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                      ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30 font-bold'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-background/80 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/5'
                   }`}
                 >
-                  <span className="text-[11px]">{getLangIcon(b.label)}</span>
+                  <span className="text-[12px]">{getLangIcon(b.label)}</span>
                   <span>{b.label}</span>
                 </button>
               );
@@ -110,13 +116,13 @@ export function MultiLangCodeTabs({ blocks }: MultiLangCodeTabsProps) {
             <button
               type="button"
               onClick={() => selectLanguage('all')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
                 isAll
-                  ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30 font-bold'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/80 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/5'
               }`}
             >
-              <Layers className="w-3 h-3" />
+              <Layers className="w-3.5 h-3.5" />
               <span>All ({blocks.length})</span>
             </button>
           </div>
@@ -127,12 +133,12 @@ export function MultiLangCodeTabs({ blocks }: MultiLangCodeTabsProps) {
           type="button"
           onClick={handleCopy}
           aria-label="Copy code to clipboard"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all active:scale-95 ml-auto"
+          className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:text-slate-900 bg-card hover:bg-muted border border-border shadow-xs dark:text-slate-300 dark:hover:text-white dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 transition-all active:scale-95"
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400 text-[11px] font-semibold">Copied!</span>
+              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">Copied!</span>
             </>
           ) : (
             <>
@@ -145,12 +151,12 @@ export function MultiLangCodeTabs({ blocks }: MultiLangCodeTabsProps) {
 
       {/* Code Display Area */}
       {isAll ? (
-        <div className="divide-y divide-[#1e2330]">
+        <div className="divide-y divide-border">
           {blocks.map((b) => (
             <div key={b.label}>
-              <div className="flex items-center justify-between px-4 py-1.5 bg-[#0e111a] text-xs font-mono font-semibold text-purple-400 border-b border-[#1e2330]/60">
+              <div className="flex items-center justify-between px-4 py-1.5 bg-muted/50 dark:bg-[#0e111a] text-xs font-mono font-semibold text-purple-700 dark:text-purple-400 border-b border-border transition-colors">
                 <span>{getLangIcon(b.label)} {b.label}</span>
-                <span className="text-[10px] text-slate-500 uppercase">{b.lang}</span>
+                <span className="text-[10px] text-muted-foreground uppercase">{b.lang}</span>
               </div>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -159,7 +165,7 @@ export function MultiLangCodeTabs({ blocks }: MultiLangCodeTabsProps) {
                   pre({ children }) { return <>{children}</>; },
                   code({ className, children }) {
                     return (
-                      <pre className="p-4 sm:p-5 overflow-x-auto text-[13px] sm:text-sm font-mono leading-relaxed bg-[#0b0d14] text-[#f1f5f9] scrollbar-thin scrollbar-thumb-border m-0">
+                      <pre className="p-4 sm:p-5 overflow-x-auto text-[13px] sm:text-sm font-mono leading-relaxed bg-slate-50 dark:bg-[#0b0d14] text-slate-900 dark:text-[#f1f5f9] scrollbar-thin scrollbar-thumb-border m-0 transition-colors">
                         <code className={className}>{children}</code>
                       </pre>
                     );
@@ -179,7 +185,7 @@ export function MultiLangCodeTabs({ blocks }: MultiLangCodeTabsProps) {
             pre({ children }) { return <>{children}</>; },
             code({ className, children }) {
               return (
-                <pre className="p-4 sm:p-5 overflow-x-auto text-[13px] sm:text-sm font-mono leading-relaxed bg-[#0b0d14] text-[#f1f5f9] scrollbar-thin scrollbar-thumb-border m-0">
+                <pre className="p-4 sm:p-5 overflow-x-auto text-[13px] sm:text-sm font-mono leading-relaxed bg-slate-50 dark:bg-[#0b0d14] text-slate-900 dark:text-[#f1f5f9] scrollbar-thin scrollbar-thumb-border m-0 transition-colors">
                   <code className={className}>{children}</code>
                 </pre>
               );

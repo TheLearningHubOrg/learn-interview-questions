@@ -1,6 +1,6 @@
 # Data Structures & Algorithms (DSA) Master Interview Question Bank: Blind 75, NeetCode & Core Patterns (1 - 100)
 
-> Multi-language algorithmic problem bank covering problem-solving frameworks, Big-O asymptotic analysis, Arrays, Two Pointers, Sliding Window, Monotonic Stacks, Linked Lists, Binary Search, Trees, Tries, Heaps, Backtracking, Graphs, and Dynamic Programming with complete implementations in Python 3, Java, C++, and TypeScript for live technical coding interviews.
+> Multi-language algorithmic problem bank covering problem-solving frameworks, Big-O asymptotic analysis, Arrays, Two Pointers, Sliding Window, Monotonic Stacks, Linked Lists, Binary Search, Trees, Tries, Heaps, Backtracking, Graphs, and Dynamic Programming with complete implementations in Python 3, JavaScript, TypeScript, Java, and C++ for live technical coding interviews.
 
 ---
 
@@ -69,6 +69,21 @@ public:
         return result;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function solveInterviewProblem(input) {
+    // 1. Guard clauses / edge cases
+    if (!input || input.length === 0)
+        return 0;
+    if (input.length === 1)
+        return input[0];
+    // 2. Optimal core logic
+    let result = 0;
+    // ... algorithm here ...
+    return result;
+}
 ```
 
 #### TypeScript
@@ -159,6 +174,24 @@ public:
         data[size++] = val;
     }
 };
+```
+
+#### JavaScript
+```javascript
+class DynamicArray {
+    data = new Array(2);
+    size = 0;
+    push(val) {
+        if (this.size === this.data.length) {
+            // O(N) resize happens only when capacity doubles (rare)
+            const next = new Array(this.data.length * 2);
+            for (let i = 0; i < this.size; i++)
+                next[i] = this.data[i];
+            this.data = next;
+        }
+        this.data[this.size++] = val; // O(1) most of the time
+    }
+}
 ```
 
 #### TypeScript
@@ -264,6 +297,30 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+// Merge Sort dividing recurrence T(n) = 2T(n/2) + O(n) -> O(N log N)
+function mergeSort(arr) {
+    if (arr.length <= 1)
+        return arr;
+    const mid = Math.floor(arr.length / 2);
+    const left = mergeSort(arr.slice(0, mid)); // T(n/2)
+    const right = mergeSort(arr.slice(mid)); // T(n/2)
+    return merge(left, right); // O(n) combine step
+}
+function merge(left, right) {
+    const res = [];
+    let i = 0, j = 0;
+    while (i < left.length && j < right.length) {
+        if (left[i] <= right[j])
+            res.push(left[i++]);
+        else
+            res.push(right[j++]);
+    }
+    return res.concat(left.slice(i)).concat(right.slice(j));
+}
+```
+
 #### TypeScript
 ```typescript
 // Merge Sort dividing recurrence T(n) = 2T(n/2) + O(n) -> O(N log N)
@@ -346,6 +403,23 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+// Recursive: O(N) Call Stack memory (danger of stack overflow for N > 10000)
+function sumRecursive(n) {
+    if (n <= 1)
+        return n;
+    return n + sumRecursive(n - 1);
+}
+// Iterative: O(1) Stack and Heap memory (safe for any N)
+function sumIterative(n) {
+    let total = 0;
+    for (let i = 1; i <= n; i++)
+        total += i;
+    return total;
+}
+```
+
 #### TypeScript
 ```typescript
 // Recursive: O(N) Call Stack memory (danger of stack overflow for N > 10000)
@@ -407,6 +481,14 @@ public:
         return false;
     }
 };
+```
+
+#### JavaScript
+```javascript
+// Choosing O(N) Hash Map when N = 10^5 vs O(N^2) nested loop:
+function hasDuplicate(nums) {
+    return new Set(nums).size !== nums.length;
+}
 ```
 
 #### TypeScript
@@ -471,6 +553,20 @@ public:
         return {};
     }
 };
+```
+
+#### JavaScript
+```javascript
+function twoSum(nums, target) {
+    const map = new Map();
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement))
+            return [map.get(complement), i];
+        map.set(nums[i], i);
+    }
+    return [];
+}
 ```
 
 #### TypeScript
@@ -554,6 +650,25 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function longestConsecutive(nums) {
+    const set = new Set(nums);
+    let maxLen = 0;
+    for (const num of set) {
+        if (!set.has(num - 1)) {
+            let current = num, streak = 1;
+            while (set.has(current + 1)) {
+                current++;
+                streak++;
+            }
+            maxLen = Math.max(maxLen, streak);
+        }
+    }
+    return maxLen;
+}
+```
+
 #### TypeScript
 ```typescript
 function longestConsecutive(nums: number[]): number {
@@ -621,6 +736,20 @@ public:
         return result;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function groupAnagrams(strs) {
+    const map = new Map();
+    for (const s of strs) {
+        const key = s.split('').sort().join('');
+        if (!map.has(key))
+            map.set(key, []);
+        map.get(key).push(s);
+    }
+    return Array.from(map.values());
+}
 ```
 
 #### TypeScript
@@ -702,6 +831,24 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function productExceptSelf(nums) {
+    const res = new Array(nums.length).fill(1);
+    let prefix = 1;
+    for (let i = 0; i < nums.length; i++) {
+        res[i] = prefix;
+        prefix *= nums[i];
+    }
+    let postfix = 1;
+    for (let i = nums.length - 1; i >= 0; i--) {
+        res[i] *= postfix;
+        postfix *= nums[i];
+    }
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function productExceptSelf(nums: number[]): number[] {
@@ -765,6 +912,18 @@ public:
         return maxSoFar;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function maxSubArray(nums) {
+    let maxSoFar = nums[0], current = nums[0];
+    for (let i = 1; i < nums.length; i++) {
+        current = Math.max(nums[i], current + nums[i]);
+        maxSoFar = Math.max(maxSoFar, current);
+    }
+    return maxSoFar;
+}
 ```
 
 #### TypeScript
@@ -833,6 +992,20 @@ public:
         return count;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function subarraySum(nums, k) {
+    const map = new Map([[0, 1]]);
+    let sum = 0, count = 0;
+    for (const n of nums) {
+        sum += n;
+        count += map.get(sum - k) || 0;
+        map.set(sum, (map.get(sum) || 0) + 1);
+    }
+    return count;
+}
 ```
 
 #### TypeScript
@@ -920,6 +1093,18 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function maxProfit(prices) {
+    let minPrice = Infinity, maxProfit = 0;
+    for (const p of prices) {
+        minPrice = Math.min(minPrice, p);
+        maxProfit = Math.max(maxProfit, p - minPrice);
+    }
+    return maxProfit;
+}
+```
+
 #### TypeScript
 ```typescript
 function maxProfit(prices: number[]): number {
@@ -987,6 +1172,23 @@ public:
         return strs[0];
     }
 };
+```
+
+#### JavaScript
+```javascript
+function longestCommonPrefix(strs) {
+    if (!strs.length)
+        return '';
+    for (let i = 0; i < strs[0].length; i++) {
+        const char = strs[0][i];
+        for (let j = 1; j < strs.length; j++) {
+            if (i === strs[j].length || strs[j][i] !== char) {
+                return strs[0].slice(0, i);
+            }
+        }
+    }
+    return strs[0];
+}
 ```
 
 #### TypeScript
@@ -1082,6 +1284,24 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function encode(strs) {
+    return strs.map(s => `${s.length}#${s}`).join('');
+}
+function decode(s) {
+    const res = [];
+    let i = 0;
+    while (i < s.length) {
+        const hash = s.indexOf('#', i);
+        const len = parseInt(s.substring(i, hash), 10);
+        res.push(s.substring(hash + 1, hash + 1 + len));
+        i = hash + 1 + len;
+    }
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function encode(strs: string[]): string {
@@ -1153,6 +1373,23 @@ public:
         reverse(nums.begin() + k, nums.end());
     }
 };
+```
+
+#### JavaScript
+```javascript
+function rotate(nums, k) {
+    k %= nums.length;
+    const reverse = (l, r) => {
+        while (l < r) {
+            [nums[l], nums[r]] = [nums[r], nums[l]];
+            l++;
+            r--;
+        }
+    };
+    reverse(0, nums.length - 1);
+    reverse(0, k - 1);
+    reverse(k, nums.length - 1);
+}
 ```
 
 #### TypeScript
@@ -1233,6 +1470,27 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function nextPermutation(nums) {
+    let i = nums.length - 2;
+    while (i >= 0 && nums[i] >= nums[i + 1])
+        i--;
+    if (i >= 0) {
+        let j = nums.length - 1;
+        while (nums[j] <= nums[i])
+            j--;
+        [nums[i], nums[j]] = [nums[j], nums[i]];
+    }
+    let l = i + 1, r = nums.length - 1;
+    while (l < r) {
+        [nums[l], nums[r]] = [nums[r], nums[l]];
+        l++;
+        r--;
+    }
+}
+```
+
 #### TypeScript
 ```typescript
 function nextPermutation(nums: number[]): void {
@@ -1311,6 +1569,24 @@ public:
         return res;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function merge(intervals) {
+    intervals.sort((a, b) => a[0] - b[0]);
+    const res = [intervals[0]];
+    for (let i = 1; i < intervals.length; i++) {
+        const prev = res[res.length - 1];
+        if (intervals[i][0] <= prev[1]) {
+            prev[1] = Math.max(prev[1], intervals[i][1]);
+        }
+        else {
+            res.push(intervals[i]);
+        }
+    }
+    return res;
+}
 ```
 
 #### TypeScript
@@ -1399,6 +1675,27 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function insert(intervals, newInterval) {
+    const res = [];
+    let i = 0;
+    while (i < intervals.length && intervals[i][1] < newInterval[0]) {
+        res.push(intervals[i++]);
+    }
+    while (i < intervals.length && intervals[i][0] <= newInterval[1]) {
+        newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
+        newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
+        i++;
+    }
+    res.push(newInterval);
+    while (i < intervals.length) {
+        res.push(intervals[i++]);
+    }
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function insert(intervals: number[][], newInterval: number[]): number[][] {
@@ -1480,6 +1777,24 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function isPalindrome(s) {
+    let l = 0, r = s.length - 1;
+    while (l < r) {
+        while (l < r && !/[a-zA-Z0-9]/.test(s[l]))
+            l++;
+        while (l < r && !/[a-zA-Z0-9]/.test(s[r]))
+            r--;
+        if (s[l].toLowerCase() !== s[r].toLowerCase())
+            return false;
+        l++;
+        r--;
+    }
+    return true;
+}
+```
+
 #### TypeScript
 ```typescript
 function isPalindrome(s: string): boolean {
@@ -1547,6 +1862,23 @@ public:
         return {};
     }
 };
+```
+
+#### JavaScript
+```javascript
+function twoSumSorted(numbers, target) {
+    let l = 0, r = numbers.length - 1;
+    while (l < r) {
+        const sum = numbers[l] + numbers[r];
+        if (sum === target)
+            return [l + 1, r + 1]; // 1-indexed
+        if (sum < target)
+            l++;
+        else
+            r--;
+    }
+    return [];
+}
 ```
 
 #### TypeScript
@@ -1644,6 +1976,36 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function threeSum(nums) {
+    nums.sort((a, b) => a - b);
+    const res = [];
+    for (let i = 0; i < nums.length - 2; i++) {
+        if (i > 0 && nums[i] === nums[i - 1])
+            continue;
+        let l = i + 1, r = nums.length - 1;
+        while (l < r) {
+            const sum = nums[i] + nums[l] + nums[r];
+            if (sum === 0) {
+                res.push([nums[i], nums[l], nums[r]]);
+                while (l < r && nums[l] === nums[l + 1])
+                    l++;
+                while (l < r && nums[r] === nums[r - 1])
+                    r--;
+                l++;
+                r--;
+            }
+            else if (sum < 0)
+                l++;
+            else
+                r--;
+        }
+    }
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function threeSum(nums: number[]): number[][] {
@@ -1720,6 +2082,21 @@ public:
         return maxW;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function maxArea(height) {
+    let l = 0, r = height.length - 1, maxW = 0;
+    while (l < r) {
+        maxW = Math.max(maxW, Math.min(height[l], height[r]) * (r - l));
+        if (height[l] < height[r])
+            l++;
+        else
+            r--;
+    }
+    return maxW;
+}
 ```
 
 #### TypeScript
@@ -1808,6 +2185,27 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function trap(height) {
+    let l = 0, r = height.length - 1;
+    let maxL = height[l], maxR = height[r], water = 0;
+    while (l < r) {
+        if (maxL < maxR) {
+            l++;
+            maxL = Math.max(maxL, height[l]);
+            water += maxL - height[l];
+        }
+        else {
+            r--;
+            maxR = Math.max(maxR, height[r]);
+            water += maxR - height[r];
+        }
+    }
+    return water;
+}
+```
+
 #### TypeScript
 ```typescript
 function trap(height: number[]): number {
@@ -1887,6 +2285,22 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function lengthOfLongestSubstring(s) {
+    const map = new Map();
+    let l = 0, maxLen = 0;
+    for (let r = 0; r < s.length; r++) {
+        if (map.has(s[r]) && map.get(s[r]) >= l) {
+            l = map.get(s[r]) + 1;
+        }
+        map.set(s[r], r);
+        maxLen = Math.max(maxLen, r - l + 1);
+    }
+    return maxLen;
+}
+```
+
 #### TypeScript
 ```typescript
 function lengthOfLongestSubstring(s: string): number {
@@ -1964,6 +2378,24 @@ public:
         return res;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function characterReplacement(s, k) {
+    const count = new Map();
+    let l = 0, maxF = 0, res = 0;
+    for (let r = 0; r < s.length; r++) {
+        count.set(s[r], (count.get(s[r]) || 0) + 1);
+        maxF = Math.max(maxF, count.get(s[r]));
+        while ((r - l + 1) - maxF > k) {
+            count.set(s[l], count.get(s[l]) - 1);
+            l++;
+        }
+        res = Math.max(res, r - l + 1);
+    }
+    return res;
+}
 ```
 
 #### TypeScript
@@ -2078,6 +2510,35 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function minWindow(s, t) {
+    const target = new Map();
+    for (const c of t)
+        target.set(c, (target.get(c) || 0) + 1);
+    const window = new Map();
+    let have = 0, need = target.size;
+    let res = [-1, -1], minLen = Infinity, l = 0;
+    for (let r = 0; r < s.length; r++) {
+        const c = s[r];
+        window.set(c, (window.get(c) || 0) + 1);
+        if (target.has(c) && window.get(c) === target.get(c))
+            have++;
+        while (have === need) {
+            if (r - l + 1 < minLen) {
+                minLen = r - l + 1;
+                res = [l, r];
+            }
+            window.set(s[l], window.get(s[l]) - 1);
+            if (target.has(s[l]) && window.get(s[l]) < target.get(s[l]))
+                have--;
+            l++;
+        }
+    }
+    return minLen === Infinity ? '' : s.slice(res[0], res[1] + 1);
+}
+```
+
 #### TypeScript
 ```typescript
 function minWindow(s: string, t: string): string {
@@ -2190,6 +2651,41 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function checkInclusion(s1, s2) {
+    if (s1.length > s2.length)
+        return false;
+    const c1 = new Array(26).fill(0), c2 = new Array(26).fill(0);
+    const a = 'a'.charCodeAt(0);
+    for (let i = 0; i < s1.length; i++) {
+        c1[s1.charCodeAt(i) - a]++;
+        c2[s2.charCodeAt(i) - a]++;
+    }
+    let matches = 0;
+    for (let i = 0; i < 26; i++)
+        if (c1[i] === c2[i])
+            matches++;
+    for (let i = s1.length; i < s2.length; i++) {
+        if (matches === 26)
+            return true;
+        const r = s2.charCodeAt(i) - a;
+        c2[r]++;
+        if (c2[r] === c1[r])
+            matches++;
+        else if (c2[r] === c1[r] + 1)
+            matches--;
+        const l = s2.charCodeAt(i - s1.length()) - a;
+        c2[l]--;
+        if (c2[l] === c1[l])
+            matches++;
+        else if (c2[l] === c1[l] - 1)
+            matches--;
+    }
+    return matches === 26;
+}
+```
+
 #### TypeScript
 ```typescript
 function checkInclusion(s1: string, s2: string): boolean {
@@ -2280,6 +2776,24 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function maxSlidingWindow(nums, k) {
+    const q = []; // deque of indices
+    const res = [];
+    for (let i = 0; i < nums.length; i++) {
+        if (q.length && q[0] <= i - k)
+            q.shift();
+        while (q.length && nums[q[q.length - 1]] < nums[i])
+            q.pop();
+        q.push(i);
+        if (i >= k - 1)
+            res.push(nums[q[0]]);
+    }
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function maxSlidingWindow(nums: number[], k: number): number[] {
@@ -2354,6 +2868,24 @@ public:
         return st.empty();
     }
 };
+```
+
+#### JavaScript
+```javascript
+function isValid(s) {
+    const stack = [];
+    const map = { ')': '(', '}': '{', ']': '[' };
+    for (const c of s) {
+        if (map[c]) {
+            if (stack.pop() !== map[c])
+                return false;
+        }
+        else {
+            stack.push(c);
+        }
+    }
+    return stack.length === 0;
+}
 ```
 
 #### TypeScript
@@ -2438,6 +2970,25 @@ public:
     int top() { return st.top(); }
     int getMin() { return minSt.top(); }
 };
+```
+
+#### JavaScript
+```javascript
+class MinStack {
+    stack = [];
+    minStack = [];
+    push(val) {
+        this.stack.push(val);
+        const m = this.minStack.length ? Math.min(val, this.minStack[this.minStack.length - 1]) : val;
+        this.minStack.push(m);
+    }
+    pop() {
+        this.stack.pop();
+        this.minStack.pop();
+    }
+    top() { return this.stack[this.stack.length - 1]; }
+    getMin() { return this.minStack[this.minStack.length - 1]; }
+}
 ```
 
 #### TypeScript
@@ -2527,6 +3078,30 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function evalRPN(tokens) {
+    const stack = [];
+    for (const t of tokens) {
+        if (['+', '-', '*', '/'].includes(t)) {
+            const b = stack.pop(), a = stack.pop();
+            if (t === '+')
+                stack.push(a + b);
+            if (t === '-')
+                stack.push(a - b);
+            if (t === '*')
+                stack.push(a * b);
+            if (t === '/')
+                stack.push(Math.trunc(a / b));
+        }
+        else {
+            stack.push(Number(t));
+        }
+    }
+    return stack[0];
+}
+```
+
 #### TypeScript
 ```typescript
 function evalRPN(tokens: string[]): number {
@@ -2603,6 +3178,22 @@ public:
         return res;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function dailyTemperatures(temperatures) {
+    const res = new Array(temperatures.length).fill(0);
+    const stack = []; // monotonic decreasing indices
+    for (let i = 0; i < temperatures.length; i++) {
+        while (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) {
+            const prev = stack.pop();
+            res[prev] = i - prev;
+        }
+        stack.push(i);
+    }
+    return res;
+}
 ```
 
 #### TypeScript
@@ -2684,6 +3275,24 @@ public:
         return maxArea;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function largestRectangleArea(heights) {
+    const stack = []; // indices
+    let maxArea = 0;
+    const h = [...heights, 0];
+    for (let i = 0; i < h.length; i++) {
+        while (stack.length && h[i] < h[stack[stack.length - 1]]) {
+            const height = h[stack.pop()];
+            const width = stack.length ? i - stack[stack.length - 1] - 1 : i;
+            maxArea = Math.max(maxArea, height * width);
+        }
+        stack.push(i);
+    }
+    return maxArea;
+}
 ```
 
 #### TypeScript
@@ -2769,6 +3378,24 @@ public:
     }
     bool empty() { return inSt.empty() && outSt.empty(); }
 };
+```
+
+#### JavaScript
+```javascript
+class MyQueue {
+    in = [];
+    out = [];
+    push(x) { this.in.push(x); }
+    pop() { this.peek(); return this.out.pop(); }
+    peek() {
+        if (!this.out.length) {
+            while (this.in.length)
+                this.out.push(this.in.pop());
+        }
+        return this.out[this.out.length - 1];
+    }
+    empty() { return !this.in.length && !this.out.length; }
+}
 ```
 
 #### TypeScript
@@ -2862,6 +3489,25 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function generateParenthesis(n) {
+    const res = [];
+    function backtrack(open, close, curr) {
+        if (curr.length === n * 2) {
+            res.push(curr);
+            return;
+        }
+        if (open < n)
+            backtrack(open + 1, close, curr + '(');
+        if (close < open)
+            backtrack(open, close + 1, curr + ')');
+    }
+    backtrack(0, 0, '');
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function generateParenthesis(n: number): string[] {
@@ -2946,6 +3592,21 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function carFleet(target, position, speed) {
+    const cars = position.map((p, i) => ({ p, t: (target - p) / speed[i] }))
+        .sort((a, b) => b.p - a.p);
+    const stack = [];
+    for (const car of cars) {
+        if (!stack.length || car.t > stack[stack.length - 1]) {
+            stack.push(car.t);
+        }
+    }
+    return stack.length;
+}
+```
+
 #### TypeScript
 ```typescript
 function carFleet(target: number, position: number[], speed: number[]): number {
@@ -3022,6 +3683,21 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function reverseList(head) {
+    let prev = null;
+    let curr = head;
+    while (curr) {
+        const next = curr.next;
+        curr.next = prev;
+        prev = curr;
+        curr = next;
+    }
+    return prev;
+}
+```
+
 #### TypeScript
 ```typescript
 function reverseList(head: ListNode | null): ListNode | null {
@@ -3096,6 +3772,27 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function mergeTwoLists(l1, l2) {
+    const dummy = new ListNode(0);
+    let tail = dummy;
+    while (l1 && l2) {
+        if (l1.val <= l2.val) {
+            tail.next = l1;
+            l1 = l1.next;
+        }
+        else {
+            tail.next = l2;
+            l2 = l2.next;
+        }
+        tail = tail.next;
+    }
+    tail.next = l1 || l2;
+    return dummy.next;
+}
+```
+
 #### TypeScript
 ```typescript
 function mergeTwoLists(l1: ListNode | null, l2: ListNode | null): ListNode | null {
@@ -3159,6 +3856,20 @@ public:
         return false;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function hasCycle(head) {
+    let slow = head, fast = head;
+    while (fast && fast.next) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow === fast)
+            return true;
+    }
+    return false;
+}
 ```
 
 #### TypeScript
@@ -3229,6 +3940,22 @@ public:
         return dummy.next;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function removeNthFromEnd(head, n) {
+    const dummy = new ListNode(0, head);
+    let slow = dummy, fast = dummy;
+    for (let i = 0; i <= n; i++)
+        fast = fast.next;
+    while (fast) {
+        slow = slow.next;
+        fast = fast.next;
+    }
+    slow.next = slow.next.next;
+    return dummy.next;
+}
 ```
 
 #### TypeScript
@@ -3330,6 +4057,35 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function reorderList(head) {
+    if (!head || !head.next)
+        return;
+    let slow = head, fast = head;
+    while (fast && fast.next) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    let prev = null, curr = slow.next;
+    slow.next = null;
+    while (curr) {
+        const next = curr.next;
+        curr.next = prev;
+        prev = curr;
+        curr = next;
+    }
+    let first = head, second = prev;
+    while (second) {
+        const t1 = first.next, t2 = second.next;
+        first.next = second;
+        second.next = t1;
+        first = t1;
+        second = t2;
+    }
+}
+```
+
 #### TypeScript
 ```typescript
 function reorderList(head: ListNode | null): void {
@@ -3429,6 +4185,27 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function copyRandomList(head) {
+    if (!head)
+        return null;
+    const map = new Map();
+    let curr = head;
+    while (curr) {
+        map.set(curr, new Node(curr.val));
+        curr = curr.next;
+    }
+    curr = head;
+    while (curr) {
+        map.get(curr).next = curr.next ? map.get(curr.next) : null;
+        map.get(curr).random = curr.random ? map.get(curr.random) : null;
+        curr = curr.next;
+    }
+    return map.get(head);
+}
+```
+
 #### TypeScript
 ```typescript
 function copyRandomList(head: Node | null): Node | null {
@@ -3519,6 +4296,25 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function addTwoNumbers(l1, l2) {
+    const dummy = new ListNode(0);
+    let curr = dummy, carry = 0;
+    while (l1 || l2 || carry) {
+        const v1 = l1 ? l1.val : 0;
+        const v2 = l2 ? l2.val : 0;
+        const sum = v1 + v2 + carry;
+        carry = Math.floor(sum / 10);
+        curr.next = new ListNode(sum % 10);
+        curr = curr.next;
+        l1 = l1 ? l1.next : null;
+        l2 = l2 ? l2.next : null;
+    }
+    return dummy.next;
+}
+```
+
 #### TypeScript
 ```typescript
 function addTwoNumbers(l1: ListNode | null, l2: ListNode | null): ListNode | null {
@@ -3603,6 +4399,23 @@ public:
         return slow;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function findDuplicate(nums) {
+    let slow = 0, fast = 0;
+    do {
+        slow = nums[slow];
+        fast = nums[nums[fast]];
+    } while (slow !== fast);
+    let slow2 = 0;
+    while (slow !== slow2) {
+        slow = nums[slow];
+        slow2 = nums[slow2];
+    }
+    return slow;
+}
 ```
 
 #### TypeScript
@@ -3713,6 +4526,39 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function mergeKLists(lists) {
+    if (!lists.length)
+        return null;
+    const merge2 = (l1, l2) => {
+        const dummy = new ListNode(0);
+        let tail = dummy;
+        while (l1 && l2) {
+            if (l1.val <= l2.val) {
+                tail.next = l1;
+                l1 = l1.next;
+            }
+            else {
+                tail.next = l2;
+                l2 = l2.next;
+            }
+            tail = tail.next;
+        }
+        tail.next = l1 || l2;
+        return dummy.next;
+    };
+    while (lists.length > 1) {
+        const merged = [];
+        for (let i = 0; i < lists.length; i += 2) {
+            merged.push(merge2(lists[i], i + 1 < lists.length ? lists[i + 1] : null));
+        }
+        lists = merged;
+    }
+    return lists[0];
+}
+```
+
 #### TypeScript
 ```typescript
 function mergeKLists(lists: (ListNode | null)[]): ListNode | null {
@@ -3795,6 +4641,23 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function binarySearch(nums, target) {
+    let l = 0, r = nums.length - 1;
+    while (l <= r) {
+        const mid = l + Math.floor((r - l) / 2);
+        if (nums[mid] === target)
+            return mid;
+        if (nums[mid] < target)
+            l = mid + 1;
+        else
+            r = mid - 1;
+    }
+    return -1;
+}
+```
+
 #### TypeScript
 ```typescript
 function binarySearch(nums: number[], target: number): number {
@@ -3869,6 +4732,25 @@ public:
         return false;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function searchMatrix(matrix, target) {
+    const m = matrix.length, n = matrix[0].length;
+    let l = 0, r = m * n - 1;
+    while (l <= r) {
+        const mid = Math.floor((l + r) / 2);
+        const val = matrix[Math.floor(mid / n)][mid % n];
+        if (val === target)
+            return true;
+        if (val < target)
+            l = mid + 1;
+        else
+            r = mid - 1;
+    }
+    return false;
+}
 ```
 
 #### TypeScript
@@ -3962,6 +4844,31 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function searchRotated(nums, target) {
+    let l = 0, r = nums.length - 1;
+    while (l <= r) {
+        const mid = Math.floor((l + r) / 2);
+        if (nums[mid] === target)
+            return mid;
+        if (nums[l] <= nums[mid]) { // Left half sorted
+            if (nums[l] <= target && target < nums[mid])
+                r = mid - 1;
+            else
+                l = mid + 1;
+        }
+        else { // Right half sorted
+            if (nums[mid] < target && target <= nums[r])
+                l = mid + 1;
+            else
+                r = mid - 1;
+        }
+    }
+    return -1;
+}
+```
+
 #### TypeScript
 ```typescript
 function searchRotated(nums: number[], target: number): number {
@@ -4034,6 +4941,21 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function findMin(nums) {
+    let l = 0, r = nums.length - 1;
+    while (l < r) {
+        const mid = Math.floor((l + r) / 2);
+        if (nums[mid] > nums[r])
+            l = mid + 1;
+        else
+            r = mid;
+    }
+    return nums[l];
+}
+```
+
 #### TypeScript
 ```typescript
 function findMin(nums: number[]): number {
@@ -4104,6 +5026,22 @@ public:
         return l;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function minEatingSpeed(piles, h) {
+    let l = 1, r = Math.max(...piles);
+    while (l < r) {
+        const k = Math.floor((l + r) / 2);
+        const hours = piles.reduce((acc, p) => acc + Math.ceil(p / k), 0);
+        if (hours <= h)
+            r = k;
+        else
+            l = k + 1;
+    }
+    return l;
+}
 ```
 
 #### TypeScript
@@ -4208,6 +5146,33 @@ public:
         return res;
     }
 };
+```
+
+#### JavaScript
+```javascript
+class TimeMap {
+    map = new Map();
+    set(key, value, timestamp) {
+        if (!this.map.has(key))
+            this.map.set(key, []);
+        this.map.get(key).push({ time: timestamp, val: value });
+    }
+    get(key, timestamp) {
+        const arr = this.map.get(key) || [];
+        let l = 0, r = arr.length - 1, res = '';
+        while (l <= r) {
+            const mid = Math.floor((l + r) / 2);
+            if (arr[mid].time <= timestamp) {
+                res = arr[mid].val;
+                l = mid + 1;
+            }
+            else {
+                r = mid - 1;
+            }
+        }
+        return res;
+    }
+}
 ```
 
 #### TypeScript
@@ -4329,6 +5294,36 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function findMedianSortedArrays(nums1, nums2) {
+    if (nums1.length > nums2.length)
+        return findMedianSortedArrays(nums2, nums1);
+    const m = nums1.length, n = nums2.length;
+    let l = 0, r = m;
+    while (l <= r) {
+        const i = Math.floor((l + r) / 2);
+        const j = Math.floor((m + n + 1) / 2) - i;
+        const maxL1 = i === 0 ? -Infinity : nums1[i - 1];
+        const minR1 = i === m ? Infinity : nums1[i];
+        const maxL2 = j === 0 ? -Infinity : nums2[j - 1];
+        const minR2 = j === n ? Infinity : nums2[j];
+        if (maxL1 <= minR2 && maxL2 <= minR1) {
+            if ((m + n) % 2 === 1)
+                return Math.max(maxL1, maxL2);
+            return (Math.max(maxL1, maxL2) + Math.min(minR1, minR2)) / 2;
+        }
+        else if (maxL1 > minR2) {
+            r = i - 1;
+        }
+        else {
+            l = i + 1;
+        }
+    }
+    return 0;
+}
+```
+
 #### TypeScript
 ```typescript
 function findMedianSortedArrays(nums1: number[], nums2: number[]): number {
@@ -4408,6 +5403,19 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function invertTree(root) {
+    if (!root)
+        return null;
+    const left = invertTree(root.right);
+    const right = invertTree(root.left);
+    root.left = left;
+    root.right = right;
+    return root;
+}
+```
+
 #### TypeScript
 ```typescript
 function invertTree(root: TreeNode | null): TreeNode | null {
@@ -4453,6 +5461,15 @@ public:
         return 1 + max(maxDepth(root->left), maxDepth(root->right));
     }
 };
+```
+
+#### JavaScript
+```javascript
+function maxDepth(root) {
+    if (!root)
+        return 0;
+    return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+}
 ```
 
 #### TypeScript
@@ -4519,6 +5536,22 @@ public:
         return maxDiameter;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function diameterOfBinaryTree(root) {
+    let diameter = 0;
+    function dfs(node) {
+        if (!node)
+            return 0;
+        const l = dfs(node.left), r = dfs(node.right);
+        diameter = Math.max(diameter, l + r);
+        return 1 + Math.max(l, r);
+    }
+    dfs(root);
+    return diameter;
+}
 ```
 
 #### TypeScript
@@ -4589,6 +5622,26 @@ public:
         return check(root) != -1;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function isBalanced(root) {
+    function check(node) {
+        if (!node)
+            return 0;
+        const l = check(node.left);
+        if (l === -1)
+            return -1;
+        const r = check(node.right);
+        if (r === -1)
+            return -1;
+        if (Math.abs(l - r) > 1)
+            return -1;
+        return 1 + Math.max(l, r);
+    }
+    return check(root) !== -1;
+}
 ```
 
 #### TypeScript
@@ -4668,6 +5721,17 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function isSameTree(p, q) {
+    if (!p && !q)
+        return true;
+    if (!p || !q || p.val !== q.val)
+        return false;
+    return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+}
+```
+
 #### TypeScript
 ```typescript
 function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
@@ -4731,6 +5795,26 @@ private:
         return isSame(a->left, b->left) && isSame(a->right, b->right);
     }
 };
+```
+
+#### JavaScript
+```javascript
+function isSubtree(root, subRoot) {
+    if (!subRoot)
+        return true;
+    if (!root)
+        return false;
+    const isSame = (a, b) => {
+        if (!a && !b)
+            return true;
+        if (!a || !b || a.val !== b.val)
+            return false;
+        return isSame(a.left, b.left) && isSame(a.right, b.right);
+    };
+    if (isSame(root, subRoot))
+        return true;
+    return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+}
 ```
 
 #### TypeScript
@@ -4802,6 +5886,19 @@ public:
         return left ? left : right;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function lowestCommonAncestor(root, p, q) {
+    if (!root || root === p || root === q)
+        return root;
+    const left = lowestCommonAncestor(root.left, p, q);
+    const right = lowestCommonAncestor(root.right, p, q);
+    if (left && right)
+        return root;
+    return left || right;
+}
 ```
 
 #### TypeScript
@@ -4888,6 +5985,30 @@ public:
         return res;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function levelOrder(root) {
+    if (!root)
+        return [];
+    const res = [];
+    const q = [root];
+    while (q.length) {
+        const len = q.length;
+        const level = [];
+        for (let i = 0; i < len; i++) {
+            const node = q.shift();
+            level.push(node.val);
+            if (node.left)
+                q.push(node.left);
+            if (node.right)
+                q.push(node.right);
+        }
+        res.push(level);
+    }
+    return res;
+}
 ```
 
 #### TypeScript
@@ -4982,6 +6103,29 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function rightSideView(root) {
+    if (!root)
+        return [];
+    const res = [];
+    const q = [root];
+    while (q.length) {
+        const len = q.length;
+        for (let i = 0; i < len; i++) {
+            const node = q.shift();
+            if (i === len - 1)
+                res.push(node.val);
+            if (node.left)
+                q.push(node.left);
+            if (node.right)
+                q.push(node.right);
+        }
+    }
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function rightSideView(root: TreeNode | null): number[] {
@@ -5047,6 +6191,20 @@ private:
         return validate(node->left, minVal, node->val) && validate(node->right, node->val, maxVal);
     }
 };
+```
+
+#### JavaScript
+```javascript
+function isValidBST(root) {
+    function validate(node, min, max) {
+        if (!node)
+            return true;
+        if (node.val <= min || node.val >= max)
+            return false;
+        return validate(node.left, min, node.val) && validate(node.right, node.val, max);
+    }
+    return validate(root, -Infinity, Infinity);
+}
 ```
 
 #### TypeScript
@@ -5118,6 +6276,25 @@ public:
         return -1;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function kthSmallest(root, k) {
+    const stack = [];
+    let curr = root;
+    while (curr || stack.length) {
+        while (curr) {
+            stack.push(curr);
+            curr = curr.left;
+        }
+        curr = stack.pop();
+        if (--k === 0)
+            return curr.val;
+        curr = curr.right;
+    }
+    return -1;
+}
 ```
 
 #### TypeScript
@@ -5202,6 +6379,26 @@ public:
         return build(preorder, 0, inorder.size() - 1);
     }
 };
+```
+
+#### JavaScript
+```javascript
+function buildTree(preorder, inorder) {
+    const map = new Map();
+    inorder.forEach((v, i) => map.set(v, i));
+    let preIdx = 0;
+    function build(l, r) {
+        if (l > r)
+            return null;
+        const rootVal = preorder[preIdx++];
+        const root = new TreeNode(rootVal);
+        const mid = map.get(rootVal);
+        root.left = build(l, mid - 1);
+        root.right = build(mid + 1, r);
+        return root;
+    }
+    return build(0, inorder.length - 1);
+}
 ```
 
 #### TypeScript
@@ -5354,6 +6551,44 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+class TrieNode {
+    children = new Map();
+    isEnd = false;
+}
+class Trie {
+    root = new TrieNode();
+    insert(word) {
+        let curr = this.root;
+        for (const c of word) {
+            if (!curr.children.has(c))
+                curr.children.set(c, new TrieNode());
+            curr = curr.children.get(c);
+        }
+        curr.isEnd = true;
+    }
+    search(word) {
+        let curr = this.root;
+        for (const c of word) {
+            if (!curr.children.has(c))
+                return false;
+            curr = curr.children.get(c);
+        }
+        return curr.isEnd;
+    }
+    startsWith(prefix) {
+        let curr = this.root;
+        for (const c of prefix) {
+            if (!curr.children.has(c))
+                return false;
+            curr = curr.children.get(c);
+        }
+        return true;
+    }
+}
+```
+
 #### TypeScript
 ```typescript
 class TrieNode {
@@ -5440,6 +6675,21 @@ public:
         return pq.top();
     }
 };
+```
+
+#### JavaScript
+```javascript
+function findKthLargest(nums, k) {
+    // Min-Heap approach:
+    const heap = [];
+    for (const n of nums) {
+        heap.push(n);
+        heap.sort((a, b) => a - b);
+        if (heap.length > k)
+            heap.shift();
+    }
+    return heap[0];
+}
 ```
 
 #### TypeScript
@@ -5529,6 +6779,28 @@ public:
         return res;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function topKFrequent(nums, k) {
+    const count = new Map();
+    for (const n of nums)
+        count.set(n, (count.get(n) || 0) + 1);
+    const buckets = Array.from({ length: nums.length + 1 }, () => []);
+    for (const [num, freq] of count.entries()) {
+        buckets[freq].push(num);
+    }
+    const res = [];
+    for (let i = buckets.length - 1; i >= 0 && res.length < k; i--) {
+        for (const num of buckets[i]) {
+            res.push(num);
+            if (res.length === k)
+                return res;
+        }
+    }
+    return res;
+}
 ```
 
 #### TypeScript
@@ -5626,6 +6898,31 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+class MedianFinder {
+    arr = [];
+    addNum(num) {
+        // Binary insert for O(N) insertion, O(1) median
+        let l = 0, r = this.arr.length - 1;
+        while (l <= r) {
+            const mid = Math.floor((l + r) / 2);
+            if (this.arr[mid] < num)
+                l = mid + 1;
+            else
+                r = mid - 1;
+        }
+        this.arr.splice(l, 0, num);
+    }
+    findMedian() {
+        const mid = Math.floor(this.arr.length / 2);
+        return this.arr.length % 2 === 1
+            ? this.arr[mid]
+            : (this.arr[mid - 1] + this.arr[mid]) / 2;
+    }
+}
+```
+
 #### TypeScript
 ```typescript
 class MedianFinder {
@@ -5703,6 +7000,24 @@ public:
         return max((int)tasks.size(), (maxF - 1) * (n + 1) + maxCount);
     }
 };
+```
+
+#### JavaScript
+```javascript
+function leastInterval(tasks, n) {
+    const map = new Map();
+    let maxF = 0;
+    for (const t of tasks) {
+        const f = (map.get(t) || 0) + 1;
+        map.set(t, f);
+        maxF = Math.max(maxF, f);
+    }
+    let maxCount = 0;
+    for (const f of map.values())
+        if (f === maxF)
+            maxCount++;
+    return Math.max(tasks.length, (maxF - 1) * (n + 1) + maxCount);
+}
 ```
 
 #### TypeScript
@@ -5849,6 +7164,38 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+class Twitter {
+    time = 0;
+    tweets = new Map();
+    follows = new Map();
+    postTweet(userId, tweetId) {
+        if (!this.tweets.has(userId))
+            this.tweets.set(userId, []);
+        this.tweets.get(userId).push({ id: tweetId, time: ++this.time });
+    }
+    getNewsFeed(userId) {
+        const users = new Set(this.follows.get(userId) || []);
+        users.add(userId);
+        const allTweets = [];
+        for (const u of users) {
+            const userTweets = this.tweets.get(u) || [];
+            allTweets.push(...userTweets.slice(-10));
+        }
+        return allTweets.sort((a, b) => b.time - a.time).slice(0, 10).map(t => t.id);
+    }
+    follow(followerId, followeeId) {
+        if (!this.follows.has(followerId))
+            this.follows.set(followerId, new Set());
+        this.follows.get(followerId).add(followeeId);
+    }
+    unfollow(followerId, followeeId) {
+        this.follows.get(followerId)?.delete(followeeId);
+    }
+}
+```
+
 #### TypeScript
 ```typescript
 class Twitter {
@@ -5966,6 +7313,29 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function reorganizeString(s) {
+    const map = new Map();
+    for (const c of s)
+        map.set(c, (map.get(c) || 0) + 1);
+    const arr = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+    if (arr[0][1] > Math.ceil(s.length / 2))
+        return '';
+    const res = new Array(s.length);
+    let idx = 0;
+    for (const [char, count] of arr) {
+        for (let i = 0; i < count; i++) {
+            if (idx >= s.length)
+                idx = 1;
+            res[idx] = char;
+            idx += 2;
+        }
+    }
+    return res.join('');
+}
+```
+
 #### TypeScript
 ```typescript
 function reorganizeString(s: string): string {
@@ -6040,6 +7410,28 @@ public:
         return total;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function connectSticks(sticks) {
+    sticks.sort((a, b) => a - b);
+    let cost = 0;
+    while (sticks.length > 1) {
+        const combined = sticks.shift() + sticks.shift();
+        cost += combined;
+        let l = 0, r = sticks.length - 1;
+        while (l <= r) {
+            const mid = Math.floor((l + r) / 2);
+            if (sticks[mid] < combined)
+                l = mid + 1;
+            else
+                r = mid - 1;
+        }
+        sticks.splice(l, 0, combined);
+    }
+    return cost;
+}
 ```
 
 #### TypeScript
@@ -6129,6 +7521,26 @@ private:
         }
     }
 };
+```
+
+#### JavaScript
+```javascript
+function subsets(nums) {
+    const res = [];
+    const subset = [];
+    function dfs(i) {
+        if (i >= nums.length) {
+            res.push([...subset]);
+            return;
+        }
+        subset.push(nums[i]);
+        dfs(i + 1);
+        subset.pop();
+        dfs(i + 1);
+    }
+    dfs(0);
+    return res;
+}
 ```
 
 #### TypeScript
@@ -6221,6 +7633,27 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function combinationSum(candidates, target) {
+    const res = [];
+    function dfs(i, curr, total) {
+        if (total === target) {
+            res.push([...curr]);
+            return;
+        }
+        if (i >= candidates.length || total > target)
+            return;
+        curr.push(candidates[i]);
+        dfs(i, curr, total + candidates[i]);
+        curr.pop();
+        dfs(i + 1, curr, total);
+    }
+    dfs(0, [], 0);
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function combinationSum(candidates: number[], target: number): number[][] {
@@ -6303,6 +7736,30 @@ private:
         }
     }
 };
+```
+
+#### JavaScript
+```javascript
+function permute(nums) {
+    const res = [];
+    function backtrack(curr, used) {
+        if (curr.length === nums.length) {
+            res.push([...curr]);
+            return;
+        }
+        for (const n of nums) {
+            if (!used.has(n)) {
+                used.add(n);
+                curr.push(n);
+                backtrack(curr, used);
+                curr.pop();
+                used.delete(n);
+            }
+        }
+    }
+    backtrack([], new Set());
+    return res;
+}
 ```
 
 #### TypeScript
@@ -6393,6 +7850,26 @@ private:
         }
     }
 };
+```
+
+#### JavaScript
+```javascript
+function subsetsWithDup(nums) {
+    nums.sort((a, b) => a - b);
+    const res = [];
+    function backtrack(start, curr) {
+        res.push([...curr]);
+        for (let i = start; i < nums.length; i++) {
+            if (i > start && nums[i] === nums[i - 1])
+                continue;
+            curr.push(nums[i]);
+            backtrack(i + 1, curr);
+            curr.pop();
+        }
+    }
+    backtrack(0, []);
+    return res;
+}
 ```
 
 #### TypeScript
@@ -6500,6 +7977,32 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function exist(board, word) {
+    const m = board.length, n = board[0].length;
+    function dfs(r, c, i) {
+        if (i === word.length)
+            return true;
+        if (r < 0 || c < 0 || r >= m || c >= n || board[r][c] !== word[i])
+            return false;
+        const tmp = board[r][c];
+        board[r][c] = '#';
+        const res = dfs(r + 1, c, i + 1) || dfs(r - 1, c, i + 1) ||
+            dfs(r, c + 1, i + 1) || dfs(r, c - 1, i + 1);
+        board[r][c] = tmp;
+        return res;
+    }
+    for (let r = 0; r < m; r++) {
+        for (let c = 0; c < n; c++) {
+            if (dfs(r, c, 0))
+                return true;
+        }
+    }
+    return false;
+}
+```
+
 #### TypeScript
 ```typescript
 function exist(board: string[][], word: string): boolean {
@@ -6605,6 +8108,35 @@ private:
         return true;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function partition(s) {
+    const res = [];
+    const curr = [];
+    const isPali = (l, r) => {
+        while (l < r)
+            if (s[l++] !== s[r--])
+                return false;
+        return true;
+    };
+    function dfs(i) {
+        if (i >= s.length) {
+            res.push([...curr]);
+            return;
+        }
+        for (let j = i; j < s.length; j++) {
+            if (isPali(i, j)) {
+                curr.push(s.slice(i, j + 1));
+                dfs(j + 1);
+                curr.pop();
+            }
+        }
+    }
+    dfs(0);
+    return res;
+}
 ```
 
 #### TypeScript
@@ -6721,6 +8253,36 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function solveNQueens(n) {
+    const res = [];
+    const board = Array.from({ length: n }, () => new Array(n).fill('.'));
+    const cols = new Set(), pos = new Set(), neg = new Set();
+    function backtrack(r) {
+        if (r === n) {
+            res.push(board.map(row => row.join('')));
+            return;
+        }
+        for (let c = 0; c < n; c++) {
+            if (cols.has(c) || pos.has(r + c) || neg.has(r - c))
+                continue;
+            cols.add(c);
+            pos.add(r + c);
+            neg.add(r - c);
+            board[r][c] = 'Q';
+            backtrack(r + 1);
+            cols.delete(c);
+            pos.delete(r + c);
+            neg.delete(r - c);
+            board[r][c] = '.';
+        }
+    }
+    backtrack(0);
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function solveNQueens(n: number): string[][] {
@@ -6831,6 +8393,32 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function numIslands(grid) {
+    let islands = 0;
+    const m = grid.length, n = grid[0].length;
+    function dfs(r, c) {
+        if (r < 0 || c < 0 || r >= m || c >= n || grid[r][c] !== '1')
+            return;
+        grid[r][c] = '0';
+        dfs(r + 1, c);
+        dfs(r - 1, c);
+        dfs(r, c + 1);
+        dfs(r, c - 1);
+    }
+    for (let r = 0; r < m; r++) {
+        for (let c = 0; c < n; c++) {
+            if (grid[r][c] === '1') {
+                islands++;
+                dfs(r, c);
+            }
+        }
+    }
+    return islands;
+}
+```
+
 #### TypeScript
 ```typescript
 function numIslands(grid: string[][]): number {
@@ -6916,6 +8504,26 @@ public:
         return copy;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function cloneGraph(node) {
+    if (!node)
+        return null;
+    const cloned = new Map();
+    function dfs(curr) {
+        if (cloned.has(curr))
+            return cloned.get(curr);
+        const copy = new Node(curr.val);
+        cloned.set(curr, copy);
+        for (const nei of curr.neighbors) {
+            copy.neighbors.push(dfs(nei));
+        }
+        return copy;
+    }
+    return dfs(node);
+}
 ```
 
 #### TypeScript
@@ -7040,6 +8648,43 @@ public:
         return fresh == 0 ? time : -1;
     }
 };
+```
+
+#### JavaScript
+```javascript
+function orangesRotting(grid) {
+    const q = [];
+    let fresh = 0;
+    const m = grid.length, n = grid[0].length;
+    for (let r = 0; r < m; r++) {
+        for (let c = 0; c < n; c++) {
+            if (grid[r][c] === 2)
+                q.push([r, c]);
+            else if (grid[r][c] === 1)
+                fresh++;
+        }
+    }
+    if (!fresh)
+        return 0;
+    let time = 0;
+    const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    while (q.length && fresh > 0) {
+        const size = q.length;
+        for (let i = 0; i < size; i++) {
+            const [r, c] = q.shift();
+            for (const [dr, dc] of dirs) {
+                const nr = r + dr, nc = c + dc;
+                if (nr >= 0 && nc >= 0 && nr < m && nc < n && grid[nr][nc] === 1) {
+                    grid[nr][nc] = 2;
+                    fresh--;
+                    q.push([nr, nc]);
+                }
+            }
+        }
+        time++;
+    }
+    return fresh === 0 ? time : -1;
+}
 ```
 
 #### TypeScript
@@ -7171,6 +8816,40 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function pacificAtlantic(heights) {
+    const m = heights.length, n = heights[0].length;
+    const pac = Array.from({ length: m }, () => new Array(n).fill(false));
+    const atl = Array.from({ length: m }, () => new Array(n).fill(false));
+    function dfs(r, c, visit, prevH) {
+        if (r < 0 || c < 0 || r >= m || c >= n || visit[r][c] || heights[r][c] < prevH)
+            return;
+        visit[r][c] = true;
+        dfs(r + 1, c, visit, heights[r][c]);
+        dfs(r - 1, c, visit, heights[r][c]);
+        dfs(r, c + 1, visit, heights[r][c]);
+        dfs(r, c - 1, visit, heights[r][c]);
+    }
+    for (let c = 0; c < n; c++) {
+        dfs(0, c, pac, heights[0][c]);
+        dfs(m - 1, c, atl, heights[m - 1][c]);
+    }
+    for (let r = 0; r < m; r++) {
+        dfs(r, 0, pac, heights[r][0]);
+        dfs(r, n - 1, atl, heights[r][n - 1]);
+    }
+    const res = [];
+    for (let r = 0; r < m; r++) {
+        for (let c = 0; c < n; c++) {
+            if (pac[r][c] && atl[r][c])
+                res.push([r, c]);
+        }
+    }
+    return res;
+}
+```
+
 #### TypeScript
 ```typescript
 function pacificAtlantic(heights: number[][]): number[][] {
@@ -7285,6 +8964,33 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function canFinish(numCourses, prerequisites) {
+    const inDegree = new Array(numCourses).fill(0);
+    const adj = Array.from({ length: numCourses }, () => []);
+    for (const [crs, pre] of prerequisites) {
+        adj[pre].push(crs);
+        inDegree[crs]++;
+    }
+    const q = [];
+    for (let i = 0; i < numCourses; i++)
+        if (inDegree[i] === 0)
+            q.push(i);
+    let count = 0;
+    while (q.length) {
+        const curr = q.shift();
+        count++;
+        for (const nei of adj[curr]) {
+            inDegree[nei]--;
+            if (inDegree[nei] === 0)
+                q.push(nei);
+        }
+    }
+    return count === numCourses;
+}
+```
+
 #### TypeScript
 ```typescript
 function canFinish(numCourses: number, prerequisites: number[][]): boolean {
@@ -7393,6 +9099,40 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+class DSU {
+    parent;
+    rank;
+    count;
+    constructor(n) {
+        this.parent = Array.from({ length: n }, (_, i) => i);
+        this.rank = new Array(n).fill(1);
+        this.count = n;
+    }
+    find(x) {
+        if (this.parent[x] !== x)
+            this.parent[x] = this.find(this.parent[x]);
+        return this.parent[x];
+    }
+    union(x, y) {
+        const rx = this.find(x), ry = this.find(y);
+        if (rx === ry)
+            return false;
+        if (this.rank[rx] < this.rank[ry])
+            this.parent[rx] = ry;
+        else if (this.rank[rx] > this.rank[ry])
+            this.parent[ry] = rx;
+        else {
+            this.parent[ry] = rx;
+            this.rank[rx]++;
+        }
+        this.count--;
+        return true;
+    }
+}
+```
+
 #### TypeScript
 ```typescript
 class DSU {
@@ -7486,6 +9226,25 @@ public:
         return {};
     }
 };
+```
+
+#### JavaScript
+```javascript
+function findRedundantConnection(edges) {
+    const parent = Array.from({ length: edges.length + 1 }, (_, i) => i);
+    function find(x) {
+        if (parent[x] !== x)
+            parent[x] = find(parent[x]);
+        return parent[x];
+    }
+    for (const [u, v] of edges) {
+        const ru = find(u), rv = find(v);
+        if (ru === rv)
+            return [u, v];
+        parent[ru] = rv;
+    }
+    return [];
+}
 ```
 
 #### TypeScript
@@ -7603,6 +9362,31 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function ladderLength(beginWord, endWord, wordList) {
+    const set = new Set(wordList);
+    if (!set.has(endWord))
+        return 0;
+    const q = [[beginWord, 1]];
+    while (q.length) {
+        const [word, len] = q.shift();
+        if (word === endWord)
+            return len;
+        for (let i = 0; i < word.length; i++) {
+            for (let c = 97; c <= 122; c++) {
+                const next = word.slice(0, i) + String.fromCharCode(c) + word.slice(i + 1);
+                if (set.has(next)) {
+                    set.delete(next);
+                    q.push([next, len + 1]);
+                }
+            }
+        }
+    }
+    return 0;
+}
+```
+
 #### TypeScript
 ```typescript
 function ladderLength(beginWord: string, endWord: string, wordList: string[]): number {
@@ -7708,6 +9492,32 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function networkDelayTime(times, n, k) {
+    const adj = new Map();
+    for (const [u, v, w] of times) {
+        if (!adj.has(u))
+            adj.set(u, []);
+        adj.get(u).push([v, w]);
+    }
+    const dist = new Map();
+    const pq = [[0, k]];
+    while (pq.length) {
+        pq.sort((a, b) => a[0] - b[0]);
+        const [w, u] = pq.shift();
+        if (dist.has(u))
+            continue;
+        dist.set(u, w);
+        for (const [v, weight] of adj.get(u) || []) {
+            if (!dist.has(v))
+                pq.push([w + weight, v]);
+        }
+    }
+    return dist.size === n ? Math.max(...dist.values()) : -1;
+}
+```
+
 #### TypeScript
 ```typescript
 function networkDelayTime(times: number[][], n: number, k: number): number {
@@ -7796,6 +9606,24 @@ public:
         return prices[dst] == 1e9 ? -1 : prices[dst];
     }
 };
+```
+
+#### JavaScript
+```javascript
+function findCheapestPrice(n, flights, src, dst, k) {
+    let prices = new Array(n).fill(Infinity);
+    prices[src] = 0;
+    for (let i = 0; i <= k; i++) {
+        const tmp = [...prices];
+        for (const [u, v, p] of flights) {
+            if (prices[u] !== Infinity && prices[u] + p < tmp[v]) {
+                tmp[v] = prices[u] + p;
+            }
+        }
+        prices = tmp;
+    }
+    return prices[dst] === Infinity ? -1 : prices[dst];
+}
 ```
 
 #### TypeScript
@@ -7928,6 +9756,51 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function alienOrder(words) {
+    const adj = new Map();
+    const inDegree = new Map();
+    for (const w of words)
+        for (const c of w) {
+            if (!adj.has(c))
+                adj.set(c, new Set());
+            if (!inDegree.has(c))
+                inDegree.set(c, 0);
+        }
+    for (let i = 0; i < words.length - 1; i++) {
+        const w1 = words[i], w2 = words[i + 1];
+        const minLen = Math.min(w1.length, w2.length);
+        if (w1.length > w2.length && w1.startsWith(w2))
+            return '';
+        for (let j = 0; j < minLen; j++) {
+            if (w1[j] !== w2[j]) {
+                if (!adj.get(w1[j]).has(w2[j])) {
+                    adj.get(w1[j]).add(w2[j]);
+                    inDegree.set(w2[j], inDegree.get(w2[j]) + 1);
+                }
+                break;
+            }
+        }
+    }
+    const q = [];
+    for (const [c, deg] of inDegree.entries())
+        if (deg === 0)
+            q.push(c);
+    let res = '';
+    while (q.length) {
+        const curr = q.shift();
+        res += curr;
+        for (const nei of adj.get(curr) || []) {
+            inDegree.set(nei, inDegree.get(nei) - 1);
+            if (inDegree.get(nei) === 0)
+                q.push(nei);
+        }
+    }
+    return res.length === inDegree.size ? res : '';
+}
+```
+
 #### TypeScript
 ```typescript
 function alienOrder(words: string[]): string {
@@ -8017,6 +9890,19 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function climbStairs(n) {
+    let one = 1, two = 1;
+    for (let i = 0; i < n - 1; i++) {
+        const temp = one;
+        one = one + two;
+        two = temp;
+    }
+    return one;
+}
+```
+
 #### TypeScript
 ```typescript
 function climbStairs(n: number): number {
@@ -8068,6 +9954,16 @@ public:
         return min(cost[0], cost[1]);
     }
 };
+```
+
+#### JavaScript
+```javascript
+function minCostClimbingStairs(cost) {
+    for (let i = cost.length - 3; i >= 0; i--) {
+        cost[i] += Math.min(cost[i + 1], cost[i + 2]);
+    }
+    return Math.min(cost[0], cost[1]);
+}
 ```
 
 #### TypeScript
@@ -8141,6 +10037,24 @@ private:
 };
 ```
 
+#### JavaScript
+```javascript
+function rob(nums) {
+    if (nums.length === 1)
+        return nums[0];
+    const helper = (arr) => {
+        let r1 = 0, r2 = 0;
+        for (const n of arr) {
+            const next = Math.max(r1 + n, r2);
+            r1 = r2;
+            r2 = next;
+        }
+        return r2;
+    };
+    return Math.max(helper(nums.slice(1)), helper(nums.slice(0, -1)));
+}
+```
+
 #### TypeScript
 ```typescript
 function rob(nums: number[]): number {
@@ -8209,6 +10123,21 @@ public:
         return dp[amount] > amount ? -1 : dp[amount];
     }
 };
+```
+
+#### JavaScript
+```javascript
+function coinChange(coins, amount) {
+    const dp = new Array(amount + 1).fill(amount + 1);
+    dp[0] = 0;
+    for (let a = 1; a <= amount; a++) {
+        for (const c of coins) {
+            if (a - c >= 0)
+                dp[a] = Math.min(dp[a], 1 + dp[a - c]);
+        }
+    }
+    return dp[amount] > amount ? -1 : dp[amount];
+}
 ```
 
 #### TypeScript
@@ -8283,6 +10212,25 @@ public:
         return tails.size();
     }
 };
+```
+
+#### JavaScript
+```javascript
+function lengthOfLIS(nums) {
+    const tails = [];
+    for (const n of nums) {
+        let l = 0, r = tails.length;
+        while (l < r) {
+            const mid = Math.floor((l + r) / 2);
+            if (tails[mid] < n)
+                l = mid + 1;
+            else
+                r = mid;
+        }
+        tails[l] = n;
+    }
+    return tails.length;
+}
 ```
 
 #### TypeScript
@@ -8364,6 +10312,24 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function wordBreak(s, wordDict) {
+    const dp = new Array(s.length + 1).fill(false);
+    dp[s.length] = true;
+    for (let i = s.length - 1; i >= 0; i--) {
+        for (const w of wordDict) {
+            if (i + w.length <= s.length && s.slice(i, i + w.length) === w) {
+                dp[i] = dp[i + w.length];
+            }
+            if (dp[i])
+                break;
+        }
+    }
+    return dp[0];
+}
+```
+
 #### TypeScript
 ```typescript
 function wordBreak(s: string, wordDict: string[]): boolean {
@@ -8430,6 +10396,19 @@ public:
         return row[n - 1];
     }
 };
+```
+
+#### JavaScript
+```javascript
+function uniquePaths(m, n) {
+    let row = new Array(n).fill(1);
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            row[j] += row[j - 1];
+        }
+    }
+    return row[n - 1];
+}
 ```
 
 #### TypeScript
@@ -8505,6 +10484,23 @@ public:
 };
 ```
 
+#### JavaScript
+```javascript
+function longestCommonSubsequence(text1, text2) {
+    const m = text1.length, n = text2.length;
+    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+    for (let i = m - 1; i >= 0; i--) {
+        for (let j = n - 1; j >= 0; j--) {
+            if (text1[i] === text2[j])
+                dp[i][j] = 1 + dp[i + 1][j + 1];
+            else
+                dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);
+        }
+    }
+    return dp[0][0];
+}
+```
+
 #### TypeScript
 ```typescript
 function longestCommonSubsequence(text1: string, text2: string): number {
@@ -8573,6 +10569,20 @@ public:
         return max(sold, rest);
     }
 };
+```
+
+#### JavaScript
+```javascript
+function maxProfitWithCooldown(prices) {
+    let sold = 0, rest = 0, hold = -Infinity;
+    for (const p of prices) {
+        const prevSold = sold;
+        sold = hold + p;
+        hold = Math.max(hold, rest - p);
+        rest = Math.max(rest, prevSold);
+    }
+    return Math.max(sold, rest);
+}
 ```
 
 #### TypeScript
@@ -8646,6 +10656,24 @@ public:
         return dp[target];
     }
 };
+```
+
+#### JavaScript
+```javascript
+function canPartition(nums) {
+    const sum = nums.reduce((a, b) => a + b, 0);
+    if (sum % 2 !== 0)
+        return false;
+    const target = sum / 2;
+    const dp = new Array(target + 1).fill(false);
+    dp[0] = true;
+    for (const n of nums) {
+        for (let i = target; i >= n; i--) {
+            dp[i] = dp[i] || dp[i - n];
+        }
+    }
+    return dp[target];
+}
 ```
 
 #### TypeScript

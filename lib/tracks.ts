@@ -22,7 +22,9 @@ export async function getTrackContent(filename: string): Promise<string> {
 }
 
 export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestion[] {
-  const lines = markdown.split('\n');
+  // Normalize CRLF to LF to prevent regex line-ending match failures
+  const cleanMarkdown = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = cleanMarkdown.split('\n');
   const questions: ParsedQuestion[] = [];
   let currentPart = 'General';
   let currentQ: { number: number; title: string; part: string } | null = null;
@@ -33,7 +35,7 @@ export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestio
     if (line.startsWith('## Part ') || line.startsWith('## PART ')) {
       currentPart = line.replace(/^##\s+/, '').trim();
     } else if (line.startsWith('### ')) {
-      const match = line.match(/^### (\d+)\.\s*(.+)$/);
+      const match = line.trimEnd().match(/^### (\d+)\.\s*(.+)$/);
       if (match) {
         if (currentQ) {
           questions.push({

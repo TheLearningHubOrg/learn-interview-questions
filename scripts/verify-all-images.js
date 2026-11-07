@@ -30,3 +30,4 @@ trackFiles.forEach(file => {
 });
 
 console.log(`\nImage check completed: ${totalRefs} image references checked, ${missingFiles} missing files.`);
+

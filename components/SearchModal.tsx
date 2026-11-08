@@ -2,19 +2,78 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, ArrowRight, BookOpen, Hash } from 'lucide-react';
+import { Search, X, ArrowRight, BookOpen, Hash, Loader2 } from 'lucide-react';
 import { QuestionIndexItem } from '@/lib/tracks-meta';
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  indexItems: QuestionIndexItem[];
+  indexItems?: QuestionIndexItem[];
+}
+
+// Module-level cache so search index is fetched at most ONCE per session
+let globalSearchCache: QuestionIndexItem[] | null = null;
+let fetchPromise: Promise<QuestionIndexItem[]> | null = null;
+
+function fetchSearchIndex(): Promise<QuestionIndexItem[]> {
+  if (globalSearchCache) return Promise.resolve(globalSearchCache);
+  if (!fetchPromise) {
+    fetchPromise = fetch('/api/search-index')
+      .then((res) => {
+        if (!res.ok) throw new Error('Search index fetch failed');
+        return res.json();
+      })
+      .then((data: QuestionIndexItem[]) => {
+        globalSearchCache = data;
+        return data;
+      })
+      .catch((err) => {
+        console.error('Error fetching search index:', err);
+        fetchPromise = null;
+        return [];
+      });
+  }
+  return fetchPromise;
 }
 
 export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [items, setItems] = useState<QuestionIndexItem[]>(() => indexItems || globalSearchCache || []);
+  const [loading, setLoading] = useState<boolean>(!indexItems && !globalSearchCache);
+
+  // Pre-fetch search index during idle time after 1.5 seconds
+  useEffect(() => {
+    if (globalSearchCache || indexItems) return;
+    const timer = setTimeout(() => {
+      fetchSearchIndex().then((data) => {
+        setItems(data);
+        setLoading(false);
+      });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [indexItems]);
+
+  // When modal opens, make sure search items are loaded
+  useEffect(() => {
+    if (!isOpen) return;
+    if (indexItems && indexItems.length > 0) {
+      setItems(indexItems);
+      setLoading(false);
+      return;
+    }
+    if (globalSearchCache && globalSearchCache.length > 0) {
+      setItems(globalSearchCache);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    fetchSearchIndex().then((data) => {
+      setItems(data);
+      setLoading(false);
+    });
+  }, [isOpen, indexItems]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -31,16 +90,16 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
   }, [isOpen, onClose]);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return indexItems.slice(0, 15);
+    if (!query.trim()) return items.slice(0, 15);
     const q = query.toLowerCase();
-    return indexItems.filter(
+    return items.filter(
       (item) =>
         item.title.toLowerCase().includes(q) ||
         item.part.toLowerCase().includes(q) ||
         item.trackShortTitle.toLowerCase().includes(q) ||
         item.questionNumber.toString() === q
     ).slice(0, 30);
-  }, [query, indexItems]);
+  }, [query, items]);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -90,7 +149,12 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
 
         {/* Results List */}
         <div className="flex-1 overflow-y-auto p-2 divide-y divide-border/40">
-          {filtered.length === 0 ? (
+          {loading && items.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground flex flex-col items-center justify-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin text-purple-600 dark:text-purple-400" />
+              <p className="text-xs">Loading search index...</p>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No matching questions found for "{query}".</p>

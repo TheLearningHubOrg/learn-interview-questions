@@ -8,7 +8,7 @@ import { QuestionIndexItem } from '@/lib/tracks-meta';
 
 interface ClientShellProps {
   children: React.ReactNode;
-  searchIndex: QuestionIndexItem[];
+  searchIndex?: QuestionIndexItem[];
 }
 
 export function ClientShell({ children, searchIndex }: ClientShellProps) {

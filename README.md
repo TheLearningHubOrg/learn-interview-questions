@@ -1,12 +1,12 @@
 # The Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Question Bank 🚀
 
-> **1,690+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
+> **1,740+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, DevOps & Kubernetes, Cloud Infrastructure, Backend, Databases, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
-[![Curriculum: 10 Tracks](https://img.shields.io/badge/Tracks-10%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1690+](https://img.shields.io/badge/Questions-1690%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Curriculum: 11 Tracks](https://img.shields.io/badge/Tracks-11%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
+[![Questions: 1740+](https://img.shields.io/badge/Questions-1740%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -24,7 +24,8 @@
 | **Track 8: Core JavaScript Internals** | Core Language Bank: 521 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **521** | [Open Track 8](tracks/08-frontend-javascript.md) |
 | **Track 9: Behavioral, HR & Leadership** | General Intro, STAR Method (S-T-A-R), Incident Post-Mortems, Culture, Negotiation | **50** | [Open Track 9](tracks/09-general-behavioral-hr.md) |
 | **Track 10: System Design & Distributed Systems** | Distributed Trade-offs, TinyURL, Rate Limiter, WhatsApp, Twitter, Raft, Back-of-the-Envelope | **50** | [Open Track 10](tracks/10-system-design-distributed-systems.md) |
-| **TOTAL** | **Full-Stack, Cloud, Algorithms, System Design & Behavioral Mastery** | **1,699** | — |
+| **Track 11: DevOps, Containers & Kubernetes** | Docker Internals, Kubernetes Control Plane, CNI/CSI, HPA/Karpenter, GitOps, CI/CD, Terraform, SRE | **50** | [Open Track 11](tracks/11-devops-containers-kubernetes.md) |
+| **TOTAL** | **Full-Stack, Cloud, DevOps, K8s, System Design & Behavioral Mastery** | **1,749** | — |
 
 ---
 
@@ -131,13 +132,22 @@
 
 ---
 
+### ☸️ [Track 11: DevOps, Containers, Kubernetes & Cloud Infrastructure Master (1 - 50)](tracks/11-devops-containers-kubernetes.md)
+1. **Candid Experience, Container Internals & Docker (Q1 - Q10)**: DevOps philosophy, VM vs container Linux kernel namespaces (PID, NET, MNT) and cgroups (v1/v2), Overlay2 storage driver and Copy-on-Write (CoW), Dockerfile multi-stage builds and layer caching, non-root security context hardening, Docker network drivers (Bridge, Host, Overlay, iptables NAT port mapping), PID 1 zombie process reaping and tini, Docker Compose v2 healthcheck dependencies, multi-architecture buildx and Cosign image signing, systematic container crash debugging (Exit codes 137, 139, 1).
+2. **Kubernetes Architecture & Core Workloads (Q11 - Q25)**: Control Plane components (API Server, Controller Manager, Scheduler, etcd) vs Worker Node agents (Kubelet, Kube-proxy, CRI containerd), etcd Raft consensus and snapshot disaster recovery, Kube-API Server request lifecycle (AuthN, AuthZ, Mutating/Validating Admission Webhooks), Kube-Scheduler filtering and scoring (Affinity, Taints, Tolerations, Topology Spread), Kubelet syncLoop and systemd cgroup driver alignment, Pod lifecycle phases and zero-downtime graceful shutdown with preStop hooks, Liveness vs Readiness vs Startup probes, Deployments vs StatefulSets (headless services), DaemonSets and Job concurrency policies (Allow, Forbid, Replace), ConfigMaps and Secrets encryption at rest with External Secrets Operator, PersistentVolumes (PV/PVC/CSI/StorageClass), CNI plugins (Cilium eBPF vs Calico vs AWS VPC CNI), Kubernetes Services and Kube-proxy IPVS/iptables, Gateway API vs Ingress, NetworkPolicies microsegmentation.
+3. **Production K8s Scaling, Reliability & SRE (Q26 - Q35)**: HPA scaling algorithm and KEDA event-driven autoscaling, Cluster Autoscaler vs Karpenter just-in-time direct EC2 provisioning and bin-packing consolidation, Resource Requests/Limits and QoS classes (Guaranteed, Burstable, BestEffort), PodDisruptionBudgets (PDB) protecting voluntary disruptions, Zero-downtime rolling upgrades (maxSurge, maxUnavailable, preStop sleep 10), Service mesh evaluation (Istio Ambient Mesh vs Linkerd mTLS), Kubernetes RBAC and ServiceAccount token security, Custom Resource Definitions (CRDs) and the Go Operator Pattern reconcile loop, Systematic CrashLoopBackOff and Pending Pod troubleshooting, Multi-tenant cluster isolation (ResourceQuotas, LimitRanges, vcluster).
+4. **CI/CD Pipelines, GitOps & Progressive Delivery (Q36 - Q42)**: CI vs CD vs Continuous Deployment and trunk-based development, Secure GitHub Actions with OIDC keyless AWS authentication, GitOps philosophy and ArgoCD automated drift remediation, Progressive delivery (Blue/Green, Canary, Traffic Mirroring) with Argo Rollouts and Prometheus metrics analysis, Helm templating vs Kustomize declarative overlay patching, Software supply chain security (SLSA, SBOM with Syft, Trivy container scanning, SAST), Zero-downtime database migrations in CI/CD via the Expand-and-Contract (Parallel Run) pattern.
+5. **Infrastructure as Code, SRE Observability & Production Troubleshooting (Q43 - Q50)**: Terraform internals (state file, S3 remote backend, DynamoDB state locking, DAG dependency graph), Modular Terraform architecture and automated drift detection, SRE foundations (SLI, SLO, SLA, Error Budgets, and Multi-Window Burn Rate alerting), Three Pillars of Observability (Metrics, Structured Logs, Distributed Tracing with OpenTelemetry W3C traceparent), Prometheus architecture and essential PromQL queries (rate, histogram_quantile p95, memory saturation), Grafana dashboard engineering and Alertmanager anti-fatigue tuning (inhibition, grouping), Production incident command and blameless 5-Whys post-mortems, Concluding a DevOps/SRE technical interview with platform engineering tenets.
+
+---
+
 ## 💻 Interactive Next.js Web Application
 
 This repository includes a full-fledged **Next.js 14 App Router** web portal providing an interactive study experience with Markdown rendering, instant search, copyable code blocks, and responsive layouts.
 
 ### 🚀 Running Locally
 
-```bash
+\`\`\`bash
 # Clone the repository
 git clone https://github.com/TheLearningHubOrg/learn-interview-questions.git
 cd learn-interview-questions
@@ -154,10 +164,10 @@ npm run build
 
 # Start production server
 npm run start
-```
+\`\`\`
 
 ### ⚡ Web App Features
-- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,690+ questions with live filtering and jump links.
+- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,740+ questions with live filtering and jump links.
 - **Table of Contents Sidebar**: Sticky scroll-spy outline for every track.
 - **Code Block Utilities**: One-click code copying and language tags.
 - **Server-Side Generation (SSG)**: Zero runtime markdown overhead with pre-rendered pages.

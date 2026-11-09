@@ -167,5 +167,18 @@ export const TRACKS: TrackMeta[] = [
     badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-400 dark:border-indigo-500/30',
     iconName: 'Network',
     tags: ['System Design', 'Distributed Systems', 'Microservices', 'Kafka', 'Redis', 'Consistent Hashing', 'CAP Theorem', 'TinyURL', 'Rate Limiter']
+  },
+  {
+    id: '11',
+    sectionNumber: 11,
+    slug: 'devops-kubernetes',
+    title: 'DevOps, Containers, Kubernetes & Cloud Infrastructure Master (50 Qs)',
+    shortTitle: 'DevOps & Kubernetes (50 Qs)',
+    description: 'The definitive 50 DevOps interview questions covering Docker internals, Kubernetes control plane, CNI/CSI, Pod lifecycles, HPA, ArgoCD GitOps, CI/CD security, Terraform, and Prometheus/Grafana SRE observability.',
+    questionCount: 50,
+    filename: '11-devops-containers-kubernetes.md',
+    badgeColor: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/30',
+    iconName: 'Server',
+    tags: ['DevOps', 'Docker', 'Kubernetes', 'CI/CD', 'GitOps', 'Terraform', 'Prometheus', 'ArgoCD', 'SRE']
   }
 ];

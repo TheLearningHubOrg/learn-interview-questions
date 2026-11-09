@@ -1,12 +1,12 @@
 # The Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Question Bank 🚀
 
-> **1,790+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, Web Security & OWASP, DevOps & Kubernetes, Cloud Infrastructure, Backend, Databases, and Algorithms.
+> **1,799+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, Web Security & OWASP, DevOps & Kubernetes, Cloud Infrastructure, Backend, Databases, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
 [![Curriculum: 12 Tracks](https://img.shields.io/badge/Tracks-12%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1790+](https://img.shields.io/badge/Questions-1790%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Questions: 1799+](https://img.shields.io/badge/Questions-1799%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -177,7 +177,7 @@ npm run start
 \`\`\`
 
 ### ⚡ Web App Features
-- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,790+ questions with live filtering and jump links.
+- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,799+ questions with live filtering and jump links.
 - **Table of Contents Sidebar**: Sticky scroll-spy outline for every track.
 - **Code Block Utilities**: One-click code copying and language tags.
 - **Server-Side Generation (SSG)**: Zero runtime markdown overhead with pre-rendered pages.

@@ -29,7 +29,7 @@ export default async function HomePage() {
     '@type': 'EducationalOrganization',
     name: 'InterviewHub - The Learning Hub Org',
     url: 'https://learn-interview-questions.vercel.app',
-    description: 'Comprehensive, production-tested interview question bank with 1,790+ questions covering Angular 2-19, React 18/19, Core JavaScript Internals, Large-Scale System Design, Web Security & OWASP Top 10, DevOps, Kubernetes, Docker, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
+    description: 'Comprehensive, production-tested interview question bank with 1,799+ questions covering Angular 2-19, React 18/19, Core JavaScript Internals, Large-Scale System Design, Web Security & OWASP Top 10, DevOps, Kubernetes, Docker, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
     knowsAbout: [
       'JavaScript',
       'Angular',

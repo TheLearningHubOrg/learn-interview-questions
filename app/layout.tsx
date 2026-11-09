@@ -7,10 +7,10 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://learn-interview-questions.vercel.app'),
   title: {
-    default: 'Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Bank (1,600+ Questions)',
+    default: 'Master Full-Stack, Cloud, System Design, Security & DevOps Interview Bank (1,799+ Questions)',
     template: '%s | InterviewHub PRO',
   },
-  description: 'Comprehensive, battle-tested engineering interview question bank with 1,600+ questions and answers covering Angular 2-19, React 18/19, Core JavaScript Internals, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
+  description: 'Comprehensive, production-tested engineering interview question bank with 1,799+ questions and answers covering Angular 2-19, React 18/19, Core JavaScript Internals, System Design, Web Security & OWASP, DevOps, Kubernetes, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
   keywords: [
     'interview questions',
     'javascript interview questions',
@@ -18,6 +18,12 @@ export const metadata: Metadata = {
     'react interview questions',
     'nextjs interview questions',
     'core javascript',
+    'system design interview',
+    'distributed systems',
+    'web security interview',
+    'owasp top 10',
+    'devops interview questions',
+    'kubernetes docker',
     'full stack developer interview',
     'python fastapi interview',
     'nodejs event loop',
@@ -25,7 +31,7 @@ export const metadata: Metadata = {
     'dsa patterns',
     'blind 75',
     'neetcode 150',
-    'system design interview'
+    'behavioral interview questions'
   ],
   authors: [{ name: 'The Learning Hub Org', url: 'https://github.com/TheLearningHubOrg' }],
   creator: 'The Learning Hub Org',
@@ -46,13 +52,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://learn-interview-questions.vercel.app',
     siteName: 'InterviewHub PRO - The Learning Hub Org',
-    title: 'Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Bank (1,600+ Qs)',
-    description: '1,600+ production-tested questions with 100% code coverage across Angular, React, Core JS, Databases, Python, Node.js, AWS Cloud, and DSA.',
+    title: 'Master Full-Stack, Cloud, System Design, Security & DevOps Interview Bank (1,799+ Qs)',
+    description: '1,799+ production-tested questions with 100% code coverage across Angular, React, Core JS, System Design, Web Security, DevOps, Databases, Python, Node.js, AWS Cloud, and DSA.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Bank',
-    description: '1,600+ production-tested engineering interview questions with 100% code examples.',
+    title: 'Master Full-Stack, Cloud, System Design, Security & DevOps Interview Bank',
+    description: '1,799+ production-tested engineering interview questions with 100% code examples.',
     creator: '@TheLearningHub',
   },
 };

@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'InterviewHub PRO - 1,600+ Master Technical Interview Questions';
+export const alt = 'InterviewHub PRO - 1,799+ Master Technical Interview Questions';
 export const size = {
   width: 1200,
   height: 630,
@@ -69,7 +69,7 @@ export default async function Image() {
             margin: '0 0 40px 0',
           }}
         >
-          1,600+ Battle-Tested Questions & Code Examples Across Angular 2-19, React 18/19, JavaScript Internals, Databases, Python, Node.js, AWS Cloud, and DSA.
+          1,799+ Battle-Tested Questions & Code Examples Across Angular 2-19, React 18/19, JavaScript Internals, System Design, OWASP Security, DevOps, Cloud Architecture, and DSA.
         </p>
 
         <div
@@ -79,7 +79,7 @@ export default async function Image() {
             alignItems: 'center',
           }}
         >
-          {['Angular & Signals', 'React & Next.js', 'Core JS (518 Qs)', 'AWS Cloud', 'Databases'].map(
+          {['Angular & Signals', 'React & Next.js', 'Core JS (521 Qs)', 'System Design', 'Web Security', 'DevOps & K8s'].map(
             (item) => (
               <div
                 key={item}

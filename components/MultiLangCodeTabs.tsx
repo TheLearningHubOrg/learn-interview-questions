@@ -17,21 +17,10 @@ interface MultiLangCodeTabsProps {
 }
 
 export function MultiLangCodeTabs({ blocks }: MultiLangCodeTabsProps) {
-  const [activeLabel, setActiveLabel] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem('interviewhub-dsa-lang');
-        if (stored && blocks.some((b) => b.label.toLowerCase() === stored.toLowerCase())) {
-          return stored;
-        }
-      } catch {}
-    }
-    return blocks[0]?.label || 'Python 3';
-  });
-
+  const [activeLabel, setActiveLabel] = useState<string>(() => blocks[0]?.label || 'Python 3');
   const [copied, setCopied] = useState(false);
 
-  // Sync preference with localStorage
+  // Sync preference with localStorage after mount (guarantees 0 hydration mismatch)
   useEffect(() => {
     try {
       const stored = localStorage.getItem('interviewhub-dsa-lang');

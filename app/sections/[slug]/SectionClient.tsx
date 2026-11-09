@@ -10,10 +10,19 @@ import {
   ChevronRight,
   Layers,
   Sparkles,
-  BookmarkCheck
+  BookmarkCheck,
+  Bookmark,
+  CheckCircle2,
+  X
 } from 'lucide-react';
 import { TrackMeta, ParsedQuestion } from '@/lib/tracks-meta';
 import { getTrackLastRead, READING_UPDATE_EVENT } from '@/lib/reading-history';
+import { 
+  getTrackStudiedMap, 
+  getAllBookmarks, 
+  STUDY_PROGRESS_UPDATE_EVENT, 
+  BOOKMARKS_UPDATE_EVENT 
+} from '@/lib/study-progress';
 
 interface SectionClientProps {
   track: TrackMeta;
@@ -24,48 +33,76 @@ interface SectionClientProps {
 export function SectionClient({ track, questions, allTracks }: SectionClientProps) {
   const [query, setQuery] = useState('');
   const [lastReadNum, setLastReadNum] = useState<number | null>(null);
+  const [filterTab, setFilterTab] = useState<'all' | 'studied' | 'bookmarked'>('all');
+  const [studiedMap, setStudiedMap] = useState<Record<number, boolean>>({});
+  const [bookmarkedSet, setBookmarkedSet] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const refresh = () => {
       const num = getTrackLastRead(track.slug);
       setLastReadNum(num);
+
+      const map = getTrackStudiedMap(track.slug);
+      setStudiedMap(map);
+
+      const allB = getAllBookmarks();
+      const trackBookmarks = allB.filter((b) => b.trackSlug === track.slug);
+      setBookmarkedSet(new Set(trackBookmarks.map((b) => b.questionNumber)));
     };
 
     refresh();
     window.addEventListener(READING_UPDATE_EVENT, refresh);
+    window.addEventListener(STUDY_PROGRESS_UPDATE_EVENT, refresh);
+    window.addEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
     window.addEventListener('storage', refresh);
     window.addEventListener('focus', refresh);
 
     return () => {
       window.removeEventListener(READING_UPDATE_EVENT, refresh);
+      window.removeEventListener(STUDY_PROGRESS_UPDATE_EVENT, refresh);
+      window.removeEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
       window.removeEventListener('storage', refresh);
       window.removeEventListener('focus', refresh);
     };
   }, [track.slug]);
 
-  // Group questions by Part
+  const studiedCount = useMemo(() => {
+    return Object.values(studiedMap).filter(Boolean).length;
+  }, [studiedMap]);
+
+  const bookmarkedCount = bookmarkedSet.size;
+
+  // Filter questions based on filterTab and query
+  const displayedQuestions = useMemo(() => {
+    return questions.filter((item) => {
+      // Tab filter
+      if (filterTab === 'studied' && !studiedMap[item.number]) return false;
+      if (filterTab === 'bookmarked' && !bookmarkedSet.has(item.number)) return false;
+
+      // Query filter
+      if (!query.trim()) return true;
+      const q = query.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.part.toLowerCase().includes(q) ||
+        item.number.toString() === q
+      );
+    });
+  }, [questions, filterTab, query, studiedMap, bookmarkedSet]);
+
+  // Group displayed questions by Part
   const groupedByPart = useMemo(() => {
     const map = new Map<string, ParsedQuestion[]>();
-    for (const q of questions) {
+    for (const q of displayedQuestions) {
       if (!map.has(q.part)) {
         map.set(q.part, []);
       }
       map.get(q.part)!.push(q);
     }
     return Array.from(map.entries());
-  }, [questions]);
+  }, [displayedQuestions]);
 
-  // Filter questions
-  const filtered = useMemo(() => {
-    if (!query.trim()) return null;
-    const q = query.toLowerCase();
-    return questions.filter(
-      (item) =>
-        item.title.toLowerCase().includes(q) ||
-        item.part.toLowerCase().includes(q) ||
-        item.number.toString() === q
-    );
-  }, [query, questions]);
+  const isFiltering = query.trim().length > 0 || filterTab !== 'all';
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -97,6 +134,11 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-muted text-foreground border border-border">
                 {track.questionCount} Questions (1 Per Page)
               </span>
+              {studiedCount > 0 && (
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                  {studiedCount}/{track.questionCount} Studied ({Math.round((studiedCount / track.questionCount) * 100)}%)
+                </span>
+              )}
             </div>
 
             <div className="text-xs text-muted-foreground font-semibold">
@@ -146,51 +188,129 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
                 placeholder={`Search ${questions.length} questions in this track...`}
                 className="w-full pl-9 pr-4 py-3 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-400 shadow-sm dark:shadow-none"
               />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Questions List */}
-      {filtered ? (
-        // Search Results Mode
-        <div className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-border text-xs text-muted-foreground">
-            <span>Found {filtered.length} matching questions for "{query}"</span>
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              className="text-purple-600 dark:text-purple-400 hover:underline font-bold"
-            >
-              Clear search
-            </button>
-          </div>
+      {/* Filter Tabs: All Questions, Studied, Bookmarked */}
+      <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setFilterTab('all')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              filterTab === 'all'
+                ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/20'
+                : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-card-hover'
+            }`}
+          >
+            All Questions ({questions.length})
+          </button>
 
-          <div className="grid grid-cols-1 gap-3">
-            {filtered.map((q) => (
-              <Link
-                key={q.number}
-                href={`/sections/${track.slug}/${q.number}`}
-                className="p-4 rounded-xl bg-card border border-border hover:border-purple-400 hover:bg-card-hover transition-all flex items-center justify-between gap-4 group shadow-sm dark:shadow-none"
+          <button
+            type="button"
+            onClick={() => setFilterTab('studied')}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              filterTab === 'studied'
+                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20'
+                : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-card-hover'
+            }`}
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            <span>Studied ({studiedCount})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilterTab('bookmarked')}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              filterTab === 'bookmarked'
+                ? 'bg-amber-600 text-white shadow-sm shadow-amber-600/20'
+                : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-card-hover'
+            }`}
+          >
+            <Bookmark className="h-3.5 w-3.5 fill-current" />
+            <span>Bookmarked ({bookmarkedCount})</span>
+          </button>
+        </div>
+
+        {isFiltering && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
+            <span>Showing {displayedQuestions.length} of {questions.length}</span>
+            {(query || filterTab !== 'all') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery('');
+                  setFilterTab('all');
+                }}
+                className="text-purple-600 dark:text-purple-400 hover:underline font-bold ml-1"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <span className="w-9 h-9 rounded-lg bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 font-bold text-xs flex items-center justify-center shrink-0">
-                    Q{q.number}
-                  </span>
-                  <div className="min-w-0">
-                    <span className="text-[11px] text-muted-foreground block mb-0.5 truncate font-medium">{q.part}</span>
-                    <p className="text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1">
-                      {q.title}
-                    </p>
-                  </div>
-                </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 shrink-0 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
-            ))}
+                Reset filters
+              </button>
+            )}
           </div>
+        )}
+      </div>
+
+      {/* Questions List */}
+      {displayedQuestions.length === 0 ? (
+        <div className="p-12 text-center rounded-2xl bg-card border border-border text-muted-foreground">
+          {filterTab === 'bookmarked' ? (
+            <>
+              <Bookmark className="h-10 w-10 mx-auto mb-3 text-amber-500 opacity-60" />
+              <h3 className="text-base font-bold text-foreground mb-1">No Bookmarked Questions in This Section</h3>
+              <p className="text-xs max-w-sm mx-auto leading-relaxed mb-4">
+                Click the <strong>Bookmark</strong> button on any question page to add it to your revision list.
+              </p>
+              <button
+                type="button"
+                onClick={() => setFilterTab('all')}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition-all shadow-sm"
+              >
+                Show All Questions
+              </button>
+            </>
+          ) : filterTab === 'studied' ? (
+            <>
+              <CheckCircle2 className="h-10 w-10 mx-auto mb-3 text-emerald-500 opacity-60" />
+              <h3 className="text-base font-bold text-foreground mb-1">No Questions Marked as Studied Yet</h3>
+              <p className="text-xs max-w-sm mx-auto leading-relaxed mb-4">
+                Click <strong>Mark as Studied</strong> on questions as you complete them to track your progress.
+              </p>
+              <button
+                type="button"
+                onClick={() => setFilterTab('all')}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition-all shadow-sm"
+              >
+                Show All Questions
+              </button>
+            </>
+          ) : (
+            <>
+              <BookOpen className="h-10 w-10 mx-auto mb-3 opacity-50" />
+              <p className="text-sm font-semibold">No questions found matching "{query}".</p>
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                className="mt-3 text-xs text-purple-600 dark:text-purple-400 hover:underline font-bold"
+              >
+                Clear search query
+              </button>
+            </>
+          )}
         </div>
       ) : (
-        // Grouped by Part Mode
         <div className="space-y-10">
           {groupedByPart.map(([partTitle, partQuestions]) => (
             <div key={partTitle} className="space-y-4">
@@ -200,29 +320,58 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
                   <span>{partTitle}</span>
                 </h2>
                 <span className="text-xs text-muted-foreground font-bold">
-                  {partQuestions.length} Questions
+                  {partQuestions.length} {partQuestions.length === 1 ? 'Question' : 'Questions'}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {partQuestions.map((q) => {
                   const isLastRead = q.number === lastReadNum;
+                  const isStudied = !!studiedMap[q.number];
+                  const isQBookmarked = bookmarkedSet.has(q.number);
+
                   return (
                     <Link
                       key={q.number}
                       href={`/sections/${track.slug}/${q.number}`}
-                      className={`p-4 rounded-xl bg-card border ${isLastRead ? 'border-purple-500 dark:border-purple-400 ring-1 ring-purple-500/30' : 'border-border'} hover:border-purple-400 hover:bg-card-hover transition-all flex items-start justify-between gap-3 group shadow-sm dark:shadow-none`}
+                      className={`p-4 rounded-xl bg-card border ${
+                        isLastRead 
+                          ? 'border-purple-500 dark:border-purple-400 ring-1 ring-purple-500/30' 
+                          : isQBookmarked
+                          ? 'border-amber-300 dark:border-amber-500/40'
+                          : 'border-border'
+                      } hover:border-purple-400 hover:bg-card-hover transition-all flex items-start justify-between gap-3 group shadow-sm dark:shadow-none`}
                     >
                       <div className="flex items-start gap-3 min-w-0">
-                        <span className={`w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 transition-all ${isLastRead ? 'bg-purple-600 text-white' : 'bg-muted text-foreground border border-border group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600'}`}>
+                        <span className={`w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 transition-all ${
+                          isLastRead 
+                            ? 'bg-purple-600 text-white' 
+                            : isStudied
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30'
+                            : 'bg-muted text-foreground border border-border group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600'
+                        }`}>
                           {q.number}
                         </span>
                         <div className="min-w-0">
-                          {isLastRead && (
-                            <span className="inline-block px-1.5 py-0.5 mb-1 rounded text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300 border border-purple-300 dark:border-purple-500/30">
-                              Resume Here
-                            </span>
-                          )}
+                          <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                            {isLastRead && (
+                              <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300 border border-purple-300 dark:border-purple-500/30">
+                                Resume Here
+                              </span>
+                            )}
+                            {isStudied && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
+                                <CheckCircle2 className="h-2.5 w-2.5" />
+                                Studied
+                              </span>
+                            )}
+                            {isQBookmarked && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30">
+                                <Bookmark className="h-2.5 w-2.5 fill-current" />
+                                Bookmarked
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
                             {q.title}
                           </p>

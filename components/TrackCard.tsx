@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { TrackMeta } from '@/lib/tracks-meta';
 import { getTrackLastRead, READING_UPDATE_EVENT } from '@/lib/reading-history';
+import { getTrackStudiedMap, STUDY_PROGRESS_UPDATE_EVENT } from '@/lib/study-progress';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Shield,
@@ -45,24 +46,33 @@ interface TrackCardProps {
 export function TrackCard({ track }: TrackCardProps) {
   const IconComponent = ICON_MAP[track.iconName] || Code2;
   const [lastReadNum, setLastReadNum] = useState<number | null>(null);
+  const [studiedCount, setStudiedCount] = useState<number>(0);
 
   useEffect(() => {
     const refresh = () => {
       const num = getTrackLastRead(track.slug);
       setLastReadNum(num);
+
+      const map = getTrackStudiedMap(track.slug);
+      const count = Object.values(map).filter(Boolean).length;
+      setStudiedCount(count);
     };
 
     refresh();
     window.addEventListener(READING_UPDATE_EVENT, refresh);
+    window.addEventListener(STUDY_PROGRESS_UPDATE_EVENT, refresh);
     window.addEventListener('storage', refresh);
     window.addEventListener('focus', refresh);
 
     return () => {
       window.removeEventListener(READING_UPDATE_EVENT, refresh);
+      window.removeEventListener(STUDY_PROGRESS_UPDATE_EVENT, refresh);
       window.removeEventListener('storage', refresh);
       window.removeEventListener('focus', refresh);
     };
   }, [track.slug]);
+
+  const progressPercent = Math.min(100, Math.round((studiedCount / track.questionCount) * 100));
 
   return (
     <div className="group relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl bg-card border border-border hover:border-purple-400/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1">
@@ -111,6 +121,29 @@ export function TrackCard({ track }: TrackCardProps) {
             </span>
           )}
         </div>
+        {/* Track Progress Bar (if studied > 0) */}
+        {studiedCount > 0 && (
+          <div className="mb-4 pt-2">
+            <div className="flex items-center justify-between text-[11px] mb-1.5 font-medium">
+              <span className="text-muted-foreground">
+                {studiedCount} / {track.questionCount} studied
+              </span>
+              <span className={`font-mono font-bold ${progressPercent === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-purple-600 dark:text-purple-400'}`}>
+                {progressPercent === 100 ? '🎉 Mastered' : `${progressPercent}%`}
+              </span>
+            </div>
+            <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-muted overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-300 ${
+                  progressPercent === 100
+                    ? 'bg-emerald-500'
+                    : 'bg-gradient-to-r from-purple-600 to-indigo-600'
+                }`}
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons: Start Q1 vs Overview */}

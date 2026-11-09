@@ -18,6 +18,7 @@ import {
 import { getAllTracks } from '@/lib/tracks';
 import { TrackCard } from '@/components/TrackCard';
 import { ContinueReadingBanner } from '@/components/ContinueReadingBanner';
+import { StudyProgressCard } from '@/components/StudyProgressCard';
 
 export default async function HomePage() {
   const tracks = await getAllTracks();
@@ -141,6 +142,9 @@ export default async function HomePage() {
 
       {/* Continue Reading Banner (client-side persisted) */}
       <ContinueReadingBanner />
+
+      {/* Global Study Progress Dashboard */}
+      <StudyProgressCard tracks={tracks} />
 
       {/* Tracks Section */}
       <section id="tracks" className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

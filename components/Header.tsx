@@ -2,16 +2,34 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink } from 'lucide-react';
+import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { TRACKS } from '@/lib/tracks-meta';
+import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
 
 interface HeaderProps {
   onOpenSearch?: () => void;
+  onOpenBookmarks?: () => void;
 }
 
-export function Header({ onOpenSearch }: HeaderProps) {
+export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [bookmarkCount, setBookmarkCount] = useState<number>(0);
+
+  useEffect(() => {
+    const refresh = () => {
+      setBookmarkCount(getAllBookmarks().length);
+    };
+
+    refresh();
+    window.addEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
+    window.addEventListener('storage', refresh);
+
+    return () => {
+      window.removeEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, []);
 
   // Close mobile drawer on escape
   useEffect(() => {
@@ -84,6 +102,23 @@ export function Header({ onOpenSearch }: HeaderProps) {
               <span>Tracks</span>
             </Link>
 
+            {/* Saved / Bookmarks Button */}
+            <button
+              type="button"
+              onClick={onOpenBookmarks}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-all shadow-sm dark:shadow-none active:scale-95"
+              title="View saved questions for review"
+              aria-label="View bookmarked questions"
+            >
+              <Bookmark className="h-3.5 w-3.5 fill-current" />
+              <span className="hidden sm:inline font-bold">Saved</span>
+              {bookmarkCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white leading-tight">
+                  {bookmarkCount}
+                </span>
+              )}
+            </button>
+
             {/* Light / Dark Mode Toggle */}
             <ThemeToggle />
 
@@ -147,10 +182,30 @@ export function Header({ onOpenSearch }: HeaderProps) {
                   setMobileMenuOpen(false);
                   onOpenSearch?.();
                 }}
-                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-6 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground text-sm font-medium shadow-sm dark:shadow-none"
+                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-3 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground text-sm font-medium shadow-sm dark:shadow-none"
               >
                 <Search className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 <span>Search 1,799+ questions...</span>
+              </button>
+
+              {/* Mobile Saved Bookmarks Button in Drawer */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenBookmarks?.();
+                }}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-6 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm font-bold shadow-sm dark:shadow-none active:scale-95 transition-all"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Bookmark className="h-4 w-4 fill-current" />
+                  <span>Saved for Review</span>
+                </div>
+                {bookmarkCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-xs bg-amber-500 text-white font-bold">
+                    {bookmarkCount}
+                  </span>
+                )}
               </button>
 
               {/* Tracks List */}

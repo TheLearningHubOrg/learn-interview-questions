@@ -13,6 +13,7 @@ import {
   BookOpen, 
   Grid, 
   CheckCircle2, 
+  Bookmark,
   X, 
   ChevronLeft,
   ChevronRight,
@@ -22,6 +23,13 @@ import { QuestionViewData } from '@/lib/tracks-meta';
 import { CodeBlock } from '@/components/CodeBlock';
 import { MultiLangCodeTabs, LanguageBlock } from '@/components/MultiLangCodeTabs';
 import { saveLastRead } from '@/lib/reading-history';
+import { 
+  isQuestionBookmarked, 
+  toggleBookmark, 
+  getAllBookmarks, 
+  BOOKMARKS_UPDATE_EVENT,
+  STUDY_PROGRESS_UPDATE_EVENT 
+} from '@/lib/study-progress';
 
 function parseQuestionContent(content: string) {
   const langRegex = /####\s+(Python 3|Python|JavaScript|JS|TypeScript|TS|Java|C\+\+|Go|Rust)\s*\n+```(\w+)\n([\s\S]*?)```/gi;
@@ -91,20 +99,36 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
   const [copiedLink, setCopiedLink] = useState(false);
   const [isGridOpen, setIsGridOpen] = useState(false);
   const [studiedMap, setStudiedMap] = useState<Record<number, boolean>>({});
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const [bookmarkedSet, setBookmarkedSet] = useState<Set<number>>(new Set());
 
   const storageKey = `studied_${track.slug}`;
 
-  // Load studied status from localStorage
+  // Load studied status & bookmarks from localStorage
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        setStudiedMap(JSON.parse(stored));
-      }
-    } catch {
-      // Ignore storage errors
-    }
-  }, [storageKey]);
+    const refresh = () => {
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+          setStudiedMap(JSON.parse(stored));
+        }
+      } catch {}
+
+      const allB = getAllBookmarks();
+      const trackBookmarks = allB.filter((b) => b.trackSlug === track.slug);
+      setBookmarkedSet(new Set(trackBookmarks.map((b) => b.questionNumber)));
+      setIsBookmarked(isQuestionBookmarked(track.slug, question.number));
+    };
+
+    refresh();
+    window.addEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
+    window.addEventListener('storage', refresh);
+
+    return () => {
+      window.removeEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, [storageKey, track.slug, question.number]);
 
   // Save current question to reading history
   useEffect(() => {
@@ -124,7 +148,21 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
     setStudiedMap(updated);
     try {
       localStorage.setItem(storageKey, JSON.stringify(updated));
+      window.dispatchEvent(new Event(STUDY_PROGRESS_UPDATE_EVENT));
     } catch {}
+  };
+
+  // Toggle bookmark status
+  const handleToggleBookmark = () => {
+    const res = toggleBookmark({
+      trackSlug: track.slug,
+      trackTitle: track.shortTitle,
+      sectionNumber: track.sectionNumber,
+      questionNumber: question.number,
+      questionTitle: question.title,
+      timestamp: Date.now(),
+    });
+    setIsBookmarked(res);
   };
 
   const isCurrentStudied = !!studiedMap[question.number];
@@ -194,6 +232,21 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             >
               <CheckCircle2 className={`h-3.5 w-3.5 ${isCurrentStudied ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`} />
               <span>{isCurrentStudied ? 'Studied' : 'Mark as Studied'}</span>
+            </button>
+
+            {/* Bookmark / Save for Review Toggle */}
+            <button
+              type="button"
+              onClick={handleToggleBookmark}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none ${
+                isBookmarked
+                  ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30 shadow-amber-500/10'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-amber-400/50'
+              }`}
+              title={isBookmarked ? 'Remove from review cheat sheet' : 'Save question to review cheat sheet'}
+            >
+              <Bookmark className={`h-3.5 w-3.5 ${isBookmarked ? 'fill-current text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`} />
+              <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
             </button>
 
             {/* Question Grid Modal Trigger */}
@@ -457,6 +510,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
                 {allQuestions.map((q) => {
                   const isCurrent = q.number === question.number;
                   const isStudied = !!studiedMap[q.number];
+                  const isQBookmarked = bookmarkedSet.has(q.number);
 
                   return (
                     <button
@@ -476,6 +530,11 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
                       title={`Q${q.number}: ${q.title}`}
                     >
                       <span>{q.number}</span>
+                      {isQBookmarked && (
+                        <span className="absolute top-1 right-1 text-[9px] text-amber-500 font-black leading-none" title="Bookmarked">
+                          ★
+                        </span>
+                      )}
                       {isStudied && !isCurrent && (
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 absolute bottom-1" />
                       )}
@@ -485,13 +544,16 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               </div>
             </div>
 
-            <div className="pt-3 sm:pt-4 border-t border-border mt-4 flex items-center justify-between text-xs text-muted-foreground font-medium">
-              <div className="flex items-center gap-3 sm:gap-4">
+            <div className="pt-3 sm:pt-4 border-t border-border mt-4 flex items-center justify-between text-xs text-muted-foreground font-medium flex-wrap gap-2">
+              <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-purple-600" /> Current
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Studied
+                </span>
+                <span className="flex items-center gap-1.5 text-amber-500 font-semibold">
+                  <span>★</span> Bookmarked
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-border" /> Unread

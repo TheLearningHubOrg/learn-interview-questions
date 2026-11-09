@@ -1,12 +1,12 @@
 # The Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Question Bank 🚀
 
-> **1,740+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, DevOps & Kubernetes, Cloud Infrastructure, Backend, Databases, and Algorithms.
+> **1,790+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, Web Security & OWASP, DevOps & Kubernetes, Cloud Infrastructure, Backend, Databases, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
-[![Curriculum: 11 Tracks](https://img.shields.io/badge/Tracks-11%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1740+](https://img.shields.io/badge/Questions-1740%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Curriculum: 12 Tracks](https://img.shields.io/badge/Tracks-12%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
+[![Questions: 1790+](https://img.shields.io/badge/Questions-1790%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -25,7 +25,8 @@
 | **Track 9: Behavioral, HR & Leadership** | General Intro, STAR Method (S-T-A-R), Incident Post-Mortems, Culture, Negotiation | **50** | [Open Track 9](tracks/09-general-behavioral-hr.md) |
 | **Track 10: System Design & Distributed Systems** | Distributed Trade-offs, TinyURL, Rate Limiter, WhatsApp, Twitter, Raft, Back-of-the-Envelope | **50** | [Open Track 10](tracks/10-system-design-distributed-systems.md) |
 | **Track 11: DevOps, Containers & Kubernetes** | Docker Internals, Kubernetes Control Plane, CNI/CSI, HPA/Karpenter, GitOps, CI/CD, Terraform, SRE | **50** | [Open Track 11](tracks/11-devops-containers-kubernetes.md) |
-| **TOTAL** | **Full-Stack, Cloud, DevOps, K8s, System Design & Behavioral Mastery** | **1,749** | — |
+| **Track 12: Web Security & OWASP Top 10** | OWASP Top 10, BOLA/IDOR, XSS, CSRF, SSRF, CSP Nonces, JWT, OAuth2 PKCE, Cryptography | **50** | [Open Track 12](tracks/12-web-security-owasp.md) |
+| **TOTAL** | **Full-Stack, Cloud, Security, DevOps, System Design & Behavioral Mastery** | **1,799** | — |
 
 ---
 
@@ -141,6 +142,15 @@
 
 ---
 
+### 🛡️ [Track 12: Web Security, Application Defense & OWASP Top 10 Master (1 - 50)](tracks/12-web-security-owasp.md)
+1. **Candid Security Experience, Threat Modeling & Fundamentals (Q1 - Q10)**: Defensive engineering mindset, CIA Triad and Defense-in-Depth layers, STRIDE threat modeling framework, Least Privilege and Zero Trust architecture, Session management and HttpOnly/SameSite cookie security, CORS protocol mechanics and preflight OPTIONS, Same-Origin Policy (SOP) and postMessage validation, HTTP security headers suite (HSTS, nosniff, Referrer-Policy, Permissions-Policy), Modern password hashing (Argon2id vs bcrypt vs PBKDF2), CSPRNG cryptographic randomness (crypto.getRandomValues vs Math.random).
+2. **OWASP Top 10 & Critical Vulnerability Deep-Dives (Q11 - Q25)**: Broken Object Level Authorization (BOLA/IDOR) tenant context enforcement, Cross-Site Scripting (XSS) (Reflected, Stored, DOM-based) and DOMPurify sanitization, Content Security Policy (CSP Level 3) nonce-based architecture and strict-dynamic, Cross-Site Request Forgery (CSRF) and Double Submit Cookie patterns, Server-Side Request Forgery (SSRF) and AWS IMDSv2 protection, Parameterized prepared statements vs SQL Injection, Command injection avoidance via execFile/spawn, Broken authentication and HaveIBeenPwned k-Anonymity checks, Security misconfigurations and sanitized error responses, Vulnerable and outdated components (SCA with Trivy/Snyk), Insecure deserialization risks, Structured JSON logging and PII masking, Server-Side Template Injection (SSTI), XML External Entity (XXE) parser hardening, Mass Assignment DTO validation.
+3. **Authentication, Authorization & Cryptographic Standards (Q26 - Q35)**: JSON Web Token (JWT) vulnerabilities (alg: none, RS256 vs HS256, JTI Bloom Filter revocation), OAuth 2.0 and OpenID Connect (OIDC) core flows, OAuth 2.0 PKCE (code_verifier and code_challenge), RBAC vs Attribute-Based Access Control (ABAC) with Open Policy Agent (Rego), Symmetric (AES-256-GCM AEAD) vs Asymmetric (RSA vs ECC Curve25519), Envelope Encryption architecture (DEK vs KEK), Mutual TLS (mTLS) and SPIFFE cryptographic service identities, Phishing-resistant Multi-Factor Authentication (FIDO2 / WebAuthn / Passkeys vs TOTP), Enterprise Single Sign-On (SAML 2.0 vs OIDC), Cryptographic Salt vs Pepper vs Nonce.
+4. **Browser Security, HTTP Headers & Client Hardening (Q36 - Q42)**: Clickjacking mitigation via frame-ancestors, Subresource Integrity (SRI) on external CDNs, Reverse tabnabbing defense (rel="noopener noreferrer"), MIME sniffing defense (X-Content-Type-Options: nosniff), HTTP Strict Transport Security (HSTS) and Chromium Preload submission, Permissions-Policy hardware sensor restrictions, Prototype Pollution in JavaScript (recursive merge flaws, Object.freeze, Object.create(null)).
+5. **API Security, DevSecOps & Enterprise Incident Handling (Q43 - Q50)**: Regular Expression Denial of Service (ReDoS) catastrophic backtracking and RE2 linear DFA engine, Web Application Firewalls (WAF) managed rules and bot mitigation, Secure file upload pipelines (magic byte inspection, ClamAV, S3 isolation), GraphQL security (query depth limits, complexity scoring, disabling introspection), DevSecOps shift-left automation (Gitleaks, Semgrep, Trivy in CI/CD), Zero-Secret-Leak architectures and dynamic credentials with HashiCorp Vault, Security incident response containment and GDPR 72-hour reporting rule, High-signal application security interview conclusion.
+
+---
+
 ## 💻 Interactive Next.js Web Application
 
 This repository includes a full-fledged **Next.js 14 App Router** web portal providing an interactive study experience with Markdown rendering, instant search, copyable code blocks, and responsive layouts.
@@ -167,7 +177,7 @@ npm run start
 \`\`\`
 
 ### ⚡ Web App Features
-- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,740+ questions with live filtering and jump links.
+- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,790+ questions with live filtering and jump links.
 - **Table of Contents Sidebar**: Sticky scroll-spy outline for every track.
 - **Code Block Utilities**: One-click code copying and language tags.
 - **Server-Side Generation (SSG)**: Zero runtime markdown overhead with pre-rendered pages.

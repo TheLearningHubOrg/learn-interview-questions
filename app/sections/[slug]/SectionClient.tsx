@@ -13,7 +13,7 @@ import {
   BookmarkCheck
 } from 'lucide-react';
 import { TrackMeta, ParsedQuestion } from '@/lib/tracks-meta';
-import { getTrackLastRead } from '@/lib/reading-history';
+import { getTrackLastRead, READING_UPDATE_EVENT } from '@/lib/reading-history';
 
 interface SectionClientProps {
   track: TrackMeta;
@@ -26,8 +26,21 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
   const [lastReadNum, setLastReadNum] = useState<number | null>(null);
 
   useEffect(() => {
-    const num = getTrackLastRead(track.slug);
-    if (num) setLastReadNum(num);
+    const refresh = () => {
+      const num = getTrackLastRead(track.slug);
+      setLastReadNum(num);
+    };
+
+    refresh();
+    window.addEventListener(READING_UPDATE_EVENT, refresh);
+    window.addEventListener('storage', refresh);
+    window.addEventListener('focus', refresh);
+
+    return () => {
+      window.removeEventListener(READING_UPDATE_EVENT, refresh);
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener('focus', refresh);
+    };
   }, [track.slug]);
 
   // Group questions by Part

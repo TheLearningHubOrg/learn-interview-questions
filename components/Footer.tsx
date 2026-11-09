@@ -29,6 +29,7 @@ export function Footer() {
             <Link href="/sections/dsa" className="hover:text-purple-400 transition-colors">DSA Patterns</Link>
             <Link href="/sections/system-design" className="hover:text-purple-400 transition-colors">System Design (50 Qs)</Link>
             <Link href="/sections/devops-kubernetes" className="hover:text-purple-400 transition-colors">DevOps & K8s (50 Qs)</Link>
+            <Link href="/sections/web-security-owasp" className="hover:text-purple-400 transition-colors">Web Security & OWASP (50 Qs)</Link>
             <Link href="/sections/behavioral-hr" className="hover:text-purple-400 transition-colors">Behavioral & HR (50 Qs)</Link>
           </div>
 

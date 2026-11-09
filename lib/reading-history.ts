@@ -9,12 +9,14 @@ export interface LastReadItem {
 
 const GLOBAL_KEY = 'interviewhub_last_read';
 const TRACK_PREFIX = 'interviewhub_last_read_';
+export const READING_UPDATE_EVENT = 'interviewhub_reading_update';
 
 export function saveLastRead(item: LastReadItem): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(GLOBAL_KEY, JSON.stringify(item));
     localStorage.setItem(`${TRACK_PREFIX}${item.trackSlug}`, item.questionNumber.toString());
+    window.dispatchEvent(new Event(READING_UPDATE_EVENT));
   } catch {
     // Ignore storage quota or private browsing errors
   }

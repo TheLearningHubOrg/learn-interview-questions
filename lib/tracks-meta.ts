@@ -180,5 +180,18 @@ export const TRACKS: TrackMeta[] = [
     badgeColor: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/30',
     iconName: 'Server',
     tags: ['DevOps', 'Docker', 'Kubernetes', 'CI/CD', 'GitOps', 'Terraform', 'Prometheus', 'ArgoCD', 'SRE']
+  },
+  {
+    id: '12',
+    sectionNumber: 12,
+    slug: 'web-security-owasp',
+    title: 'Web Security, Application Defense & OWASP Top 10 Master (50 Qs)',
+    shortTitle: 'Web Security & OWASP (50 Qs)',
+    description: 'The definitive 50 application security interview questions covering OWASP Top 10, BOLA/IDOR, XSS, CSRF, SSRF, CSP nonces, JWT security, OAuth 2.0 PKCE, Argon2id, mTLS, and DevSecOps pipelines.',
+    questionCount: 50,
+    filename: '12-web-security-owasp.md',
+    badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30',
+    iconName: 'Lock',
+    tags: ['Security', 'OWASP Top 10', 'XSS', 'CSRF', 'SSRF', 'IDOR', 'BOLA', 'Cryptography', 'JWT', 'OAuth 2.0']
   }
 ];

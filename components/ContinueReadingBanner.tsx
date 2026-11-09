@@ -3,17 +3,28 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BookmarkCheck, ArrowRight, X, Sparkles } from 'lucide-react';
-import { getGlobalLastRead, LastReadItem } from '@/lib/reading-history';
+import { getGlobalLastRead, LastReadItem, READING_UPDATE_EVENT } from '@/lib/reading-history';
 
 export function ContinueReadingBanner() {
   const [lastRead, setLastRead] = useState<LastReadItem | null>(null);
   const [dismissed, setDismissed] = useState<boolean>(false);
 
   useEffect(() => {
-    const item = getGlobalLastRead();
-    if (item) {
-      setLastRead(item);
-    }
+    const refresh = () => {
+      const item = getGlobalLastRead();
+      if (item) setLastRead(item);
+    };
+
+    refresh();
+    window.addEventListener('storage', refresh);
+    window.addEventListener('focus', refresh);
+    window.addEventListener(READING_UPDATE_EVENT, refresh);
+
+    return () => {
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener('focus', refresh);
+      window.removeEventListener(READING_UPDATE_EVENT, refresh);
+    };
   }, []);
 
   if (!lastRead || dismissed) return null;

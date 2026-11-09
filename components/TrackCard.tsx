@@ -13,6 +13,7 @@ import {
   Code2, 
   FileCode,
   Users,
+  Network,
   ArrowRight,
   Play,
   List
@@ -30,6 +31,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Code2,
   FileCode,
   Users,
+  Network,
 };
 
 interface TrackCardProps {

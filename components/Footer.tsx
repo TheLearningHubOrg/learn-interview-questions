@@ -27,6 +27,7 @@ export function Footer() {
             <Link href="/sections/nodejs" className="hover:text-purple-400 transition-colors">Node.js</Link>
             <Link href="/sections/aws" className="hover:text-purple-400 transition-colors">AWS Cloud</Link>
             <Link href="/sections/dsa" className="hover:text-purple-400 transition-colors">DSA Patterns</Link>
+            <Link href="/sections/system-design" className="hover:text-purple-400 transition-colors">System Design (50 Qs)</Link>
             <Link href="/sections/behavioral-hr" className="hover:text-purple-400 transition-colors">Behavioral & HR (50 Qs)</Link>
           </div>
 

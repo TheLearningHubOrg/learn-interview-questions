@@ -1,12 +1,12 @@
 # The Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Question Bank 🚀
 
-> **1,640+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
+> **1,690+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, Frontend, Backend, Databases, Cloud Architecture, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
-[![Curriculum: 9 Tracks](https://img.shields.io/badge/Tracks-8%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1640+](https://img.shields.io/badge/Questions-1600%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Curriculum: 10 Tracks](https://img.shields.io/badge/Tracks-10%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
+[![Questions: 1690+](https://img.shields.io/badge/Questions-1690%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -23,7 +23,8 @@
 | **Track 7: Data Structures & Algorithms** | Multi-Language: Python 3, Java, C++, TypeScript (Blind 75, NeetCode 150) | **100** | [Open Track 7](tracks/07-data-structures-algorithms.md) |
 | **Track 8: Core JavaScript Internals** | Core Language Bank: 521 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **521** | [Open Track 8](tracks/08-frontend-javascript.md) |
 | **Track 9: Behavioral, HR & Leadership** | General Intro, STAR Method (S-T-A-R), Incident Post-Mortems, Culture, Negotiation | **50** | [Open Track 9](tracks/09-general-behavioral-hr.md) |
-| **TOTAL** | **Full-Stack, Cloud, Algorithms & Behavioral Mastery** | **1,649** | — |
+| **Track 10: System Design & Distributed Systems** | Distributed Trade-offs, TinyURL, Rate Limiter, WhatsApp, Twitter, Raft, Back-of-the-Envelope | **50** | [Open Track 10](tracks/10-system-design-distributed-systems.md) |
+| **TOTAL** | **Full-Stack, Cloud, Algorithms, System Design & Behavioral Mastery** | **1,699** | — |
 
 ---
 
@@ -121,6 +122,15 @@
 
 ---
 
+### 🌐 [Track 10: Large-Scale System Design & Distributed Architecture Master (1 - 50)](tracks/10-system-design-distributed-systems.md)
+1. **Foundational Distributed Systems Concepts & Trade-offs (Q1 - Q10)**: 4-Step interview framework, Horizontal vs Vertical scaling bottlenecks, CAP Theorem & PACELC theorem, Consistent Hashing with virtual nodes, Load Balancer algorithms (L4 vs L7), Caching strategies (Cache-Aside, Write-Through, Write-Behind, Refresh-Ahead), Cache Stampede/Penetration/Avalanche mitigation, Database sharding vs partitioning, Replication lag & Read-After-Write consistency, Strong vs Eventual consistency models.
+2. **Real-World High-Scale Architecture Problems (Q11 - Q25)**: TinyURL URL Shortener (Base62 + KGS), Distributed Rate Limiter (Token Bucket, Leaky Bucket, Redis Lua), WhatsApp/Telegram Real-Time Messaging (WebSocket, Presence, Cassandra), Twitter/X News Feed System (Fan-out on write vs read, Hybrid celebrity model), Uber/Grab Proximity Driver Dispatch (Geohash, Google S2, QuadTrees), Netflix Global Video Streaming CDN (Chunking, Transcoding, Dynamic DASH/HLS), Distributed Unique ID Generator (Snowflake ID 64-bit bits), Stripe Idempotent Payment Processing (Idempotency keys, distributed locks), Distributed Cache Cluster (LRU/LFU, Redis Cluster hash slots), Web Crawler (Frontier queue, robots.txt, deduplication, Bloom filter), Typeahead / Search Autocomplete (Trie with Top-K pre-computation), YouTube/TikTok Video Upload Pipeline (Resumable uploads, chunked parallel processing, CDN ingest), E-Commerce Flash Sale System (Virtual queue, Redis atomic inventory decrement), Metrics & Real-Time Monitoring Platform (Prometheus time-series TSDB, Grafana), Distributed Webhook Delivery Engine (Dead-letter queues, exponential backoff, HMAC signatures).
+3. **Distributed Transactions, Consensus & Reliability (Q26 - Q36)**: 2-Phase Commit (2PC) vs 3PC, Saga Pattern (Orchestration vs Choreography), Eventual Consistency & Transactional Outbox pattern, Raft Consensus Algorithm (Leader Election, Log Replication, Heartbeats), Paxos vs Raft, Circuit Breaker Pattern (Closed, Open, Half-Open), Dead Letter Queues (DLQ) & Poison pill handling, Message Delivery Semantics (At-most-once, At-least-once, Exactly-once), Gossip Protocol (Peer-to-peer cluster state), Distributed Locking with Redis (Redlock algorithm), Split-Brain scenarios & quorum fencing.
+4. **API Design, Security & Edge Networking (Q37 - Q43)**: REST vs GraphQL vs gRPC, API Gateway patterns (BFF - Backend For Frontend), WebSockets vs SSE vs Long Polling, CDN Edge caching & Cache-Control headers, API Idempotency & Replay attack defense, Zero Trust Security in Microservices (mTLS, SPIFFE), OAuth 2.0 PKCE flow in distributed single-page applications.
+5. **Back-of-the-Envelope Estimation & Production Calculations (Q44 - Q50)**: Back-of-the-envelope estimation cheat sheet (powers of two, latency numbers), QPS and Read/Write throughput sizing, Storage capacity sizing over 5 years, Network egress & network bandwidth sizing, Memory & Redis Cache cluster sizing (80/20 Pareto rule), High availability sizing (99.9% vs 99.99% downtime budgets), CDN cost optimization sizing, Closing and summarizing a system design interview.
+
+---
+
 ## 💻 Interactive Next.js Web Application
 
 This repository includes a full-fledged **Next.js 14 App Router** web portal providing an interactive study experience with Markdown rendering, instant search, copyable code blocks, and responsive layouts.
@@ -147,7 +157,7 @@ npm run start
 ```
 
 ### ⚡ Web App Features
-- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 745+ questions with live filtering and jump links.
+- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,690+ questions with live filtering and jump links.
 - **Table of Contents Sidebar**: Sticky scroll-spy outline for every track.
 - **Code Block Utilities**: One-click code copying and language tags.
 - **Server-Side Generation (SSG)**: Zero runtime markdown overhead with pre-rendered pages.

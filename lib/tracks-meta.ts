@@ -154,5 +154,18 @@ export const TRACKS: TrackMeta[] = [
     badgeColor: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-400 dark:border-rose-500/30',
     iconName: 'Users',
     tags: ['STAR Method', 'Behavioral', 'Leadership', 'HR', 'Conflict Resolution', 'Post-Mortems', 'Culture', 'Negotiation']
+  },
+  {
+    id: '10',
+    sectionNumber: 10,
+    slug: 'system-design',
+    title: 'Large-Scale System Design & Distributed Architecture Master (50 Qs)',
+    shortTitle: 'System Design (50 Qs)',
+    description: 'The definitive 50 system design interview questions covering distributed systems trade-offs, real-world architectures (TinyURL, Rate Limiter, WhatsApp, Twitter, Uber, Netflix), consensus, and back-of-the-envelope calculations.',
+    questionCount: 50,
+    filename: '10-system-design-distributed-systems.md',
+    badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-400 dark:border-indigo-500/30',
+    iconName: 'Network',
+    tags: ['System Design', 'Distributed Systems', 'Microservices', 'Kafka', 'Redis', 'Consistent Hashing', 'CAP Theorem', 'TinyURL', 'Rate Limiter']
   }
 ];

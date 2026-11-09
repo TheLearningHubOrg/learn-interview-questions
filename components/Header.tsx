@@ -55,7 +55,7 @@ export function Header({ onOpenSearch }: HeaderProps) {
             >
               <div className="flex items-center gap-2">
                 <Search className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" />
-                <span className="text-xs sm:text-sm font-medium">Search 1,600+ interview questions...</span>
+                <span className="text-xs sm:text-sm font-medium">Search 1,690+ interview questions...</span>
               </div>
               <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[11px] font-mono bg-muted border border-border rounded text-muted-foreground font-semibold">
                 ⌘K
@@ -150,13 +150,13 @@ export function Header({ onOpenSearch }: HeaderProps) {
                 className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-6 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground text-sm font-medium shadow-sm dark:shadow-none"
               >
                 <Search className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                <span>Search 1,600+ questions...</span>
+                <span>Search 1,690+ questions...</span>
               </button>
 
               {/* Tracks List */}
               <div className="space-y-1">
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider px-2 mb-2">
-                  All 9 Study Tracks
+                  All {TRACKS.length} Study Tracks
                 </p>
                 {TRACKS.map((t) => (
                   <Link

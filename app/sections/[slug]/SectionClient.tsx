@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Search, 
@@ -9,9 +9,11 @@ import {
   BookOpen, 
   ChevronRight,
   Layers,
-  Sparkles
+  Sparkles,
+  BookmarkCheck
 } from 'lucide-react';
 import { TrackMeta, ParsedQuestion } from '@/lib/tracks-meta';
+import { getTrackLastRead } from '@/lib/reading-history';
 
 interface SectionClientProps {
   track: TrackMeta;
@@ -21,6 +23,12 @@ interface SectionClientProps {
 
 export function SectionClient({ track, questions, allTracks }: SectionClientProps) {
   const [query, setQuery] = useState('');
+  const [lastReadNum, setLastReadNum] = useState<number | null>(null);
+
+  useEffect(() => {
+    const num = getTrackLastRead(track.slug);
+    if (num) setLastReadNum(num);
+  }, [track.slug]);
 
   // Group questions by Part
   const groupedByPart = useMemo(() => {
@@ -92,13 +100,27 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
 
           {/* Primary Action Buttons */}
           <div className="flex flex-wrap items-center gap-4">
+            {lastReadNum && lastReadNum > 1 && (
+              <Link
+                href={`/sections/${track.slug}/${lastReadNum}`}
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-purple-600/30 transition-all active:scale-95 animate-in fade-in"
+              >
+                <BookmarkCheck className="h-4 w-4" />
+                <span>Continue Q{lastReadNum}</span>
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            )}
+
             <Link
               href={`/sections/${track.slug}/1`}
-              className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/25 transition-all active:scale-95"
+              className={`flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-all active:scale-95 ${
+                lastReadNum && lastReadNum > 1
+                  ? 'bg-card hover:bg-card-hover border border-border text-foreground shadow-sm'
+                  : 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/25'
+              }`}
             >
-              <Play className="h-4 w-4 fill-white" />
-              <span>Start from Question 1</span>
-              <ArrowRight className="h-4 w-4 ml-1" />
+              <Play className="h-4 w-4 fill-current" />
+              <span>Start from Q1</span>
             </Link>
 
             {/* Search Input Filter */}
@@ -170,23 +192,33 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {partQuestions.map((q) => (
-                  <Link
-                    key={q.number}
-                    href={`/sections/${track.slug}/${q.number}`}
-                    className="p-4 rounded-xl bg-card border border-border hover:border-purple-400 hover:bg-card-hover transition-all flex items-start justify-between gap-3 group shadow-sm dark:shadow-none"
-                  >
-                    <div className="flex items-start gap-3 min-w-0">
-                      <span className="w-8 h-8 rounded-lg bg-muted text-foreground border border-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all">
-                        {q.number}
-                      </span>
-                      <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
-                        {q.title}
-                      </p>
-                    </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 shrink-0 mt-1 transform group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                ))}
+                {partQuestions.map((q) => {
+                  const isLastRead = q.number === lastReadNum;
+                  return (
+                    <Link
+                      key={q.number}
+                      href={`/sections/${track.slug}/${q.number}`}
+                      className={`p-4 rounded-xl bg-card border ${isLastRead ? 'border-purple-500 dark:border-purple-400 ring-1 ring-purple-500/30' : 'border-border'} hover:border-purple-400 hover:bg-card-hover transition-all flex items-start justify-between gap-3 group shadow-sm dark:shadow-none`}
+                    >
+                      <div className="flex items-start gap-3 min-w-0">
+                        <span className={`w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 transition-all ${isLastRead ? 'bg-purple-600 text-white' : 'bg-muted text-foreground border border-border group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600'}`}>
+                          {q.number}
+                        </span>
+                        <div className="min-w-0">
+                          {isLastRead && (
+                            <span className="inline-block px-1.5 py-0.5 mb-1 rounded text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300 border border-purple-300 dark:border-purple-500/30">
+                              Resume Here
+                            </span>
+                          )}
+                          <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
+                            {q.title}
+                          </p>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 shrink-0 mt-1 transform group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           ))}

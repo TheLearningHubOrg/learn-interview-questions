@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { getAllTracks } from '@/lib/tracks';
 import { TrackCard } from '@/components/TrackCard';
+import { ContinueReadingBanner } from '@/components/ContinueReadingBanner';
 
 export default async function HomePage() {
   const tracks = await getAllTracks();
@@ -133,6 +134,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Continue Reading Banner (client-side persisted) */}
+      <ContinueReadingBanner />
 
       {/* Tracks Section */}
       <section id="tracks" className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

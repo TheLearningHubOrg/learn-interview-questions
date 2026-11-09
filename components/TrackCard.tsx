@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Shield, 
@@ -16,9 +16,11 @@ import {
   Network,
   ArrowRight,
   Play,
-  List
+  List,
+  BookmarkCheck
 } from 'lucide-react';
 import { TrackMeta } from '@/lib/tracks-meta';
+import { getTrackLastRead } from '@/lib/reading-history';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Shield,
@@ -40,6 +42,12 @@ interface TrackCardProps {
 
 export function TrackCard({ track }: TrackCardProps) {
   const IconComponent = ICON_MAP[track.iconName] || Code2;
+  const [lastReadNum, setLastReadNum] = useState<number | null>(null);
+
+  useEffect(() => {
+    const num = getTrackLastRead(track.slug);
+    if (num) setLastReadNum(num);
+  }, [track.slug]);
 
   return (
     <div className="group relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl bg-card border border-border hover:border-purple-400/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1">
@@ -100,14 +108,25 @@ export function TrackCard({ track }: TrackCardProps) {
           <span>All Questions</span>
         </Link>
 
-        <Link
-          href={`/sections/${track.slug}/1`}
-          className="flex items-center gap-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-md shadow-purple-600/20 py-1.5 px-3 rounded-lg transition-all active:scale-95"
-        >
-          <Play className="h-3 w-3 fill-current" />
-          <span>Start Q1</span>
-          <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
-        </Link>
+        {lastReadNum && lastReadNum > 1 ? (
+          <Link
+            href={`/sections/${track.slug}/${lastReadNum}`}
+            className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-md shadow-purple-600/25 py-1.5 px-3 rounded-lg transition-all active:scale-95 animate-in fade-in"
+          >
+            <BookmarkCheck className="h-3.5 w-3.5" />
+            <span>Resume Q{lastReadNum}</span>
+            <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
+          </Link>
+        ) : (
+          <Link
+            href={`/sections/${track.slug}/1`}
+            className="flex items-center gap-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-md shadow-purple-600/20 py-1.5 px-3 rounded-lg transition-all active:scale-95"
+          >
+            <Play className="h-3 w-3 fill-current" />
+            <span>Start Q1</span>
+            <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
+          </Link>
+        )}
       </div>
     </div>
   );

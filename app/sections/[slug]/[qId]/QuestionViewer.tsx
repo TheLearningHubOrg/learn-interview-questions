@@ -21,6 +21,7 @@ import {
 import { QuestionViewData } from '@/lib/tracks-meta';
 import { CodeBlock } from '@/components/CodeBlock';
 import { MultiLangCodeTabs, LanguageBlock } from '@/components/MultiLangCodeTabs';
+import { saveLastRead } from '@/lib/reading-history';
 
 function parseQuestionContent(content: string) {
   const langRegex = /####\s+(Python 3|Python|JavaScript|JS|TypeScript|TS|Java|C\+\+|Go|Rust)\s*\n+```(\w+)\n([\s\S]*?)```/gi;
@@ -104,6 +105,18 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
       // Ignore storage errors
     }
   }, [storageKey]);
+
+  // Save current question to reading history
+  useEffect(() => {
+    saveLastRead({
+      trackSlug: track.slug,
+      trackTitle: track.shortTitle,
+      sectionNumber: track.sectionNumber,
+      questionNumber: question.number,
+      questionTitle: question.title,
+      timestamp: Date.now(),
+    });
+  }, [track.slug, track.shortTitle, track.sectionNumber, question.number, question.title]);
 
   // Toggle studied status
   const toggleStudied = (num: number) => {

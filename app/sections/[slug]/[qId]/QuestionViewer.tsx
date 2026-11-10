@@ -17,7 +17,12 @@ import {
   X, 
   ChevronLeft,
   ChevronRight,
-  Share2
+  Share2,
+  BrainCircuit,
+  Eye,
+  EyeOff,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { QuestionViewData } from '@/lib/tracks-meta';
 import { CodeBlock } from '@/components/CodeBlock';
@@ -29,7 +34,10 @@ import {
   toggleBookmark, 
   getAllBookmarks, 
   BOOKMARKS_UPDATE_EVENT,
-  STUDY_PROGRESS_UPDATE_EVENT 
+  STUDY_PROGRESS_UPDATE_EVENT,
+  getFlashcardMode,
+  toggleFlashcardMode,
+  FLASHCARD_MODE_UPDATE_EVENT
 } from '@/lib/study-progress';
 
 function parseQuestionContent(content: string) {
@@ -102,6 +110,21 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
   const [studiedMap, setStudiedMap] = useState<Record<number, boolean>>({});
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [bookmarkedSet, setBookmarkedSet] = useState<Set<number>>(new Set());
+  const [isFlashcardMode, setIsFlashcardMode] = useState<boolean>(false);
+  const [isAnswerRevealed, setIsAnswerRevealed] = useState<boolean>(false);
+
+  // Reset answer reveal whenever question changes
+  useEffect(() => {
+    setIsAnswerRevealed(false);
+  }, [question.number]);
+
+  // Load and listen to Flashcard mode preference
+  useEffect(() => {
+    setIsFlashcardMode(getFlashcardMode());
+    const onFlashcardUpdate = () => setIsFlashcardMode(getFlashcardMode());
+    window.addEventListener(FLASHCARD_MODE_UPDATE_EVENT, onFlashcardUpdate);
+    return () => window.removeEventListener(FLASHCARD_MODE_UPDATE_EVENT, onFlashcardUpdate);
+  }, []);
 
   const storageKey = `studied_${track.slug}`;
 
@@ -168,7 +191,41 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
 
   const isCurrentStudied = !!studiedMap[question.number];
 
-  // Keyboard Navigation: ArrowLeft for Prev, ArrowRight for Next, G for Grid
+  const handleToggleFlashcardMode = () => {
+    const next = toggleFlashcardMode();
+    setIsFlashcardMode(next);
+    if (!next) {
+      setIsAnswerRevealed(true);
+    } else {
+      setIsAnswerRevealed(false);
+    }
+  };
+
+  const handleNeedReview = () => {
+    if (!isBookmarked) {
+      handleToggleBookmark();
+    }
+    if (nextQuestion) {
+      router.push(`/sections/${track.slug}/${nextQuestion.number}`);
+    }
+  };
+
+  const handleMastered = () => {
+    if (!isCurrentStudied) {
+      toggleStudied(question.number);
+    }
+    if (nextQuestion) {
+      router.push(`/sections/${track.slug}/${nextQuestion.number}`);
+    }
+  };
+
+  // Keyboard Navigation:
+  // ArrowLeft/ArrowRight: Prev/Next
+  // G: Jump Grid
+  // F: Toggle Flashcard Mode
+  // Space: Reveal/Hide Answer in Flashcard Mode
+  // B: Need Review (in Flashcard mode when revealed)
+  // S: Mastered (in Flashcard mode when revealed)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
@@ -181,12 +238,34 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         router.push(`/sections/${track.slug}/${nextQuestion.number}`);
       } else if (e.key === 'g' || e.key === 'G') {
         setIsGridOpen((prev) => !prev);
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        handleToggleFlashcardMode();
+      } else if (e.code === 'Space' && isFlashcardMode) {
+        e.preventDefault();
+        setIsAnswerRevealed((prev) => !prev);
+      } else if ((e.key === 'b' || e.key === 'B') && isFlashcardMode && isAnswerRevealed) {
+        e.preventDefault();
+        handleNeedReview();
+      } else if ((e.key === 's' || e.key === 'S') && isFlashcardMode && isAnswerRevealed) {
+        e.preventDefault();
+        handleMastered();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [prevQuestion, nextQuestion, router, track.slug]);
+  }, [
+    prevQuestion, 
+    nextQuestion, 
+    router, 
+    track.slug, 
+    isFlashcardMode, 
+    isAnswerRevealed, 
+    isBookmarked, 
+    isCurrentStudied,
+    question.number
+  ]);
 
   const handleCopyLink = async () => {
     if (typeof window !== 'undefined') {
@@ -248,6 +327,24 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             >
               <Bookmark className={`h-3.5 w-3.5 ${isBookmarked ? 'fill-current text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`} />
               <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+            </button>
+
+            {/* Self-Test / Flashcard Mode Toggle */}
+            <button
+              type="button"
+              onClick={handleToggleFlashcardMode}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer ${
+                isFlashcardMode
+                  ? 'bg-purple-600 text-white border-purple-500 shadow-purple-600/25 ring-2 ring-purple-500/20'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
+              }`}
+              title="Toggle Self-Test Flashcard Mode (Press F)"
+            >
+              <BrainCircuit className="h-3.5 w-3.5" />
+              <span>{isFlashcardMode ? 'Self-Test ON' : 'Self-Test'}</span>
+              <kbd className="hidden sm:inline-block text-[10px] font-mono px-1 rounded bg-black/15 dark:bg-white/10 ml-0.5">
+                F
+              </kbd>
             </button>
 
             {/* Question Grid Modal Trigger */}
@@ -320,17 +417,162 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
           </h1>
         </div>
 
-        {/* Answer Content with Syntax-Highlighted Markdown */}
-        <div className="markdown-body">
-          {(() => {
-            const parsed = parseQuestionContent(question.content);
-            if (parsed.isMultiLang) {
-              return (
-                <>
+        {/* Answer Content with Syntax-Highlighted Markdown & Self-Test Blur */}
+        {isFlashcardMode && !isAnswerRevealed ? (
+          <div className="relative mt-4">
+            {/* Blurred answer preview */}
+            <div className="filter blur-md opacity-20 select-none pointer-events-none max-h-[360px] overflow-hidden" aria-hidden="true">
+              <div className="markdown-body">
+                {(() => {
+                  const parsed = parseQuestionContent(question.content);
+                  if (parsed.isMultiLang) {
+                    return (
+                      <>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {parsed.explanation}
+                        </ReactMarkdown>
+                        <MultiLangCodeTabs blocks={parsed.blocks} />
+                      </>
+                    );
+                  }
+                  return (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {question.content}
+                    </ReactMarkdown>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Frosted Glass Active Recall Overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-card/80 backdrop-blur-md rounded-2xl border border-purple-500/30 shadow-lg">
+              <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-3.5 shadow-inner">
+                <BrainCircuit className="w-7 h-7" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-foreground mb-1.5">
+                Self-Test Mode Active
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-md mb-6 leading-relaxed">
+                Formulate your answer or speak your technical explanation out loud as if you are in a real interview loop.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => setIsAnswerRevealed(true)}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow-lg shadow-purple-600/30 transition-all active:scale-95 cursor-pointer"
+              >
+                <Eye className="w-4 h-4" />
+                <span>Reveal Answer</span>
+                <kbd className="text-[11px] font-mono bg-purple-800/80 px-2 py-0.5 rounded text-purple-200 ml-1">
+                  Space
+                </kbd>
+              </button>
+
+              <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-4 font-mono">
+                <span>Press <kbd className="px-1.5 py-0.5 bg-muted rounded border border-border text-[10px]">Space</kbd> to reveal</span>
+                <span>•</span>
+                <span>Press <kbd className="px-1.5 py-0.5 bg-muted rounded border border-border text-[10px]">F</kbd> to exit</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            {isFlashcardMode && isAnswerRevealed && (
+              <div className="flex items-center justify-between p-3 mb-6 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-800 dark:text-purple-300">
+                <span className="flex items-center gap-2 font-medium">
+                  <Eye className="w-4 h-4 text-purple-500" />
+                  <span>Answer Revealed — Rate your understanding below</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsAnswerRevealed(false)}
+                  className="text-purple-600 dark:text-purple-400 font-bold hover:underline cursor-pointer"
+                >
+                  Hide again (Space)
+                </button>
+              </div>
+            )}
+
+            <div className="markdown-body">
+              {(() => {
+                const parsed = parseQuestionContent(question.content);
+                if (parsed.isMultiLang) {
+                  return (
+                    <>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeSlug, [rehypeHighlight, { detect: true, ignoreMissing: true }]]}
+                        components={{
+                          img: renderMarkdownImage,
+                          table({ children }) {
+                            return (
+                              <div className="table-wrapper">
+                                <table>{children}</table>
+                              </div>
+                            );
+                          },
+                        }}
+                      >
+                        {parsed.explanation}
+                      </ReactMarkdown>
+
+                      {/* Multi-Language Interactive Code IDE */}
+                      <div className="mt-8 pt-4 border-t border-border/60">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-foreground tracking-wide">Multi-Language Solutions</span>
+                            <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold border border-purple-500/20">
+                              Python 3 • JavaScript • TypeScript • Java • C++
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-muted-foreground font-medium">Switch tabs or choose All</span>
+                        </div>
+                        <MultiLangCodeTabs blocks={parsed.blocks} />
+                      </div>
+                    </>
+                  );
+                }
+
+                return (
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeSlug, [rehypeHighlight, { detect: true, ignoreMissing: true }]]}
                     components={{
+                      pre({ children }) {
+                        return <>{children}</>;
+                      },
+                      code({ className, children, ...props }) {
+                        const match = /language-(\w+)/.exec(className || '');
+                        const isInline = !match;
+
+                        if (isInline) {
+                          return (
+                            <code className={className} {...props}>
+                              {children}
+                            </code>
+                          );
+                        }
+
+                        const extractRawText = (node: any): string => {
+                          if (typeof node === 'string') return node;
+                          if (Array.isArray(node)) return node.map(extractRawText).join('');
+                          if (node?.props?.children) return extractRawText(node.props.children);
+                          return '';
+                        };
+
+                        const rawCode = extractRawText(children).replace(/\n$/, '');
+                        const lang = match ? match[1] : '';
+
+                        if (lang.toLowerCase() === 'mermaid') {
+                          return <MermaidBlock chart={rawCode} />;
+                        }
+
+                        return (
+                          <CodeBlock language={lang} codeString={rawCode}>
+                            {children}
+                          </CodeBlock>
+                        );
+                      },
                       img: renderMarkdownImage,
                       table({ children }) {
                         return (
@@ -341,83 +583,53 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
                       },
                     }}
                   >
-                    {parsed.explanation}
+                    {question.content}
                   </ReactMarkdown>
+                );
+              })()}
+            </div>
 
-                  {/* Multi-Language Interactive Code IDE */}
-                  <div className="mt-8 pt-4 border-t border-border/60">
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-foreground tracking-wide">Multi-Language Solutions</span>
-                        <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold border border-purple-500/20">
-                          Python 3 • JavaScript • TypeScript • Java • C++
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-muted-foreground font-medium">Switch tabs or choose All</span>
-                    </div>
-                    <MultiLangCodeTabs blocks={parsed.blocks} />
-                  </div>
-                </>
-              );
-            }
+            {/* Active Recall Self-Assessment Bar (only shown in Flashcard mode when revealed) */}
+            {isFlashcardMode && isAnswerRevealed && (
+              <div className="mt-8 p-5 rounded-2xl bg-gradient-to-r from-muted/50 to-card border border-border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-500" />
+                    <span>How confident did you feel answering this?</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Self-assessing updates your progress and bookmarks tricky questions for revision.
+                  </p>
+                </div>
 
-            return (
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeSlug, [rehypeHighlight, { detect: true, ignoreMissing: true }]]}
-                components={{
-                  pre({ children }) {
-                    // Pass children cleanly to avoid pre > div invalid HTML
-                    return <>{children}</>;
-                  },
-                  code({ className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || '');
-                    const isInline = !match;
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleNeedReview}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 transition-all active:scale-95 cursor-pointer"
+                    title="Bookmark this question and advance to next"
+                  >
+                    <Bookmark className="w-3.5 h-3.5 fill-current" />
+                    <span>Need Review</span>
+                    <kbd className="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20">B</kbd>
+                  </button>
 
-                    if (isInline) {
-                      return (
-                        <code className={className} {...props}>
-                          {children}
-                        </code>
-                      );
-                    }
-
-                    // Block code: extract raw text content for copy button
-                    const extractRawText = (node: any): string => {
-                      if (typeof node === 'string') return node;
-                      if (Array.isArray(node)) return node.map(extractRawText).join('');
-                      if (node?.props?.children) return extractRawText(node.props.children);
-                      return '';
-                    };
-
-                    const rawCode = extractRawText(children).replace(/\n$/, '');
-                    const lang = match ? match[1] : '';
-
-                    if (lang.toLowerCase() === 'mermaid') {
-                      return <MermaidBlock chart={rawCode} />;
-                    }
-
-                    return (
-                      <CodeBlock language={lang} codeString={rawCode}>
-                        {children}
-                      </CodeBlock>
-                    );
-                  },
-                  img: renderMarkdownImage,
-                      table({ children }) {
-                    return (
-                      <div className="table-wrapper">
-                        <table>{children}</table>
-                      </div>
-                    );
-                  },
-                }}
-              >
-                {question.content}
-              </ReactMarkdown>
-            );
-          })()}
-        </div>
+                  <button
+                    type="button"
+                    onClick={handleMastered}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/25 transition-all active:scale-95 cursor-pointer"
+                    title="Mark question studied and advance to next"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Mastered</span>
+                    <kbd className="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-800">S</kbd>
+                    {nextQuestion && <ArrowRight className="w-3.5 h-3.5 ml-1" />}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </article>
 
       {/* Bottom Previous & Next Navigation */}

@@ -96,7 +96,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
           </div>
 
           {/* Right Action Icons & Toggles */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {/* Mobile Search Button */}
             <button
               type="button"
@@ -120,7 +120,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
             <button
               type="button"
               onClick={() => setIsStreakOpen(true)}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm dark:shadow-none active:scale-95 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm dark:shadow-none active:scale-95 cursor-pointer ${
                 streakData.currentStreak > 0
                   ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30 hover:bg-orange-500/20'
                   : 'bg-card text-muted-foreground border-border hover:text-foreground hover:bg-card-hover'
@@ -145,7 +145,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
             <button
               type="button"
               onClick={onOpenBookmarks}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-all shadow-sm dark:shadow-none active:scale-95"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-all shadow-sm dark:shadow-none active:scale-95"
               title="View saved questions for review"
               aria-label="View bookmarked questions"
             >
@@ -193,7 +193,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
           onClick={() => setMobileMenuOpen(false)}
         >
           <div
-            className="fixed inset-y-0 right-0 w-full max-w-xs bg-background border-l border-border p-6 shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-300"
+            className="fixed inset-y-0 right-0 w-full max-w-xs bg-background border-l border-border p-5 sm:p-6 shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <div>

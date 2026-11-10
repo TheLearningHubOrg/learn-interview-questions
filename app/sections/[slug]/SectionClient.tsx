@@ -164,8 +164,8 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
               )}
             </div>
 
-            <div className="text-xs text-muted-foreground font-semibold">
-              Section {track.sectionNumber} of {allTracks.length}
+            <div className="hidden sm:block text-xs text-muted-foreground font-semibold">
+              Free & Open Source
             </div>
           </div>
 
@@ -177,7 +177,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
           </p>
 
           {/* Primary Action Buttons */}
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             {lastReadNum && lastReadNum > 1 && (
               <Link
                 href={`/sections/${track.slug}/${lastReadNum}`}
@@ -202,7 +202,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
             </Link>
 
             {/* Search Input Filter */}
-            <div className="relative flex-1 min-w-[260px] max-w-md">
+            <div className="relative w-full sm:flex-1 sm:min-w-[260px] max-w-md">
               <Search className="h-4 w-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"

@@ -16,18 +16,18 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           
           {/* Brand & Platform Identity */}
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 text-center sm:text-left">
+            <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
               <BookOpen className="h-4 w-4 text-purple-400" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <p className="text-sm font-semibold text-foreground flex items-center justify-center sm:justify-start gap-2">
                 The Learning Hub Org
                 <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
                   Open Source
                 </span>
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground text-center sm:text-left">
                 Free & open-source engineering interview platform • 1,849+ Questions • 13 Specialized Tracks
               </p>
             </div>

@@ -100,7 +100,7 @@ export function QuestionNotesDrawer({
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors shrink-0 ${
             hasNote
               ? 'bg-purple-600 text-white shadow-sm'
               : 'bg-muted text-muted-foreground'
@@ -108,7 +108,7 @@ export function QuestionNotesDrawer({
             <PencilLine className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-bold text-foreground">
                 My Personal Notes & Cheat Sheet
               </span>
@@ -172,7 +172,7 @@ export function QuestionNotesDrawer({
               Supports markdown formatting
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {hasNote && (
                 <button
                   type="button"
@@ -201,3 +201,4 @@ export function QuestionNotesDrawer({
     </div>
   );
 }
+

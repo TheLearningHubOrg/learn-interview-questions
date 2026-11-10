@@ -82,7 +82,7 @@ export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCard
           {/* Top Row: Overall Summary */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-border">
             {/* Left: Circular Ring + Headline */}
-            <div className="flex items-center gap-5">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-4 sm:gap-5 text-center sm:text-left">
               {/* Circular SVG Progress Ring */}
               <div className="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0 flex items-center justify-center">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
@@ -126,7 +126,7 @@ export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCard
 
               {/* Title & Status */}
               <div>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center justify-center sm:justify-start gap-2 mb-1 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20">
                     Curriculum Readiness
                   </span>
@@ -144,7 +144,7 @@ export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCard
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
                   {stats.totalStudied === 0
-                    ? 'Mark questions as studied as you practice to track your overall curriculum completion across all 12 tracks.'
+                    ? `Mark questions as studied as you practice to track your overall curriculum completion across all ${tracks.length} tracks.`
                     : `You've invested approximately ~${hoursInvested} hours of focused interview preparation across ${tracks.length} engineering tracks.`}
                 </p>
               </div>
@@ -214,13 +214,13 @@ export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCard
           </div>
 
           {/* Bottom Accordion Trigger: Track-by-Track Breakdown */}
-          <div className="pt-4 flex items-center justify-between">
+          <div className="pt-4 flex items-center justify-between gap-2 flex-wrap">
             <button
               type="button"
               onClick={() => setExpanded((prev) => !prev)}
               className="flex items-center gap-2 text-xs sm:text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
             >
-              <span>{expanded ? 'Hide Track Readiness Breakdown' : 'View Track Readiness Breakdown (All 12 Tracks)'}</span>
+              <span>{expanded ? 'Hide Track Readiness Breakdown' : `View Track Readiness Breakdown (All ${tracks.length} Tracks)`}</span>
               {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
 

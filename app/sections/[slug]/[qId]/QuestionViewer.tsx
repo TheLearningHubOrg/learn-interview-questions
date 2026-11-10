@@ -325,26 +325,27 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-start sm:justify-end">
             {/* Studied Toggle */}
             <button
               type="button"
               onClick={() => toggleStudied(question.number)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none ${
                 isCurrentStudied
                   ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
               }`}
             >
               <CheckCircle2 className={`h-3.5 w-3.5 ${isCurrentStudied ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`} />
-              <span>{isCurrentStudied ? 'Studied' : 'Mark as Studied'}</span>
+              <span className="hidden sm:inline">{isCurrentStudied ? 'Studied' : 'Mark as Studied'}</span>
+              <span className="sm:hidden">{isCurrentStudied ? 'Studied' : 'Study'}</span>
             </button>
 
             {/* Bookmark / Save for Review Toggle */}
             <button
               type="button"
               onClick={handleToggleBookmark}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none ${
                 isBookmarked
                   ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30 shadow-amber-500/10'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-amber-400/50'
@@ -352,14 +353,15 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               title={isBookmarked ? 'Remove from review cheat sheet' : 'Save question to review cheat sheet'}
             >
               <Bookmark className={`h-3.5 w-3.5 ${isBookmarked ? 'fill-current text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`} />
-              <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+              <span className="hidden sm:inline">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+              <span className="sm:hidden">{isBookmarked ? 'Saved' : 'Save'}</span>
             </button>
 
             {/* Self-Test / Flashcard Mode Toggle */}
             <button
               type="button"
               onClick={handleToggleFlashcardMode}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer ${
                 isFlashcardMode
                   ? 'bg-purple-600 text-white border-purple-500 shadow-purple-600/25 ring-2 ring-purple-500/20'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -367,7 +369,8 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               title="Toggle Self-Test Flashcard Mode (Press F)"
             >
               <BrainCircuit className="h-3.5 w-3.5" />
-              <span>{isFlashcardMode ? 'Self-Test ON' : 'Self-Test'}</span>
+              <span className="hidden sm:inline">{isFlashcardMode ? 'Self-Test ON' : 'Self-Test'}</span>
+              <span className="sm:hidden">{isFlashcardMode ? 'Test ON' : 'Self-Test'}</span>
               <kbd className="hidden sm:inline-block text-[10px] font-mono px-1 rounded bg-black/15 dark:bg-white/10 ml-0.5">
                 F
               </kbd>
@@ -377,7 +380,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={() => setIsNotesOpen((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer ${
                 isNotesOpen || hasNote
                   ? 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -395,7 +398,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={() => setIsGridOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all text-xs font-semibold shadow-sm dark:shadow-none"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all text-xs font-semibold shadow-sm dark:shadow-none"
               title="Jump to question (Press G)"
             >
               <Grid className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
@@ -470,7 +473,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               </span>
             ))}
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug break-words [overflow-wrap:anywhere]">
             {question.title}
           </h1>
         </div>
@@ -649,7 +652,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
 
             {/* Active Recall Self-Assessment Bar (only shown in Flashcard mode when revealed) */}
             {isFlashcardMode && isAnswerRevealed && (
-              <div className="mt-8 p-5 rounded-2xl bg-gradient-to-r from-muted/50 to-card border border-border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="mt-8 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-muted/50 to-card border border-border shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-bold text-foreground flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-purple-500" />

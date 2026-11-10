@@ -224,3 +224,4 @@ export function getCurrentWeekDays(activeDates: string[]): WeekDayStatus[] {
 
   return days;
 }
+

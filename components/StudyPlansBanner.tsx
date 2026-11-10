@@ -74,7 +74,7 @@ export function StudyPlansBanner() {
               <div
                 key={plan.id}
                 onClick={() => setSelectedPlan(plan)}
-                className="group relative rounded-3xl bg-card border border-border p-6 sm:p-7 shadow-sm hover:shadow-xl hover:border-purple-500/40 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden"
+                className="group relative rounded-3xl bg-card border border-border p-5 sm:p-7 shadow-sm hover:shadow-xl hover:border-purple-500/40 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden"
               >
                 {/* Ambient Card Background Glow */}
                 <div
@@ -83,18 +83,18 @@ export function StudyPlansBanner() {
 
                 <div>
                   {/* Top Row: Icon + Badge */}
-                  <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                     <div
-                      className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${plan.gradient} text-white flex items-center justify-center shadow-md shadow-orange-500/10 group-hover:scale-105 transition-transform duration-200`}
+                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr ${plan.gradient} text-white flex items-center justify-center shadow-md shadow-orange-500/10 group-hover:scale-105 transition-transform duration-200 shrink-0`}
                     >
                       {is7Day ? (
-                        <Zap className="w-6 h-6 fill-current" />
+                        <Zap className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
                       ) : (
-                        <Trophy className="w-6 h-6 fill-current" />
+                        <Trophy className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-muted/70 text-foreground border border-border flex items-center gap-1.5">
                         <Clock className="w-3 h-3 text-muted-foreground" />
                         <span>{plan.questionsPerDay} Qs / day</span>
@@ -134,7 +134,7 @@ export function StudyPlansBanner() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
                     <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>{plan.days.length} Daily Modules</span>
@@ -164,3 +164,4 @@ export function StudyPlansBanner() {
     </>
   );
 }
+

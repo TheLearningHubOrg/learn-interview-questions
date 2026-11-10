@@ -73,7 +73,7 @@ export function BookmarksModal({ isOpen, onClose }: BookmarksModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between gap-3 bg-muted/40">
+        <div className="p-3.5 sm:p-5 border-b border-border flex items-center justify-between gap-3 bg-muted/40">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
               <Bookmark className="h-5 w-5 fill-current" />

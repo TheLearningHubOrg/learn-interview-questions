@@ -59,10 +59,10 @@ export function ContinueReadingBanner() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 self-end sm:self-center shrink-0">
+          <div className="flex items-center justify-between sm:justify-start gap-2.5 w-full sm:w-auto shrink-0">
             <Link
               href={`/sections/${lastRead.trackSlug}/${lastRead.questionNumber}`}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/25 transition-all active:scale-95"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/25 transition-all active:scale-95 flex-1 sm:flex-initial"
             >
               <span>Continue Reading</span>
               <ArrowRight className="h-4 w-4" />

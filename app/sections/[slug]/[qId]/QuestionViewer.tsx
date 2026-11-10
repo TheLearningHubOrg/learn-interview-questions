@@ -22,7 +22,8 @@ import {
   Eye,
   EyeOff,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Zap
 } from 'lucide-react';
 import { QuestionViewData } from '@/lib/tracks-meta';
 import { CodeBlock } from '@/components/CodeBlock';
@@ -40,6 +41,7 @@ import {
   FLASHCARD_MODE_UPDATE_EVENT
 } from '@/lib/study-progress';
 import { recordStudyActivity } from '@/lib/study-streak';
+import { getQuestionStudyPlanBadges } from '@/lib/study-plans';
 
 function parseQuestionContent(content: string) {
   const langRegex = /####\s+(Python 3|Python|JavaScript|JS|TypeScript|TS|Java|C\+\+|Go|Rust)\s*\n+```(\w+)\n([\s\S]*?)```/gi;
@@ -283,6 +285,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
   };
 
   const progressPercent = Math.round((question.number / totalInTrack) * 100);
+  const planBadges = getQuestionStudyPlanBadges(track.slug, question.number);
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -416,6 +419,20 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             </span>
             <span className="text-xs text-muted-foreground">•</span>
             <span className="text-xs text-muted-foreground font-semibold">{question.part}</span>
+
+            {/* Curated Study Plan Badge */}
+            {planBadges.map((b) => (
+              <span
+                key={b.planId}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25"
+                title={`${b.planTitle} • Day ${b.dayNumber}`}
+              >
+                <Zap className="w-3 h-3 text-amber-500 fill-current" />
+                <span>
+                  {b.planId === '7-day-sprint' ? '7-Day Sprint' : '30-Day Master'}: Day {b.dayNumber} ({b.importance.replace('_', ' ')})
+                </span>
+              </span>
+            ))}
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug">
             {question.title}

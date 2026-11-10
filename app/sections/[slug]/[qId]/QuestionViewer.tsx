@@ -23,7 +23,8 @@ import {
   EyeOff,
   Sparkles,
   ArrowRight,
-  Zap
+  Zap,
+  PencilLine
 } from 'lucide-react';
 import { QuestionViewData } from '@/lib/tracks-meta';
 import { CodeBlock } from '@/components/CodeBlock';
@@ -42,6 +43,8 @@ import {
 } from '@/lib/study-progress';
 import { recordStudyActivity } from '@/lib/study-streak';
 import { getQuestionStudyPlanBadges } from '@/lib/study-plans';
+import { QuestionNotesDrawer } from '@/components/QuestionNotesDrawer';
+import { getQuestionNote, NOTES_UPDATE_EVENT } from '@/lib/study-notes';
 
 function parseQuestionContent(content: string) {
   const langRegex = /####\s+(Python 3|Python|JavaScript|JS|TypeScript|TS|Java|C\+\+|Go|Rust)\s*\n+```(\w+)\n([\s\S]*?)```/gi;
@@ -115,6 +118,18 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
   const [bookmarkedSet, setBookmarkedSet] = useState<Set<number>>(new Set());
   const [isFlashcardMode, setIsFlashcardMode] = useState<boolean>(false);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState<boolean>(false);
+  const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
+  const [hasNote, setHasNote] = useState<boolean>(false);
+
+  // Check if note exists for this question
+  useEffect(() => {
+    const checkNote = () => {
+      setHasNote(getQuestionNote(track.slug, question.number).trim().length > 0);
+    };
+    checkNote();
+    window.addEventListener(NOTES_UPDATE_EVENT, checkNote);
+    return () => window.removeEventListener(NOTES_UPDATE_EVENT, checkNote);
+  }, [track.slug, question.number]);
 
   // Reset answer reveal whenever question changes
   useEffect(() => {
@@ -257,6 +272,9 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
       } else if ((e.key === 's' || e.key === 'S') && isFlashcardMode && isAnswerRevealed) {
         e.preventDefault();
         handleMastered();
+      } else if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        setIsNotesOpen((prev) => !prev);
       }
     };
 
@@ -352,6 +370,24 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               <span>{isFlashcardMode ? 'Self-Test ON' : 'Self-Test'}</span>
               <kbd className="hidden sm:inline-block text-[10px] font-mono px-1 rounded bg-black/15 dark:bg-white/10 ml-0.5">
                 F
+              </kbd>
+            </button>
+
+            {/* Personal Notes Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsNotesOpen((prev) => !prev)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer ${
+                isNotesOpen || hasNote
+                  ? 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
+              }`}
+              title="Toggle Personal Notes (Press N)"
+            >
+              <PencilLine className="h-3.5 w-3.5" />
+              <span>{hasNote ? 'Notes (1)' : 'Notes'}</span>
+              <kbd className="hidden sm:inline-block text-[10px] font-mono px-1 rounded bg-black/15 dark:bg-white/10 ml-0.5">
+                N
               </kbd>
             </button>
 
@@ -654,8 +690,18 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         )}
       </article>
 
+      {/* Personal Study Notes Drawer */}
+      <QuestionNotesDrawer
+        trackSlug={track.slug}
+        trackTitle={track.shortTitle}
+        questionNumber={question.number}
+        questionTitle={question.title}
+        isOpen={isNotesOpen}
+        onToggle={() => setIsNotesOpen((prev) => !prev)}
+      />
+
       {/* Bottom Previous & Next Navigation */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-6">
         {prevQuestion ? (
           <Link
             href={`/sections/${track.slug}/${prevQuestion.number}`}

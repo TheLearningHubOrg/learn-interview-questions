@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Bookmark, X, ArrowRight, Trash2, BookOpen, ExternalLink } from 'lucide-react';
+import { Bookmark, X, ArrowRight, Trash2, BookOpen, ExternalLink, Download } from 'lucide-react';
 import { 
   BookmarkItem, 
   getAllBookmarks, 
@@ -10,6 +10,7 @@ import {
   clearAllBookmarks, 
   BOOKMARKS_UPDATE_EVENT 
 } from '@/lib/study-progress';
+import { downloadNotesFile } from '@/lib/study-notes';
 
 interface BookmarksModalProps {
   isOpen: boolean;
@@ -198,11 +199,20 @@ export function BookmarksModal({ isOpen, onClose }: BookmarksModalProps) {
 
         {/* Footer */}
         <div className="p-3.5 bg-muted/40 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-          <span>Tip: Filter by bookmarks inside any section directory</span>
+          <button
+            type="button"
+            onClick={downloadNotesFile}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border text-foreground hover:bg-card-hover font-semibold text-xs shadow-xs cursor-pointer"
+            title="Download personal study notes as Markdown"
+          >
+            <Download className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+            <span>Export Notes (.md)</span>
+          </button>
+
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 rounded-lg bg-card border border-border text-foreground hover:bg-card-hover font-semibold text-xs shadow-xs"
+            className="px-3 py-1.5 rounded-lg bg-card border border-border text-foreground hover:bg-card-hover font-semibold text-xs shadow-xs cursor-pointer"
           >
             Close (ESC)
           </button>

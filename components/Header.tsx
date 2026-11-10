@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark } from 'lucide-react';
+import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { TRACKS } from '@/lib/tracks-meta';
 import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
+import { getStudyStreak, StudyStreakData, STREAK_UPDATE_EVENT } from '@/lib/study-streak';
+import { StreakModal } from './StreakModal';
 
 interface HeaderProps {
   onOpenSearch?: () => void;
@@ -15,18 +17,30 @@ interface HeaderProps {
 export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [bookmarkCount, setBookmarkCount] = useState<number>(0);
+  const [streakData, setStreakData] = useState<StudyStreakData>({
+    currentStreak: 0,
+    longestStreak: 0,
+    lastStudiedDate: null,
+    activeDates: [],
+    totalActiveDays: 0,
+    studiedToday: false,
+  });
+  const [isStreakOpen, setIsStreakOpen] = useState(false);
 
   useEffect(() => {
     const refresh = () => {
       setBookmarkCount(getAllBookmarks().length);
+      setStreakData(getStudyStreak());
     };
 
     refresh();
     window.addEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
+    window.addEventListener(STREAK_UPDATE_EVENT, refresh);
     window.addEventListener('storage', refresh);
 
     return () => {
       window.removeEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
+      window.removeEventListener(STREAK_UPDATE_EVENT, refresh);
       window.removeEventListener('storage', refresh);
     };
   }, []);
@@ -101,6 +115,31 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               <Layers className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
               <span>Tracks</span>
             </Link>
+
+            {/* Daily Study Streak Counter */}
+            <button
+              type="button"
+              onClick={() => setIsStreakOpen(true)}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm dark:shadow-none active:scale-95 cursor-pointer ${
+                streakData.currentStreak > 0
+                  ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30 hover:bg-orange-500/20'
+                  : 'bg-card text-muted-foreground border-border hover:text-foreground hover:bg-card-hover'
+              }`}
+              title={`${streakData.currentStreak}-day study streak • Click to view full calendar & stats`}
+              aria-label="Daily study streak"
+            >
+              <Flame
+                className={`h-3.5 w-3.5 ${
+                  streakData.currentStreak > 0
+                    ? 'text-orange-500 fill-orange-500 animate-pulse'
+                    : 'text-muted-foreground'
+                }`}
+              />
+              <span className="font-bold">{streakData.currentStreak}</span>
+              <span className="hidden lg:inline text-[11px] font-medium">
+                {streakData.currentStreak === 1 ? 'day' : 'days'}
+              </span>
+            </button>
 
             {/* Saved / Bookmarks Button */}
             <button
@@ -188,6 +227,24 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
                 <span>Search 1,849+ questions...</span>
               </button>
 
+              {/* Mobile Daily Streak in Drawer */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsStreakOpen(true);
+                }}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-sm font-bold shadow-sm dark:shadow-none active:scale-95 transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Flame className="h-4 w-4 fill-current text-orange-500 animate-pulse" />
+                  <span>Daily Study Streak</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-xs bg-orange-500 text-white font-bold">
+                  {streakData.currentStreak} {streakData.currentStreak === 1 ? 'day' : 'days'}
+                </span>
+              </button>
+
               {/* Mobile Saved Bookmarks Button in Drawer */}
               <button
                 type="button"
@@ -252,6 +309,13 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
           </div>
         </div>
       )}
+
+      {/* Streak Modal Dialog */}
+      <StreakModal
+        isOpen={isStreakOpen}
+        onClose={() => setIsStreakOpen(false)}
+        streakData={streakData}
+      />
     </>
   );
 }

@@ -20,6 +20,8 @@ import {
   resetAllStudyProgress, 
   STUDY_PROGRESS_UPDATE_EVENT 
 } from '@/lib/study-progress';
+import { getStudyStreak, StudyStreakData, STREAK_UPDATE_EVENT } from '@/lib/study-streak';
+import { StreakModal } from './StreakModal';
 import { TrackMeta } from '@/lib/tracks-meta';
 
 interface StudyProgressCardProps {
@@ -29,20 +31,32 @@ interface StudyProgressCardProps {
 
 export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCardProps) {
   const [stats, setStats] = useState<GlobalStudyStats | null>(null);
+  const [streakData, setStreakData] = useState<StudyStreakData>({
+    currentStreak: 0,
+    longestStreak: 0,
+    lastStudiedDate: null,
+    activeDates: [],
+    totalActiveDays: 0,
+    studiedToday: false,
+  });
+  const [isStreakOpen, setIsStreakOpen] = useState(false);
   const [expanded, setExpanded] = useState<boolean>(false);
 
   useEffect(() => {
     const refresh = () => {
       setStats(getGlobalStudyStats(tracks));
+      setStreakData(getStudyStreak());
     };
 
     refresh();
     window.addEventListener(STUDY_PROGRESS_UPDATE_EVENT, refresh);
+    window.addEventListener(STREAK_UPDATE_EVENT, refresh);
     window.addEventListener('storage', refresh);
     window.addEventListener('focus', refresh);
 
     return () => {
       window.removeEventListener(STUDY_PROGRESS_UPDATE_EVENT, refresh);
+      window.removeEventListener(STREAK_UPDATE_EVENT, refresh);
       window.removeEventListener('storage', refresh);
       window.removeEventListener('focus', refresh);
     };
@@ -137,7 +151,26 @@ export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCard
             </div>
 
             {/* Right: Quick Action & Stat Pills */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 shrink-0">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 shrink-0">
+              {/* Daily Streak Pill */}
+              <button
+                type="button"
+                onClick={() => setIsStreakOpen(true)}
+                className="p-3 sm:p-3.5 rounded-2xl bg-orange-500/10 border border-orange-500/20 hover:bg-orange-500/20 text-left transition-all group cursor-pointer"
+                title="View Daily Streak Breakdown"
+              >
+                <div className="flex items-center gap-1.5 text-xs text-orange-600 dark:text-orange-400 font-semibold mb-1">
+                  <Flame className="h-3.5 w-3.5 fill-current animate-pulse text-orange-500" />
+                  <span>Streak</span>
+                </div>
+                <p className="text-lg sm:text-xl font-bold text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                  {streakData.currentStreak}
+                  <span className="text-xs text-muted-foreground font-normal ml-1">
+                    {streakData.currentStreak === 1 ? 'day' : 'days'}
+                  </span>
+                </p>
+              </button>
+
               {/* Studied Count */}
               <div className="p-3 sm:p-3.5 rounded-2xl bg-muted/60 border border-border">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold mb-1">
@@ -167,7 +200,7 @@ export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCard
               </button>
 
               {/* Study Time */}
-              <div className="p-3 sm:p-3.5 rounded-2xl bg-muted/60 border border-border col-span-2 sm:col-span-1">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-muted/60 border border-border">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold mb-1">
                   <Clock className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
                   <span>Prep Time</span>
@@ -252,6 +285,13 @@ export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCard
           )}
         </div>
       </div>
+
+      {/* Streak Modal */}
+      <StreakModal
+        isOpen={isStreakOpen}
+        onClose={() => setIsStreakOpen(false)}
+        streakData={streakData}
+      />
     </div>
   );
 }

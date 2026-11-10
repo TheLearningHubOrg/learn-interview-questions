@@ -39,6 +39,7 @@ import {
   toggleFlashcardMode,
   FLASHCARD_MODE_UPDATE_EVENT
 } from '@/lib/study-progress';
+import { recordStudyActivity } from '@/lib/study-streak';
 
 function parseQuestionContent(content: string) {
   const langRegex = /####\s+(Python 3|Python|JavaScript|JS|TypeScript|TS|Java|C\+\+|Go|Rust)\s*\n+```(\w+)\n([\s\S]*?)```/gi;
@@ -168,11 +169,15 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
 
   // Toggle studied status
   const toggleStudied = (num: number) => {
-    const updated = { ...studiedMap, [num]: !studiedMap[num] };
+    const nextStatus = !studiedMap[num];
+    const updated = { ...studiedMap, [num]: nextStatus };
     setStudiedMap(updated);
     try {
       localStorage.setItem(storageKey, JSON.stringify(updated));
       window.dispatchEvent(new Event(STUDY_PROGRESS_UPDATE_EVENT));
+      if (nextStatus) {
+        recordStudyActivity();
+      }
     } catch {}
   };
 

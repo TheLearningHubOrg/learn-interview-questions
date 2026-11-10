@@ -1,4 +1,5 @@
 import { TrackMeta, TRACKS } from './tracks-meta';
+import { recordStudyActivity } from './study-streak';
 
 export interface BookmarkItem {
   trackSlug: string;
@@ -143,6 +144,9 @@ export function toggleQuestionStudied(trackSlug: string, questionNumber: number)
     const updatedStatus = !map[questionNumber];
     map[questionNumber] = updatedStatus;
     setTrackStudiedMap(trackSlug, map);
+    if (updatedStatus) {
+      recordStudyActivity();
+    }
     return updatedStatus;
   } catch {
     return false;

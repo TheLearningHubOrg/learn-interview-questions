@@ -23,6 +23,7 @@ import {
   STUDY_PROGRESS_UPDATE_EVENT, 
   BOOKMARKS_UPDATE_EVENT 
 } from '@/lib/study-progress';
+import { TrackRoadmapFlowchart, RoadmapPartInfo } from '@/components/TrackRoadmapFlowchart';
 
 interface SectionClientProps {
   track: TrackMeta;
@@ -36,6 +37,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
   const [filterTab, setFilterTab] = useState<'all' | 'studied' | 'bookmarked'>('all');
   const [studiedMap, setStudiedMap] = useState<Record<number, boolean>>({});
   const [bookmarkedSet, setBookmarkedSet] = useState<Set<number>>(new Set());
+  const [selectedRoadmapPart, setSelectedRoadmapPart] = useState<string | null>(null);
 
   useEffect(() => {
     const refresh = () => {
@@ -72,9 +74,30 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
 
   const bookmarkedCount = bookmarkedSet.size;
 
-  // Filter questions based on filterTab and query
+  // Compute full roadmap stages from all questions
+  const roadmapParts = useMemo<RoadmapPartInfo[]>(() => {
+    const map = new Map<string, ParsedQuestion[]>();
+    for (const q of questions) {
+      if (!map.has(q.part)) {
+        map.set(q.part, []);
+      }
+      map.get(q.part)!.push(q);
+    }
+    return Array.from(map.entries()).map(([partName, qList]) => ({
+      partName,
+      count: qList.length,
+      startNum: qList[0]?.number || 1,
+      endNum: qList[qList.length - 1]?.number || qList.length,
+      questionNumbers: qList.map((q) => q.number),
+    }));
+  }, [questions]);
+
+  // Filter questions based on selectedRoadmapPart, filterTab and query
   const displayedQuestions = useMemo(() => {
     return questions.filter((item) => {
+      // Roadmap part filter
+      if (selectedRoadmapPart && item.part !== selectedRoadmapPart) return false;
+
       // Tab filter
       if (filterTab === 'studied' && !studiedMap[item.number]) return false;
       if (filterTab === 'bookmarked' && !bookmarkedSet.has(item.number)) return false;
@@ -88,7 +111,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
         item.number.toString() === q
       );
     });
-  }, [questions, filterTab, query, studiedMap, bookmarkedSet]);
+  }, [questions, selectedRoadmapPart, filterTab, query, studiedMap, bookmarkedSet]);
 
   // Group displayed questions by Part
   const groupedByPart = useMemo(() => {
@@ -102,7 +125,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
     return Array.from(map.entries());
   }, [displayedQuestions]);
 
-  const isFiltering = query.trim().length > 0 || filterTab !== 'all';
+  const isFiltering = query.trim().length > 0 || filterTab !== 'all' || selectedRoadmapPart !== null;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -202,6 +225,15 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
         </div>
       </div>
 
+      {/* Interactive Curriculum Roadmap Flowchart */}
+      <TrackRoadmapFlowchart
+        trackSlug={track.slug}
+        parts={roadmapParts}
+        studiedMap={studiedMap}
+        selectedPart={selectedRoadmapPart}
+        onSelectPart={setSelectedRoadmapPart}
+      />
+
       {/* Filter Tabs: All Questions, Studied, Bookmarked */}
       <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -247,12 +279,13 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
         {isFiltering && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
             <span>Showing {displayedQuestions.length} of {questions.length}</span>
-            {(query || filterTab !== 'all') && (
+            {isFiltering && (
               <button
                 type="button"
                 onClick={() => {
                   setQuery('');
                   setFilterTab('all');
+                  setSelectedRoadmapPart(null);
                 }}
                 className="text-purple-600 dark:text-purple-400 hover:underline font-bold ml-1"
               >

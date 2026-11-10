@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { QuestionViewData } from '@/lib/tracks-meta';
 import { CodeBlock } from '@/components/CodeBlock';
+import { MermaidBlock } from '@/components/MermaidBlock';
 import { MultiLangCodeTabs, LanguageBlock } from '@/components/MultiLangCodeTabs';
 import { saveLastRead } from '@/lib/reading-history';
 import { 
@@ -391,6 +392,10 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
 
                     const rawCode = extractRawText(children).replace(/\n$/, '');
                     const lang = match ? match[1] : '';
+
+                    if (lang.toLowerCase() === 'mermaid') {
+                      return <MermaidBlock chart={rawCode} />;
+                    }
 
                     return (
                       <CodeBlock language={lang} codeString={rawCode}>

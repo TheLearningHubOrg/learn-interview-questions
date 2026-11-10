@@ -217,3 +217,4 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
     </div>
   );
 }
+

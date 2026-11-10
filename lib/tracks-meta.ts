@@ -193,5 +193,18 @@ export const TRACKS: TrackMeta[] = [
     badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30',
     iconName: 'Lock',
     tags: ['Security', 'OWASP Top 10', 'XSS', 'CSRF', 'SSRF', 'IDOR', 'BOLA', 'Cryptography', 'JWT', 'OAuth 2.0']
+  },
+  {
+    id: '13',
+    sectionNumber: 13,
+    slug: 'ai-engineering-llm',
+    title: 'AI Engineering, LLM Architecture & Agentic Systems Master (50 Qs)',
+    shortTitle: 'AI Engineering & LLMs (50 Qs)',
+    description: 'The definitive 50 AI engineering interview questions covering RAG pipelines, Vector Search (HNSW), vLLM PagedAttention, KV cache sizing, FlashAttention, Autonomous Agents, Model Context Protocol (MCP), OWASP Top 10 for LLMs, and LoRA/DPO fine-tuning.',
+    questionCount: 50,
+    filename: '13-ai-engineering-llm.md',
+    badgeColor: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-500/15 dark:text-violet-400 dark:border-violet-500/30',
+    iconName: 'Bot',
+    tags: ['AI Engineering', 'RAG', 'Vector Search', 'vLLM', 'MCP', 'Agents', 'LoRA', 'DPO', 'OWASP for LLMs', 'FlashAttention']
   }
 ];

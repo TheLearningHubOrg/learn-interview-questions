@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'InterviewHub PRO - Master Technical Interview Question Bank',
     short_name: 'InterviewHub',
-    description: '1,799+ production-tested questions across Angular, React, JavaScript, System Design, Web Security, DevOps, Databases, Python, Node.js, AWS Cloud, and DSA.',
+    description: '1,849+ production-tested questions across Angular, React, JavaScript, System Design, AI Engineering, Web Security, DevOps, Databases, Python, Node.js, AWS Cloud, and DSA.',
     start_url: '/',
     display: 'standalone',
     background_color: '#090a0f',

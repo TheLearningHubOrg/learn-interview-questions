@@ -7,10 +7,10 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://learn-interview-questions.vercel.app'),
   title: {
-    default: 'Master Full-Stack, Cloud, System Design, Security & DevOps Interview Bank (1,799+ Questions)',
+    default: 'Master Full-Stack, Cloud, System Design, AI Engineering & DevOps Interview Bank (1,849+ Questions)',
     template: '%s | InterviewHub PRO',
   },
-  description: 'Comprehensive, production-tested engineering interview question bank with 1,799+ questions and answers covering Angular 2-19, React 18/19, Core JavaScript Internals, System Design, Web Security & OWASP, DevOps, Kubernetes, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
+  description: 'Comprehensive, production-tested engineering interview question bank with 1,849+ questions and answers covering Angular 2-19, React 18/19, Core JavaScript Internals, System Design, AI Engineering & LLM Architecture, Web Security & OWASP, DevOps, Kubernetes, Python, Node.js, Databases, AWS Cloud Architecture, and Data Structures & Algorithms.',
   keywords: [
     'interview questions',
     'javascript interview questions',
@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     'core javascript',
     'system design interview',
     'distributed systems',
+    'ai engineering interview',
+    'llm architecture',
+    'rag vector search',
+    'mcp protocol',
+    'lora fine tuning',
     'web security interview',
     'owasp top 10',
     'devops interview questions',
@@ -52,13 +57,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://learn-interview-questions.vercel.app',
     siteName: 'InterviewHub PRO - The Learning Hub Org',
-    title: 'Master Full-Stack, Cloud, System Design, Security & DevOps Interview Bank (1,799+ Qs)',
-    description: '1,799+ production-tested questions with 100% code coverage across Angular, React, Core JS, System Design, Web Security, DevOps, Databases, Python, Node.js, AWS Cloud, and DSA.',
+    title: 'Master Full-Stack, Cloud, System Design, AI & Security Interview Bank (1,849+ Qs)',
+    description: '1,849+ production-tested questions with 100% code coverage across Angular, React, Core JS, System Design, AI Engineering & LLMs, Web Security, DevOps, Databases, Python, Node.js, AWS Cloud, and DSA.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Master Full-Stack, Cloud, System Design, Security & DevOps Interview Bank',
-    description: '1,799+ production-tested engineering interview questions with 100% code examples.',
+    title: 'Master Full-Stack, Cloud, System Design, AI & Security Interview Bank',
+    description: '1,849+ production-tested engineering interview questions with 100% code examples.',
     creator: '@TheLearningHub',
   },
 };

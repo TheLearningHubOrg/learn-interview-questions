@@ -1,12 +1,12 @@
-# The Master Full-Stack, Cloud, React, Angular & Core JavaScript Interview Question Bank 🚀
+# The Master Full-Stack, Cloud, AI Engineering, React & System Design Interview Question Bank 🚀
 
-> **1,799+ Production-Tested Master Interview Questions and Deep-Dive Answers** across Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, Web Security & OWASP, DevOps & Kubernetes, Cloud Infrastructure, Backend, Databases, and Algorithms.
+> **1,849+ Production-Tested Master Interview Questions and Deep-Dive Answers** across AI Engineering & LLM Architecture, Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, Web Security & OWASP, DevOps & Kubernetes, Cloud Infrastructure, Backend, Databases, and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
-[![Curriculum: 12 Tracks](https://img.shields.io/badge/Tracks-12%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1799+](https://img.shields.io/badge/Questions-1799%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Curriculum: 13 Tracks](https://img.shields.io/badge/Tracks-13%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
+[![Questions: 1849+](https://img.shields.io/badge/Questions-1849%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
 
 ---
 
@@ -26,7 +26,8 @@
 | **Track 10: System Design & Distributed Systems** | Distributed Trade-offs, TinyURL, Rate Limiter, WhatsApp, Twitter, Raft, Back-of-the-Envelope | **50** | [Open Track 10](tracks/10-system-design-distributed-systems.md) |
 | **Track 11: DevOps, Containers & Kubernetes** | Docker Internals, Kubernetes Control Plane, CNI/CSI, HPA/Karpenter, GitOps, CI/CD, Terraform, SRE | **50** | [Open Track 11](tracks/11-devops-containers-kubernetes.md) |
 | **Track 12: Web Security & OWASP Top 10** | OWASP Top 10, BOLA/IDOR, XSS, CSRF, SSRF, CSP Nonces, JWT, OAuth2 PKCE, Cryptography | **50** | [Open Track 12](tracks/12-web-security-owasp.md) |
-| **TOTAL** | **Full-Stack, Cloud, Security, DevOps, System Design & Behavioral Mastery** | **1,799** | — |
+| **Track 13: AI Engineering & LLM Architecture** | RAG, Vector Search, PagedAttention/vLLM, KV Cache, Autonomous Agents, MCP, LoRA & DPO | **50** | [Open Track 13](tracks/13-ai-engineering-llm.md) |
+| **TOTAL** | **Full-Stack, Cloud, AI Systems, Security, DevOps & System Design Mastery** | **1,849** | — |
 
 ---
 
@@ -151,6 +152,15 @@
 
 ---
 
+### 🤖 [Track 13: AI Engineering, LLM Architecture & Agentic Systems Master (1 - 50)](tracks/13-ai-engineering-llm.md)
+1. **RAG Architecture, Chunking & Vector Search (Q1 - Q10)**: Chunking strategies (fixed-size, semantic, sentence window, parent-document), Distance metrics (Cosine, Dot Product, Euclidean), Vector indexing algorithms (HNSW vs IVF-PQ), Bi-Encoder retrieval vs Cross-Encoder re-ranking (ColBERT), Reciprocal Rank Fusion (RRF) hybrid search, Hypothetical Document Embeddings (HyDE), Lost-in-the-Middle context degradation, RAGAS automated RAG evaluation (Faithfulness, Answer Relevance, Context Precision/Recall), Multi-tenant vector isolation and ACL metadata filtering, GraphRAG with knowledge graph entity extraction.
+2. **LLM Runtime Internals, KV Cache & High-Throughput Serving (Q11 - Q20)**: Transformer prefill (compute-bound) vs decode (memory-bound) phases, KV Cache memory consumption formulas, vLLM PagedAttention virtual memory block allocation, Continuous (iteration-level) batching vs static batching, Prefix Caching (Radix Attention), Speculative Decoding with draft models, Tokenization anomalies (BPE, byte-level fallback, Token Healing), LLM Weight & Activation Quantization (GPTQ, AWQ, GGUF, FP8, bitsandbytes NF4), FlashAttention 1/2/3 GPU SRAM kernel tiling, Server-Sent Events (SSE) streaming architecture, TTFT, ITL, and latency SLAs.
+3. **Autonomous Agents, Tool Calling & Multi-Agent Workflows (Q21 - Q30)**: ReAct (Reasoning + Acting) loop mechanics, Grammar-constrained decoding and Structured JSON Outputs (CFG / Outlines), Model Context Protocol (MCP) client-server architecture, LangGraph stateful multi-agent orchestrations with cyclic graphs, Plan-and-Solve vs ReAct patterns, Short-term vs Episodic vs Semantic agent memory tiers, External tool calling error handling, backoff and fallbacks, Human-in-the-Loop (HITL) interrupt checkpoints, Runaway infinite loop and tool recursion guards, Secure isolated code execution sandboxes (gVisor, Firecracker microVMs).
+4. **LLM Security, Guardrails & OWASP Top 10 for LLMs (Q31 - Q40)**: Direct vs Indirect Prompt Injection attacks and dual-LLM defense boundaries, Insecure Output Handling and cross-context script execution, Canary tokens for system prompt leakage detection, Model deserialization hazards (Pickle RCE vs SafeTensors), LLM Denial of Service (Sponge Examples and prompt dilation), Grounding citations and hallucination mitigation, Presidio PII anonymization and masking pipelines, NeMo Guardrails and Llama Guard input/output moderation policies, Excessive Agency risks and least-privilege scoping, Greedy Coordinate Gradient (GCG) adversarial suffix jailbreaks.
+5. **Fine-Tuning, Alignment, Benchmarks & Production AI Deployment (Q41 - Q50)**: Full fine-tuning vs PEFT (LoRA rank $r$, $\alpha$ scaling, low-rank decomposition), QLoRA 4-bit NormalFloat (NF4) and Double Quantization, RLHF with PPO vs Direct Preference Optimization (DPO), High-quality synthetic data generation (Alpaca, Evol-Instruct, UltraFeedback), Standardized LLM evaluation benchmarks (MMLU, GSM8K, HumanEval, SWE-bench), LLM-as-a-Judge systemic biases (Position, Verbosity, Self-enhancement), Continual learning, catastrophic forgetting, and rehearsal datasets, Enterprise vLLM Kubernetes deployment (Ray, multi-GPU tensor parallelism), GPU VRAM sizing formulas for inference and training, AI Gateway architecture (Semantic Caching, fallback routing, rate limiting, token cost governance).
+
+---
+
 ## 💻 Interactive Next.js Web Application
 
 This repository includes a full-fledged **Next.js 14 App Router** web portal providing an interactive study experience with Markdown rendering, instant search, copyable code blocks, and responsive layouts.
@@ -177,7 +187,7 @@ npm run start
 \`\`\`
 
 ### ⚡ Web App Features
-- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,799+ questions with live filtering and jump links.
+- **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,849+ questions with live filtering and jump links.
 - **Table of Contents Sidebar**: Sticky scroll-spy outline for every track.
 - **Code Block Utilities**: One-click code copying and language tags.
 - **Server-Side Generation (SSG)**: Zero runtime markdown overhead with pre-rendered pages.

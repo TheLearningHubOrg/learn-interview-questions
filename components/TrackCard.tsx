@@ -15,6 +15,7 @@ import {
   Users,
   Network,
   Lock,
+  Bot,
   ArrowRight,
   Play,
   List,
@@ -37,6 +38,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Users,
   Network,
   Lock,
+  Bot,
 };
 
 interface TrackCardProps {

@@ -202,3 +202,34 @@ export function resetAllStudyProgress(tracks: TrackMeta[] = TRACKS): void {
   } catch {}
 }
 
+// ---------------------------------------------------------------------
+// Active Recall / Flashcard Mode APIs
+// ---------------------------------------------------------------------
+
+const FLASHCARD_STORAGE_KEY = 'interviewhub_flashcard_mode';
+export const FLASHCARD_MODE_UPDATE_EVENT = 'interviewhub_flashcard_mode_update';
+
+export function getFlashcardMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return localStorage.getItem(FLASHCARD_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function setFlashcardMode(enabled: boolean): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(FLASHCARD_STORAGE_KEY, String(enabled));
+    window.dispatchEvent(new Event(FLASHCARD_MODE_UPDATE_EVENT));
+  } catch {}
+}
+
+export function toggleFlashcardMode(): boolean {
+  const current = getFlashcardMode();
+  setFlashcardMode(!current);
+  return !current;
+}
+
+

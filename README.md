@@ -5,8 +5,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
-[![Curriculum: 13 Tracks](https://img.shields.io/badge/Tracks-13%20Specialized%20Tracks-purple.svg)](#-curriculum-overview--tracks)
-[![Questions: 1849+](https://img.shields.io/badge/Questions-1849%2B%20Master%20Bank-success.svg)](#-curriculum-overview--tracks)
+[![Live App](https://img.shields.io/badge/Live_App-learn--interview--questions.vercel.app-000000.svg?logo=vercel)](https://learn-interview-questions.vercel.app)
+[![Curriculum: 13 Tracks](https://img.shields.io/badge/Tracks-13%20Specialized%20Tracks-purple.svg)](#-master-navigation--tracks)
+[![Questions: 1849+](https://img.shields.io/badge/Questions-1849%2B%20Master%20Bank-success.svg)](#-master-navigation--tracks)
+
+🌐 **Interactive Web Portal**: [https://learn-interview-questions.vercel.app](https://learn-interview-questions.vercel.app)
 
 ---
 
@@ -33,6 +36,20 @@
 
 ## 📚 Curriculum Breakdown
 
+### 🔷 [Track 1: Complete Angular Master (1 - 283)](tracks/01-frontend-angular-ts.md)
+1. **Core Angular Architecture, TypeScript & Components (Q1 - Q30)**: Angular vs AngularJS, TypeScript fundamentals, architecture overview, components & directives, lifecycle hooks (`ngOnInit`, `ngOnChanges`, `ngOnDestroy`), data binding & interpolation, template statements & expressions.
+2. **Templates, Directives, Pipes & View Encapsulation (Q31 - Q60)**: Custom directives, pure vs impure pipes, ViewEncapsulation modes (Emulated, ShadowDom, None), template reference variables (`#var`), content projection (`<ng-content>`), ViewChild & ContentChild queries.
+3. **Services, Dependency Injection & Hierarchical Injectors (Q61 - Q90)**: `@Injectable()`, `providedIn: 'root'`, hierarchical injector trees, injection tokens, multi-providers, factory providers, singleton services.
+4. **Angular Forms: Template-Driven & Reactive Forms (Q91 - Q120)**: `FormControl`, `FormGroup`, `FormArray`, built-in & custom validators, async validators, cross-field validation, valueChanges observables.
+5. **Angular Routing, Guards & Navigation (Q121 - Q150)**: Router configuration, route parameters & query params, router outlets, Route Guards (`CanActivateFn`, `CanDeactivateFn`, `ResolveFn`), lazy loading modules and standalone routes.
+6. **HTTP Client, Interceptors & RxJS Observables (Q151 - Q180)**: `HttpClient`, HTTP interceptors (`HttpInterceptorFn`), error handling with `catchError`, retry logic, RxJS Subject vs BehaviorSubject vs ReplaySubject, flattening operators (`switchMap`, `mergeMap`, `concatMap`, `exhaustMap`).
+7. **Angular Animations, Internationalization & Service Workers (Q181 - Q210)**: BrowserAnimationsModule, trigger, state, transition, animate, i18n tooling, Service Worker PWA support, Web Workers integration.
+8. **Angular Ivy, Universal (SSR) & Security (Q211 - Q240)**: Ivy compiler benefits, differential loading, Angular Universal / SSR hydration, XSS prevention, DomSanitizer, CSP configuration.
+9. **Angular CLI, Testing, Schematics & Modern Tooling (Q241 - Q270)**: Angular CLI commands, Karma & Jasmine unit tests, component fixture testing, mocking services, custom Schematics, ESLint migration, standalone components.
+10. **Modern Angular 17-19, Signals & NgRx State Management (Q271 - Q283)**: Angular Signals (`signal`, `computed`, `effect`), built-in Control Flow (`@if`, `@for`, `@switch`), Deferrable Views (`@defer`), NgRx architecture (Store, Actions, Reducers, Effects, Selectors).
+
+---
+
 ### ⚛️ [Track 2: Complete React Master (1 - 445)](tracks/02-frontend-react-nextjs.md)
 1. **Core React, JSX & Component Architecture (Q1 - Q77)**: React evolution from XHP/FaxJS, JSX transpilation, Virtual DOM, React Fiber scheduling, controlled vs uncontrolled components, reconciliation, fragments, portals, static type checking, synthetic events, prop validation, inline styles, error boundaries.
 2. **React Router & Navigation (Q78 - Q88)**: React Router v6 architecture, `<BrowserRouter>`, `<Routes>`, programmatic navigation with `useNavigate`, `push` vs `replace`, query parameters, 404 fallback routing.
@@ -45,32 +62,6 @@
 9. **React Hooks Deep Dive (Q262 - Q316)**: `useState` vs `useReducer`, `useContext`, `useEffect` dependency array & cleanup mechanics, `useLayoutEffect` DOM measurements, `useRef` mutable containers, `useMemo` vs `useCallback`, Custom Hooks, `useId`, `useTransition`, `useDeferredValue`, `useSyncExternalStore`, `useInsertionEffect`.
 10. **Modern React 18, React 19 & Next.js Patterns (Q317 - Q353)**: React 18 Concurrent Rendering, React 19 Actions, `use()` hook for promises & context, Server Actions, `useOptimistic`, `useFormStatus`, React Compiler (React Forget), Streaming SSR (`renderToPipeableStream`), Next.js App Router vs Pages Router, Server Components vs Client Components.
 11. **Legacy Architecture, Migration Patterns & Historical Internals (Q354 - Q445)**: React 15 vs 16 migration paths, `unstable_handleError`, deprecated lifecycles (`componentWillMount`, `componentWillReceiveProps`), `replaceState`, Mixins deprecation, string refs vs callback refs, `renderToNodeStream` vs `renderToPipeableStream`, `create-react-app` internals, class component reconciliation details.
-
----
-
-### 🟨 [Track 8: Core JavaScript Master (1 - 521)](tracks/08-frontend-javascript.md)
-1. **Core Objects, Prototypes, Functions & Scope (Q1 - Q50)**: Ways to create objects, prototype chains, `call`/`apply`/`bind`, Map vs Object, arrow functions, currying, pure functions, `let` vs `var`, TDZ, IIFE, memoization, hoisting, closures, scopes, service workers, IndexedDB, cookies & web storage.
-2. **Promises, Callbacks, Async & Strict Mode (Q51 - Q100)**: Web workers, Promise states, callback hell, SSE, promise chaining, `Promise.all()`, strict mode, `typeof`, `null` vs `undefined`, `window` vs `document`, event flow, bubbling & capturing, SOP, compiled vs interpreted, case-sensitivity.
-3. **DOM, Event Flow, Timers & Browser APIs (Q101 - Q170)**: `preventDefault()` vs `stopPropagation()`, single-threaded model, event delegation, ECMAScript vs JS, `clearTimeout` / `clearInterval`, URL location properties, loops, polyfills, tree shaking, regex patterns, breakpoints.
-4. **Prototypes, Object Methods & Event Loop (Q171 - Q250)**: `Object.freeze` vs `Object.seal`, `Object.is()`, `Object.assign()`, Proxy objects, WeakSet & WeakMap, accessors, getters & setters, error objects, Intl API, iterators, event loop, call stack & event queue.
-5. **ES6+ Modern Syntax, Classes, Modules & Destructuring (Q251 - Q325)**: Comma operator, TypeScript differences, class constructors & `super()`, prototype getters/setters, non-extensible objects, minification & obfuscation, constraint validation, ES6 features, template literals, destructuring, typed arrays.
-6. **Async Internals, Memory, Microtasks & Web APIs (Q326 - Q400)**: PostMessage security, JS paradigms, `~~` operator, `ArrayBuffer`, shallow vs deep copy, mixins, reflow vs repaint, AJAX, zero timeout, microtask queues, observables & RxJS.
-7. **Execution Context, Functional JS & V8 Engine (Q401 - Q460)**: Babel, Node.js concurrency, `this` keyword, memory leak causes, V8 optimization (hidden classes, inline caching), HOFs, ASI, compose & pipe functions.
-8. **Modern JavaScript APIs, WeakRef, Proxy & Performance (Q461 - Q521)**: Lexical scope, dark mode detection, `requestAnimationFrame`, `globalThis`, shadowing, `structuredClone`, `Promise.any()`, BigInt, private class fields, Array `.at()`, top-level await, WeakRef & FinalizationRegistry, Temporal API, Symbols, AbortController, Intersection Observer, Mutation Observer, Atomics API, bundle size optimization.
-
----
-
-### 🔷 [Track 1: Complete Angular Master (1 - 283)](tracks/01-frontend-angular-ts.md)
-1. **Core Angular Architecture, TypeScript & Components (Q1 - Q30)**: Angular vs AngularJS, TypeScript fundamentals, architecture overview, components & directives, lifecycle hooks (`ngOnInit`, `ngOnChanges`, `ngOnDestroy`), data binding & interpolation, template statements & expressions.
-2. **Templates, Directives, Pipes & View Encapsulation (Q31 - Q60)**: Custom directives, pure vs impure pipes, ViewEncapsulation modes (Emulated, ShadowDom, None), template reference variables (`#var`), content projection (`<ng-content>`), ViewChild & ContentChild queries.
-3. **Services, Dependency Injection & Hierarchical Injectors (Q61 - Q90)**: `@Injectable()`, `providedIn: 'root'`, hierarchical injector trees, injection tokens, multi-providers, factory providers, singleton services.
-4. **Angular Forms: Template-Driven & Reactive Forms (Q91 - Q120)**: `FormControl`, `FormGroup`, `FormArray`, built-in & custom validators, async validators, cross-field validation, valueChanges observables.
-5. **Angular Routing, Guards & Navigation (Q121 - Q150)**: Router configuration, route parameters & query params, router outlets, Route Guards (`CanActivateFn`, `CanDeactivateFn`, `ResolveFn`), lazy loading modules and standalone routes.
-6. **HTTP Client, Interceptors & RxJS Observables (Q151 - Q180)**: `HttpClient`, HTTP interceptors (`HttpInterceptorFn`), error handling with `catchError`, retry logic, RxJS Subject vs BehaviorSubject vs ReplaySubject, flattening operators (`switchMap`, `mergeMap`, `concatMap`, `exhaustMap`).
-7. **Angular Animations, Internationalization & Service Workers (Q181 - Q210)**: BrowserAnimationsModule, trigger, state, transition, animate, i18n tooling, Service Worker PWA support, Web Workers integration.
-8. **Angular Ivy, Universal (SSR) & Security (Q211 - Q240)**: Ivy compiler benefits, differential loading, Angular Universal / SSR hydration, XSS prevention, DomSanitizer, CSP configuration.
-9. **Angular CLI, Testing, Schematics & Modern Tooling (Q241 - Q270)**: Angular CLI commands, Karma & Jasmine unit tests, component fixture testing, mocking services, custom Schematics, ESLint migration, standalone components.
-10. **Modern Angular 17-19, Signals & NgRx State Management (Q271 - Q283)**: Angular Signals (`signal`, `computed`, `effect`), built-in Control Flow (`@if`, `@for`, `@switch`), Deferrable Views (`@defer`), NgRx architecture (Store, Actions, Reducers, Effects, Selectors).
 
 ---
 
@@ -111,7 +102,7 @@
 ---
 
 ### 🧠 [Track 7: Data Structures & Algorithms (1 - 100) — Multi-Language: Python 3 • Java • C++ • TypeScript](tracks/07-data-structures-algorithms.md)
-1. **Intro & Approach (Q1 - Q5)**: Step-by-step interview problem-solving framework, Big-O / Big-$\Omega$ / Big-$\Theta$ asymptotic notation, Master Theorem, recursion stack vs heap memory bounds, constraint-based pattern recognition.
+1. **Intro & Approach (Q1 - Q5)**: Step-by-step interview problem-solving framework, Big-O / Big-\$\\Omega\$ / Big-\$\\Theta\$ asymptotic notation, Master Theorem, recursion stack vs heap memory bounds, constraint-based pattern recognition.
 2. **Arrays, Strings & Hash Maps (Q6 - Q18)**: Two Sum ($O(N)$), Longest Consecutive Sequence ($O(N)$), Group Anagrams, Product of Array Except Self ($O(1)$ space), Kadane’s Algorithm for Maximum Subarray, Subarray Sum Equals K (prefix sums), Next Permutation, Merge & Insert Intervals.
 3. **Two Pointers & Sliding Window (Q19 - Q28)**: Valid Palindrome, Two Sum II (sorted array), 3Sum ($O(N^2)$), Container With Most Water, Trapping Rain Water ($O(1)$ space), Longest Substring Without Repeating Characters, Minimum Window Substring ($O(N+M)$), Sliding Window Maximum (Monotonic Deque).
 4. **Stacks & Queues (Q29 - Q36)**: Valid Parentheses, Min Stack ($O(1)$ all ops), Evaluate Reverse Polish Notation, Daily Temperatures (Monotonic Stack), Largest Rectangle in Histogram ($O(N)$), Implement Queue using Stacks.
@@ -122,6 +113,27 @@
 9. **Backtracking (Q73 - Q79)**: Subsets (Power Set $O(2^N)$), Combination Sum, Permutations ($O(N!)$), Subsets II (duplicate handling), Word Search in Grid, Palindrome Partitioning, N-Queens.
 10. **Graphs (BFS, DFS, Topological Sort & Union-Find) (Q80 - Q90)**: Number of Islands, Clone Graph, Rotting Oranges (Multi-source BFS), Pacific Atlantic Water Flow, Course Schedule I & II (Kahn’s Algorithm In-degree BFS), Number of Connected Components & Disjoint Set Union (DSU with Path Compression & Union by Rank), Redundant Connection, Word Ladder, Network Delay Time (Dijkstra’s Algorithm $O((V+E)\log V)$), Alien Dictionary.
 11. **1D & 2D Dynamic Programming (Q91 - Q100)**: Climbing Stairs, Min Cost Climbing Stairs, House Robber I & II (circular), Coin Change, Longest Increasing Subsequence ($O(N \log N)$ Patience Sorting), Word Break, Unique Paths, Longest Common Subsequence (LCS), Best Time to Buy and Sell Stock with Cooldown, 0/1 Knapsack & Partition Equal Subset Sum.
+
+---
+
+### 🟨 [Track 8: Core JavaScript Master (1 - 521)](tracks/08-frontend-javascript.md)
+1. **Core Objects, Prototypes, Functions & Scope (Q1 - Q50)**: Ways to create objects, prototype chains, `call`/`apply`/`bind`, Map vs Object, arrow functions, currying, pure functions, `let` vs `var`, TDZ, IIFE, memoization, hoisting, closures, scopes, service workers, IndexedDB, cookies & web storage.
+2. **Promises, Callbacks, Async & Strict Mode (Q51 - Q100)**: Web workers, Promise states, callback hell, SSE, promise chaining, `Promise.all()`, strict mode, `typeof`, `null` vs `undefined`, `window` vs `document`, event flow, bubbling & capturing, SOP, compiled vs interpreted, case-sensitivity.
+3. **DOM, Event Flow, Timers & Browser APIs (Q101 - Q170)**: `preventDefault()` vs `stopPropagation()`, single-threaded model, event delegation, ECMAScript vs JS, `clearTimeout` / `clearInterval`, URL location properties, loops, polyfills, tree shaking, regex patterns, breakpoints.
+4. **Prototypes, Object Methods & Event Loop (Q171 - Q250)**: `Object.freeze` vs `Object.seal`, `Object.is()`, `Object.assign()`, Proxy objects, WeakSet & WeakMap, accessors, getters & setters, error objects, Intl API, iterators, event loop, call stack & event queue.
+5. **ES6+ Modern Syntax, Classes, Modules & Destructuring (Q251 - Q325)**: Comma operator, TypeScript differences, class constructors & `super()`, prototype getters/setters, non-extensible objects, minification & obfuscation, constraint validation, ES6 features, template literals, destructuring, typed arrays.
+6. **Async Internals, Memory, Microtasks & Web APIs (Q326 - Q400)**: PostMessage security, JS paradigms, `~~` operator, `ArrayBuffer`, shallow vs deep copy, mixins, reflow vs repaint, AJAX, zero timeout, microtask queues, observables & RxJS.
+7. **Execution Context, Functional JS & V8 Engine (Q401 - Q460)**: Babel, Node.js concurrency, `this` keyword, memory leak causes, V8 optimization (hidden classes, inline caching), HOFs, ASI, compose & pipe functions.
+8. **Modern JavaScript APIs, WeakRef, Proxy & Performance (Q461 - Q521)**: Lexical scope, dark mode detection, `requestAnimationFrame`, `globalThis`, shadowing, `structuredClone`, `Promise.any()`, BigInt, private class fields, Array `.at()`, top-level await, WeakRef & FinalizationRegistry, Temporal API, Symbols, AbortController, Intersection Observer, Mutation Observer, Atomics API, bundle size optimization.
+
+---
+
+### 👥 [Track 9: Behavioral, HR & Leadership Master: The STAR Framework (1 - 50)](tracks/09-general-behavioral-hr.md)
+1. **General Intro, Elevator Pitch & Career Trajectory (Q1 - Q10)**: 90-second elevator pitch (Present-Past-Future narrative), framing departures toward growth, explaining career transitions, navigating counter-offers, authentic strengths and structured self-correction loops.
+2. **Behavioral Scenarios & The STAR Method (Q11 - Q25)**: Situation, Task, Action, Result framework; handling critical production outages under pressure, navigating architectural disagreements with Staff/Principal engineers, prioritizing conflicting business deliverables, managing underperforming teammates.
+3. **Engineering Leadership, Code Quality & Collaboration (Q26 - Q36)**: Conducting constructive code reviews, advocating for technical debt remediation, driving cross-team alignment, balancing velocity vs perfection, establishing high-trust engineering team cultures.
+4. **Production Incident Management & Blameless Post-Mortems (Q37 - Q44)**: On-call incident response, 5 Whys root cause analysis, authoring blameless post-mortems, tracking preventive remediation action items, fostering psychological safety.
+5. **Reverse Interviewing, Compensation & Negotiation (Q45 - Q50)**: High-signal reverse-interview questions to ask engineering directors and VP peers, evaluating engineering culture, equity compensation mechanics (RSUs vs ISOs/NSOs), competing offers, and salary negotiation frameworks.
 
 ---
 
@@ -157,7 +169,7 @@
 2. **LLM Runtime Internals, KV Cache & High-Throughput Serving (Q11 - Q20)**: Transformer prefill (compute-bound) vs decode (memory-bound) phases, KV Cache memory consumption formulas, vLLM PagedAttention virtual memory block allocation, Continuous (iteration-level) batching vs static batching, Prefix Caching (Radix Attention), Speculative Decoding with draft models, Tokenization anomalies (BPE, byte-level fallback, Token Healing), LLM Weight & Activation Quantization (GPTQ, AWQ, GGUF, FP8, bitsandbytes NF4), FlashAttention 1/2/3 GPU SRAM kernel tiling, Server-Sent Events (SSE) streaming architecture, TTFT, ITL, and latency SLAs.
 3. **Autonomous Agents, Tool Calling & Multi-Agent Workflows (Q21 - Q30)**: ReAct (Reasoning + Acting) loop mechanics, Grammar-constrained decoding and Structured JSON Outputs (CFG / Outlines), Model Context Protocol (MCP) client-server architecture, LangGraph stateful multi-agent orchestrations with cyclic graphs, Plan-and-Solve vs ReAct patterns, Short-term vs Episodic vs Semantic agent memory tiers, External tool calling error handling, backoff and fallbacks, Human-in-the-Loop (HITL) interrupt checkpoints, Runaway infinite loop and tool recursion guards, Secure isolated code execution sandboxes (gVisor, Firecracker microVMs).
 4. **LLM Security, Guardrails & OWASP Top 10 for LLMs (Q31 - Q40)**: Direct vs Indirect Prompt Injection attacks and dual-LLM defense boundaries, Insecure Output Handling and cross-context script execution, Canary tokens for system prompt leakage detection, Model deserialization hazards (Pickle RCE vs SafeTensors), LLM Denial of Service (Sponge Examples and prompt dilation), Grounding citations and hallucination mitigation, Presidio PII anonymization and masking pipelines, NeMo Guardrails and Llama Guard input/output moderation policies, Excessive Agency risks and least-privilege scoping, Greedy Coordinate Gradient (GCG) adversarial suffix jailbreaks.
-5. **Fine-Tuning, Alignment, Benchmarks & Production AI Deployment (Q41 - Q50)**: Full fine-tuning vs PEFT (LoRA rank $r$, $\alpha$ scaling, low-rank decomposition), QLoRA 4-bit NormalFloat (NF4) and Double Quantization, RLHF with PPO vs Direct Preference Optimization (DPO), High-quality synthetic data generation (Alpaca, Evol-Instruct, UltraFeedback), Standardized LLM evaluation benchmarks (MMLU, GSM8K, HumanEval, SWE-bench), LLM-as-a-Judge systemic biases (Position, Verbosity, Self-enhancement), Continual learning, catastrophic forgetting, and rehearsal datasets, Enterprise vLLM Kubernetes deployment (Ray, multi-GPU tensor parallelism), GPU VRAM sizing formulas for inference and training, AI Gateway architecture (Semantic Caching, fallback routing, rate limiting, token cost governance).
+5. **Fine-Tuning, Alignment, Benchmarks & Production AI Deployment (Q41 - Q50)**: Full fine-tuning vs PEFT (LoRA rank $r$, $alpha$ scaling, low-rank decomposition), QLoRA 4-bit NormalFloat (NF4) and Double Quantization, RLHF with PPO vs Direct Preference Optimization (DPO), High-quality synthetic data generation (Alpaca, Evol-Instruct, UltraFeedback), Standardized LLM evaluation benchmarks (MMLU, GSM8K, HumanEval, SWE-bench), LLM-as-a-Judge systemic biases (Position, Verbosity, Self-enhancement), Continual learning, catastrophic forgetting, and rehearsal datasets, Enterprise vLLM Kubernetes deployment (Ray, multi-GPU tensor parallelism), GPU VRAM sizing formulas for inference and training, AI Gateway architecture (Semantic Caching, fallback routing, rate limiting, token cost governance).
 
 ---
 
@@ -167,7 +179,7 @@ This repository includes a full-fledged **Next.js 14 App Router** web portal pro
 
 ### 🚀 Running Locally
 
-\`\`\`bash
+```bash
 # Clone the repository
 git clone https://github.com/TheLearningHubOrg/learn-interview-questions.git
 cd learn-interview-questions
@@ -184,21 +196,26 @@ npm run build
 
 # Start production server
 npm run start
-\`\`\`
+```
 
 ### ⚡ Web App Features
 - **Instant Global Search (`⌘K` / `Ctrl+K`)**: Search across all 1,849+ questions with live filtering and jump links.
+- **Reading History ("Continue Reading")**: Resumes right where you left off across every track and displays a dynamic resume banner on the homepage.
+- **Bookmarks & "Save for Review"**: Curate a personal study cheat sheet with an amber star and filter tracks by `Studied` or `Bookmarked`.
+- **Global Study Progress Dashboard**: Interactive completion ring, estimated study hours calculation, track readiness breakdown, and mastery badges.
+- **Multi-Language Interactive Code IDE**: Switchable tabs for Python 3, JavaScript, TypeScript, Java, and C++ for all algorithmic patterns.
+- **Keyboard Navigation Shortcuts**: `←` / `→` arrow keys to navigate questions, `G` to open the Jump Palette, `⌘K` for instant global search.
 - **Table of Contents Sidebar**: Sticky scroll-spy outline for every track.
-- **Code Block Utilities**: One-click code copying and language tags.
-- **Server-Side Generation (SSG)**: Zero runtime markdown overhead with pre-rendered pages.
-- **Sleek Dark Theme**: Built with Tailwind CSS, custom obsidian color scales, and smooth transitions.
+- **Code Block Utilities**: One-click code copying and syntax highlighting.
+- **Server-Side Generation (SSG)**: 1,883 pre-rendered static HTML pages with zero runtime markdown overhead.
+- **Obsidian Dark & Clean Light Themes**: Custom color palettes with high-contrast typography.
 
 ---
 
 ## 🎯 How to Use This Question Bank
 1. **Targeted Track Review**: Jump straight into the track corresponding to your upcoming technical round (e.g., Frontend System Design, Backend API Deep-Dive, Cloud Architecture, or Live Coding DSA).
 2. **Mock Interview Simulation**: Practice explaining questions candidly out loud using the structured answers, code snippets, and comparative tables.
-3. **Architecture Reference**: Use the detailed design patterns (Expand/Contract migrations, Transactional Outbox, Sliding Window rate limiters, Next.js Server Components, Angular Signals) as production architectural blueprints for real-world projects.
+3. **Architecture Reference**: Use the detailed design patterns (Expand/Contract migrations, Transactional Outbox, Sliding Window rate limiters, Next.js Server Components, Angular Signals, RAG, and MCP) as production architectural blueprints for real-world projects.
 
 ---
 
@@ -213,6 +230,5 @@ Contributions, enhancements, and additional real-world interview scenarios are w
 ---
 
 ## 📄 License
-This project is open-source software licensed under the [MIT License](LICENSE).
+This project is open-source software licensed under the [MIT License](LICENSE).  
 Part of **[The Learning Hub Org](https://github.com/TheLearningHubOrg)**.
-

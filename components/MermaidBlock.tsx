@@ -55,11 +55,27 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
   useEffect(() => {
     let isMounted = true;
 
+    const purgeMermaidBodyArtifacts = () => {
+      if (typeof document === 'undefined') return;
+      document
+        .querySelectorAll('body > svg[id^="mermaid-"], body > svg.error-icon, body > [id^="dmermaid"]')
+        .forEach((el) => el.remove());
+    };
+
+    // Purge any stale Mermaid error elements on mount
+    purgeMermaidBodyArtifacts();
+
     getMermaid()
       .then(async (mermaid) => {
+        // Prevent mermaid from writing unstyled error SVGs directly to document.body
+        mermaid.parseError = () => {
+          purgeMermaidBodyArtifacts();
+        };
+
         const isDark = document.documentElement.classList.contains('dark');
         mermaid.initialize({
           startOnLoad: false,
+          suppressErrorRendering: true,
           theme: isDark ? 'dark' : 'default',
           securityLevel: 'loose',
           fontFamily: 'ui-sans-serif, system-ui, sans-serif',
@@ -90,17 +106,20 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
             cleanChart = cleanChart.replace(/-->>/g, '-->').replace(/<<--/g, '<--');
           }
           const { svg: renderedSvg } = await mermaid.render(renderId.current, cleanChart);
+          purgeMermaidBodyArtifacts();
           if (isMounted) {
             setSvg(renderedSvg);
             setError(null);
           }
         } catch (renderErr: any) {
+          purgeMermaidBodyArtifacts();
           if (isMounted) {
             setError(renderErr?.message || 'Diagram syntax parse error');
           }
         }
       })
       .catch((loadErr) => {
+        purgeMermaidBodyArtifacts();
         if (isMounted) {
           setError('Unable to load diagram rendering engine (offline mode)');
         }
@@ -108,6 +127,7 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
 
     return () => {
       isMounted = false;
+      purgeMermaidBodyArtifacts();
     };
   }, [chart]);
 

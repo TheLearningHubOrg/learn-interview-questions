@@ -169,10 +169,15 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
     return () => window.removeEventListener(NOTES_UPDATE_EVENT, checkNote);
   }, [track.slug, question.number]);
 
-  // Reset answer reveal whenever question changes
+  // Reset answer reveal and purge rogue body SVGs whenever question changes
   useEffect(() => {
     setIsAnswerRevealed(false);
-  }, [question.number]);
+    if (typeof document !== 'undefined') {
+      document
+        .querySelectorAll('body > svg[id^="mermaid-"], body > svg.error-icon, body > [id^="dmermaid"]')
+        .forEach((el) => el.remove());
+    }
+  }, [track.slug, question.number]);
 
   // Load and listen to Flashcard mode preference
   useEffect(() => {

@@ -1043,13 +1043,13 @@ P1 - Critical (Risk of service-wide 504 gateway timeouts)
 ## Step-by-Step Remediation:
 1. Open Datadog Database Dashboard: `https://app.datadoghq.com/db/postgres-prod`
 2. Identify top connection-consuming services:
-   ```sql
+```sql
    SELECT client_addr, usename, count(*) FROM pg_stat_activity GROUP BY 1, 2 ORDER BY 3 DESC;
-   ```
+```
 3. If PgBouncer pool is saturated, restart PgBouncer pods in Kubernetes:
-   ```bash
+```bash
    kubectl rollout restart deployment/pgbouncer -n production
-   ```
+```
 4. If problem persists, escalate to Database Administrator (DBA) on-call.
 ````
 

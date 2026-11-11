@@ -192,17 +192,17 @@ render() {
 - Creating an element is a fast, lightweight operation—it does **not** create any actual DOM nodes or render anything to the screen directly.
 
  **Example (without JSX):**
- ```js
+```js
  const element = React.createElement("button", { id: "login-btn" }, "Login");
- ```
+```
 
  **Equivalent JSX syntax:**
- ```jsx
+```jsx
  <button id="login-btn">Login</button>
- ```
+```
 
  **The object returned by `React.createElement`:**
- ```js
+```js
  {
    type: 'button',
    props: {
@@ -210,7 +210,7 @@ render() {
      children: 'Login'
    }
  }
- ```
+```
  Elements are then passed to the React DOM renderer (e.g., `ReactDOM.render()`), which translates them to actual DOM nodes.
 
  ---
@@ -221,24 +221,24 @@ render() {
 - You can define a component using a function or a class:
 
  **Example (Function Component with JSX):**
- ```jsx
+```jsx
  const Button = ({ handleLogin }) => (
    <button id="login-btn" onClick={handleLogin}>
      Login
    </button>
  );
- ```
+```
 
  When JSX is compiled, it's transformed into a tree of `React.createElement` calls:
 
- ```js
+```js
  const Button = ({ handleLogin }) =>
    React.createElement(
      "button",
      { id: "login-btn", onClick: handleLogin },
      "Login"
    );
- ```
+```
 
  ---
 
@@ -1225,40 +1225,40 @@ React uses **className** instead of **class** because of a JavaScript naming con
 1. `class` is a reserved keyword in JavaScript
  In JavaScript, class is used to define ES6 classes:
 
- ```js
+```js
  class Person {
    constructor(name) {
      this.name = name;
    }
  }
- ```
+```
  If you try to use class as a variable or property name, it will throw a syntax error. Since JSX is just JavaScript with XML-like syntax, using class directly in JSX would break the parser.
 
 2. JSX Is JavaScript
 
  When you write JSX like this:
- ```jsx
+```jsx
  <div class="btn">Click</div>
- ```
+```
  It will be compiled to:
- ```jsx
+```jsx
  React.createElement('div', { class: 'btn' }, 'Click');
- ```
+```
  But `class` is invalid in this object literal context (since it clashes with the JS keyword), hence React instead uses className.
- ```jsx
+```jsx
  <div className="btn">Click</div>
- ```
+```
  which compiles to:
- ```jsx
+```jsx
  React.createElement('div', { className: 'btn' }, 'Click');
- ```
+```
  React then translates `className` to` class` in the final HTML DOM.
 
 3. Aligns with DOM APIs
  In vanilla JavaScript, you interact with element classes using:
- ```js
+```js
  element.className = 'my-class';
- ```
+```
  React follows this convention, staying consistent with the DOM API's property name rather than HTML’s attribute.
 
 ---
@@ -2458,7 +2458,7 @@ There are two common practices for React project file structure.
 
  One common way to structure projects is locate CSS, JS, and tests together, grouped by feature or route.
 
- ```
+```
  common/
  ├─ Avatar.js
  ├─ Avatar.css
@@ -2477,13 +2477,13 @@ There are two common practices for React project file structure.
  ├─ ProfileHeader.js
  ├─ ProfileHeader.css
  └─ ProfileAPI.js
- ```
+```
 
 2.  **Grouping by file type:**
 
  Another popular way to structure projects is to group similar files together.
 
- ```
+```
  api/
  ├─ APIUtils.js
  ├─ APIUtils.test.js
@@ -2499,7 +2499,7 @@ There are two common practices for React project file structure.
  ├─ Profile.js
  ├─ ProfileHeader.js
  └─ ProfileHeader.css
- ```
+```
 
 ---
 
@@ -2684,7 +2684,7 @@ There are three different ways to achieve programmatic routing/navigation within
 
  The `withRouter()` higher-order function will inject the history object as a prop of the component. This object provides `push()` and `replace()` methods to avoid the usage of context.
 
- ```jsx
+```jsx
  import { withRouter } from "react-router-dom"; // this also works with 'react-router-native'
 
  const Button = withRouter(({ history }) => (
@@ -2697,13 +2697,13 @@ There are three different ways to achieve programmatic routing/navigation within
      {"Click Me!"}
    </button>
  ));
- ```
+```
 
 2.  **Using `<Route>` component and render props pattern:**
 
  The `<Route>` component passes the same props as `withRouter()`, so you will be able to access the history methods through the history prop.
 
- ```jsx
+```jsx
  import { Route } from "react-router-dom";
 
  const Button = () => (
@@ -2720,13 +2720,13 @@ There are three different ways to achieve programmatic routing/navigation within
      )}
    />
  );
- ```
+```
 
 3.  **Using context:**
 
  This option is not recommended and treated as unstable API.
 
- ```jsx
+```jsx
  const Button = (props, context) => (
    <button
      type="button"
@@ -2743,7 +2743,7 @@ There are three different ways to achieve programmatic routing/navigation within
      push: React.PropTypes.func.isRequired,
    }),
  };
- ```
+```
 
 ---
 
@@ -2828,17 +2828,17 @@ Below are the list of steps to get history object on React Router v4,
 
  For example, create `history.js` file:
 
- ```javascript
+```javascript
  import { createBrowserHistory } from "history";
 
  export default createBrowserHistory({
    /* pass a configuration object here if needed */
  });
- ```
+```
 
 2.  You should use the `<Router>` component instead of built-in routers. Import the above `history.js` inside `index.js` file:
 
- ```jsx
+```jsx
  import { Router } from "react-router-dom";
  import history from "./history";
  import App from "./App";
@@ -2849,16 +2849,16 @@ Below are the list of steps to get history object on React Router v4,
    </Router>,
    holder
  );
- ```
+```
 
 3.  You can also use push method of `history` object similar to built-in history object:
 
- ```javascript
+```javascript
  // some-other-file.js
  import history from "./history";
 
  history.push("/go-here");
- ```
+```
 
 ---
 
@@ -2966,16 +2966,16 @@ The library provides two ways to format strings, numbers, and dates:
 
 1.  **Using react components:**
 
- ```jsx
+```jsx
  <FormattedMessage
    id={"account"}
    defaultMessage={"The amount is less than minimum balance."}
  />
- ```
+```
 
 2.  **Using an API:**
 
- ```javascript
+```javascript
  const messages = defineMessages({
    accountMessage: {
      id: "account",
@@ -2984,7 +2984,7 @@ The library provides two ways to format strings, numbers, and dates:
  });
 
  formatMessage(messages.accountMessage);
- ```
+```
 
 ---
 
@@ -3649,19 +3649,19 @@ In Redux, you use them in two places:
 
  Let's take `actions.js`:
 
- ```javascript
+```javascript
  import { ADD_TODO } from "./actionTypes";
 
  export function addTodo(text) {
    return { type: ADD_TODO, text };
  }
- ```
+```
 
 2. **In reducers:**
 
  Let's create `reducer.js`:
 
- ```javascript
+```javascript
  import { ADD_TODO } from "./actionTypes";
 
  export default (state = [], action) => {
@@ -3678,7 +3678,7 @@ In Redux, you use them in two places:
        return state;
    }
  };
- ```
+```
 
 ---
 
@@ -4150,23 +4150,23 @@ The below steps followed to include Font Awesome in React:
 
 1. Install `font-awesome`:
 
- ```console
+```console
  $ npm install --save font-awesome
- ```
+```
 
 2. Import `font-awesome` in your `index.js` file:
 
- ```javascript
+```javascript
  import "font-awesome/css/font-awesome.min.css";
- ```
+```
 
 3. Add Font Awesome classes in `className`:
 
- ```javascript
+```javascript
  function MyComponent {
    return <div><i className={'fa fa-spinner'} /></div>
  }
- ```
+```
 
 ---
 
@@ -4209,7 +4209,7 @@ You need to follow below steps to use Polymer in React,
 
 1. Create a Polymer element:
 
- ```jsx
+```jsx
  <link
    rel="import"
    href="../../bower_components/polymer/polymer.html"
@@ -4220,24 +4220,24 @@ You need to follow below steps to use Polymer in React,
      this.textContent = "I am a calendar";
    },
  });
- ```
+```
 
 2. Create the Polymer component HTML tag by importing it in a HTML document, e.g. import it in the `index.html` of your React application:
 
- ```html
+```html
  <link
    rel="import"
    href="./src/polymer-components/calendar-element.html"
  />
- ```
+```
 
 3. Use that element in the JSX file:
 
- ```javascript
+```javascript
  export default function MyComponent {
    return <calendar-element />;
  }
- ```
+```
 
 ---
 
@@ -4833,13 +4833,13 @@ In the above incorrect usage example, both `useState` and `useEffect` are used i
 
 React team released an ESLint plugin called **eslint-plugin-react-hooks** that enforces Hook's two rules. It is part of Hooks API. You can add this plugin to your project using the below command,
 
- ```javascript
+```javascript
  npm install eslint-plugin-react-hooks --save-dev
- ```
+```
 
  And apply the below config in your ESLint config file,
 
- ```javascript
+```javascript
  // Your ESLint configuration
  {
    "plugins": [
@@ -4851,16 +4851,16 @@ React team released an ESLint plugin called **eslint-plugin-react-hooks** that e
      "react-hooks/rules-of-hooks": "error"
    }
  }
- ```
+```
 
  This plugin also provide another important rule through `react-hooks/exhaustive-deps`. It ensures that the dependencies of useEffect, useCallback, and useMemo hooks are correctly listed to avoid potential bugs.
 
- ```jsx
+```jsx
  useEffect(() => {
    // Forgetting `message` will result in incorrect behavior
    console.log(message);
  }, []); // Here `message` should be a dependency
- ```
+```
  The recommended `eslint-config-react-app` preset already includes the hooks rules of this plugin.
  For example, the linter enforce proper naming convention for hooks. If you rename your custom hooks which as prefix "use" to something else then linter won't allow you to call built-in hooks such as useState, useEffect etc inside of your custom hook anymore.
 
@@ -5545,7 +5545,7 @@ Common use cases:
 
 1. **Code splitting with `React.lazy()`**
 
- ```javascript
+```javascript
  import { Suspense, lazy } from "react";
 
  const OtherComponent = lazy(() => import("./OtherComponent"));
@@ -5557,13 +5557,13 @@ Common use cases:
      </Suspense>
    );
  }
- ```
+```
 
  The fallback is shown until `OtherComponent` is downloaded and rendered.
 
 2. **Data fetching that can suspend**
 
- ```jsx
+```jsx
  import { Suspense, use } from "react";
 
  function UserProfile() {
@@ -5578,13 +5578,13 @@ Common use cases:
      </Suspense>
    );
  }
- ```
+```
 
 3. **Nested Suspense for progressive loading**
 
  Nested boundaries let important content render first while slower sections keep loading.
 
- ```jsx
+```jsx
  import { Suspense, lazy } from "react";
 
  const ProductDetails = lazy(() => import("./ProductDetails"));
@@ -5601,7 +5601,7 @@ Common use cases:
      </Suspense>
    );
  }
- ```
+```
 
  Here, `ProductDetails` can appear first, and `ProductReviews` can continue loading with its own fallback.
 
@@ -5682,18 +5682,18 @@ When diffing two trees, React first compares the two root elements. The behavior
 2. **DOM Elements Of The Same Type:**
  When comparing two React DOM elements of the same type, React looks at the attributes of both, keeps the same underlying DOM node, and only updates the changed attributes. Lets take an example with same DOM elements except className attribute,
 
- ```javascript
+```javascript
  <div className="show" title="ReactJS" />
 
  <div className="hide" title="ReactJS" />
- ```
+```
 
 3. **Component Elements Of The Same Type:**
  When a component updates, the instance stays the same, so that state is maintained across renders. React updates the props of the underlying component instance to match the new element, and calls componentWillReceiveProps() and componentWillUpdate() on the underlying instance. After that, the render() method is called and the diff algorithm recurses on the previous result and the new result.
 4. **Recursing On Children:**
  when recursing on the children of a DOM node, React just iterates over both lists of children at the same time and generates a mutation whenever there’s a difference. For example, when adding an element at the end of the children, converting between these two trees works well.
 
- ```javascript
+```javascript
  <ul>
    <li>first</li>
    <li>second</li>
@@ -5705,7 +5705,7 @@ When diffing two trees, React first compares the two root elements. The behavior
    <li>third</li>
  </ul>
 
- ```
+```
 
 5. **Handling keys:**
  React supports a key attribute. When children have keys, React uses the key to match children in the original tree with children in the subsequent tree. For example, adding a key can make the tree conversion efficient,
@@ -5942,9 +5942,9 @@ Bootstrap can be added to your React app in a three possible ways,
  This is the easiest way to add bootstrap. Add both bootstrap CSS and JS resources in a head tag.
 2. Bootstrap as Dependency:
  If you are using a build tool or a module bundler such as Webpack, then this is the preferred option for adding Bootstrap to your React application
- ```javascript
+```javascript
  npm install bootstrap
- ```
+```
 3. React Bootstrap Package:
  In this case, you can add Bootstrap to our React app is by using a package that has rebuilt Bootstrap components to work particularly as React components. Below packages are popular in this category,
  1. react-bootstrap
@@ -6258,34 +6258,34 @@ No, you don’t have to learn es2015/es6 to learn react. But you may find many r
 
 1. **Destructuring:** To get props and use them in a component
 
- ```javascript
+```javascript
  // in es 5
  var someData = this.props.someData;
  var dispatch = this.props.dispatch;
 
  // in es6
  const { someData, dispatch } = this.props;
- ```
+```
 
 2. **Spread operator:** Helps in passing props down into a component
 
- ```javascript
+```javascript
  // in es 5
  <SomeComponent someData={this.props.someData} dispatch={this.props.dispatch} />
 
  // in es6
  <SomeComponent {...this.props} />
- ```
+```
 
 3. **Arrow functions:** Makes compact syntax
- ```javascript
+```javascript
  // es 5
  var users = usersList.map(function (user) {
    return <li>{user.name}</li>;
  });
  // es 6
  const users = usersList.map((user) => <li>{user.name}</li>);
- ```
+```
 
 ---
 
@@ -7027,12 +7027,12 @@ React updates UI in three steps,
 
  1. **Initial render:** When the app starts, you can trigger the initial render by calling `creatRoot` with the target DOM node followed by invoking component's `render` method. For example, the following code snippet renders `App` component on root DOM node.
 
- ```jsx
+```jsx
  import { createRoot } from "react-dom/client";
 
  const root = createRoot(document.getElementById("root"));
  root.render(<App />);
- ```
+```
 
  2. **Re-render when the state updated:** When you update the component state using the state setter function, the componen't state automatically queues for a render.
 
@@ -7527,11 +7527,11 @@ The usage of useContext involves three main steps:
 
  Use `React.createContext()` to create a context object.
 
- ```jsx
+```jsx
  import React, { createContext } from 'react'; 
 
  const ThemeContext = createContext(); // default value optional
- ```
+```
 
 You typically export this so other components can import it.
 
@@ -7539,7 +7539,7 @@ You typically export this so other components can import it.
 
  Wrap your component tree (or a part of it) with the `Context.Provider` and pass a `value` prop.
 
- ```jsx
+```jsx
  function App() {
      return ( 
          <ThemeContext.Provider value="dark">
@@ -7547,7 +7547,7 @@ You typically export this so other components can import it.
          </ThemeContext.Provider>
      ); 
  }
- ```
+```
 
  Now any component inside `<ThemeContext.Provider>` can access the context value.
 
@@ -7555,13 +7555,13 @@ You typically export this so other components can import it.
 
  In any functional component **inside the Provider**, use the `useContext` hook:
 
- ```jsx
+```jsx
  import { useContext } from 'react'; 
  function MyComponent() {
      const theme = useContext(ThemeContext); // theme = "dark"
      return <p>Current Theme: {theme}</p>; 
  }
- ```
+```
 
 ---
 
@@ -7876,7 +7876,7 @@ To see the updated state value, you can use `useEffect()` hook. It runs **after 
  *   The component has been updated.
  *   The **state contains the new value**.
 
- ```js
+```js
  import React, { useState, useEffect } from 'react';
 
  function Counter() {
@@ -7893,7 +7893,7 @@ To see the updated state value, you can use `useEffect()` hook. It runs **after 
  
  return <button onClick={handleClick}>Count: {count}</button>;
  }
- ```
+```
 
 ---
 
@@ -7971,7 +7971,7 @@ The pseudocode for internal implementation of `useState` looks like below,
      hookIndex++;
      return [hook.state, setState];
  }
- ```
+```
 
 ---
 
@@ -7981,9 +7981,9 @@ The `useReducer` hook is a React hook used to manage **complex state logic** ins
 
 The `useReducer` hook takes three arguments:
 
- ```js
+```js
  const [state, dispatch] = useReducer(reducer, initialState, initFunction);
- ```
+```
 
  *   `**reducer**`: A function `(state, action) => newState` that handles how state should change based on the action.
  *   `**initialState**`: The starting state.
@@ -8015,7 +8015,7 @@ The `useReducer` hooks works similarly to Redux, where:
 
  Define a counter reducer function that takes the current state and an action object with a type, and returns a new state based on that type.
 
-  ```js
+```js
   function counterReducer(state, action) {
      switch (action.type) {
        case 'increment':
@@ -8028,7 +8028,7 @@ The `useReducer` hooks works similarly to Redux, where:
          return state;
      }
    }
-  ```
+```
 2. Using `useReducer`:
 Invoke `useReducer` with above reducer function along with initial state. Thereafter, you can attach dispatch actions for respective button handlers.
 ```js
@@ -8158,28 +8158,28 @@ In the above example, even though `dispatch` is called twice, `state.count` stil
 If you need the updated value right after dispatching, you have several options:
 
 1. **Use `useEffect` to react to state changes:**
- ```jsx
+```jsx
  useEffect(() => {
    console.log('Updated count:', state.count);
  }, [state.count]);
- ```
+```
 
 2. **Compute the next state manually:**
- ```jsx
+```jsx
  const handleClick = () => {
    const nextState = reducer(state, { type: 'increment' });
    console.log('Next state will be:', nextState.count);
    dispatch({ type: 'increment' });
  };
- ```
+```
 
 3. **Use `useRef` to track the latest state:**
- ```jsx
+```jsx
  const stateRef = useRef(state);
  useEffect(() => {
    stateRef.current = state;
  }, [state]);
- ```
+```
 
 **Note:** This behavior is by design in React. The `dispatch` function itself has a **stable identity** (it doesn't change between re-renders), which makes it safe to omit from `useEffect` dependency arrays.
 
@@ -8198,7 +8198,7 @@ Let's build a simple authentication flow with:
 **1. Create the Auth Context:**
 
 You can define `AuthProvider` which holds and provides `user`, `login()`, and `logout()` via context.
- ```js
+```js
  // AuthContext.js
  import React, { createContext, useContext, useState } from 'react';
  
@@ -8219,11 +8219,11 @@ You can define `AuthProvider` which holds and provides `user`, `login()`, and `l
  
  // Custom hook for cleaner usage
  export const useAuth = () => useContext(AuthContext);
- ```
+```
 **2. Wrap Your App with the Provider:**
 
  Wrap the above created provider in main `App.js` file      
- ```js
+```js
  // App.js
  import React from 'react';
  import { AuthProvider } from './AuthContext';
@@ -8240,11 +8240,11 @@ You can define `AuthProvider` which holds and provides `user`, `login()`, and `l
  }
  
  export default App;
- ```
+```
 **3. Home page with login:**
 Read or access user and login details through custom useAuth hook and use it inside home page.
 
- ```js
+```js
   // HomePage.js
   import React from 'react';
   import { useAuth } from './AuthContext';
@@ -8265,7 +8265,7 @@ Read or access user and login details through custom useAuth hook and use it ins
   }
 
   export default HomePage;
- ```
+```
 
 **4. Dashboard with logout:**
 Read or access user and logout details from `useAuth` custom hook and use it inside dashboard page.
@@ -8450,11 +8450,11 @@ useEffect(() => {
 
 3. **No Dependency Array (Omitted)**
 
-   ```css
+```css
    useEffect(() => {
      // runs after **every** render
    });
-   ```
+```
 
     *   Effect runs after **every render**, regardless of what changed.
     *   Can lead to **performance issues** if not used carefully.
@@ -8538,19 +8538,19 @@ Each effect runs independently and helps make code modular and easier to debug.
 Infinite loops happen when the effect updates state that’s listed in its own dependency array, which causes the effect to re-run, updating state again and so on.
  
  **Infinite loop scenario:**
- ```js
+```js
  useEffect(() => {
    setCount(count + 1);
  }, [count]); // Triggers again every time count updates
- ```
+```
  You need to ensure that setState calls do not depend on values that cause the effect to rerun, or isolate them with a guard.
- ```js
+```js
  useEffect(() => {
    if (count < 5) {
      setCount(count + 1);
    }
  }, [count]);
- ```
+```
 
 ---
 
@@ -8638,7 +8638,7 @@ The `useRef` hook is commonly used in React to directly reference and interact w
  
  **Example: Focus an input**
 
- ```js
+```js
  import React, { useRef } from 'react';
  
  function FocusInput() {
@@ -8655,7 +8655,7 @@ The `useRef` hook is commonly used in React to directly reference and interact w
      </div>
    );
  }
- ```
+```
 **Note:** The DOM reference is only available **after the component has mounted** — typically accessed in `useEffect` or event handlers.
 
 ---
@@ -8665,7 +8665,7 @@ The `useRef` hook is commonly used in React to directly reference and interact w
 Yes, you can use `useRef` to persist values across renders in React. Unlike `useState`, changing `.current` does not cause re-renders, but the value is preserved across renders.
  
  **Example:**
- ```js
+```js
  function Timer() {
    const renderCount = useRef(0);
    useEffect(() => {
@@ -8675,7 +8675,7 @@ Yes, you can use `useRef` to persist values across renders in React. Unlike `use
  
    return <div>Check console for render count.</div>;
  }
- ```
+```
 
 ---
 
@@ -8684,7 +8684,7 @@ Yes, you can use `useRef` to persist values across renders in React. Unlike `use
 Yes, `useRef` is a common pattern when you want to compare current and previous props or state without causing re-renders.
  
  **Example: Storing previous state value**
- ```js
+```js
  import { useEffect, useRef, useState } from 'react';
  
  function PreviousValueExample() {
@@ -8705,7 +8705,7 @@ Yes, `useRef` is a common pattern when you want to compare current and previous 
      </div>
    );
  }
- ```
+```
 
 ---
 
@@ -8714,12 +8714,12 @@ Yes, `useRef` is a common pattern when you want to compare current and previous 
 Yes, you can access a ref in the render method, but what you get from it depends on how you're using the ref and when in the component lifecycle you're rendering.
  
  For example, when using ref to access a DOM node (e.g., divRef.current), it's not immediately available on the first render.
- ```js
+```js
  const divRef = useRef(null);
  
  console.log(divRef.current); // ❌ null on initial render
  return <div ref={divRef}>Hello</div>;
- ```
+```
 
 ---
 
@@ -8897,11 +8897,11 @@ The `useCallback` is a React Hook used to memoize **function definitions** betwe
  
  **Example:**
  
- ```css
+```css
  const handleClick = useCallback(() => {
    console.log('Button clicked');
  }, []);
- ```
+```
  
  Without `useCallback`, a new function is created on every render, potentially causing child components to re-render unnecessarily.
 
@@ -10665,25 +10665,25 @@ By default, `useSelector` re-renders a component whenever the **selected value's
 
 1.  **Select the smallest piece of state you need** instead of the whole slice:
 
-  ```javascript
+```javascript
   // BAD: re-renders whenever ANY field in `user` changes
   const user = useSelector((state) => state.user);
 
   // GOOD: only re-renders when `name` changes
   const name = useSelector((state) => state.user.name);
-  ```
+```
 
 2.  **Memoize derived/computed selectors** with `createSelector` (see next question) so a new array/object is only created when its actual inputs change.
 3.  **Use a custom equality function** (e.g., `shallowEqual` from `react-redux`) when you must select multiple fields as an object:
 
-  ```javascript
+```javascript
   import { shallowEqual, useSelector } from "react-redux";
 
   const { name, email } = useSelector(
     (state) => ({ name: state.user.name, email: state.user.email }),
     shallowEqual
   );
-  ```
+```
 
 4.  **Split one large connected component into smaller ones**, each with its own narrow `useSelector`, so a state change only re-renders the component that actually cares about it.
 5.  **Wrap presentational children in `React.memo`** so they skip re-rendering when their own props haven't changed, even if their parent re-renders.
@@ -10882,7 +10882,7 @@ Since each `createSlice` only manages its own piece of state, a few patterns let
 
 1.  **`extraReducers`**: listen for another slice's action type without importing its reducer.
 
-  ```javascript
+```javascript
   const notificationsSlice = createSlice({
     name: "notifications",
     initialState: [],
@@ -10893,7 +10893,7 @@ Since each `createSlice` only manages its own piece of state, a few patterns let
       });
     },
   });
-  ```
+```
 
 2.  **Thunks that touch multiple slices**: a single `createAsyncThunk`/thunk can `dispatch` actions belonging to several slices, or read `getState()` to combine data before deciding what to dispatch.
 3.  **Selectors that combine slices**: a `createSelector` can take input selectors from different slices (e.g., posts + users) and join them together for the UI, without the slices knowing about each other.
@@ -10937,7 +10937,7 @@ A race condition happens when multiple async requests are in flight and they **r
 
 1.  **`createAsyncThunk` + request tracking**: store the latest `requestId` and ignore results from stale requests.
 
-  ```javascript
+```javascript
   const fetchResults = createAsyncThunk("search/fetch", async (query) => {
     const res = await fetch(`/api/search?q=${query}`);
     return res.json();
@@ -10949,7 +10949,7 @@ A race condition happens when multiple async requests are in flight and they **r
       state.results = action.payload;
     }
   });
-  ```
+```
 
 2.  **Abort stale requests** using `AbortController`, which `createAsyncThunk` supports via `thunkAPI.signal` — cancel the previous request when a new one starts.
 3.  **Debounce/throttle the trigger** (e.g., debounce keystrokes) so fewer overlapping requests are made in the first place.
@@ -11443,7 +11443,7 @@ Key points:
 
 The Concurrent rendering makes React apps to be more responsive by rendering component trees without blocking the main UI thread. It allows React to interrupt a long-running render to handle a high-priority event. i.e, When you enabled concurrent Mode, React will keep an eye on other tasks that need to be done, and if there's something with a higher priority it will pause what it is currently rendering and let the other task finish first. You can enable this in two ways,
 
-   ```javascript
+```javascript
    // 1. Part of an app by wrapping with ConcurrentMode
    <React.unstable_ConcurrentMode>
      <Something />
@@ -11451,7 +11451,7 @@ The Concurrent rendering makes React apps to be more responsive by rendering com
 
    // 2. Whole app using createRoot
    ReactDOM.unstable_createRoot(domNode).render(<App />);
-   ```
+```
 
 ---
 
@@ -11459,17 +11459,17 @@ The Concurrent rendering makes React apps to be more responsive by rendering com
 
 If you try to update the state directly then it won't re-render the component.
 
-   ```javascript
+```javascript
    //Wrong
    this.state.message = "Hello world";
-   ```
+```
 
    Instead use `setState()` method. It schedules an update to a component's state object. When state changes, the component responds by re-rendering.
 
-   ```javascript
+```javascript
    //Correct
    this.setState({ message: "Hello World" });
-   ```
+```
 
    **Note:** You can directly assign to the state object either in _constructor_ or using latest javascript's class field declaration syntax.
 
@@ -11551,24 +11551,24 @@ There are 3 possible ways to achieve this in class components:
 
 You can use an _arrow function_ to wrap around an _event handler_ and pass parameters:
 
-   ```jsx
+```jsx
    <button onClick={() => this.handleClick(id)} />
-   ```
+```
 
    This is an equivalent to calling `.bind`:
 
-   ```jsx
+```jsx
    <button onClick={this.handleClick.bind(this, id)} />
-   ```
+```
 
    Apart from these two approaches, you can also pass arguments to a function which is defined as arrow function
 
-   ```jsx
+```jsx
    <button onClick={this.handleClick(id)} />;
    handleClick = (id) => () => {
      console.log("Hello, your ticket number is", id);
    };
-   ```
+```
 
 ---
 
@@ -11656,7 +11656,7 @@ There are two approaches
 
 _Ref forwarding_ is a feature that lets some components take a _ref_ they receive, and pass it further down to a child.
 
-   ```jsx
+```jsx
    const ButtonElement = React.forwardRef((props, ref) => (
      <button ref={ref} className="CustomButton">
        {props.children}
@@ -11666,7 +11666,7 @@ _Ref forwarding_ is a feature that lets some components take a _ref_ they receiv
    // Create ref to the DOM button:
    const ref = React.createRef();
    <ButtonElement ref={ref}>{"Forward Ref"}</ButtonElement>;
-   ```
+```
 
 ---
 
@@ -11676,7 +11676,7 @@ It is preferred to use _callback refs_ over `findDOMNode()` API. Because `findDO
 
    The **legacy** approach of using `findDOMNode`:
 
-   ```javascript
+```javascript
    class MyComponent extends Component {
      componentDidMount() {
        findDOMNode(this).scrollIntoView();
@@ -11686,11 +11686,11 @@ It is preferred to use _callback refs_ over `findDOMNode()` API. Because `findDO
        return <div />;
      }
    }
-   ```
+```
 
    The recommended approach is:
 
-   ```javascript
+```javascript
    class MyComponent extends Component {
      constructor(props) {
        super(props);
@@ -11704,7 +11704,7 @@ It is preferred to use _callback refs_ over `findDOMNode()` API. Because `findDO
        return <div ref={this.node} />;
      }
    }
-   ```
+```
 
 ---
 

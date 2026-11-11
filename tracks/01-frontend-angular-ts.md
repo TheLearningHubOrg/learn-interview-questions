@@ -312,33 +312,33 @@ Data binding is a core concept in Angular and allows to define communication bet
 1. **From the Component to the DOM:**
 
  **Interpolation:** {{ value }}: Adds the value of a property from the component
- ```html
+```html
  <li>Name: {{ user.name }}</li>
  <li>Address: {{ user.address }}</li>
- ```
+```
  **Property binding:** [property]=”value”: The value is passed from the component to the specified property or simple HTML attribute
- ```html
+```html
  <input type="email" [value]="user.email">
- ```
+```
 
 2. **From the DOM to the Component:**
  **Event binding: (event)=”function”:** When a specific DOM event happens (eg.: click, change, keyup), call the specified method in the component
- ```html
+```html
  <button (click)="logout()"></button>
- ```
+```
 
 3. **Two-way binding:**
  **Two-way data binding:** [(ngModel)]=”value”: Two-way data binding allows to have the data flow both ways. For example, in the below code snippet, both the email DOM input and component email property are in sync
- ```html
+```html
  <input type="email" [(ngModel)]="user.email">
- ```
+```
 
 ### 13. What is metadata?
 
 Metadata is used to decorate a class so that it can configure the expected behavior of the class. The metadata is represented by decorators
 
 1. **Class decorators**, e.g. @Component and @NgModule
- ```typescript
+```typescript
  import { NgModule, Component } from '@angular/core';
 
  @Component({
@@ -360,10 +360,10 @@ Metadata is used to decorate a class so that it can configure the expected behav
      console.log('Hey I am a module!');
    }
  }
- ```
+```
 
 2. **Property decorators** Used for properties inside classes, e.g. @Input and @Output
- ```typescript
+```typescript
  import { Component, Input } from '@angular/core';
 
  @Component({
@@ -375,10 +375,10 @@ Metadata is used to decorate a class so that it can configure the expected behav
      @Input()
      title: string;
  }
- ```
+```
 
 3. **Method decorators** Used for methods inside classes, e.g. @HostListener
- ```typescript
+```typescript
  import { Component, HostListener } from '@angular/core';
 
  @Component({
@@ -391,10 +391,10 @@ Metadata is used to decorate a class so that it can configure the expected behav
          // clicked, `event` available
      }
  }
- ```
+```
 
 4. **Parameter decorators** Used for parameters inside class constructors, e.g. @Inject, @Optional
- ```typescript
+```typescript
  import { Component, Inject } from '@angular/core';
  import { MyService } from './my-service';
 
@@ -423,7 +423,7 @@ Metadata is used to decorate a class so that it can configure the expected behav
          console.log(myService); // MyService
      }
  }
- ```
+```
 
 ### 14. What is angular CLI?
 
@@ -719,15 +719,15 @@ A **template expression** in Angular produces a value similar to any JavaScript 
 #### 1. Common Template Expression Usages
 
 - **Property Binding (`[property]="expression"`)**:
-  ```html
+```html
   <button [disabled]="isSubmitting || !userForm.valid">Save Changes</button>
   <img [src]="userProfile.avatarUrl" [alt]="userProfile.displayName" />
-  ```
+```
 
 - **Interpolation (`{{ expression }}`)**:
-  ```html
+```html
   <h3>{{ user.firstName + ' ' + user.lastName }}, welcome to Angular!</h3>
-  ```
+```
 
 #### 2. Prohibited JavaScript Expressions in Template Expressions
 
@@ -884,22 +884,22 @@ Apart from built-in pipes, you can write your own custom pipe with the below key
 
 1. A pipe is a class decorated with pipe metadata `@Pipe` decorator, which you import from the core Angular library
 For example,
- ```javascript
+```javascript
      @Pipe({name: 'myCustomPipe'})
- ```
+```
 
 2. The pipe class implements the **PipeTransform** interface's transform method that accepts an input value followed by optional parameters and returns the transformed value.
 The structure of `PipeTransform` would be as below,
- ```javascript
+```javascript
  interface PipeTransform {
    transform(value: any, ...args: any[]): any
  }
- ```
+```
 
 3. The `@Pipe` decorator allows you to define the pipe name that you'll use within template expressions. It must be a valid JavaScript identifier.
- ```javascript
+```javascript
  template: `{{someInputValue | myCustomPipe: someOtherValue}}`
- ```
+```
 
 ### 32. Give an example of custom pipe?
 
@@ -1023,7 +1023,7 @@ The major advantages of HttpClient can be listed as below,
 Below are the steps need to be followed for the usage of `HttpClient`.
 
 1. Import `HttpClient` into root module:
- ```javascript
+```javascript
  import { HttpClientModule } from '@angular/common/http';
  @NgModule({
    imports: [
@@ -1034,11 +1034,11 @@ Below are the steps need to be followed for the usage of `HttpClient`.
    ......
    })
   export class AppModule {}
- ```
+```
 
 2. Inject the `HttpClient` into the application:
  Let's create a userProfileService(`userprofile.service.ts`) as an example. It also defines get method of `HttpClient`:
- ```javascript
+```javascript
  import { Injectable } from '@angular/core';
  import { HttpClient } from '@angular/common/http';
 
@@ -1052,11 +1052,11 @@ Below are the steps need to be followed for the usage of `HttpClient`.
      return this.http.get(this.userProfileUrl);
    }
  }
- ```
+```
 
 3. Create a component for subscribing service:
  Let's create a component called UserProfileComponent(`userprofile.component.ts`), which injects `UserProfileService` and invokes the service method:
- ```javascript
+```javascript
  fetchUserProfile() {
    this.userProfileService.getUserProfile()
      .subscribe((data: User) => this.user = {
@@ -1065,7 +1065,7 @@ Below are the steps need to be followed for the usage of `HttpClient`.
          city:  data['city']
      });
  }
- ```
+```
 Since the above service method returns an Observable which needs to be subscribed in the component.
 
 ### 38. How can you read full response?
@@ -1268,7 +1268,7 @@ source$.pipe(
 RxJS provides creation functions for the process of creating observables from promises, events, timers and Ajax requests. Let us explain each of them with an example:
 
 1. Create an observable from a promise
- ```javascript
+```javascript
  import { from } from 'rxjs'; // from function
  const data = from(fetch('/api/endpoint')); //Created from Promise
  data.subscribe({
@@ -1276,33 +1276,33 @@ RxJS provides creation functions for the process of creating observables from pr
   error(err) { console.error('Error: ' + err); },
   complete() { console.log('Completed'); }
  });
- ```
+```
 
 2. Create an observable that creates an AJAX request
- ```javascript
+```javascript
  import { ajax } from 'rxjs/ajax'; // ajax function
  const apiData = ajax('/api/data'); // Created from AJAX request
  // Subscribe to create the request
  apiData.subscribe(res => console.log(res.status, res.response));
- ```
+```
 
 3. Create an observable from a counter
- ```javascript
+```javascript
  import { interval } from 'rxjs'; // interval function
  const secondsCounter = interval(1000); // Created from Counter value
  secondsCounter.subscribe(n =>
    console.log(`Counter value: ${n}`));
- ```
+```
 
 4. Create an observable from an event
- ```javascript
+```javascript
  import { fromEvent } from 'rxjs';
  const el = document.getElementById('custom-element');
  const mouseMoves = fromEvent(el, 'mousemove');
  const subscription = mouseMoves.subscribe((e: MouseEvent) => {
    console.log(`Coordnitaes of mouse pointer: ${e.clientX} * ${e.clientY}`);
    });
- ```
+```
 
 ### 50. What will happen if you do not supply handler for the observer?
 
@@ -1452,12 +1452,12 @@ You can use the `NgElement` and `WithProperties` types exported from @angular/el
 Let's see how it can be applied by comparing with Angular component.
 
 1. The simple container with input property would be as below,
- ```javascript
+```javascript
  @Component(...)
  class MyContainer {
    @Input() message: string;
  }
- ```
+```
 
 2. After applying types typescript validates input value and their types,
 ```typescript
@@ -1523,7 +1523,7 @@ ng generate directive directives/auto-focus
 Let's take simple highlighter behavior as a example directive for DOM element. You can create and apply the attribute directive using below step:
 
 1. Create HighlightDirective class with the file name `src/app/highlight.directive.ts`. In this file, we need to import **Directive** from core library to apply the metadata and **ElementRef** in the directive's constructor to inject a reference to the host DOM element ,
- ```javascript
+```javascript
  import { Directive, ElementRef } from '@angular/core';
 
  @Directive({
@@ -1534,17 +1534,17 @@ Let's take simple highlighter behavior as a example directive for DOM element. Y
         el.nativeElement.style.backgroundColor = 'red';
      }
  }
- ```
+```
 
 2. Apply the attribute directive as an attribute to the host element(for example, <p>)
- ```javascript
+```javascript
  <p appHighlight>Highlight me!</p>
- ```
+```
 
 3. Run the application to see the highlight behavior on paragraph element
- ```javascript
+```javascript
  ng serve
- ```
+```
 
 
 
@@ -2002,15 +2002,15 @@ Below are some of the errors encountered in metadata,
 
 1. **Expression form not supported:** Some of the language features outside of the compiler's restricted expression syntax used in angular metadata can produce this error.
  Let's see some of these examples,
- ```javascript
+```javascript
  1. export class User { ... }
     const prop = typeof User; // typeof is not valid in metadata
  2. { provide: 'token', useValue: { [prop]: 'value' } }; // bracket notation is not valid in metadata
- ```
+```
 
 2. **Reference to a local (non-exported) symbol:** The compiler encountered a referenced to a locally defined symbol that either wasn't exported or wasn't initialized.
  Let's take example of this error,
- ```javascript
+```javascript
  // ERROR
  let username: string; // neither exported nor initialized
 
@@ -2022,34 +2022,34 @@ Below are some of the errors encountered in metadata,
    ]
  })
  export class MyComponent {}
- ```
+```
  You can fix this by either exporting or initializing the value,
- ```javascript
+```javascript
  export let username: string; // exported
  (or)
  let username = 'John'; // initialized
- ```
+```
 
 3. **Function calls are not supported:** The compiler does not currently support function expressions or lambda functions. For example, you cannot set a provider's useFactory to an anonymous function or arrow function as below.
- ```javascript
+```javascript
   providers: [
      { provide: MyStrategy, useFactory: function() { ... } },
      { provide: OtherStrategy, useFactory: () => { ... } }
    ]
- ```
+```
  You can fix this with exported function
- ```javascript
+```javascript
  export function myStrategy() { ... }
  export function otherStrategy() { ... }
  ... // metadata
  providers: [
      { provide: MyStrategy, useFactory: myStrategy },
      { provide: OtherStrategy, useFactory: otherStrategy },
- ```
+```
 
 4. **Destructured variable or constant not supported:** The compiler does not support references to variables assigned by destructuring.
  For example, you cannot write something like this:
- ```javascript
+```javascript
  import { user } from './user';
 
  // destructured assignment to name and age
@@ -2059,16 +2059,16 @@ Below are some of the errors encountered in metadata,
      {provide: Name, useValue: name},
      {provide: Age, useValue: age},
    ]
- ```
+```
  You can fix this by non-destructured values
- ```javascript
+```javascript
  import { user } from './user';
  ... //metadata
  providers: [
      {provide: Name, useValue: user.name},
      {provide: Age, useValue: user.age},
    ]
- ```
+```
 
 ### 90. What is metadata rewriting?
 
@@ -2271,7 +2271,7 @@ export const fadeInAnimation = trigger('fadeIn', [
 You need to follow below steps to implement animation in your angular project,
 
 1. **Enabling the animations module:** Import BrowserAnimationsModule to add animation capabilities into your Angular root application module(for example, src/app/app.module.ts).
-  ```javascript
+```javascript
   import { NgModule } from '@angular/core';
   import { BrowserModule } from '@angular/platform-browser';
   import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -2285,10 +2285,10 @@ You need to follow below steps to implement animation in your angular project,
     bootstrap: [ ]
   })
   export class AppModule { }
-  ```
+```
 
 2. **Importing animation functions into component files:** Import required animation functions from @angular/animations in component files(for example, src/app/app.component.ts).
-  ```javascript
+```javascript
   import {
     trigger,
     state,
@@ -2297,10 +2297,10 @@ You need to follow below steps to implement animation in your angular project,
     transition,
     // ...
   } from '@angular/animations';
-  ```
+```
 
 3. **Adding the animation metadata property:** add a metadata property called animations: within the @Component() decorator in component files(for example, src/app/app.component.ts)
-  ```javascript
+```javascript
   @Component({
     selector: 'app-root',
     templateUrl: 'app.component.html',
@@ -2309,7 +2309,7 @@ You need to follow below steps to implement animation in your angular project,
       // animation triggers go here
     ]
   })
-  ```
+```
 
 ### 103. What is State function?
 
@@ -2342,7 +2342,7 @@ backgroundColor: 'green'
 
 Angular Animations are a powerful way to implement sophisticated and compelling animations for your Angular single page web application.
 
- ```javascript
+```javascript
  import { Component, OnInit, Input } from '@angular/core';
  import { trigger, state, style, animate, transition } from '@angular/animations';
 
@@ -2380,7 +2380,7 @@ Angular Animations are a powerful way to implement sophisticated and compelling 
      ngOnInit() {
      }
  }
- ```
+```
 
 ### 106. What is transition function?
 
@@ -2477,20 +2477,20 @@ Angular Ivy is a new rendering engine for Angular. You can choose to opt in a pr
 
 1. You can enable ivy in a new project by using the --enable-ivy flag with the ng new command
 
-   ```bash
+```bash
    ng new ivy-demo-app --enable-ivy
-   ```
+```
 
 2. You can add it to an existing project by adding `enableIvy` option in the `angularCompilerOptions` in your project's `tsconfig.app.json`.
 
-   ```javascript
+```javascript
    {
      "compilerOptions": { ... },
      "angularCompilerOptions": {
        "enableIvy": true
      }
    }
-   ```
+```
 
 ### 112. What are the features included in ivy preview?
 
@@ -2600,15 +2600,15 @@ You can add web worker anywhere in your application. For example, If the file th
 
 1. Configure your project to use Web Workers
 2. Adds app.worker.ts to receive messages
-   ```javascript
+```javascript
    addEventListener('message', ({ data }) => {
      const response = `worker response to ${data}`;
      postMessage(response);
    });
-   ```
+```
 
 3. The component `app.component.ts` file updated with web worker file
-   ```javascript
+```javascript
    if (typeof Worker !== 'undefined') {
      // Create a new
      const worker = new Worker('./app.worker', { type: 'module' });
@@ -2619,7 +2619,7 @@ You can add web worker anywhere in your application. For example, If the file th
    } else {
      // Web Workers are not supported in this environment.
    }
-   ```
+```
 
 **Note:** You may need to refactor your initial scaffolding web worker code for sending messages to and from.
 
@@ -2856,15 +2856,15 @@ Below are the list of key advantages of Bazel tool,
 The @angular/bazel package provides a builder that allows Angular CLI to use Bazel as the build tool.
 
 1. **Use in an existing application:** Add @angular/bazel using CLI
-  ```javascript
+```javascript
   ng add @angular/bazel
-  ```
+```
 
 2. **Use in a new application:** Install the package and create the application with collection option
-  ```javascript
+```javascript
   npm install -g @angular/bazel
   ng new --collection=@angular/bazel
-  ```
+```
 When you use ng build and ng serve commands, Bazel is used behind the scenes and outputs the results in dist/bin folder.
 
 ### 135. How do you run Bazel directly?
@@ -3135,13 +3135,13 @@ The Angular CLI provides support for polyfills officially. When you create a new
 1. **Mandatory polyfills:** These are installed automatically when you create your project with ng new command and the respective import statements enabled in 'src/polyfills.ts' file.
 2. **Optional polyfills:** You need to install its npm package and then create import statement in 'src/polyfills.ts' file.
  For example, first you need to install below npm package for adding web animations (optional) polyfill.
-     ```bash
+```bash
       npm install --save web-animations-js
-     ```
+```
  and create import statement in polyfill file.
-     ```javascript
+```javascript
      import 'web-animations-js';
-     ```
+```
 
 
 
@@ -3695,28 +3695,28 @@ registerLocaleData(localeDe, 'de');
 The i18n template translation process has four phases:
 
 1. **Mark static text messages in your component templates for translation:** You can place i18n on every element tag whose fixed text is to be translated. For example, you need i18n attribute for heading as below,
-  ```javascript
+```javascript
   <h1 i18n>Hello i18n!</h1>
-  ```
+```
 
 2. **Create a translation file:** Use the Angular CLI xi18n command to extract the marked text into an industry-standard translation source file. i.e, Open terminal window at the root of the app project and run the CLI command xi18n.
-  ```bash
+```bash
   ng xi18n
-  ```
+```
  The above command creates a file named `messages.xlf` in your project's root directory.
 
  **Note:** You can supply command options to change the format, the name, the location, and the source locale of the extracted file.
 
 3. **Edit the generated translation file:** Translate the extracted text into the target language. In this step, create a localization folder (such as `locale`)under root directory(src) and then create target language translation file by copying and renaming the default messages.xlf file. You need to copy source text node and provide the translation under target tag.
   For example, create the translation file(messages.de.xlf) for German language
-  ```javascript
+```javascript
   <trans-unit id="greetingHeader" datatype="html">
     <source>Hello i18n!</source>
     <target>Hallo i18n !</target>
     <note priority="1" from="description">A welcome header for this sample</note>
     <note priority="1" from="meaning">welcome message</note>
   </trans-unit>
-  ```
+```
 
 4. **Merge the completed translation file into the app:** You need to use Angular CLI build command to compile the app, choosing a locale-specific configuration, or specifying the following command options.
 
@@ -3973,24 +3973,24 @@ ng generate @angular-devkit/schematics-cli:schematic --name=custom-schematic
 You can use jquery in Angular using 3 simple steps,
 
 1. **Install the dependency:** At first, install the jquery dependency using npm
-  ```cmd
+```cmd
      npm install --save jquery
-  ```
+```
 
 2. **Add the jquery script:** In Angular-CLI project, add the relative path to jquery in the angular.json file.
-  ```javascript
+```javascript
   "scripts": [
      "node_modules/jquery/dist/jquery.min.js"
   ]
-  ```
+```
 
 3. **Start using jquery:** Define the element in template. Whereas declare the jquery variable and apply CSS classes on the element.
-  ```html
+```html
   <div id="elementId">
     <h1>JQuery integration</h1>
   </div>
-  ```
-  ```javascript
+```
+```javascript
   import {Component, OnInit} from '@angular/core';
 
   declare var $: any; // (or) import * as $ from 'jquery';
@@ -4007,7 +4007,7 @@ You can use jquery in Angular using 3 simple steps,
       });
     }
   }
-  ```
+```
 
 ### 197. What is the reason for No provider for HTTP exception?
 
@@ -4265,16 +4265,16 @@ The modern `@switch` block eliminates the need for wrapper HTML elements, provid
 Yes, it is possible to do aliasing for inputs and outputs in two ways.
 
 1. **Aliasing in metadata:** The inputs and outputs in the metadata aliased using a colon-delimited (:) string with the directive property name on the left and the public alias on the right. i.e. It will be in the format of propertyName:alias.
-  ```javascript
+```javascript
   inputs: ['input1: buyItem'],
   outputs: ['outputEvent1: completedEvent']
-  ```
+```
 
 2. **Aliasing with @Input()/@Output() decorator:** The alias can be specified for the property name by passing the alias name to the @Input()/@Output() decorator.i.e. It will be in the form of @Input(alias) or @Output(alias).
-  ```javascript
+```javascript
   @Input('buyItem') input1: string;
   @Output('completedEvent') outputEvent1 = new EventEmitter<string>();
-  ```
+```
 
 ### 207. What is safe navigation operator?
 
@@ -4672,7 +4672,7 @@ export class AppService {}
 It is possible to restrict service provider scope to a specific module instead making available to entire application. There are two possible ways to do it.
 
 1. **Using providedIn in service:**
-  ```js
+```js
   import { Injectable } from '@angular/core';
   import { SomeModule } from './some.module';
 
@@ -4681,10 +4681,10 @@ It is possible to restrict service provider scope to a specific module instead m
   })
   export class SomeService {
   }
-  ```
+```
 
 2. **Declare provider for the service in module:**
-  ```js
+```js
   import { NgModule } from '@angular/core';
 
   import { SomeService } from './some.service';
@@ -4694,7 +4694,7 @@ It is possible to restrict service provider scope to a specific module instead m
   })
   export class SomeModule {
   }
-  ```
+```
 
 ### 235. How do you provide a singleton service?
 
@@ -4702,7 +4702,7 @@ There are two possible ways to provide a singleton service.
 
 1. Set the providedIn property of the @Injectable() to "root". This is the preferred way(starting from Angular 6.0) of creating a singleton service since it makes your services tree-shakable.
 
-  ```js
+```js
   import { Injectable } from '@angular/core';
 
   @Injectable({
@@ -4710,17 +4710,17 @@ There are two possible ways to provide a singleton service.
   })
   export class MyService {
   }
-  ```
+```
 
 2. Include the service in root module or in a module that is only imported by root module. It has been used to register services before Angular 6.0.
 
-  ```js
+```js
   @NgModule({
     ...
     providers: [MyService],
     ...
   })
-  ```
+```
 
 ### 236. What are the different ways to remove duplicate service registration?
 
@@ -4866,18 +4866,18 @@ Zone is loaded/required by default in Angular applications and it helps Angular 
 Let's follow the below two steps to remove zone.js,
 
 1. Remove the zone.js import from polyfills.ts.
-  ```js
+```js
   /***************************************************************************************************
    * Zone JS is required by default for Angular itself.
    */
   // import 'zone.js/dist/zone';  // Included with Angular CLI.
-  ```
+```
 
 2. Bootstrap Angular with noop zone in src/main.ts.
-  ```js
+```js
   platformBrowserDynamic().bootstrapModule(AppModule, {ngZone: 'noop'})
     .catch(err => console.error(err));
-  ```
+```
 
 ### 245. How do you create displayBlock components?
 
@@ -4893,7 +4893,7 @@ The change detection works in the following scenarios where the data changes nee
 
 1. **Component initialization:** While bootstrapping the Angular application, Angular triggers the `ApplicationRef.tick()` to call change detection and View Rendering.
 2. **Event listener:**  The DOM event listener can update the data in an Angular component and trigger the change detection too.
-  ```js
+```js
   @Component({
     selector: 'app-event-listener',
     template: `
@@ -4907,10 +4907,10 @@ The change detection works in the following scenarios where the data changes nee
       this.message = 'data updated';
     }
   }
-  ```
+```
 
 3. **HTTP Data Request:** You can get data from a server through an HTTP request
-  ```js
+```js
   data = 'default value';
   constructor(private httpClient: HttpClient) {}
 
@@ -4919,10 +4919,10 @@ The change detection works in the following scenarios where the data changes nee
         this.data = response.data; // change detection will happen automatically
       });
     }
-  ```
+```
 
 4. **Macro tasks setTimeout() or setInterval():** You can update the data in the callback function of setTimeout or setInterval
-  ```js
+```js
   data = 'default value';
 
     ngOnInit() {
@@ -4930,10 +4930,10 @@ The change detection works in the following scenarios where the data changes nee
         this.data = 'data updated'; // Change detection will happen automatically
       });
     }
-  ```
+```
 
 5. **Micro tasks Promises:** You can update the data in the callback function of promise
-  ```js
+```js
   data = 'initial value';
 
     ngOnInit() {
@@ -4941,7 +4941,7 @@ The change detection works in the following scenarios where the data changes nee
         this.data = v; // Change detection will happen automatically
       });
     }
-  ```
+```
 
 6. **Async operations like Web sockets and Canvas:** The data can be updated asynchronously using WebSocket.onmessage() and Canvas.toBlob().
 
@@ -4965,36 +4965,36 @@ The current zone is retrieved through `Zone.current`.
 There are four lifecycle hooks for asynchronous operations from zone.js.
 
 1. **onScheduleTask:** This hook triggers when a new asynchronous task is scheduled. For example, when you call setTimeout()
-  ```js
+```js
   onScheduleTask: function(delegate, curr, target, task) {
       console.log('new task is scheduled:', task.type, task.source);
       return delegate.scheduleTask(target, task);
     }
-  ```
+```
 
 2. **onInvokeTask:** This hook triggers when an asynchronous task is about to execute. For example, when the callback of setTimeout() is about to execute.
-  ```js
+```js
   onInvokeTask: function(delegate, curr, target, task, applyThis, applyArgs) {
       console.log('task will be invoked:', task.type, task.source);
       return delegate.invokeTask(target, task, applyThis, applyArgs);
     }
-  ```
+```
 
 3. **onHasTask:** This hook triggers when the status of one kind of task inside a zone changes from stable(no tasks in the zone) to unstable(a new task is scheduled in the zone) or from unstable to stable.
-  ```js
+```js
     onHasTask: function(delegate, curr, target, hasTaskState) {
       console.log('task state changed in the zone:', hasTaskState);
       return delegate.hasTask(target, hasTaskState);
     }
-  ```
+```
 
 4. **onInvoke:** This hook triggers when a synchronous function is going to execute in the zone.
-  ```js
+```js
   onInvoke: function(delegate, curr, target, callback, applyThis, applyArgs) {
       console.log('the callback will be invoked:', callback);
       return delegate.invoke(target, callback, applyThis, applyArgs);
     }
-  ```
+```
 
 ### 249. What are the methods of NgZone used to control change detection?
 
@@ -5110,16 +5110,16 @@ i.e, If we add the decorator, the metadata `design:paramtypes` is added, and the
 For example, Let's see the different variations of AppService in a root component,
 
 1. The below AppService can be injected in AppComponent without any problems. This is because there are no dependency services inside AppService.
-  ```js
+```js
   export class AppService {
     constructor() {
       console.log('A new app service');
     }
   }
-  ```
+```
 
 2. The below AppService with dummy decorator and httpService can be injected in AppComponent without any problems. This is because meta information is generated with dummy decorator.
-  ```js
+```js
   function SomeDummyDecorator() {
     return (constructor: Function) => console.log(constructor);
   }
@@ -5130,9 +5130,9 @@ For example, Let's see the different variations of AppService in a root componen
       console.log(http);
     }
   }
-  ```
+```
 and the generated javascript code of above service has meta information about HttpService,
-  ```js
+```js
   var AppService = (function () {
       function AppService(http) {
           console.log(http);
@@ -5144,10 +5144,10 @@ and the generated javascript code of above service has meta information about Ht
       return AppService;
   }());
   exports.AppService = AppService;
-  ```
+```
 
 3. The below AppService with @injectable decorator and httpService can be injected in AppComponent without any problems. This is because meta information is generated with Injectable decorator.
-  ```js
+```js
   @Injectable({
     providedIn: 'root',
   })
@@ -5156,7 +5156,7 @@ and the generated javascript code of above service has meta information about Ht
       console.log(http);
     }
   }
-  ```
+```
 
 ### 254. What is an optional dependency?
 
@@ -5198,7 +5198,7 @@ There are two types of injector hierarchies in Angular
 Reactive forms is a model-driven approach for creating forms in a reactive style(form inputs changes over time). These are built around observable streams, where form inputs and values are provided as streams of input values. Let's follow the below steps to create reactive forms,
 
 1. Register the reactive forms module which declares reactive-form directives in your app
-  ```js
+```js
   import { ReactiveFormsModule } from '@angular/forms';
 
   @NgModule({
@@ -5208,10 +5208,10 @@ Reactive forms is a model-driven approach for creating forms in a reactive style
     ],
   })
   export class AppModule { }
-  ```
+```
 
 2. Create a new FormControl instance and save it in the component.
-  ```js
+```js
   import { Component } from '@angular/core';
   import { FormControl } from '@angular/forms';
 
@@ -5222,15 +5222,15 @@ Reactive forms is a model-driven approach for creating forms in a reactive style
   export class UserProfileComponent {
     userName = new FormControl('');
   }
-  ```
+```
 
 3. Register the FormControl in the template.
-  ```js
+```js
   <label>
     User name:
     <input type="text" [formControl]="userName">
   </label>
-  ```
+```
 Finally, the component with reactive form control appears as below,
 ```js
 import { Component } from '@angular/core';
@@ -5272,7 +5272,7 @@ Template driven forms are model-driven forms where you write the logic, validati
 For example, you can create register form easily by following the below simple steps,
 
 1. Import the FormsModule into the Application module's imports array
-  ```js
+```js
      import { BrowserModule } from '@angular/platform-browser';
      import { NgModule } from '@angular/core';
      import {FormsModule} from '@angular/forms'
@@ -5289,22 +5289,22 @@ For example, you can create register form easily by following the below simple s
        bootstrap: [RegisterComponent]
      })
      export class AppModule { }
-  ```
+```
 
 2. Bind the form from template to the component using ngModel syntax
-  ```html
+```html
   <input type="text" class="form-control" id="name"
     required
     [(ngModel)]="model.name" name="name">
-  ```
+```
 
 3.  Attach NgForm directive to the <form> tag in order to create FormControl instances and register them
-  ```js
+```js
   <form #registerForm="ngForm">
-  ```
+```
 
 4. Apply the validation message for form controls
-  ```html
+```html
   <label for="name">Name</label>
   <input type="text" class="form-control" id="name"
          required
@@ -5314,14 +5314,14 @@ For example, you can create register form easily by following the below simple s
        class="alert alert-danger">
     Please enter your name
   </div>
-  ```
+```
 
 5. Let's submit the form with ngSubmit directive and add type="submit" button at the bottom of the form to trigger form submit.
-  ```html
+```html
   <form (ngSubmit)="onSubmit()" #heroForm="ngForm">
   // Form goes here
   <button type="submit" class="btn btn-success" [disabled]="!registerForm.form.valid">Submit</button>
-  ```
+```
 Finally, the completed template-driven registration form will be appeared as follow.
 ```html
 <div class="container">
@@ -5370,7 +5370,7 @@ Reactive forms provide two ways of grouping multiple related controls.
 
 1. **FormGroup**: It defines a form with a fixed set of controls those can be managed together in an one object. It has same properties and methods similar to a FormControl instance.
  This FormGroup can be nested to create complex forms as below.
- ```js
+```js
  import { Component } from '@angular/core';
  import { FormGroup, FormControl } from '@angular/forms';
 
@@ -5395,8 +5395,8 @@ Reactive forms provide two ways of grouping multiple related controls.
      // Store this.userProfile.value in DB
    }
  }
- ```
- ```html
+```
+```html
  <form [formGroup]="userProfile" (ngSubmit)="onSubmit()">
 
    <label>
@@ -5435,10 +5435,10 @@ Reactive forms provide two ways of grouping multiple related controls.
      <button type="submit" [disabled]="!userProfile.valid">Submit</button>
 
  </form>
- ```
+```
 
 2. **FormArray:** It defines a dynamic form in an array format, where you can add and remove controls at run time. This is useful for dynamic forms when you don’t know how many controls will be present within the group.
-    ```js
+```js
      import { Component } from '@angular/core';
      import { FormArray, FormControl } from '@angular/forms';
 
@@ -5471,8 +5471,8 @@ Reactive forms provide two ways of grouping multiple related controls.
          this.orderForm.controls['items'].removeAt(index);
        }
      }
-    ```
-    ```html
+```
+```html
     <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
 
       <label>
@@ -5497,7 +5497,7 @@ Reactive forms provide two ways of grouping multiple related controls.
         Add an item
       </button>
      </div>
-    ```
+```
 
 ### 261. How do you update specific properties of a form model?
 
@@ -5631,14 +5631,14 @@ Since all validators run after every form value change, it creates a major impac
 The usage would be different based on form types,
 
 1. **Template-driven forms:** Set the property on `ngModelOptions` directive
-  ```html
+```html
   <input [(ngModel)]="name" [ngModelOptions]="{updateOn: 'blur'}">
-  ```
+```
 
 2. **Reactive-forms:** Set the property on FormControl instance
-  ```js
+```js
   name = new FormControl('', {updateOn: 'blur'});
-  ```
+```
 
 ### 269. How to set ngFor and ngIf on the same element?
 

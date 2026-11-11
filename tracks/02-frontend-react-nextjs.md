@@ -2386,24 +2386,23 @@ export default function MyProfile {
 }
 ```
 
-<details><summary><b>See Class</b></summary>
-<p>
+<details>
+<summary><b>See Class</b></summary>
+
 ```jsx
 import React from "react";
 import User from "user";
 
 export default class MyProfile extends React.Component {
-render() {
-return <User type="customer">//...</User>;
+  render() {
+    return <User type="customer">//...</User>;
+  }
 }
-}
-
 ```
-</p>
+
 </details>
 
 With the export specifier, the MyProfile is going to be the member and exported to this module and the same can be imported without mentioning the name in other components.
-```
 
 ---
 
@@ -2576,10 +2575,6 @@ Another popular plugin is `eslint-plugin-jsx-a11y`, which will help fix common i
 }
 ```
 
-
-
-#### Part 2: React Router & Navigation (79 - 89)
-
 ---
 
 ## Part 2: React Router & Navigation (78 - 88)
@@ -2689,7 +2684,7 @@ There are three different ways to achieve programmatic routing/navigation within
 
  The `withRouter()` higher-order function will inject the history object as a prop of the component. This object provides `push()` and `replace()` methods to avoid the usage of context.
 
- ```jsx harmony
+ ```jsx
  import { withRouter } from "react-router-dom"; // this also works with 'react-router-native'
 
  const Button = withRouter(({ history }) => (
@@ -2708,7 +2703,7 @@ There are three different ways to achieve programmatic routing/navigation within
 
  The `<Route>` component passes the same props as `withRouter()`, so you will be able to access the history methods through the history prop.
 
- ```jsx harmony
+ ```jsx
  import { Route } from "react-router-dom";
 
  const Button = () => (
@@ -2731,7 +2726,7 @@ There are three different ways to achieve programmatic routing/navigation within
 
  This option is not recommended and treated as unstable API.
 
- ```jsx harmony
+ ```jsx
  const Button = (props, context) => (
    <button
      type="button"
@@ -2843,7 +2838,7 @@ Below are the list of steps to get history object on React Router v4,
 
 2.  You should use the `<Router>` component instead of built-in routers. Import the above `history.js` inside `index.js` file:
 
- ```jsx harmony
+ ```jsx
  import { Router } from "react-router-dom";
  import history from "./history";
  import App from "./App";
@@ -2908,10 +2903,6 @@ render() {
 
 #### React Internationalization
 
-
-
-#### Part 3: React Internationalization (90 - 95)
-
 ---
 
 ## Part 3: React Internationalization (89 - 94)
@@ -2975,7 +2966,7 @@ The library provides two ways to format strings, numbers, and dates:
 
 1.  **Using react components:**
 
- ```jsx harmony
+ ```jsx
  <FormattedMessage
    id={"account"}
    defaultMessage={"The amount is less than minimum balance."}
@@ -3066,10 +3057,6 @@ export default injectIntl(MyComponent);
 
 
 #### React Testing
-
-
-
-#### Part 4: React Testing & Jest (96 - 101)
 
 ---
 
@@ -3231,10 +3218,6 @@ PASS ./sum.test.js
 ```
 
 #### React Redux
-
-
-
-#### Part 5: React Redux State Management (102 - 135)
 
 ---
 
@@ -4023,10 +4006,6 @@ text: 'Add todo item'
 
 #### React Native
 
-
-
-#### Part 6: React Native Architecture (136 - 139)
-
 ---
 
 ## Part 6: React Native Architecture (135 - 138)
@@ -4106,10 +4085,6 @@ Follow the below steps to debug React Native app:
 // 2. Chrome Inspect (Hermes debugger)
 // 3. React Native LogBox in simulator
 ```
-
-
-
-#### Part 7: Supported Libraries, Styling & Integrations (140 - 152)
 
 ---
 
@@ -4234,7 +4209,7 @@ You need to follow below steps to use Polymer in React,
 
 1. Create a Polymer element:
 
- ```jsx harmony
+ ```jsx
  <link
    rel="import"
    href="../../bower_components/polymer/polymer.html"
@@ -4390,10 +4365,6 @@ Relay is a JavaScript framework for providing a data layer and client-server com
 ```javascript
 // Relay: Production-grade GraphQL client library for React created by Meta
 ```
-
-
-
-#### Part 8: Advanced React Patterns, Portals & Performance (153 - 264)
 
 ---
 
@@ -7438,10 +7409,6 @@ There are two guidelines to be taken care while writing reducers in your code.
 // 3. Return original state by default for unknown action types
 ```
 
-
-
-#### Part 9: React Hooks Deep Dive (265 - 319)
-
 ---
 
 ## Part 9: React Hooks Deep Dive (262 - 316)
@@ -9616,10 +9583,6 @@ Always return a cleanup function when subscribing to events, timers, or external
 
 #### Modern React Features (React 18/19)
 
-
-
-#### Part 10: Modern React 18, React 19 & Next.js Patterns (320 - 356)
-
 ---
 
 ## Part 10: Modern React 18, React 19 & Next.js Patterns (317 - 353)
@@ -11516,19 +11479,19 @@ If you try to update the state directly then it won't re-render the component.
 
 The callback function provided as the second argument to `setState` is executed after the state has been updated and the component has re-rendered. Because `setState()` is asynchronous, you cannot reliably perform actions that require the updated state immediately after calling `setState`. The callback ensures your code runs only after the update and re-render are complete.
 
-    #### Example
+#### Example
 
-    ```jsx
+```jsx
     this.setState({ name: "Alex Morgan" }, () => {
       console.log("The name has been updated and the component has re-rendered.");
     });
-    ```
+```
 
-    #### When to use the callback?
+#### When to use the callback?
 
     Use the `setState` callback when you need to perform an action immediately after the DOM has been updated in response to a state change. i.e, The callback is a reliable way to perform actions after a state update and re-render, especially when the timing is critical due to the asynchronous nature of state updates in React. For example, if you need to interact with the updated DOM, trigger analytics, or perform further computations that depend on the new state or rendered output.
 
-    #### Note
+#### Note
 
     - In modern React (with function components), you can achieve similar effects using the `useEffect` hook to respond to state changes.
     - In class components, you can also use lifecycle methods like `componentDidUpdate` for broader post-update logic.
@@ -11542,7 +11505,7 @@ There are 3 possible ways to achieve this in class components:
 
    1. **Binding in Constructor:** In JavaScript classes, the methods are not bound by default. The same rule applies for React event handlers defined as class methods. Normally we bind them in constructor.
 
-      ```javascript
+```javascript
       class User extends Component {
         constructor(props) {
           super(props);
@@ -11555,30 +11518,30 @@ There are 3 possible ways to achieve this in class components:
           return <button onClick={this.handleClick}>SingOut</button>;
         }
       }
-      ```
+```
 
    2. **Public class fields syntax:** If you don't like to use bind approach then _public class fields syntax_ can be used to correctly bind callbacks. The Create React App enables this syntax by default.
 
-      ```jsx harmony
+```jsx
       handleClick = () => {
         console.log("SingOut triggered", this);
       };
-      ```
+```
 
-      ```jsx harmony
+```jsx
       <button onClick={this.handleClick}>SingOut</button>
-      ```
+```
 
    3. **Arrow functions in callbacks:** It is possible to use _arrow functions_ directly in the callbacks.
 
-      ```jsx harmony
+```jsx
       handleClick() {
           console.log('SingOut triggered');
       }
       render() {
           return <button onClick={() => this.handleClick()}>SignOut</button>;
       }
-      ```
+```
 
    **Note:** If the callback is passed as prop to child components, those components might do an extra re-rendering. In those cases, it is preferred to go with `.bind()` or _public class fields syntax_ approach considering performance.
 
@@ -11588,19 +11551,19 @@ There are 3 possible ways to achieve this in class components:
 
 You can use an _arrow function_ to wrap around an _event handler_ and pass parameters:
 
-   ```jsx harmony
+   ```jsx
    <button onClick={() => this.handleClick(id)} />
    ```
 
    This is an equivalent to calling `.bind`:
 
-   ```jsx harmony
+   ```jsx
    <button onClick={this.handleClick.bind(this, id)} />
    ```
 
    Apart from these two approaches, you can also pass arguments to a function which is defined as arrow function
 
-   ```jsx harmony
+   ```jsx
    <button onClick={this.handleClick(id)} />;
    handleClick = (id) => () => {
      console.log("Hello, your ticket number is", id);
@@ -11646,7 +11609,7 @@ There are two approaches
 
    1. This is a recently added approach. _Refs_ are created using `React.createRef()` method and attached to React elements via the `ref` attribute. In order to use _refs_ throughout the component, just assign the _ref_ to the instance property within constructor.
 
-      ```jsx harmony
+```jsx
       class MyComponent extends React.Component {
         constructor(props) {
           super(props);
@@ -11656,10 +11619,10 @@ There are two approaches
           return <div ref={this.myRef} />;
         }
       }
-      ```
+```
 
    2. You can also use ref callbacks approach regardless of React version. For example, the search bar component's input element is accessed as follows,
-      ```jsx harmony
+```jsx
       class SearchBar extends Component {
         constructor(props) {
           super(props);
@@ -11682,7 +11645,7 @@ There are two approaches
           );
         }
       }
-      ```
+```
 
    You can also use _refs_ in function components using **closures**.
    **Note**: You can also use inline ref callbacks even though it is not a recommended approach.
@@ -11693,7 +11656,7 @@ There are two approaches
 
 _Ref forwarding_ is a feature that lets some components take a _ref_ they receive, and pass it further down to a child.
 
-   ```jsx harmony
+   ```jsx
    const ButtonElement = React.forwardRef((props, ref) => (
      <button ref={ref} className="CustomButton">
        {props.children}
@@ -11754,7 +11717,7 @@ If you worked with React before, you might be familiar with an older API where t
    3. They _don't work with static analysis_ like Flow. Flow can't guess the magic that framework does to make the string ref appear on `this.refs`, as well as its type (which could be different). Callback refs are friendlier to static analysis.
    4. It doesn't work as most people would expect with the "render callback" pattern (e.g. <DataGrid renderRow={this.renderRow} />)
 
-      ```jsx harmony
+```jsx
       class MyComponent extends Component {
         renderRow = (index) => {
           // This won't work. Ref will get attached to DataTable rather than MyComponent:
@@ -11770,7 +11733,7 @@ If you worked with React before, you might be familiar with an older API where t
           );
         }
       }
-      ```
+```
 
 ---
 
@@ -11916,7 +11879,7 @@ export class OrderTracker extends Component<{ orderId: string }, { status: strin
 
 You can add/edit props passed to the component using _props proxy_ pattern like this:
 
-    ```jsx harmony
+```jsx
     function HOC(WrappedComponent) {
       return class Test extends Component {
         render() {
@@ -11931,7 +11894,7 @@ You can add/edit props passed to the component using _props proxy_ pattern like 
         }
       };
     }
-    ```
+```
 
 ---
 
@@ -11941,9 +11904,9 @@ _Context_ provides a way to pass data through the component tree without having 
 
     For example, authenticated users, locale preferences, UI themes need to be accessed in the application by many components.
 
-    ```javascript
+```javascript
     const { Provider, Consumer } = React.createContext(defaultValue);
-    ```
+```
 
 ---
 
@@ -11953,7 +11916,7 @@ A child class constructor cannot make use of `this` reference until the `super()
 
     **Passing props:**
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       constructor(props) {
         super(props);
@@ -11961,11 +11924,11 @@ A child class constructor cannot make use of `this` reference until the `super()
         console.log(this.props); // prints { name: 'John', age: 42 }
       }
     }
-    ```
+```
 
     **Not passing props:**
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       constructor(props) {
         super();
@@ -11981,7 +11944,7 @@ A child class constructor cannot make use of `this` reference until the `super()
         console.log(this.props); // prints { name: 'John', age: 42 }
       }
     }
-    ```
+```
 
     The above code snippets reveals that `this.props` is different only within the constructor. It would be the same outside the constructor.
 
@@ -11991,11 +11954,11 @@ A child class constructor cannot make use of `this` reference until the `super()
 
 If you are using ES6 or the Babel transpiler to transform your JSX code then you can accomplish this with _computed property names_.
 
-    ```javascript
+```javascript
     handleInputChange(event) {
       this.setState({ [event.target.id]: event.target.value })
     }
-    ```
+```
 
 ---
 
@@ -12003,21 +11966,21 @@ If you are using ES6 or the Babel transpiler to transform your JSX code then you
 
 You need to make sure that function is not being called while passing the function as a parameter.
 
-    ```jsx harmony
+```jsx
     render() {
       // Wrong: handleClick is called instead of passed as a reference!
       return <button onClick={this.handleClick()}>{'Click Me'}</button>
     }
-    ```
+```
 
     Instead, pass the function itself without parenthesis:
 
-    ```jsx harmony
+```jsx
     render() {
       // Correct: handleClick is passed as a reference!
       return <button onClick={this.handleClick}>{'Click Me'}</button>
     }
-    ```
+```
 
 ---
 
@@ -12031,7 +11994,7 @@ You need to make sure that function is not being called while passing the functi
     - `static getDerivedStateFromError(error)` - for rendering fallback UI
     - `componentDidCatch(error, info)` - for logging error information
 
-    ```jsx harmony
+```jsx
     class ErrorBoundary extends React.Component {
       constructor(props) {
         super(props);
@@ -12057,15 +12020,15 @@ You need to make sure that function is not being called while passing the functi
         return this.props.children;
       }
     }
-    ```
+```
 
     Usage:
 
-    ```jsx harmony
+```jsx
     <ErrorBoundary>
       <MyWidget />
     </ErrorBoundary>
-    ```
+```
 
     **Note:** Error boundaries currently only work with class components. There is no hook equivalent yet, though `use()` hook in React 19 provides some error handling capabilities.
 
@@ -12125,9 +12088,9 @@ class ModernErrorBoundary extends React.Component<any, { hasError: boolean }> {
 
 This method is used to render a React element into the DOM in the supplied container and return a reference to the component. If the React element was previously rendered into container, it will perform an update on it and only mutate the DOM as necessary to reflect the latest changes.
 
-    ```
+```
     ReactDOM.render(element, container, [callback])
-    ```
+```
 
     If the optional callback is provided, it will be executed after the component is rendered or updated.
 
@@ -12178,7 +12141,7 @@ class UserProfile extends Component {
     **Modern Alternative:**
     Use `componentDidMount()` for side effects and async initialization in class components:
 
-    ```jsx harmony
+```jsx
     componentDidMount() {
       axios.get(`api/todos`)
         .then((result) => {
@@ -12187,7 +12150,7 @@ class UserProfile extends Component {
           })
         })
     }
-    ```
+```
 
 ---
 
@@ -12197,7 +12160,7 @@ If the props on the component are changed without the component being refreshed,
 
     The below component won't display the updated input value:
 
-    ```jsx harmony
+```jsx
     class MyComponent extends React.Component {
       constructor(props) {
         super(props);
@@ -12212,11 +12175,11 @@ If the props on the component are changed without the component being refreshed,
         return <div>{this.state.inputValue}</div>;
       }
     }
-    ```
+```
 
     Using props inside render method will update the value:
 
-    ```jsx harmony
+```jsx
     class MyComponent extends React.Component {
       constructor(props) {
         super(props);
@@ -12230,7 +12193,7 @@ If the props on the component are changed without the component being refreshed,
         return <div>{this.props.inputValue}</div>;
       }
     }
-    ```
+```
 
 ---
 
@@ -12238,7 +12201,7 @@ If the props on the component are changed without the component being refreshed,
 
 You can _decorate_ your _class_ components, which is the same as passing the component into a function. **Decorators** are flexible and readable way of modifying component functionality.
 
-    ```jsx harmony
+```jsx
     @setTitle("Profile")
     class Profile extends React.Component {
       //....
@@ -12260,7 +12223,7 @@ You can _decorate_ your _class_ components, which is the same as passing the com
         }
       };
     };
-    ```
+```
 
     **Note:** Decorators are a feature that didn't make it into ES7, but are currently a _stage 2 proposal_.
 
@@ -12280,19 +12243,19 @@ You can _decorate_ your _class_ components, which is the same as passing the com
 
     Let's create Todo App using _CRA_:
 
-    ```console
-    # Installation
+```console
+# Installation
     $ npm install -g create-react-app
 
-    # Create new project
+# Create new project
     $ create-react-app todo-app
     $ cd todo-app
 
-    # Build, test and run
+# Build, test and run
     $ npm run build
     $ npm run test
     $ npm start
-    ```
+```
 
     It includes everything we need to build a React app:
 
@@ -12308,22 +12271,22 @@ You can _decorate_ your _class_ components, which is the same as passing the com
     **Modern Alternatives (Recommended 2026):**
 
     **1. Vite (Best for SPAs):**
-    ```console
+```console
     npm create vite@latest my-app -- --template react
     cd my-app
     npm install
     npm run dev
-    ```
+```
     - Lightning-fast HMR (Hot Module Replacement)
     - Modern ESM-based development
     - Optimized production builds with Rollup
 
     **2. Next.js (Best for full-stack/SSR):**
-    ```console
+```console
     npx create-next-app@latest my-app
     cd my-app
     npm run dev
-    ```
+```
     - Server-side rendering and App Router
     - Server Components and Server Actions
     - Built-in routing, API routes, and optimizations
@@ -12437,13 +12400,13 @@ function ModernReplacement({ userId }: { userId: string }) {
 
 The new static `getDerivedStateFromProps()` lifecycle method is invoked after a component is instantiated as well as before it is re-rendered. It can return an object to update state, or `null` to indicate that the new props do not require any state updates.
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       static getDerivedStateFromProps(props, state) {
         // ...
       }
     }
-    ```
+```
 
     This lifecycle method along with `componentDidUpdate()` covers all the use cases of `componentWillReceiveProps()`.
 
@@ -12453,13 +12416,13 @@ The new static `getDerivedStateFromProps()` lifecycle method is invoked after a 
 
 The new `getSnapshotBeforeUpdate()` lifecycle method is called right before DOM updates. The return value from this method will be passed as the third parameter to `componentDidUpdate()`.
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       getSnapshotBeforeUpdate(prevProps, prevState) {
         // ...
       }
     }
-    ```
+```
 
     This lifecycle method along with `componentDidUpdate()` covers all the use cases of `componentWillUpdate()`.
 
@@ -12471,29 +12434,29 @@ It is recommended to name the component by reference instead of using `displayNa
 
     Using `displayName` for naming component:
 
-    ```javascript
+```javascript
     export default React.createClass({
       displayName: "TodoApp",
       // ...
     });
-    ```
+```
 
     The **recommended** approach:
 
-    ```javascript
+```javascript
     export default class TodoApp extends React.Component {
       // ...
     }
-    ```
+```
 
     also
 
-    ```javascript
+```javascript
     const TodoApp = () => {
       //...
     };
     export default TodoApp;
-    ```
+```
 
 ---
 
@@ -12559,46 +12522,46 @@ The reason behind for this is that `setState()` is an asynchronous operation. Re
 
     Let's say the initial count value is zero. After three consecutive increment operations, the value is going to be incremented only by one.
 
-    ```javascript
+```javascript
     // assuming this.state.count === 0
     this.setState({ count: this.state.count + 1 });
     this.setState({ count: this.state.count + 1 });
     this.setState({ count: this.state.count + 1 });
     // this.state.count === 1, not 3
-    ```
+```
 
     If we pass a function to `setState()`, the count gets incremented correctly.
 
-    ```javascript
+```javascript
     this.setState((prevState, props) => ({
       count: prevState.count + props.increment,
     }));
     // this.state.count === 3 as expected
-    ```
+```
 
     **(OR)**
 
-    ### Why function is preferred over object for `setState()`?
+### Why function is preferred over object for `setState()`?
 
     React may batch multiple `setState()` calls into a single update for performance. Because `this.props` and `this.state` may be updated asynchronously, you should not rely on their values for calculating the next state.
 
     This counter example will fail to update as expected:
 
-    ```javascript
+```javascript
     // Wrong
     this.setState({
       counter: this.state.counter + this.props.increment,
     });
-    ```
+```
 
     The preferred approach is to call `setState()` with function rather than object. That function will receive the previous state as the first argument, and the props at the time the update is applied as the second argument.
 
-    ```javascript
+```javascript
     // Correct
     this.setState((prevState, props) => ({
       counter: prevState.counter + props.increment,
     }));
-    ```
+```
 
 ---
 
@@ -12606,11 +12569,11 @@ The reason behind for this is that `setState()` is an asynchronous operation. Re
 
 The primary use case for `isMounted()` is to avoid calling `setState()` after a component has been unmounted, because it will emit a warning.
 
-    ```javascript
+```javascript
     if (this.isMounted()) {
       this.setState({...})
     }
-    ```
+```
 
     Checking `isMounted()` before calling `setState()` does eliminate the warning, but it also defeats the purpose of the warning. Using `isMounted()` is a code smell because the only reason you would check is because you think you might be holding a reference after the component has unmounted.
 
@@ -12624,7 +12587,7 @@ You should initialize state in the constructor when using ES6 classes, and `getI
 
     **Using ES6 classes:**
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       constructor(props) {
         super(props);
@@ -12633,11 +12596,11 @@ You should initialize state in the constructor when using ES6 classes, and `getI
         };
       }
     }
-    ```
+```
 
     **Using `React.createClass()`:**
 
-    ```javascript
+```javascript
     const MyComponent = React.createClass({
       getInitialState() {
         return {
@@ -12645,7 +12608,7 @@ You should initialize state in the constructor when using ES6 classes, and `getI
         };
       },
     });
-    ```
+```
 
     **Note:** `React.createClass()` is deprecated and removed in React v16. Use plain JavaScript classes instead.
 
@@ -12655,9 +12618,9 @@ You should initialize state in the constructor when using ES6 classes, and `getI
 
 By default, when your component's state or props change, your component will re-render. If your `render()` method depends on some other data, you can tell React that the component needs re-rendering by calling `forceUpdate()`.
 
-    ```javascript
+```javascript
     component.forceUpdate(callback);
-    ```
+```
 
     It is recommended to avoid all uses of `forceUpdate()` and only read from `this.props` and `this.state` in `render()`.
 
@@ -12669,25 +12632,25 @@ When you want to access `this.props` in `constructor()` then you should pass pro
 
     **Using `super(props)`:**
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       constructor(props) {
         super(props);
         console.log(this.props); // { name: 'John', ... }
       }
     }
-    ```
+```
 
     **Using `super()`:**
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       constructor(props) {
         super();
         console.log(this.props); // undefined
       }
     }
-    ```
+```
 
     Outside `constructor()` both will display same value for `this.props`.
 
@@ -12730,9 +12693,9 @@ class StateMergeDemo extends Component {
 
 The `componentDidUpdate` lifecycle method will be called when state changes. You can compare provided state and props values with current state and props to determine if something meaningful changed.
 
-    ```
+```
     componentDidUpdate(object prevProps, object prevState)
-    ```
+```
 
     **Note:** The previous releases of ReactJS also uses `componentWillUpdate(object nextProps, object nextState)` for state changes. It has been deprecated in latest releases.
 
@@ -12744,13 +12707,13 @@ The better approach is to use `Array.prototype.filter()` method.
 
     For example, let's create a `removeItem()` method for updating the state.
 
-    ```javascript
+```javascript
     removeItem(index) {
       this.setState({
         data: this.state.data.filter((item, i) => i !== index)
       })
     }
-    ```
+```
 
 ---
 
@@ -12758,59 +12721,59 @@ The better approach is to use `Array.prototype.filter()` method.
 
 It is possible. Below are the possible options:
 
-    ```jsx harmony
+```jsx
     render() {
       return false
     }
-    ```
+```
 
-    ```jsx harmony
+```jsx
     render() {
       return true
     }
-    ```
+```
 
-    ```jsx harmony
+```jsx
     render() {
       return null
     }
-    ```
+```
 
     React version >=16.0.0:
 
-    ```jsx harmony
+```jsx
     render() {
       return []
     }
-    ```
+```
 
-    ```jsx harmony
+```jsx
     render() {
       return ""
     }
-    ```
+```
 
     React version >=16.2.0:
 
-    ```jsx harmony
+```jsx
     render() {
       return <React.Fragment></React.Fragment>
     }
-    ```
+```
 
-    ```jsx harmony
+```jsx
     render() {
       return <></>
     }
-    ```
+```
 
     React version >=18.0.0:
 
-    ```jsx harmony
+```jsx
     render() {
       return undefined
     }
-    ```
+```
 
 ---
 
@@ -12820,28 +12783,28 @@ It is possible. Below are the possible options:
 
         - Using `Object.assign()` to create a copy of the object:
 
-          ```javascript
+```javascript
           const user = Object.assign({}, this.state.user, { age: 42 });
           this.setState({ user });
-          ```
+```
 
         - Using _spread operator_:
 
-          ```javascript
+```javascript
           const user = { ...this.state.user, age: 42 };
           this.setState({ user });
-          ```
+```
 
     2.  **Calling `setState()` with a function:**
 
-        ```javascript
+```javascript
         this.setState((prevState) => ({
           user: {
             ...prevState.user,
             age: 42,
           },
         }));
-        ```
+```
 
 ---
 
@@ -12853,19 +12816,19 @@ There are approaches to include polyfills in create-react-app,
 
         Create a file called (something like) `polyfills.js` and import it into root `index.js` file. Run `npm install core-js` or `yarn add core-js` and import your specific required features.
 
-        ```javascript
+```javascript
         import "core-js/fn/array/find";
         import "core-js/fn/array/includes";
         import "core-js/fn/number/is-nan";
-        ```
+```
 
     2.  **Using Polyfill service:**
 
         Use the polyfill.io CDN to retrieve custom, browser-specific polyfills by adding this line to `index.html`:
 
-        ```html
+```html
         <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default,Array.prototype.includes"></script>
-        ```
+```
 
         In the above script we had to explicitly request the `Array.prototype.includes` feature as it is not included in the default feature set.
 
@@ -12875,11 +12838,11 @@ There are approaches to include polyfills in create-react-app,
 
 You just need to use `HTTPS=true` configuration. You can edit your `package.json` scripts section:
 
-    ```json
+```json
     "scripts": {
       "start": "set HTTPS=true && react-scripts start"
     }
-    ```
+```
 
     or just run `set HTTPS=true && npm start`
 
@@ -12889,9 +12852,9 @@ You just need to use `HTTPS=true` configuration. You can edit your `package.json
 
 Create a file called `.env` in the project root and write the import path:
 
-    ```
+```
     NODE_PATH=src/app
-    ```
+```
 
     After that restart the development server. Now you should be able to import anything inside `src/app` without relative paths.
 
@@ -12901,7 +12864,7 @@ Create a file called `.env` in the project root and write the import path:
 
 You need to use `setInterval()` to trigger the change, but you also need to clear the timer when the component unmounts to prevent errors and memory leaks.
 
-    ```javascript
+```javascript
     componentDidMount() {
       this.interval = setInterval(() => this.setState({ time: Date.now() }), 1000)
     }
@@ -12909,7 +12872,7 @@ You need to use `setInterval()` to trigger the change, but you also need to clea
     componentWillUnmount() {
       clearInterval(this.interval)
     }
-    ```
+```
 
 ---
 
@@ -12954,11 +12917,11 @@ export function ProfileContainer() {
 
 You can use ES7 `static` field to define constant.
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       static DEFAULT_PAGINATION = 10;
     }
-    ```
+```
 
 ---
 
@@ -12970,15 +12933,15 @@ You could use the ref prop to acquire a reference to the underlying `HTMLInputEl
 
     1.  Create ref in render method:
 
-        ```jsx harmony
+```jsx
         <input ref={(input) => (this.inputElement = input)} />
-        ```
+```
 
     2.  Apply click event in your event handler:
 
-        ```javascript
+```javascript
         this.inputElement.click();
-        ```
+```
 
 ---
 
@@ -12988,7 +12951,7 @@ You can use AJAX libraries such as Axios, jQuery AJAX, and the browser built-in 
 
     For example, the employees list fetched from API and set local state:
 
-    ```jsx harmony
+```jsx
     class MyComponent extends React.Component {
       constructor(props) {
         super(props);
@@ -13030,7 +12993,7 @@ You can use AJAX libraries such as Axios, jQuery AJAX, and the browser built-in 
         }
       }
     }
-    ```
+```
 
 ---
 
@@ -13038,13 +13001,13 @@ You can use AJAX libraries such as Axios, jQuery AJAX, and the browser built-in 
 
 **Render Props** is a technique for sharing code/logic between components using a prop whose value is a function that returns a React element. Instead of duplicating stateful logic in every component that needs it, a "provider" component encapsulates the logic and delegates *what to render* to its caller via this function prop.
 
-    ```jsx harmony
+```jsx
     <DataProvider render={(data) => <h1>{`Hello ${data.target}`}</h1>} />
-    ```
+```
 
-    #### Full example
+#### Full example
 
-    ```jsx harmony
+```jsx
     class DataProvider extends React.Component {
       state = { target: "World" };
 
@@ -13059,25 +13022,25 @@ You can use AJAX libraries such as Axios, jQuery AJAX, and the browser built-in 
         <DataProvider render={(data) => <h1>{`Hello ${data.target}`}</h1>} />
       );
     }
-    ```
+```
 
     Here, `DataProvider` owns the state, but has no opinion on markup — any consumer can reuse the same logic while rendering completely different UI.
 
-    #### Why use render props?
+#### Why use render props?
 
     1.  **Cross-cutting logic reuse:** Encapsulates logic (data fetching, subscriptions, mouse/scroll tracking, form state, etc.) once and reuses it across many components without inheritance.
     2.  **Explicit data flow:** Unlike HOCs, which implicitly inject props, render props make it obvious exactly what data is being passed to the render function since it's right there as an argument.
     3.  **No naming collisions:** HOCs composed together can silently clash on injected prop names; with render props, you control the destructuring/naming at the call site.
     4.  **Flexible children API:** The render function doesn't need to be named `render` — the `children` prop can also be used as a function (see [Must a prop be named "render" for render props?](#is-it-prop-must-be-named-as-render-for-render-props)).
 
-    #### Common use cases
+#### Common use cases
 
     - Tracking mouse position / window size and sharing it with multiple components.
     - Toggling UI state (modals, accordions, dropdowns) — see [How do you create HOC using render props?](#how-do-you-create-hoc-using-render-props).
     - Fetching remote data and letting the consumer decide how to render loading/success/error states.
     - Libraries such as React Router (`<Route render={...} />`) and Downshift use this pattern.
 
-    #### Downsides
+#### Downsides
 
     - Can lead to deeply nested JSX ("wrapper hell") when composing many render-prop components together.
     - Defining an inline arrow function as the render prop on every render can hurt performance with `PureComponent`/`React.memo` since a new function reference is created each time (see [What are the problems with using render props with Pure Components?](#what-are-the-problems-of-using-render-props-with-pure-components)).
@@ -13089,7 +13052,7 @@ You can use AJAX libraries such as Axios, jQuery AJAX, and the browser built-in 
 
 You can dispatch an action in `componentDidMount()` method and in `render()` method you can verify the data.
 
-    ```javascript
+```javascript
     class App extends Component {
       componentDidMount() {
         this.props.fetchData();
@@ -13111,7 +13074,7 @@ You can dispatch an action in `componentDidMount()` method and in `render()` met
     const mapDispatchToProps = { fetchData };
 
     export default connect(mapStateToProps, mapDispatchToProps)(App);
-    ```
+```
 
 ---
 
@@ -13122,7 +13085,7 @@ You need to follow two steps to use your store in your container:
     1.  **Use `mapStateToProps()`:** It maps the state variables from your store to the props that you specify.
     2.  **Connect the above props to your container:** The object returned by the `mapStateToProps` function is connected to the container. You can import `connect()` from `react-redux`.
 
-        ```jsx harmony
+```jsx
         import React from "react";
         import { connect } from "react-redux";
 
@@ -13137,7 +13100,7 @@ You need to follow two steps to use your store in your container:
         }
 
         export default connect(mapStateToProps)(App);
-        ```
+```
 
 ---
 
@@ -13149,7 +13112,7 @@ The **@** symbol is in fact a JavaScript expression used to signify decorators. 
 
     - **Without decorator:**
 
-      ```javascript
+```javascript
       import React from "react";
       import * as actionCreators from "./actionCreators";
       import { bindActionCreators } from "redux";
@@ -13168,11 +13131,11 @@ The **@** symbol is in fact a JavaScript expression used to signify decorators. 
       }
 
       export default connect(mapStateToProps, mapDispatchToProps)(MyApp);
-      ```
+```
 
     - **With decorator:**
 
-      ```javascript
+```javascript
       import React from "react";
       import * as actionCreators from "./actionCreators";
       import { bindActionCreators } from "redux";
@@ -13190,7 +13153,7 @@ The **@** symbol is in fact a JavaScript expression used to signify decorators. 
       export default class MyApp extends React.Component {
         // ...define your main app here
       }
-      ```
+```
 
     The above examples are almost similar except the usage of decorator. The decorator syntax isn't built into any JavaScript runtimes yet, and is still experimental and subject to change. You can use babel for the decorators support.
 
@@ -13202,25 +13165,25 @@ Starting from react-scripts@3.3.0+ releases onwards, you can now optionally star
 
         The typeScript can be used in your project by appending `--template typescript` to the creation command.
 
-         ```bash
+```bash
          npx create-react-app my-app --template typescript
-         ```
+```
 
         But if you are using React Scripting between react-scripts@2.1.0 and react-scripts@3.2.x , there is a built-in support for TypeScript. i.e, `create-react-app` now supports TypeScript natively. You can just pass `--typescript` option as below
 
-         ```bash
+```bash
          npx create-react-app my-app --typescript
 
-         # or
+# or
 
          yarn create react-app my-app --typescript
-         ```
+```
 
          Whereas for lower versions of react scripts, just supply `--scripts-version` option as `react-scripts-ts` while you create a new project. `react-scripts-ts` is a set of adjustments to take the standard `create-react-app` project pipeline and bring TypeScript into the mix.
 
          Now the project layout should look like the following:
 
-         ```
+```
          my-app/
          ├─ .gitignore
          ├─ images.d.ts
@@ -13233,7 +13196,7 @@ Starting from react-scripts@3.3.0+ releases onwards, you can now optionally star
          ├─ tsconfig.prod.json
          ├─ tsconfig.test.json
          └─ tslint.json
-         ```
+```
 
 ---
 
@@ -13241,7 +13204,7 @@ Starting from react-scripts@3.3.0+ releases onwards, you can now optionally star
 
 No, `statics` only works with `React.createClass()`:
 
-    ```javascript
+```javascript
     someComponent = React.createClass({
       statics: {
         someMethod: function () {
@@ -13249,11 +13212,11 @@ No, `statics` only works with `React.createClass()`:
         },
       },
     });
-    ```
+```
 
     But you can write statics inside ES6+ classes as below,
 
-    ```javascript
+```javascript
     class Component extends React.Component {
       static propTypes = {
         // ...
@@ -13263,18 +13226,18 @@ No, `statics` only works with `React.createClass()`:
         // ...
       }
     }
-    ```
+```
 
     or writing them outside class as below,
 
-    ```javascript
+```javascript
     class Component extends React.Component {
        ....
     }
 
     Component.propTypes = {...}
     Component.someMethod = function(){....}
-    ```
+```
 
 ---
 
@@ -13282,7 +13245,7 @@ No, `statics` only works with `React.createClass()`:
 
 If the ref callback is defined as an inline function, it will get called twice during updates, first with null and then again with the DOM element. This is because a new instance of the function is created with each render, so React needs to clear the old ref and set up the new one.
 
-    ```jsx
+```jsx
     class UserForm extends Component {
       handleSubmit = () => {
         console.log("Input Value is: ", this.input.value);
@@ -13298,11 +13261,11 @@ If the ref callback is defined as an inline function, it will get called twice d
         );
       }
     }
-    ```
+```
 
     But our expectation is for the ref callback to get called once, when the component mounts. One quick fix is to use the ES7 class property syntax to define the function
 
-    ```jsx
+```jsx
     class UserForm extends Component {
       handleSubmit = () => {
         console.log("Input Value is: ", this.input.value);
@@ -13322,7 +13285,7 @@ If the ref callback is defined as an inline function, it will get called twice d
         );
       }
     }
-    ```
+```
 
 ---
 
@@ -13339,7 +13302,7 @@ There are two main ways of implementing HOCs in React.
 
     In this approach, the render method of the HOC returns a React Element of the type of the WrappedComponent. We also pass through the props that the HOC receives, hence the name **Props Proxy**.
 
-    ```jsx
+```jsx
     function ppHOC(WrappedComponent) {
       return class PP extends React.Component {
         render() {
@@ -13347,13 +13310,13 @@ There are two main ways of implementing HOCs in React.
         }
       };
     }
-    ```
+```
 
     **Inheritance Inversion**
 
     In this approach, the returned HOC class (Enhancer) extends the WrappedComponent. It is called Inheritance Inversion because instead of the WrappedComponent extending some Enhancer class, it is passively extended by the Enhancer. In this way the relationship between them seems **inverse**.
 
-    ```jsx
+```jsx
     function iiHOC(WrappedComponent) {
       return class Enhancer extends WrappedComponent {
         render() {
@@ -13361,7 +13324,7 @@ There are two main ways of implementing HOCs in React.
         }
       };
     }
-    ```
+```
 
 ---
 
@@ -13371,7 +13334,7 @@ React Class Components can be made much more concise using the class field decla
 
     Let's take a counter example to demonstrate class field declarations for state without using constructor and methods without binding,
 
-    ```jsx
+```jsx
     class Counter extends Component {
       state = { value: 0 };
 
@@ -13398,7 +13361,7 @@ React Class Components can be made much more concise using the class field decla
         );
       }
     }
-    ```
+```
 
 ---
 
@@ -13410,7 +13373,7 @@ Error boundaries do not catch errors inside event handlers.
 
     If you need to catch an error inside an event handler, use the regular JavaScript try / catch statement:
 
-    ```javascript
+```javascript
     class MyComponent extends React.Component {
       constructor(props) {
         super(props);
@@ -13433,7 +13396,7 @@ Error boundaries do not catch errors inside event handlers.
         return <button onClick={this.handleClick}>Click Me</button>;
       }
     }
-    ```
+```
 
     Note that the above example is demonstrating regular JavaScript behavior and doesn’t use error boundaries.
 
@@ -13445,21 +13408,21 @@ Try catch block works with imperative code whereas error boundaries are meant fo
 
     For example, the try catch block used for below imperative code
 
-    ```javascript
+```javascript
     try {
       showButton();
     } catch (error) {
       // ...
     }
-    ```
+```
 
     Whereas error boundaries wrap declarative code as below,
 
-    ```javascript
+```javascript
     <ErrorBoundary>
       <MyComponent />
     </ErrorBoundary>
-    ```
+```
 
     So if an error occurs in a **componentDidUpdate** method caused by a **setState** somewhere deep in the tree, it will still correctly propagate to the closest error boundary.
 
@@ -13544,14 +13507,14 @@ The constructor is mainly used for two purposes,
     2.  For binding event handler methods to the instance
         For example, the below code covers both the above cases,
 
-    ```javascript
+```javascript
     constructor(props) {
       super(props);
       // Don't call this.setState() here!
       this.state = { counter: 0 };
       this.handleClick = this.handleClick.bind(this);
     }
-    ```
+```
 
 ---
 
@@ -13628,13 +13591,13 @@ This lifecycle method is invoked after an error has been thrown by a descendant 
 
     The signature of the lifecycle method is as follows,
 
-    ```javascript
+```javascript
     static getDerivedStateFromError(error)
-    ```
+```
 
     Let us take error boundary use case with the above lifecycle method for demonstration purpose,
 
-    ```javascript
+```javascript
     class ErrorBoundary extends React.Component {
       constructor(props) {
         super(props);
@@ -13655,7 +13618,7 @@ This lifecycle method is invoked after an error has been thrown by a descendant 
         return this.props.children;
       }
     }
-    ```
+```
 
 ---
 
@@ -13760,9 +13723,9 @@ This method is available from react-dom package and it removes a mounted React c
 
     The method signature would be as follows,
 
-    ```javascript
+```javascript
     ReactDOM.unmountComponentAtNode(container);
-    ```
+```
 
 ---
 
@@ -13773,7 +13736,7 @@ Higher-order components come with a few caveats apart from its benefits. Below a
     1.  **Don’t use HOCs inside the render method:**
         It is not recommended to apply a HOC to a component within the render method of a component.
 
-        ```javascript
+```javascript
         render() {
           // A new version of EnhancedComponent is created on every render
           // EnhancedComponent1 !== EnhancedComponent2
@@ -13781,14 +13744,14 @@ Higher-order components come with a few caveats apart from its benefits. Below a
           // That causes the entire subtree to unmount/remount each time!
           return <EnhancedComponent />;
         }
-        ```
+```
 
         The above code impacts on performance by remounting a component that causes the state of that component and all of its children to be lost. Instead, apply HOCs outside the component definition so that the resulting component is created only once.
 
     2.  **Static methods must be copied over:**
         When you apply a HOC to a component the new component does not have any of the static methods of the original component
 
-        ```javascript
+```javascript
         // Define a static method
         WrappedComponent.staticMethod = function () {
           /*...*/
@@ -13798,11 +13761,11 @@ Higher-order components come with a few caveats apart from its benefits. Below a
 
         // The enhanced component has no static method
         typeof EnhancedComponent.staticMethod === "undefined"; // true
-        ```
+```
 
         You can overcome this by copying the methods onto the container before returning it,
 
-        ```javascript
+```javascript
         function enhance(WrappedComponent) {
           class Enhance extends React.Component {
             /*...*/
@@ -13811,7 +13774,7 @@ Higher-order components come with a few caveats apart from its benefits. Below a
           Enhance.staticMethod = WrappedComponent.staticMethod;
           return Enhance;
         }
-        ```
+```
 
     3.  **Refs aren’t passed through:**
         For HOCs you need to pass through all props to the wrapped component but this does not work for refs. This is because ref is not really a prop similar to key. In this case you need to use the React.forwardRef API
@@ -13824,23 +13787,23 @@ Higher-order components come with a few caveats apart from its benefits. Below a
 
     For example, If you don't name the render function or not using displayName property then it will appear as ”ForwardRef” in the DevTools,
 
-    ```javascript
+```javascript
     const WrappedComponent = React.forwardRef((props, ref) => {
       return <LogProps {...props} forwardedRef={ref} />;
     });
-    ```
+```
 
     But If you name the render function then it will appear as **”ForwardRef(myFunction)”**
 
-    ```javascript
+```javascript
     const WrappedComponent = React.forwardRef(function myFunction(props, ref) {
       return <LogProps {...props} forwardedRef={ref} />;
     });
-    ```
+```
 
     As an alternative, You can also set displayName property for forwardRef function,
 
-    ```javascript
+```javascript
     function logProps(Component) {
       class LogProps extends React.Component {
         // ...
@@ -13857,7 +13820,7 @@ Higher-order components come with a few caveats apart from its benefits. Below a
 
       return React.forwardRef(forwardRef);
     }
-    ```
+```
 
 ---
 
@@ -13865,7 +13828,7 @@ Higher-order components come with a few caveats apart from its benefits. Below a
 
 Yes, You can use. It is often the easiest way to pass parameters to callback functions. But you need to optimize the performance while using it.
 
-    ```javascript
+```javascript
     class Foo extends Component {
       handleClick() {
         console.log("Click happened");
@@ -13874,7 +13837,7 @@ Yes, You can use. It is often the easiest way to pass parameters to callback fun
         return <button onClick={() => this.handleClick()}>Click Me</button>;
       }
     }
-    ```
+```
 
     **Note:** Using an arrow function in render method creates a new function each time the component renders, which may have performance implications
 
@@ -13886,7 +13849,7 @@ When you call setState() in the component, React merges the object you provide i
 
     For example, let us take a facebook user with posts and comments details as state variables,
 
-    ```javascript
+```javascript
       constructor(props) {
         super(props);
         this.state = {
@@ -13894,11 +13857,11 @@ When you call setState() in the component, React merges the object you provide i
           comments: []
         };
       }
-    ```
+```
 
     Now you can update them independently with separate `setState()` calls as below,
 
-    ```javascript
+```javascript
      componentDidMount() {
         fetchPosts().then(response => {
           this.setState({
@@ -13912,7 +13875,7 @@ When you call setState() in the component, React merges the object you provide i
           });
         });
       }
-    ```
+```
 
     As mentioned in the above code snippets, `this.setState({comments})` updates only comments variable without modifying or replacing `posts` variable.
 
@@ -13924,10 +13887,10 @@ During iterations or loops, it is common to pass an extra parameter to an event 
 
     Let us take an example of user details updated in a grid,
 
-    ```javascript
+```javascript
     <button onClick={(e) => this.updateUser(userId, e)}>Update User details</button>
     <button onClick={this.updateUser.bind(this, userId)}>Update User details</button>
-    ```
+```
 
     In the both approaches, the synthetic argument `e` is passed as a second argument. You need to pass it explicitly for arrow functions and it will be passed automatically for `bind` method.
 
@@ -13937,7 +13900,7 @@ During iterations or loops, it is common to pass an extra parameter to an event 
 
 You can prevent component from rendering by returning null based on specific condition. This way it can conditionally render component.
 
-    ```javascript
+```javascript
     function Greeting(props) {
       if (!props.loggedIn) {
         return null;
@@ -13945,9 +13908,9 @@ You can prevent component from rendering by returning null based on specific con
 
       return <div className="greeting">welcome, {props.name}</div>;
     }
-    ```
+```
 
-    ```javascript
+```javascript
     class User extends React.Component {
       constructor(props) {
         super(props);
@@ -13963,7 +13926,7 @@ You can prevent component from rendering by returning null based on specific con
            </div>
        );
       }
-    ```
+```
 
     In the above example, the `greeting` component skips its rendering section by applying condition and returning null value.
 
@@ -13975,7 +13938,7 @@ You can prevent component from rendering by returning null based on specific con
 
     For example, in the code below lets manually thread through a “theme” prop in order to style the Button component.
 
-    ```javascript
+```javascript
     //Lets create a context with a default theme value "luna"
     const ThemeContext = React.createContext("luna");
     // Create App component where it uses provider to pass theme value in the tree
@@ -14003,7 +13966,7 @@ You can prevent component from rendering by returning null based on specific con
         return <Button theme={this.context} />;
       }
     }
-    ```
+```
 
 ---
 
@@ -14016,7 +13979,7 @@ ContextType is used to consume the context object. The contextType property can 
 
         Lets assign contextType property on MyClass as below,
 
-        ```javascript
+```javascript
         class MyClass extends React.Component {
           componentDidMount() {
             let value = this.context;
@@ -14036,12 +13999,12 @@ ContextType is used to consume the context object. The contextType property can 
           }
         }
         MyClass.contextType = MyContext;
-        ```
+```
 
     2.  **Static field**
         You can use a static class field to initialize your contextType using public class field syntax.
 
-        ```javascript
+```javascript
         class MyClass extends React.Component {
           static contextType = MyContext;
           render() {
@@ -14049,7 +14012,7 @@ ContextType is used to consume the context object. The contextType property can 
             /* render something based on the value */
           }
         }
-        ```
+```
 
 ---
 
@@ -14059,11 +14022,11 @@ A Consumer is a React component that subscribes to context changes. It requires 
 
     Lets take a simple example,
 
-    ```javascript
+```javascript
     <MyContext.Consumer>
       {value => /* render something based on the context value */}
     </MyContext.Consumer>
-    ```
+```
 
 ---
 
@@ -14073,7 +14036,7 @@ The context uses reference identity to determine when to re-render, there are so
 
     For example, the code below will re-render all consumers every time the Provider re-renders because a new object is always created for value.
 
-    ```javascript
+```javascript
     class App extends React.Component {
       render() {
         return (
@@ -14083,11 +14046,11 @@ The context uses reference identity to determine when to re-render, there are so
         );
       }
     }
-    ```
+```
 
     This can be solved by lifting up the value to parent state,
 
-    ```javascript
+```javascript
     class App extends React.Component {
       constructor(props) {
         super(props);
@@ -14104,7 +14067,7 @@ The context uses reference identity to determine when to re-render, there are so
         );
       }
     }
-    ```
+```
 
 ---
 
@@ -14114,7 +14077,7 @@ Refs will not get passed through because ref is not a prop. It is handled differ
 
     The below HOC logs all props,
 
-    ```javascript
+```javascript
     function logProps(Component) {
       class LogProps extends React.Component {
         componentDidUpdate(prevProps) {
@@ -14134,11 +14097,11 @@ Refs will not get passed through because ref is not a prop. It is handled differ
         return <LogProps {...props} forwardedRef={ref} />;
       });
     }
-    ```
+```
 
     Let's use this HOC to log all props that get passed to our “fancy button” component,
 
-    ```javascript
+```javascript
     class FancyButton extends React.Component {
       focus() {
         // ...
@@ -14147,17 +14110,17 @@ Refs will not get passed through because ref is not a prop. It is handled differ
       // ...
     }
     export default logProps(FancyButton);
-    ```
+```
 
     Now let's create a ref and pass it to FancyButton component. In this case, you can set focus to button element.
 
-    ```javascript
+```javascript
     import FancyButton from "./FancyButton";
 
     const ref = React.createRef();
     ref.current.focus();
     <FancyButton label="Click Me" handleClick={handleClick} ref={ref} />;
-    ```
+```
 
 ---
 
@@ -14224,7 +14187,7 @@ export const LibraryButton = forwardRef<HTMLButtonElement, { label: string }>(
 
 If you don’t use ES6 then you may need to use the create-react-class module instead. For default props, you need to define getDefaultProps() as a function on the passed object. Whereas for initial state, you have to provide a separate getInitialState method that returns the initial state.
 
-    ```javascript
+```javascript
     var Greeting = createReactClass({
       getDefaultProps: function () {
         return {
@@ -14241,7 +14204,7 @@ If you don’t use ES6 then you may need to use the create-react-class module in
         return <h1>Hello, {this.props.name}</h1>;
       },
     });
-    ```
+```
 
     **Note:** If you use createReactClass then auto binding is available for all methods. i.e, You don't need to use `.bind(this)` with in constructor for event handlers.
 
@@ -14253,7 +14216,7 @@ Yes, JSX is not mandatory for using React. Actually it is convenient when you do
 
     For example, let us take a greeting example with JSX,
 
-    ```javascript
+```javascript
     class Greeting extends React.Component {
       render() {
         return <div>Hello {this.props.message}</div>;
@@ -14264,11 +14227,11 @@ Yes, JSX is not mandatory for using React. Actually it is convenient when you do
       <Greeting message="World" />,
       document.getElementById("root")
     );
-    ```
+```
 
     You can write the same code without JSX as below,
 
-    ```javascript
+```javascript
     class Greeting extends React.Component {
       render() {
         return React.createElement("div", null, `Hello ${this.props.message}`);
@@ -14279,7 +14242,7 @@ Yes, JSX is not mandatory for using React. Actually it is convenient when you do
       React.createElement(Greeting, { message: "World" }, null),
       document.getElementById("root")
     );
-    ```
+```
 
 ---
 
@@ -14287,7 +14250,7 @@ Yes, JSX is not mandatory for using React. Actually it is convenient when you do
 
 You can implement most higher-order components (HOC) using a regular component with a render prop. For example, if you would prefer to have a withMouse HOC instead of a <Mouse> component, you could easily create one using a regular <Mouse> with a render prop.
 
-    ```javascript
+```javascript
     function withMouse(Component) {
       return class extends React.Component {
         render() {
@@ -14299,7 +14262,7 @@ You can implement most higher-order components (HOC) using a regular component w
         }
       };
     }
-    ```
+```
 
     This way render props gives the flexibility of using either pattern.
 
@@ -14408,13 +14371,13 @@ Redux team has provided official redux+js or redux+typescript templates for crea
     4.  Small "counter" example to demo how to add redux logic and React-Redux hooks API to interact with the store from components
         The below commands need to be executed along with template option as below,
     5.  **Javascript template:**
-    ```js
+```js
     npx create-react-app my-app --template redux
-    ```
+```
     2.  **Typescript template:**
-    ```js
+```js
     npx create-react-app my-app --template redux-typescript
-    ```
+```
 
 ---
 
@@ -14426,7 +14389,7 @@ Redux team has provided official redux+js or redux+typescript templates for crea
 
     Ex:
 
-    ```javascript
+```javascript
     class A extends React.component {
       constructor(props) {
         super(props);
@@ -14440,7 +14403,7 @@ Redux team has provided official redux+js or redux+typescript templates for crea
       loading = (() => true)(); // Trying to perform an operation and directly saving in a state variable
     }
 
-    ```
+```
 
     **How to prevent it:** Make sure your state variables are immutable by either enforcing immutability by using plugins like Immutable.js, always using `setState` to make updates, and returning new instances in reducers when sending updated state values.
 
@@ -14457,14 +14420,14 @@ Redux team has provided official redux+js or redux+typescript templates for crea
 
     One of the most commonly used mixins was `PureRenderMixin`:
 
-    ```javascript
+```javascript
     const PureRenderMixin = require("react-addons-pure-render-mixin");
 
     const Button = React.createClass({
       mixins: [PureRenderMixin],
       // ...
     });
-    ```
+```
 
     **Modern Alternatives:**
     - **React.memo()** for functional components (replaces PureRenderMixin)
@@ -14472,12 +14435,12 @@ Redux team has provided official redux+js or redux+typescript templates for crea
     - **Higher-Order Components (HOCs)** for cross-cutting concerns
     - **Render Props** pattern
 
-    ```javascript
+```javascript
     // Modern equivalent using React.memo
     const Button = React.memo(({ onClick, label }) => (
       <button onClick={onClick}>{label}</button>
     ));
-    ```
+```
 
 ---
 
@@ -14487,20 +14450,20 @@ Redux team has provided official redux+js or redux+typescript templates for crea
 
      In React 16.9, `javascript:` URLs would log a warning in the console because URLs starting with `javascript:` are dangerous security vulnerabilities (XSS attacks).
 
-     ```javascript
+```javascript
      const companyProfile = {
        website: "javascript: alert('Your website is hacked')",
      };
      // This logged a warning in React 16.9
      // Now blocked or throws error in modern React
      <a href={companyProfile.website}>More details</a>;
-     ```
+```
 
      **Modern Best Practice:**
      - Never use `javascript:` URLs
      - Use proper event handlers instead:
      
-     ```javascript
+```javascript
      const handleClick = (e) => {
        e.preventDefault();
        // Your logic here
@@ -14509,6 +14472,6 @@ Redux team has provided official redux+js or redux+typescript templates for crea
      <a href="#" onClick={handleClick}>More details</a>
      // Or better:
      <button onClick={handleClick}>More details</button>
-     ```
+```
 
 ---

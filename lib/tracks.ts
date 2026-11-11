@@ -32,17 +32,32 @@ export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestio
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line.startsWith('## Part ') || line.startsWith('## PART ')) {
+    if (/^##\s+Part\s+/i.test(line)) {
+      if (currentQ) {
+        let contentStr = currentContent.join('\n').trim();
+        contentStr = contentStr.replace(/\n*---\s*$/, '').trim();
+        questions.push({
+          number: currentQ.number,
+          title: currentQ.title,
+          part: currentQ.part,
+          content: contentStr,
+        });
+        currentQ = null;
+        currentContent = [];
+      }
       currentPart = line.replace(/^##\s+/, '').trim();
+      continue;
     } else if (line.startsWith('### ')) {
       const match = line.trimEnd().match(/^### (\d+)\.\s*(.+)$/);
       if (match) {
         if (currentQ) {
+          let contentStr = currentContent.join('\n').trim();
+          contentStr = contentStr.replace(/\n*---\s*$/, '').trim();
           questions.push({
             number: currentQ.number,
             title: currentQ.title,
             part: currentQ.part,
-            content: currentContent.join('\n').trim(),
+            content: contentStr,
           });
         }
         currentQ = {
@@ -60,11 +75,13 @@ export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestio
   }
 
   if (currentQ) {
+    let contentStr = currentContent.join('\n').trim();
+    contentStr = contentStr.replace(/\n*---\s*$/, '').trim();
     questions.push({
       number: currentQ.number,
       title: currentQ.title,
       part: currentQ.part,
-      content: currentContent.join('\n').trim(),
+      content: contentStr,
     });
   }
 

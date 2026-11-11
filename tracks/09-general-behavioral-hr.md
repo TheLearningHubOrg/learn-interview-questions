@@ -1031,7 +1031,7 @@ Every page should be **actionable, urgent, and customer-impacting**. If an alert
 
 #### Practical Script & Summary Template
 
-```markdown
+````markdown
 # Runbook: HighDatabaseConnectionPoolSaturation
 
 ## Alert Description
@@ -1051,7 +1051,7 @@ P1 - Critical (Risk of service-wide 504 gateway timeouts)
    kubectl rollout restart deployment/pgbouncer -n production
    ```
 4. If problem persists, escalate to Database Administrator (DBA) on-call.
-```
+````
 
 ---
 

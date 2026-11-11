@@ -15,7 +15,8 @@ import {
   STUDY_PLANS, 
   StudyPlan, 
   getStudyPlanProgress, 
-  StudyPlanProgress 
+  StudyPlanProgress,
+  getPlanActiveDayNumber
 } from '@/lib/study-plans';
 import { STUDY_PROGRESS_UPDATE_EVENT } from '@/lib/study-progress';
 import { StudyPlanModal } from './StudyPlanModal';
@@ -69,6 +70,7 @@ export function StudyPlansBanner() {
             const studied = prog?.studiedCount || 0;
 
             const is7Day = plan.id === '7-day-sprint';
+            const activeDay = getPlanActiveDayNumber(plan);
 
             return (
               <div
@@ -137,14 +139,14 @@ export function StudyPlansBanner() {
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
-                      <span>{plan.days.length} Daily Modules</span>
+                      <span>{prog?.isFullyCompleted ? '🎉 Sprint Mastered' : `Active: Day ${activeDay} of ${plan.durationDays}`}</span>
                     </span>
 
                     <button
                       type="button"
                       className="flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform"
                     >
-                      <span>Open Plan Schedule</span>
+                      <span>{prog?.studiedCount && prog.studiedCount > 0 ? `Resume Day ${activeDay}` : 'Start Sprint'}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>

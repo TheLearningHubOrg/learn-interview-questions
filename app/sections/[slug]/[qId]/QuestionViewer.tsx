@@ -42,7 +42,15 @@ import {
   FLASHCARD_MODE_UPDATE_EVENT
 } from '@/lib/study-progress';
 import { recordStudyActivity } from '@/lib/study-streak';
-import { getQuestionStudyPlanBadges } from '@/lib/study-plans';
+import { 
+  getQuestionStudyPlanBadges, 
+  getSprintQuestionNavigation, 
+  SprintQuestionNavigation, 
+  STUDY_PLANS, 
+  StudyPlan,
+  ACTIVE_PLAN_UPDATE_EVENT 
+} from '@/lib/study-plans';
+import { StudyPlanModal } from '@/components/StudyPlanModal';
 import { QuestionNotesDrawer } from '@/components/QuestionNotesDrawer';
 import { getQuestionNote, NOTES_UPDATE_EVENT } from '@/lib/study-notes';
 
@@ -120,6 +128,28 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState<boolean>(false);
   const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
   const [hasNote, setHasNote] = useState<boolean>(false);
+  const [sprintNav, setSprintNav] = useState<SprintQuestionNavigation | null>(null);
+  const [isSprintModalOpen, setIsSprintModalOpen] = useState<boolean>(false);
+  const [selectedSprintPlan, setSelectedSprintPlan] = useState<StudyPlan | null>(null);
+  const [sprintModalDay, setSprintModalDay] = useState<number | undefined>(undefined);
+
+  // Sync sprint study timeline context for current question
+  useEffect(() => {
+    const refreshSprint = () => {
+      setSprintNav(getSprintQuestionNavigation(track.slug, question.number));
+    };
+
+    refreshSprint();
+    window.addEventListener(STUDY_PROGRESS_UPDATE_EVENT, refreshSprint);
+    window.addEventListener(ACTIVE_PLAN_UPDATE_EVENT, refreshSprint);
+    window.addEventListener('storage', refreshSprint);
+
+    return () => {
+      window.removeEventListener(STUDY_PROGRESS_UPDATE_EVENT, refreshSprint);
+      window.removeEventListener(ACTIVE_PLAN_UPDATE_EVENT, refreshSprint);
+      window.removeEventListener('storage', refreshSprint);
+    };
+  }, [track.slug, question.number]);
 
   // Check if note exists for this question
   useEffect(() => {
@@ -227,7 +257,9 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
     if (!isBookmarked) {
       handleToggleBookmark();
     }
-    if (nextQuestion) {
+    if (sprintNav?.nextQuestion) {
+      router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}`);
+    } else if (nextQuestion) {
       router.push(`/sections/${track.slug}/${nextQuestion.number}`);
     }
   };
@@ -236,13 +268,15 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
     if (!isCurrentStudied) {
       toggleStudied(question.number);
     }
-    if (nextQuestion) {
+    if (sprintNav?.nextQuestion) {
+      router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}`);
+    } else if (nextQuestion) {
       router.push(`/sections/${track.slug}/${nextQuestion.number}`);
     }
   };
 
   // Keyboard Navigation:
-  // ArrowLeft/ArrowRight: Prev/Next
+  // ArrowLeft/ArrowRight: Prev/Next (follows Sprint Plan when active)
   // G: Jump Grid
   // F: Toggle Flashcard Mode
   // Space: Reveal/Hide Answer in Flashcard Mode
@@ -252,12 +286,22 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
 
-      if (e.key === 'ArrowLeft' && prevQuestion) {
-        e.preventDefault();
-        router.push(`/sections/${track.slug}/${prevQuestion.number}`);
-      } else if (e.key === 'ArrowRight' && nextQuestion) {
-        e.preventDefault();
-        router.push(`/sections/${track.slug}/${nextQuestion.number}`);
+      if (e.key === 'ArrowLeft') {
+        if (sprintNav?.prevQuestion) {
+          e.preventDefault();
+          router.push(`/sections/${sprintNav.prevQuestion.trackSlug}/${sprintNav.prevQuestion.questionNumber}`);
+        } else if (prevQuestion) {
+          e.preventDefault();
+          router.push(`/sections/${track.slug}/${prevQuestion.number}`);
+        }
+      } else if (e.key === 'ArrowRight') {
+        if (sprintNav?.nextQuestion) {
+          e.preventDefault();
+          router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}`);
+        } else if (nextQuestion) {
+          e.preventDefault();
+          router.push(`/sections/${track.slug}/${nextQuestion.number}`);
+        }
       } else if (e.key === 'g' || e.key === 'G') {
         setIsGridOpen((prev) => !prev);
       } else if (e.key === 'f' || e.key === 'F') {
@@ -448,6 +492,48 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         </div>
       </div>
 
+      {/* Sprint Study Timeline Active Module Banner */}
+      {sprintNav && (
+        <div className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-purple-500/10 border border-amber-500/30 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-orange-500/20 shrink-0">
+              <Zap className="w-5 h-5 fill-current" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+                  {sprintNav.plan.title}
+                </span>
+                <span className="text-muted-foreground text-xs hidden sm:inline">•</span>
+                <span className="text-xs font-bold text-foreground">
+                  Day {sprintNav.dayNumber}: {sprintNav.day.title}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5 font-medium truncate">
+                Question {sprintNav.dayIndex} of {sprintNav.dayTotal} today ({sprintNav.overallIndex}/{sprintNav.overallTotal} in sprint) • Focus: {sprintNav.day.focus}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
+            <span className="text-xs font-mono font-bold text-muted-foreground hidden lg:inline">
+              Day progress: {sprintNav.dayStudiedCount}/{sprintNav.dayTotal}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedSprintPlan(sprintNav.plan);
+                setSprintModalDay(sprintNav.dayNumber);
+                setIsSprintModalOpen(true);
+              }}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-card border border-amber-500/30 hover:border-amber-500 text-amber-700 dark:text-amber-400 transition-all cursor-pointer shadow-xs active:scale-95"
+            >
+              Day {sprintNav.dayNumber} Schedule
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Single Question & Answer Card */}
       <article className="p-5 sm:p-8 md:p-10 rounded-2xl bg-card border border-border shadow-sm dark:shadow-xl mb-8 animate-in fade-in duration-200">
         {/* Question Header */}
@@ -461,16 +547,23 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
 
             {/* Curated Study Plan Badge */}
             {planBadges.map((b) => (
-              <span
+              <button
                 key={b.planId}
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25"
-                title={`${b.planTitle} • Day ${b.dayNumber}`}
+                type="button"
+                onClick={() => {
+                  const plan = STUDY_PLANS.find((p) => p.id === b.planId) || null;
+                  setSelectedSprintPlan(plan);
+                  setSprintModalDay(b.dayNumber);
+                  setIsSprintModalOpen(true);
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/25 transition-colors cursor-pointer"
+                title={`${b.planTitle} • Day ${b.dayNumber} • Click to open sprint schedule`}
               >
                 <Zap className="w-3 h-3 text-amber-500 fill-current" />
                 <span>
                   {b.planId === '7-day-sprint' ? '7-Day Sprint' : '30-Day Master'}: Day {b.dayNumber} ({b.importance.replace('_', ' ')})
                 </span>
-              </span>
+              </button>
             ))}
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug break-words [overflow-wrap:anywhere]">
@@ -703,6 +796,63 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         onToggle={() => setIsNotesOpen((prev) => !prev)}
       />
 
+      {/* Sprint Study Timeline Next/Prev Actions (when part of a sprint plan) */}
+      {sprintNav && (
+        <div className="mt-8 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-indigo-500/10 border border-amber-500/30 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
+              <Zap className="w-5 h-5 fill-current" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 block">
+                {sprintNav.isLastInDay 
+                  ? `🎉 Day ${sprintNav.dayNumber} Complete! (${sprintNav.dayTotal}/${sprintNav.dayTotal} Questions)`
+                  : `${sprintNav.plan.title} • Day ${sprintNav.dayNumber}`}
+              </span>
+              <p className="text-xs sm:text-sm font-bold text-foreground mt-0.5 truncate">
+                {sprintNav.nextQuestion 
+                  ? (sprintNav.isLastInDay 
+                      ? `Up Next: Day ${sprintNav.nextQuestion.day} — ${sprintNav.nextQuestion.title}` 
+                      : `Next Sprint Question: ${sprintNav.nextQuestion.title}`)
+                  : '🏆 Congratulations! You have completed all questions in this sprint plan!'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            {sprintNav.prevQuestion && (
+              <Link
+                href={`/sections/${sprintNav.prevQuestion.trackSlug}/${sprintNav.prevQuestion.questionNumber}`}
+                className="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-card border border-border hover:bg-card-hover text-muted-foreground hover:text-foreground transition-all shrink-0"
+              >
+                ← Prev in Sprint
+              </Link>
+            )}
+
+            {sprintNav.nextQuestion ? (
+              <Link
+                href={`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}`}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-md shadow-amber-500/25 transition-all shrink-0 active:scale-95 cursor-pointer"
+              >
+                <span>{sprintNav.isLastInDay ? `Start Day ${sprintNav.nextQuestion.day} →` : 'Next Sprint Question →'}</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedSprintPlan(sprintNav.plan);
+                  setSprintModalDay(sprintNav.dayNumber);
+                  setIsSprintModalOpen(true);
+                }}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition-all shadow-sm"
+              >
+                View Full Completion Stats
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Bottom Previous & Next Navigation */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-6">
         {prevQuestion ? (
@@ -858,6 +1008,13 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
           </div>
         </div>
       )}
+      {/* Sprint Study Plan Modal */}
+      <StudyPlanModal
+        plan={selectedSprintPlan}
+        isOpen={isSprintModalOpen}
+        onClose={() => setIsSprintModalOpen(false)}
+        initialDayNumber={sprintModalDay}
+      />
     </div>
   );
 }

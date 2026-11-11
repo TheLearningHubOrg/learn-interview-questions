@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Zap, 
   Trophy, 
@@ -14,13 +15,17 @@ import {
   Sparkles, 
   ChevronRight,
   ExternalLink,
-  BookOpen
+  BookOpen,
+  Play
 } from 'lucide-react';
 import { 
   StudyPlan, 
   StudyPlanDay, 
   getStudyPlanProgress, 
-  StudyPlanProgress 
+  StudyPlanProgress,
+  setActiveStudyPlanId,
+  getPlanActiveDayNumber,
+  getNextUnstudiedQuestionInPlan
 } from '@/lib/study-plans';
 import { 
   getTrackStudiedMap, 
@@ -32,20 +37,33 @@ interface StudyPlanModalProps {
   plan: StudyPlan | null;
   isOpen: boolean;
   onClose: () => void;
+  initialDayNumber?: number;
 }
 
-export function StudyPlanModal({ plan, isOpen, onClose }: StudyPlanModalProps) {
+export function StudyPlanModal({ plan, isOpen, onClose, initialDayNumber }: StudyPlanModalProps) {
+  const router = useRouter();
   const [selectedDayNumber, setSelectedDayNumber] = useState<number>(1);
   const [progress, setProgress] = useState<StudyPlanProgress | null>(null);
 
-  // Sync progress
+  // Sync progress & auto-select active uncompleted day
   useEffect(() => {
-    if (!plan) return;
+    if (!plan || !isOpen) return;
+
+    setActiveStudyPlanId(plan.id);
+
     const refresh = () => {
       setProgress(getStudyPlanProgress(plan));
     };
 
     refresh();
+
+    if (initialDayNumber && initialDayNumber >= 1 && initialDayNumber <= plan.durationDays) {
+      setSelectedDayNumber(initialDayNumber);
+    } else {
+      const activeDay = getPlanActiveDayNumber(plan);
+      setSelectedDayNumber(activeDay);
+    }
+
     window.addEventListener(STUDY_PROGRESS_UPDATE_EVENT, refresh);
     window.addEventListener('storage', refresh);
 
@@ -53,7 +71,7 @@ export function StudyPlanModal({ plan, isOpen, onClose }: StudyPlanModalProps) {
       window.removeEventListener(STUDY_PROGRESS_UPDATE_EVENT, refresh);
       window.removeEventListener('storage', refresh);
     };
-  }, [plan]);
+  }, [plan, isOpen, initialDayNumber]);
 
   // Handle escape key
   useEffect(() => {
@@ -75,6 +93,20 @@ export function StudyPlanModal({ plan, isOpen, onClose }: StudyPlanModalProps) {
     toggleQuestionStudied(trackSlug, qNum);
     if (plan) {
       setProgress(getStudyPlanProgress(plan));
+    }
+  };
+
+  // Find first unstudied question of active day to practice
+  const firstUnstudiedInDay = activeDay.questions.find((q) => {
+    const studiedMap = getTrackStudiedMap(q.trackSlug);
+    return !studiedMap[q.questionNumber];
+  });
+  const targetQuestion = firstUnstudiedInDay || activeDay.questions[0];
+
+  const handleStartPractice = () => {
+    if (targetQuestion) {
+      onClose();
+      router.push(`/sections/${targetQuestion.trackSlug}/${targetQuestion.questionNumber}`);
     }
   };
 
@@ -295,23 +327,39 @@ export function StudyPlanModal({ plan, isOpen, onClose }: StudyPlanModalProps) {
             <span>Progress syncs across all devices via your browser storage</span>
           </div>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap sm:flex-nowrap">
+            {selectedDayNumber > 1 && (
+              <button
+                type="button"
+                onClick={() => setSelectedDayNumber((prev) => Math.max(1, prev - 1))}
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-muted hover:bg-muted/80 text-foreground transition-all cursor-pointer flex-1 sm:flex-none text-center"
+              >
+                ← Day {selectedDayNumber - 1}
+              </button>
+            )}
+
             {selectedDayNumber < plan.durationDays && (
               <button
                 type="button"
                 onClick={() => setSelectedDayNumber((prev) => Math.min(plan.durationDays, prev + 1))}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-muted hover:bg-muted/80 text-foreground transition-all cursor-pointer flex-1 sm:flex-none text-center"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-muted hover:bg-muted/80 text-foreground transition-all cursor-pointer flex-1 sm:flex-none text-center"
               >
-                Next Day (Day {selectedDayNumber + 1}) →
+                Day {selectedDayNumber + 1} →
               </button>
             )}
 
             <button
               type="button"
-              onClick={onClose}
-              className="px-5 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/20 transition-all cursor-pointer flex-1 sm:flex-none text-center"
+              onClick={handleStartPractice}
+              className="flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md shadow-purple-600/25 transition-all cursor-pointer flex-1 sm:flex-none text-center active:scale-95"
             >
-              Continue Preparation
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>
+                {firstUnstudiedInDay
+                  ? `Start Day ${selectedDayNumber} (Q${targetQuestion.questionNumber})`
+                  : `Practice Day ${selectedDayNumber}`}
+              </span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

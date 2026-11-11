@@ -836,3 +836,191 @@ export function getQuestionStudyPlanBadges(trackSlug: string, questionNumber: nu
   return matches;
 }
 
+export const ACTIVE_PLAN_UPDATE_EVENT = 'interviewhub_active_plan_update';
+
+/**
+ * Returns the user's selected active sprint plan ID ('7-day-sprint' or '30-day-master')
+ */
+export function getActiveStudyPlanId(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem('interviewhub_active_study_plan') || '7-day-sprint';
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Sets the user's active sprint plan ID
+ */
+export function setActiveStudyPlanId(planId: string | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (planId) {
+      localStorage.setItem('interviewhub_active_study_plan', planId);
+    } else {
+      localStorage.removeItem('interviewhub_active_study_plan');
+    }
+    window.dispatchEvent(new CustomEvent(ACTIVE_PLAN_UPDATE_EVENT, { detail: { planId } }));
+  } catch {}
+}
+
+/**
+ * Returns the current active day for a plan: the first uncompleted day
+ */
+export function getPlanActiveDayNumber(plan: StudyPlan): number {
+  const progress = getStudyPlanProgress(plan);
+  const uncompleted = progress.dayProgress.find((d) => !d.isCompleted);
+  if (uncompleted) {
+    return uncompleted.dayNumber;
+  }
+  return 1;
+}
+
+/**
+ * Finds the next unstudied question in a plan, starting from a given day
+ */
+export function getNextUnstudiedQuestionInPlan(
+  plan: StudyPlan,
+  startFromDay?: number
+): { question: PlanQuestionItem; day: StudyPlanDay } | null {
+  if (typeof window === 'undefined') {
+    return plan.days[0]?.questions[0] ? { question: plan.days[0].questions[0], day: plan.days[0] } : null;
+  }
+
+  const startDay = startFromDay || 1;
+  // First search forward from startDay
+  for (let d = startDay; d <= plan.durationDays; d++) {
+    const day = plan.days.find((item) => item.dayNumber === d);
+    if (!day) continue;
+    for (const q of day.questions) {
+      const map = getTrackStudiedMap(q.trackSlug);
+      if (!map[q.questionNumber]) {
+        return { question: q, day };
+      }
+    }
+  }
+
+  // Then wrap around from day 1 to startDay - 1
+  for (let d = 1; d < startDay; d++) {
+    const day = plan.days.find((item) => item.dayNumber === d);
+    if (!day) continue;
+    for (const q of day.questions) {
+      const map = getTrackStudiedMap(q.trackSlug);
+      if (!map[q.questionNumber]) {
+        return { question: q, day };
+      }
+    }
+  }
+
+  // If all are completed, default to first question of day 1
+  return plan.days[0]?.questions[0] ? { question: plan.days[0].questions[0], day: plan.days[0] } : null;
+}
+
+export interface SprintQuestionNavigation {
+  plan: StudyPlan;
+  day: StudyPlanDay;
+  dayNumber: number;
+  dayIndex: number;
+  dayTotal: number;
+  overallIndex: number;
+  overallTotal: number;
+  importance: 'MUST_KNOW' | 'HIGH_YIELD' | 'STAFF_LEVEL';
+  prevQuestion: PlanQuestionItem | null;
+  nextQuestion: PlanQuestionItem | null;
+  isLastInDay: boolean;
+  isFirstInDay: boolean;
+  isLastInPlan: boolean;
+  dayStudiedCount: number;
+  dayPercent: number;
+  isDayComplete: boolean;
+}
+
+/**
+ * Returns contextual sprint navigation for a given question if it belongs to a plan
+ */
+export function getSprintQuestionNavigation(
+  trackSlug: string,
+  questionNumber: number,
+  preferredPlanId?: string | null
+): SprintQuestionNavigation | null {
+  const activeId = preferredPlanId || getActiveStudyPlanId();
+  let targetPlan = STUDY_PLANS.find((p) => p.id === activeId);
+
+  // Check if question exists in targetPlan
+  let questionFound = false;
+  if (targetPlan) {
+    for (const d of targetPlan.days) {
+      if (d.questions.some((q) => q.trackSlug === trackSlug && q.questionNumber === questionNumber)) {
+        questionFound = true;
+        break;
+      }
+    }
+  }
+
+  // If not in preferred plan, check other plans
+  if (!questionFound) {
+    for (const plan of STUDY_PLANS) {
+      for (const d of plan.days) {
+        if (d.questions.some((q) => q.trackSlug === trackSlug && q.questionNumber === questionNumber)) {
+          targetPlan = plan;
+          questionFound = true;
+          break;
+        }
+      }
+      if (questionFound) break;
+    }
+  }
+
+  if (!targetPlan || !questionFound) return null;
+
+  // Flatten all questions
+  const allList: { question: PlanQuestionItem; day: StudyPlanDay }[] = [];
+  for (const day of targetPlan.days) {
+    for (const q of day.questions) {
+      allList.push({ question: q, day });
+    }
+  }
+
+  const currentIndex = allList.findIndex(
+    (item) => item.question.trackSlug === trackSlug && item.question.questionNumber === questionNumber
+  );
+
+  if (currentIndex === -1) return null;
+
+  const currentItem = allList[currentIndex];
+  const currentDay = currentItem.day;
+  const dayQuestions = currentDay.questions;
+  const dayIndex = dayQuestions.findIndex(
+    (q) => q.trackSlug === trackSlug && q.questionNumber === questionNumber
+  );
+
+  let dayStudiedCount = 0;
+  for (const q of dayQuestions) {
+    const map = getTrackStudiedMap(q.trackSlug);
+    if (map[q.questionNumber]) dayStudiedCount++;
+  }
+
+  const prevQuestion = currentIndex > 0 ? allList[currentIndex - 1].question : null;
+  const nextQuestion = currentIndex < allList.length - 1 ? allList[currentIndex + 1].question : null;
+
+  return {
+    plan: targetPlan,
+    day: currentDay,
+    dayNumber: currentDay.dayNumber,
+    dayIndex: dayIndex + 1,
+    dayTotal: dayQuestions.length,
+    overallIndex: currentIndex + 1,
+    overallTotal: allList.length,
+    importance: currentItem.question.importance,
+    prevQuestion,
+    nextQuestion,
+    isLastInDay: dayIndex === dayQuestions.length - 1,
+    isFirstInDay: dayIndex === 0,
+    isLastInPlan: currentIndex === allList.length - 1,
+    dayStudiedCount,
+    dayPercent: Math.round((dayStudiedCount / dayQuestions.length) * 100),
+    isDayComplete: dayStudiedCount >= dayQuestions.length,
+  };
+}
+

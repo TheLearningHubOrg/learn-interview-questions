@@ -38,44 +38,97 @@ export async function POST(req: NextRequest) {
       userPromptText = `Topic: ${questionTitle}\n\nContext:\n${(questionContent || '').slice(0, 2000)}\n\nUser Question / Doubt:\n${customPrompt || 'Explain this concept in more depth.'}`;
     }
 
-    // Use Google's latest free model: gemini-2.0-flash with fallback to gemini-1.5-flash
-    const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    // Dynamically query available models for this specific API key, or fall back to known priority list
+    const fallbackList = [
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-flash-latest',
+      'gemini-1.5-flash-latest',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
+      'gemini-2.0-flash-exp',
+      'gemini-pro'
+    ];
+
+    let modelsToTry = fallbackList;
+
+    try {
+      const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+      if (listRes.ok) {
+        const listData = await listRes.json();
+        const available: string[] = (listData.models || [])
+          .filter((m: any) => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+          .map((m: any) => m.name.replace(/^models\//, ''));
+
+        if (available.length > 0) {
+          // Sort available models by our preferred priority
+          const sorted = fallbackList.filter((m) => available.includes(m));
+          // Append any remaining models discovered
+          available.forEach((m) => {
+            if (!sorted.includes(m)) sorted.push(m);
+          });
+          modelsToTry = sorted;
+        }
+      } else {
+        const errJson = await listRes.json().catch(() => ({}));
+        if (errJson.error?.message) {
+          // If the key itself is invalid or has permissions disabled
+          return NextResponse.json(
+            { 
+              error: 'API_KEY_ERROR', 
+              message: `Gemini API Key rejected: ${errJson.error.message}. Please get a free API key at https://aistudio.google.com/app/apikey` 
+            },
+            { status: listRes.status }
+          );
+        }
+      }
+    } catch {
+      // If list request fails, proceed with fallbackList
+    }
+
     let lastError: string | null = null;
     let candidateText = '';
 
     for (const model of modelsToTry) {
-      try {
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      // Try v1beta then v1 if needed
+      for (const apiVersion of ['v1beta', 'v1']) {
+        try {
+          const apiUrl = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`;
 
-        const res = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [{ text: `${systemInstruction}\n\n${userPromptText}` }]
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: 'user',
+                  parts: [{ text: `${systemInstruction}\n\n${userPromptText}` }]
+                }
+              ],
+              generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 1200,
               }
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 1200,
-            }
-          })
-        });
+            })
+          });
 
-        if (res.ok) {
-          const data = await res.json();
-          candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (candidateText) {
-            return NextResponse.json({ text: candidateText, modelUsed: model });
+          if (res.ok) {
+            const data = await res.json();
+            candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            if (candidateText) {
+              return NextResponse.json({ text: candidateText, modelUsed: model });
+            }
+          } else {
+            const errData = await res.json().catch(() => ({}));
+            lastError = errData.error?.message || `Gemini API error (${res.status})`;
+            // If it's not a 404/not-found error (e.g. rate limit, quota, invalid key), break out
+            if (res.status !== 404) {
+              break;
+            }
           }
-        } else {
-          const errData = await res.json().catch(() => ({}));
-          lastError = errData.error?.message || `Gemini API error (${res.status})`;
+        } catch (err: any) {
+          lastError = err?.message || 'Network error reaching Gemini API';
         }
-      } catch (err: any) {
-        lastError = err?.message || 'Network error reaching Gemini API';
       }
     }
 
@@ -84,7 +137,10 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'API_ERROR', message: lastError || 'Failed to generate response from Gemini API.' },
+      { 
+        error: 'API_ERROR', 
+        message: `${lastError || 'Failed to generate response.'} (Tip: Make sure you created a free key on Google AI Studio at https://aistudio.google.com/app/apikey)` 
+      },
       { status: 502 }
     );
   } catch (err: any) {

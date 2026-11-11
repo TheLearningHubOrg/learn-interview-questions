@@ -148,7 +148,7 @@ export function AiExplainDrawer({
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-foreground">Explain with AI</h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30">
-                  Gemini 1.5 Flash
+                  Gemini 2.0 Flash (Latest Free)
                 </span>
               </div>
               <p className="text-xs text-muted-foreground truncate max-w-[260px] sm:max-w-md">
@@ -201,7 +201,7 @@ export function AiExplainDrawer({
               </a>
             </div>
             <p className="text-muted-foreground mb-3 text-[11px] leading-relaxed">
-              Google provides 15 free requests per minute with Gemini 1.5 Flash. Your key stays stored 100% locally in your browser.
+              Google provides free access with Gemini 2.0 Flash on Google AI Studio. Your key stays stored 100% locally in your browser.
             </p>
             <div className="flex gap-2">
               <input

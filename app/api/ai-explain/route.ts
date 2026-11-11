@@ -38,35 +38,55 @@ export async function POST(req: NextRequest) {
       userPromptText = `Topic: ${questionTitle}\n\nContext:\n${(questionContent || '').slice(0, 2000)}\n\nUser Question / Doubt:\n${customPrompt || 'Explain this concept in more depth.'}`;
     }
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Use Google's latest free model: gemini-2.0-flash with fallback to gemini-1.5-flash
+    const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    let lastError: string | null = null;
+    let candidateText = '';
 
-    const res = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: `${systemInstruction}\n\n${userPromptText}` }]
+    for (const model of modelsToTry) {
+      try {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: `${systemInstruction}\n\n${userPromptText}` }]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 1200,
+            }
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (candidateText) {
+            return NextResponse.json({ text: candidateText, modelUsed: model });
           }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1200,
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          lastError = errData.error?.message || `Gemini API error (${res.status})`;
         }
-      })
-    });
-
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      const errMsg = errData.error?.message || `Gemini API error (${res.status})`;
-      return NextResponse.json({ error: 'API_ERROR', message: errMsg }, { status: res.status });
+      } catch (err: any) {
+        lastError = err?.message || 'Network error reaching Gemini API';
+      }
     }
 
-    const data = await res.json();
-    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No explanation generated.';
+    if (candidateText) {
+      return NextResponse.json({ text: candidateText });
+    }
 
-    return NextResponse.json({ text: candidateText });
+    return NextResponse.json(
+      { error: 'API_ERROR', message: lastError || 'Failed to generate response from Gemini API.' },
+      { status: 502 }
+    );
   } catch (err: any) {
     return NextResponse.json(
       { error: 'SERVER_ERROR', message: err?.message || 'Internal server error' },

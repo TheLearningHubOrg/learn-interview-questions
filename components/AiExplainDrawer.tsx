@@ -139,29 +139,29 @@ export function AiExplainDrawer({
         aria-modal="true"
       >
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-border bg-gradient-to-r from-purple-500/10 via-indigo-500/5 to-transparent flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-purple-500/20">
-              <Sparkles className="w-5 h-5 fill-current" />
+        <div className="p-3.5 sm:p-5 border-b border-border bg-gradient-to-r from-purple-500/10 via-indigo-500/5 to-transparent flex items-center justify-between gap-2.5 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-foreground">Explain with AI</h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30">
-                  Gemini 2.0 Flash (Latest Free)
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h2 className="text-sm sm:text-base font-bold text-foreground">Explain with AI</h2>
+                <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30 whitespace-nowrap">
+                  Gemini 2.0 Flash
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground truncate max-w-[260px] sm:max-w-md">
+              <p className="text-[11px] sm:text-xs text-muted-foreground truncate max-w-full mt-0.5">
                 {questionTitle}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               type="button"
               onClick={() => setIsKeyInputOpen((prev) => !prev)}
-              className={`p-2 rounded-lg border text-xs font-semibold transition-all ${
+              className={`p-1.5 sm:p-2 rounded-lg border text-xs font-semibold transition-all ${
                 apiKey 
                   ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' 
                   : 'border-border bg-muted hover:border-purple-400 text-muted-foreground'
@@ -174,7 +174,7 @@ export function AiExplainDrawer({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
               title="Close (Esc)"
             >
               <X className="w-5 h-5" />
@@ -184,7 +184,7 @@ export function AiExplainDrawer({
 
         {/* API Key Configuration Dropdown / Drawer */}
         {isKeyInputOpen && (
-          <div className="p-4 bg-muted/70 border-b border-border text-xs animate-in slide-in-from-top duration-200">
+          <div className="p-3.5 sm:p-4 bg-muted/70 border-b border-border text-xs animate-in slide-in-from-top duration-200">
             <div className="flex items-center justify-between mb-2">
               <span className="font-bold text-foreground flex items-center gap-1.5">
                 <Key className="w-3.5 h-3.5 text-purple-500" />
@@ -203,31 +203,31 @@ export function AiExplainDrawer({
             <p className="text-muted-foreground mb-3 text-[11px] leading-relaxed">
               Google provides free access with Gemini 2.0 Flash on Google AI Studio. Your key stays stored 100% locally in your browser.
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="password"
                 placeholder="AIzaSy..."
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                className="flex-1 px-3 py-1.5 rounded-lg border border-border bg-card text-foreground font-mono text-xs focus:outline-hidden focus:ring-1 focus:ring-purple-500"
+                className="flex-1 px-3 py-2 sm:py-1.5 rounded-lg border border-border bg-card text-foreground font-mono text-xs focus:outline-hidden focus:ring-1 focus:ring-purple-500"
               />
               <button
                 type="button"
                 onClick={() => handleSaveApiKey(apiKey)}
-                className="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold transition-all shrink-0 cursor-pointer"
+                className="px-4 py-2 sm:py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold transition-all shrink-0 cursor-pointer text-center"
               >
-                Save
+                Save Key
               </button>
             </div>
           </div>
         )}
 
         {/* Mode Selector Tabs */}
-        <div className="p-3 bg-muted/40 border-b border-border flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
+        <div className="p-2.5 sm:p-3 bg-muted/40 border-b border-border flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
           <button
             type="button"
             onClick={() => handleModeChange('eli5')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 whitespace-nowrap cursor-pointer ${
               activeMode === 'eli5'
                 ? 'bg-purple-600 text-white shadow-sm'
                 : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -240,7 +240,7 @@ export function AiExplainDrawer({
           <button
             type="button"
             onClick={() => handleModeChange('staff')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 whitespace-nowrap cursor-pointer ${
               activeMode === 'staff'
                 ? 'bg-purple-600 text-white shadow-sm'
                 : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -253,7 +253,7 @@ export function AiExplainDrawer({
           <button
             type="button"
             onClick={() => handleModeChange('followups')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 whitespace-nowrap cursor-pointer ${
               activeMode === 'followups'
                 ? 'bg-purple-600 text-white shadow-sm'
                 : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -266,7 +266,7 @@ export function AiExplainDrawer({
           <button
             type="button"
             onClick={() => setActiveMode('custom')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 whitespace-nowrap cursor-pointer ${
               activeMode === 'custom'
                 ? 'bg-purple-600 text-white shadow-sm'
                 : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -279,10 +279,10 @@ export function AiExplainDrawer({
 
         {/* Custom Prompt Box (shown only when Ask a Doubt is active) */}
         {activeMode === 'custom' && (
-          <div className="p-3 bg-card border-b border-border flex gap-2 shrink-0">
+          <div className="p-2.5 sm:p-3 bg-card border-b border-border flex items-center gap-2 shrink-0">
             <input
               type="text"
-              placeholder="e.g., Why would we pick this over Redis? Or explain line 12..."
+              placeholder="Ask a specific doubt about this question..."
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               onKeyDown={(e) => {
@@ -291,13 +291,13 @@ export function AiExplainDrawer({
                   handleFetchExplanation('custom', customPrompt);
                 }
               }}
-              className="flex-1 px-3 py-2 rounded-xl border border-border bg-muted text-foreground text-xs focus:outline-hidden focus:ring-1 focus:ring-purple-500"
+              className="flex-1 min-w-0 px-3 py-2 rounded-xl border border-border bg-muted text-foreground text-xs focus:outline-hidden focus:ring-1 focus:ring-purple-500"
             />
             <button
               type="button"
               disabled={loading || !customPrompt.trim()}
               onClick={() => handleFetchExplanation('custom', customPrompt)}
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm"
+              className="px-3.5 sm:px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Ask</span>
@@ -393,7 +393,31 @@ export function AiExplainDrawer({
                 </div>
               </div>
 
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  pre: ({ children }) => (
+                    <pre className="overflow-x-auto p-3 sm:p-4 rounded-xl bg-muted/80 border border-border font-mono text-[11px] sm:text-xs my-3 scrollbar-thin">
+                      {children}
+                    </pre>
+                  ),
+                  code: ({ className, children, ...props }) => {
+                    const isInline = !className;
+                    if (isInline) {
+                      return (
+                        <code className="px-1.5 py-0.5 rounded bg-muted border border-border/50 text-[11px] sm:text-xs font-mono text-purple-600 dark:text-purple-400" {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+                    return (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    );
+                  }
+                }}
+              >
                 {explanation}
               </ReactMarkdown>
             </div>

@@ -54,18 +54,30 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-md transition-colors shadow-sm dark:shadow-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand */}
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-violet-500 p-[1px] shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform duration-200">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
+            <div className="h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-violet-500 p-[1px] shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform duration-200 shrink-0">
               <div className="h-full w-full bg-card rounded-xl flex items-center justify-center">
                 <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
-            <div>
+            <div className="shrink-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="font-extrabold text-sm sm:text-base tracking-tight text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                   InterviewHub
@@ -74,43 +86,43 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
                   PRO
                 </span>
               </div>
-              <p className="text-[11px] text-muted-foreground hidden sm:block font-medium">The Learning Hub Org</p>
+              <p className="text-[11px] text-muted-foreground hidden md:block font-medium">The Learning Hub Org</p>
             </div>
           </Link>
 
-          {/* Center: Search Trigger (Tablet & Desktop) */}
-          <div className="flex-1 max-w-md mx-2 sm:mx-4 hidden md:block">
+          {/* Center: Search Trigger (Desktop) */}
+          <div className="flex-1 max-w-xs md:max-w-sm lg:max-w-md mx-2 sm:mx-4 hidden md:block">
             <button
               type="button"
               onClick={onOpenSearch}
               className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-400/50 hover:bg-card-hover transition-all text-sm group shadow-sm dark:shadow-none"
             >
-              <div className="flex items-center gap-2">
-                <Search className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" />
-                <span className="text-xs sm:text-sm font-medium">Search 1,849+ interview questions...</span>
+              <div className="flex items-center gap-2 min-w-0">
+                <Search className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors shrink-0" />
+                <span className="text-xs sm:text-sm font-medium truncate">Search 1,849+ interview questions...</span>
               </div>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[11px] font-mono bg-muted border border-border rounded text-muted-foreground font-semibold">
+              <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[11px] font-mono bg-muted border border-border rounded text-muted-foreground font-semibold shrink-0">
                 ⌘K
               </kbd>
             </button>
           </div>
 
           {/* Right Action Icons & Toggles */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Mobile Search Button */}
             <button
               type="button"
               onClick={onOpenSearch}
-              className="md:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-colors"
+              className="md:hidden p-1.5 sm:p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-colors shrink-0"
               aria-label="Search questions"
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
 
             {/* Desktop Tracks link */}
             <Link
               href="/#tracks"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-muted-foreground hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-all"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-muted-foreground hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-all shrink-0"
             >
               <Layers className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
               <span>Tracks</span>
@@ -120,7 +132,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
             <button
               type="button"
               onClick={() => setIsStreakOpen(true)}
-              className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm dark:shadow-none active:scale-95 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm dark:shadow-none active:scale-95 cursor-pointer shrink-0 ${
                 streakData.currentStreak > 0
                   ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30 hover:bg-orange-500/20'
                   : 'bg-card text-muted-foreground border-border hover:text-foreground hover:bg-card-hover'
@@ -136,21 +148,21 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
                 }`}
               />
               <span className="font-bold">{streakData.currentStreak}</span>
-              <span className="hidden lg:inline text-[11px] font-medium">
+              <span className="hidden xl:inline text-[11px] font-medium">
                 {streakData.currentStreak === 1 ? 'day' : 'days'}
               </span>
             </button>
 
-            {/* Saved / Bookmarks Button */}
+            {/* Saved / Bookmarks Button (Visible on Tablet & Desktop sm+) */}
             <button
               type="button"
               onClick={onOpenBookmarks}
-              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-all shadow-sm dark:shadow-none active:scale-95"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-all shadow-sm dark:shadow-none active:scale-95 shrink-0 cursor-pointer"
               title="View saved questions for review"
               aria-label="View bookmarked questions"
             >
               <Bookmark className="h-3.5 w-3.5 fill-current" />
-              <span className="hidden sm:inline font-bold">Saved</span>
+              <span className="font-bold">Saved</span>
               {bookmarkCount > 0 && (
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white leading-tight">
                   {bookmarkCount}
@@ -158,16 +170,18 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               )}
             </button>
 
-            {/* Light / Dark Mode Toggle */}
-            <ThemeToggle />
+            {/* Light / Dark Mode Toggle (Visible on Tablet & Desktop sm+) */}
+            <div className="hidden sm:block shrink-0">
+              <ThemeToggle />
+            </div>
 
-            {/* GitHub Stars */}
+            {/* GitHub Stars (Visible on Large Desktop lg+) */}
             <a
               href="https://github.com/TheLearningHubOrg/learn-interview-questions"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Star on GitHub"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 dark:bg-purple-600/10 dark:text-purple-400 dark:border-purple-500/20 dark:hover:bg-purple-600/20 transition-all shadow-sm dark:shadow-none"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 dark:bg-purple-600/10 dark:text-purple-400 dark:border-purple-500/20 dark:hover:bg-purple-600/20 transition-all shadow-sm dark:shadow-none shrink-0"
             >
               <Github className="h-4 w-4" />
               <span>GitHub</span>
@@ -177,7 +191,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="md:hidden p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-card-hover transition-colors shadow-sm dark:shadow-none"
+              className="md:hidden p-1.5 sm:p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-card-hover transition-colors shadow-sm dark:shadow-none shrink-0"
               aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

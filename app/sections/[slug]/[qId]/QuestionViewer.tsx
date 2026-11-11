@@ -52,6 +52,7 @@ import {
 } from '@/lib/study-plans';
 import { StudyPlanModal } from '@/components/StudyPlanModal';
 import { QuestionNotesDrawer } from '@/components/QuestionNotesDrawer';
+import { AiExplainDrawer } from '@/components/AiExplainDrawer';
 import { getQuestionNote, NOTES_UPDATE_EVENT } from '@/lib/study-notes';
 
 function parseQuestionContent(content: string) {
@@ -128,6 +129,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState<boolean>(false);
   const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
   const [hasNote, setHasNote] = useState<boolean>(false);
+  const [isAiDrawerOpen, setIsAiDrawerOpen] = useState<boolean>(false);
   const [sprintPlanId, setSprintPlanId] = useState<string | null>(null);
   const [sprintNav, setSprintNav] = useState<SprintQuestionNavigation | null>(null);
   const [isSprintModalOpen, setIsSprintModalOpen] = useState<boolean>(false);
@@ -332,6 +334,9 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
       } else if (e.key === 'n' || e.key === 'N') {
         e.preventDefault();
         setIsNotesOpen((prev) => !prev);
+      } else if (e.key === 'e' || e.key === 'E') {
+        e.preventDefault();
+        setIsAiDrawerOpen((prev) => !prev);
       }
     };
 
@@ -448,6 +453,21 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               <span>{hasNote ? 'Notes (1)' : 'Notes'}</span>
               <kbd className="hidden sm:inline-block text-[10px] font-mono px-1 rounded bg-black/15 dark:bg-white/10 ml-0.5">
                 N
+              </kbd>
+            </button>
+
+            {/* Explain with AI / Simplify Button */}
+            <button
+              type="button"
+              onClick={() => setIsAiDrawerOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30 hover:border-purple-500"
+              title="Explain with AI / Simplify Concept (Press E)"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400 fill-current" />
+              <span className="hidden sm:inline">Explain with AI</span>
+              <span className="sm:hidden">AI</span>
+              <kbd className="hidden sm:inline-block text-[10px] font-mono px-1 rounded bg-black/15 dark:bg-white/10 ml-0.5">
+                E
               </kbd>
             </button>
 
@@ -816,6 +836,14 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         questionTitle={question.title}
         isOpen={isNotesOpen}
         onToggle={() => setIsNotesOpen((prev) => !prev)}
+      />
+
+      {/* AI Explain & Concept Breakdown Drawer */}
+      <AiExplainDrawer
+        questionTitle={question.title}
+        questionContent={question.content}
+        isOpen={isAiDrawerOpen}
+        onClose={() => setIsAiDrawerOpen(false)}
       />
 
       {/* Sprint Study Timeline Next/Prev Actions (when part of a sprint plan) */}

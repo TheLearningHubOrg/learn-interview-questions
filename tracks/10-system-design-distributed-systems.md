@@ -155,7 +155,7 @@ A **Load Balancer (LB)** distributes incoming network traffic across a cluster o
   - Cannot inspect HTTP headers, cookies, or URL paths.
 - **Layer 7 Load Balancing (Application Layer - HTTP/HTTPS/gRPC)**:
   - Terminates TLS handshakes, parses HTTP request headers, cookies, and JSON payloads.
-  - Can route traffic based on URL path (`/api/v1/billing` $ightarrow$ Billing Cluster, `/api/v1/search` $ightarrow$ Search Cluster).
+  - Can route traffic based on URL path (`/api/v1/billing` → Billing Cluster, `/api/v1/search` → Search Cluster).
   - Can inject security headers, handle gzip/Brotli compression, and enforce JWT rate limiting.
 
 ```typescript
@@ -268,9 +268,9 @@ Caching reduces latency and offloads database IOPS by storing hot data in ultra-
 
 | Pattern | Read Path | Write Path | Pros | Cons |
 | :--- | :--- | :--- | :--- | :--- |
-| **Cache-Aside** (Lazy Loading) | App checks cache $ightarrow$ on miss reads DB $ightarrow$ sets cache | App writes directly to DB $ightarrow$ evicts/invalidates cache | Resilient to cache failure; only requested data cached | Cache miss penalty ($3 	imes$ network hops); potential stale data |
-| **Write-Through** | App reads directly from cache | App writes to Cache $ightarrow$ Cache synchronously writes to DB | Zero stale data; reads are always fast | Write latency penalty (waits for 2 network hops); unused data cached |
-| **Write-Behind** (Write-Back) | App reads from cache | App writes to Cache $ightarrow$ Cache asynchronously queues write to DB | Ultra-fast writes; batches DB writes | Risk of data loss if cache crashes before flushing to DB |
+| **Cache-Aside** (Lazy Loading) | App checks cache → on miss reads DB → sets cache | App writes directly to DB → evicts/invalidates cache | Resilient to cache failure; only requested data cached | Cache miss penalty ($3 \times$ network hops); potential stale data |
+| **Write-Through** | App reads directly from cache | App writes to Cache → Cache synchronously writes to DB | Zero stale data; reads are always fast | Write latency penalty (waits for 2 network hops); unused data cached |
+| **Write-Behind** (Write-Back) | App reads from cache | App writes to Cache → Cache asynchronously queues write to DB | Ultra-fast writes; batches DB writes | Risk of data loss if cache crashes before flushing to DB |
 | **Write-Around** | App checks cache | App writes directly to DB (skips cache) | Cache isn't flooded with writes that are never read | Read miss penalty immediately after write |
 
 ```typescript
@@ -399,11 +399,11 @@ WHERE o.tenant_id = 'tenant_xyz123';
 Design a scalable service that converts long URLs (e.g. 150 characters) into concise aliases (e.g. `https://tiny.cc/a8X9k2`) and redirects users with sub-15ms latency.
 
 **Scale Estimations:**
-- **Traffic**: 100M new URLs created per month (~40 writes/sec), 10B redirects per month (~4,000 reads/sec $ightarrow$ 100:1 Read-Heavy).
-- **Storage**: 100M URLs $	imes$ 500 bytes per record $	imes$ 12 months $	imes$ 5 years = **3 TB total storage** (easily manageable).
-- **Base62 Character Set**: `[a-zA-Z0-9]` ($62$ characters).
-  - Length 6: $62^6 approx 56.8$ Billion combinations.
-  - Length 7: $62^7 approx 3.5$ Trillion unique combinations (safely covers 100 years).
+- **Traffic**: 100M new URLs created per month (~40 writes/sec), 10B redirects per month (~4,000 reads/sec → 100:1 Read-Heavy).
+- **Storage**: 100M URLs × 500 bytes per record × 12 months × 5 years = **3 TB total storage** (easily manageable).
+- **Base62 Character Set**: `[a-zA-Z0-9]` (62 characters).
+  - Length 6: $62^6 \approx 56.8$ Billion combinations.
+  - Length 7: $62^7 \approx 3.5$ Trillion unique combinations (safely covers 100 years).
 
 ```mermaid
 flowchart TD
@@ -412,7 +412,7 @@ flowchart TD
     LB --> WebApp["URL Redirection Service"]
     WebApp --> Redis["Redis Cluster (LRU Hot Cache)"]
     Redis -.->|"Cache Miss"| DB["NoSQL Storage (DynamoDB / Cassandra)"]
-    WebApp -->>|"301 / 302 Redirect"| Client
+    WebApp -->|"301 / 302 Redirect"| Client
 ```
 
 ```typescript
@@ -488,7 +488,7 @@ Support 1-on-1 private messaging, group channels, persistent chat history, and o
 **Core Components:**
 - **Connection Handshake**: Client connects via HTTP/HTTPS, authenticates, and upgrades connection to bidirectional **WebSocket**.
 - **Chat Service Cluster**: Maintains active persistent TCP/WebSocket connections.
-- **Redis Presence & Session Registry**: Maps `userId $ightarrow$ server_id` to know which server holds a user's active socket connection.
+- **Redis Presence & Session Registry**: Maps `userId → server_id` to know which server holds a user's active socket connection.
 - **Message Broker (Kafka / Redis Pub/Sub)**: Routes messages across different chat servers when User A and User B are connected to different physical nodes.
 
 ```mermaid
@@ -557,7 +557,7 @@ Connect drivers with nearby riders in real-time while processing location update
 
 **Spatial Indexing Technologies:**
 - **Geohash**: Hierarchical spatial data structure that subdivides Earth into bounding grid boxes and encodes them into Base32 strings. Nearby locations share common string prefixes!
-  - Example: Prefix `9q8yy` covers an area of roughly $4.9	ext{ km} 	imes 4.9	ext{ km}$.
+  - Example: Prefix `9q8yy` covers an area of roughly $4.9\text{ km} \times 4.9\text{ km}$.
 - **Google S2 / Uber H3**: Uses hexagonal cells rather than rectangular boxes, eliminating corner distortion and ensuring all neighbors are equidistant.
 
 ```mermaid
@@ -568,7 +568,7 @@ flowchart TD
     
     Rider["Rider App"] -->|"Find Rides Near (Lat, Lon)"| MatchSvc["Ride Dispatcher Engine"]
     MatchSvc --> RedisGeo
-    RedisGeo -->>|"Return Top-10 Drivers within 3km"| MatchSvc
+    RedisGeo -.->|"Return Top-10 Drivers within 3km"| MatchSvc
     MatchSvc --> DispatchSvc["Optimal Routing & Notification"]
 ```
 
@@ -585,9 +585,9 @@ Ingest raw video files uploaded by creators, transcode them into multiple resolu
   - A manifest file (`.m3u8`) lists all available resolutions (480p, 720p, 1080p, 4K) and chunk URLs.
   - Video player dynamically switches bitrates based on real-time client network bandwidth (**Adaptive Bitrate Streaming**).
 - **Storage Tiering**:
-  - Raw uploads $ightarrow$ AWS S3 Standard.
-  - Transcoded chunks $ightarrow$ S3 + Global Edge CDN (Cloudflare/Fastly).
-  - Cold, unwatched archive videos $ightarrow$ AWS S3 Glacier Flexible.
+  - Raw uploads → AWS S3 Standard.
+  - Transcoded chunks → S3 + Global Edge CDN (Cloudflare/Fastly).
+  - Cold, unwatched archive videos → AWS S3 Glacier Flexible.
 
 ```typescript
 // Sample M3U8 Master Playlist Concept for Adaptive Bitrate Streaming
@@ -1042,7 +1042,7 @@ stateDiagram-v2
 **In Simple Words:**
 When retrying failed network calls or message processing, retrying immediately causes thundering herd traffic spikes.
 - **Exponential Backoff**: Multiplies sleep interval by $2^n$ on each failure ($1s, 2s, 4s, 8s, 16s...$).
-- **Full Jitter**: Adds random uniform delay ($sleep = 	ext{random}(0, min(	ext{cap}, 	ext{base} 	imes 2^{	ext{attempt}}))$) to desynchronize retrying clients.
+- **Full Jitter**: Adds random uniform delay ($sleep = \text{random}(0, min(\text{cap}, \text{base} \times 2^{\text{attempt}}))$) to desynchronize retrying clients.
 - **Dead Letter Queue (DLQ)**: After maximum attempts (e.g. 5 retries), unprocessable messages are routed to a DLQ for inspection rather than blocking the main pipeline.
 
 ```typescript
@@ -1207,7 +1207,7 @@ export function estimateStorage(writesPerDay: number, bytesPerWrite: number, yea
 
 **In Simple Words:**
 Applying the **Pareto Principle (80/20 Rule)**: $80%$ of total read traffic is generated by $20%$ of hot data.
-- If daily read volume is $100	ext{ GB}$, your Redis cluster only needs to hold $20	ext{ GB}$ in RAM to achieve an $80%$ cache hit ratio!
+- If daily read volume is $100\text{ GB}$, your Redis cluster only needs to hold $20\text{ GB}$ in RAM to achieve an $80%$ cache hit ratio!
 
 ---
 

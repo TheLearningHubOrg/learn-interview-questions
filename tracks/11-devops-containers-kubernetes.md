@@ -844,7 +844,7 @@ Stateful Architecture (StatefulSet)
 | :--- | :--- | :--- |
 | **Identity** | Ephemeral, random hash suffixes (e.g., `api-7bf89d-4kx2p`). | Deterministic, sequential index (e.g., `redis-0`, `redis-1`). |
 | **Storage** | Pods share the same PVC or use ephemeral storage. | Each Pod gets its own dedicated PVC via `volumeClaimTemplates`. |
-| **Startup / Teardown** | Scaled in parallel. | Scaled sequentially (0 $ightarrow$ 1 $ightarrow$ 2; teardown 2 $ightarrow$ 1 $ightarrow$ 0). |
+| **Startup / Teardown** | Scaled in parallel. | Scaled sequentially (0 → 1 → 2; teardown 2 → 1 → 0). |
 | **Networking** | Standard load-balanced ClusterIP service. | **Headless Service** (`clusterIP: None`) providing direct A-records for each Pod. |
 
 #### Headless Service Blueprint for Distributed Clusters (Kafka/ZooKeeper/Cassandra)
@@ -1579,9 +1579,9 @@ The journey from code commit to running production software consists of three di
 #### Key Comparisons
 | Stage | Automation Boundary | Human Gate | Primary Goal |
 | :--- | :--- | :--- | :--- |
-| **Continuous Integration (CI)** | Code $ightarrow$ Test $ightarrow$ Package | None | Detect integration conflicts, syntax bugs, and regressions within 5–10 minutes. |
-| **Continuous Delivery (CD)** | Package $ightarrow$ Staging Deployment | **Manual button click** to deploy to Production. | Maintain a deployable, release-ready artifact at all times. |
-| **Continuous Deployment** | Commit $ightarrow$ Production Deployment | **Zero human gates**. Automated tests and health gates dictate release. | Minimize lead time to change (minutes from commit to live user traffic). |
+| **Continuous Integration (CI)** | Code → Test → Package | None | Detect integration conflicts, syntax bugs, and regressions within 5–10 minutes. |
+| **Continuous Delivery (CD)** | Package → Staging Deployment | **Manual button click** to deploy to Production. | Maintain a deployable, release-ready artifact at all times. |
+| **Continuous Deployment** | Commit → Production Deployment | **Zero human gates**. Automated tests and health gates dictate release. | Minimize lead time to change (minutes from commit to live user traffic). |
 
 #### Trunk-Based Development vs. Long-Lived Feature Branches
 High-performing engineering teams avoid merge hell by adopting **Trunk-Based Development**:

@@ -970,7 +970,7 @@ Practice **Disagree and Commit** (Andy Grove / Amazon leadership principle). Deb
 
 ### 37. Walk me through your end-to-end incident response protocol during an active P0/P1 production outage.
 **In Simple Words:**
-Follow a militarized, calm protocol: **Acknowledge $\rightarrow$ Appoint Roles $\rightarrow$ Mitigate Customer Impact $\rightarrow$ Restore $\rightarrow$ Post-Mortem**.
+Follow a militarized, calm protocol: **Acknowledge → Appoint Roles → Mitigate Customer Impact → Restore → Post-Mortem**.
 
 **Step-by-Step Incident Lifecycle:**
 1. **Triage & Page**: Alert triggers in PagerDuty; primary on-call engineer acknowledges within 5 minutes.

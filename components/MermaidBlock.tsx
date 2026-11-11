@@ -83,8 +83,12 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
         });
 
         try {
-          // Clean cleanChart input to avoid raw newlines glitches
-          const cleanChart = chart.trim();
+          // Clean and defensively sanitize chart input
+          let cleanChart = chart.trim();
+          // Normalize invalid sequence arrows in flowcharts
+          if (/^(flowchart|graph)\s+/m.test(cleanChart)) {
+            cleanChart = cleanChart.replace(/-->>/g, '-->').replace(/<<--/g, '<--');
+          }
           const { svg: renderedSvg } = await mermaid.render(renderId.current, cleanChart);
           if (isMounted) {
             setSvg(renderedSvg);

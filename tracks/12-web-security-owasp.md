@@ -656,7 +656,7 @@ Credential Stuffing is the automated testing of billions of stolen username/pass
 
 #### Checking Compromised Passwords via k-Anonymity
 Never send cleartext user passwords to third-party verification APIs. Use the **k-Anonymity model** provided by the Pwned Passwords API:
-1. Hash password locally with SHA-1: `password123` $ightarrow$ `CBFDAC6008F9CAB4083784CBD1874F76618D2A97`.
+1. Hash password locally with SHA-1: `password123` → `CBFDAC6008F9CAB4083784CBD1874F76618D2A97`.
 2. Extract the first 5 characters: `CBFDA`.
 3. Query API: `GET https://api.pwnedpasswords.com/range/CBFDA`.
 4. API returns list of hash suffixes that share that prefix.

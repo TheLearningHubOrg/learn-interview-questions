@@ -522,7 +522,7 @@ export class ProfileComponent {
 Injectors in Angular have rules that can be leveraged to achieve the desired visibility of injectables in your applications. By understanding these rules, you can determine in which NgModule, Component, or Directive you should declare a provider.
 
 #### Angular has two injector hierarchies:
-![Screenshot](/images/injector%20hierarchies.png)
+![Screenshot](/images/injector-hierarchies.png)
 
 #### Module injector 
 When angular starts, it creates a root injector where the services will be registered, these are provided via injectable annotation. All services provided in the `ng-model` property are called providers (if those modules are not lazy-loaded).
@@ -535,13 +535,13 @@ During application bootstrapping angular creates a few more injectors, above the
 #### NullInjector()
 At the very top, the next parent injector in the hierarchy is the `NullInjector()`.The responsibility of this injector is to throw the error if something tries to find dependencies there, unless you've used `@Optional()` because ultimately, everything ends at the `NullInjector()` and it returns an error or, in the case of `@Optional()`, `null`.
 
-![Screenshot](/images/hierarchy%20diagram.png)
+![Screenshot](/images/hierarchy-diagram.png)
 
 
 #### ElementInjector
 Angular creates `ElementInjector` hierarchies implicitly for each DOM element. `ElementInjector` injector is being created for any tag that matches the angular component, or any tag on which directive is applied, and you can configure it in component and directive annotations inside the provider's property, thus, it creates its own hierarchy likewise the upper one.
 
-![Screenshot](/images/element%20injector%20hieracrhy.png)
+![Screenshot](/images/element-injector-hierarchy.png)
 
 #### Practical Code Example
 

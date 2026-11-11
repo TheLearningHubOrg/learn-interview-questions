@@ -128,6 +128,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState<boolean>(false);
   const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
   const [hasNote, setHasNote] = useState<boolean>(false);
+  const [sprintPlanId, setSprintPlanId] = useState<string | null>(null);
   const [sprintNav, setSprintNav] = useState<SprintQuestionNavigation | null>(null);
   const [isSprintModalOpen, setIsSprintModalOpen] = useState<boolean>(false);
   const [selectedSprintPlan, setSelectedSprintPlan] = useState<StudyPlan | null>(null);
@@ -135,8 +136,15 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
 
   // Sync sprint study timeline context for current question
   useEffect(() => {
+    let currentSprint: string | null = null;
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      currentSprint = params.get('sprint');
+      setSprintPlanId(currentSprint);
+    }
+
     const refreshSprint = () => {
-      setSprintNav(getSprintQuestionNavigation(track.slug, question.number));
+      setSprintNav(getSprintQuestionNavigation(track.slug, question.number, currentSprint));
     };
 
     refreshSprint();
@@ -257,8 +265,8 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
     if (!isBookmarked) {
       handleToggleBookmark();
     }
-    if (sprintNav?.nextQuestion) {
-      router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}`);
+    if (sprintPlanId && sprintNav?.nextQuestion) {
+      router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}?sprint=${sprintNav.plan.id}`);
     } else if (nextQuestion) {
       router.push(`/sections/${track.slug}/${nextQuestion.number}`);
     }
@@ -268,15 +276,15 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
     if (!isCurrentStudied) {
       toggleStudied(question.number);
     }
-    if (sprintNav?.nextQuestion) {
-      router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}`);
+    if (sprintPlanId && sprintNav?.nextQuestion) {
+      router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}?sprint=${sprintNav.plan.id}`);
     } else if (nextQuestion) {
       router.push(`/sections/${track.slug}/${nextQuestion.number}`);
     }
   };
 
   // Keyboard Navigation:
-  // ArrowLeft/ArrowRight: Prev/Next (follows Sprint Plan when active)
+  // ArrowLeft/ArrowRight: Prev/Next (follows Sprint Plan when sprint query active)
   // G: Jump Grid
   // F: Toggle Flashcard Mode
   // Space: Reveal/Hide Answer in Flashcard Mode
@@ -287,17 +295,17 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
 
       if (e.key === 'ArrowLeft') {
-        if (sprintNav?.prevQuestion) {
+        if (sprintPlanId && sprintNav?.prevQuestion) {
           e.preventDefault();
-          router.push(`/sections/${sprintNav.prevQuestion.trackSlug}/${sprintNav.prevQuestion.questionNumber}`);
+          router.push(`/sections/${sprintNav.prevQuestion.trackSlug}/${sprintNav.prevQuestion.questionNumber}?sprint=${sprintNav.plan.id}`);
         } else if (prevQuestion) {
           e.preventDefault();
           router.push(`/sections/${track.slug}/${prevQuestion.number}`);
         }
       } else if (e.key === 'ArrowRight') {
-        if (sprintNav?.nextQuestion) {
+        if (sprintPlanId && sprintNav?.nextQuestion) {
           e.preventDefault();
-          router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}`);
+          router.push(`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}?sprint=${sprintNav.plan.id}`);
         } else if (nextQuestion) {
           e.preventDefault();
           router.push(`/sections/${track.slug}/${nextQuestion.number}`);
@@ -530,6 +538,15 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             >
               Day {sprintNav.dayNumber} Schedule
             </button>
+            {sprintPlanId && (
+              <Link
+                href={`/sections/${track.slug}/${question.number}`}
+                className="px-2.5 py-1.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all"
+                title="Exit sprint mode and browse track sequentially"
+              >
+                Exit Sprint
+              </Link>
+            )}
           </div>
         </div>
       )}
@@ -822,7 +839,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             {sprintNav.prevQuestion && (
               <Link
-                href={`/sections/${sprintNav.prevQuestion.trackSlug}/${sprintNav.prevQuestion.questionNumber}`}
+                href={`/sections/${sprintNav.prevQuestion.trackSlug}/${sprintNav.prevQuestion.questionNumber}?sprint=${sprintNav.plan.id}`}
                 className="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-card border border-border hover:bg-card-hover text-muted-foreground hover:text-foreground transition-all shrink-0"
               >
                 ← Prev in Sprint
@@ -831,7 +848,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
 
             {sprintNav.nextQuestion ? (
               <Link
-                href={`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}`}
+                href={`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}?sprint=${sprintNav.plan.id}`}
                 className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-md shadow-amber-500/25 transition-all shrink-0 active:scale-95 cursor-pointer"
               >
                 <span>{sprintNav.isLastInDay ? `Start Day ${sprintNav.nextQuestion.day} →` : 'Next Sprint Question →'}</span>

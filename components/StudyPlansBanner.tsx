@@ -161,6 +161,7 @@ export function StudyPlansBanner() {
       <StudyPlanModal
         plan={selectedPlan}
         isOpen={!!selectedPlan}
+        initialDayNumber={selectedPlan ? getPlanActiveDayNumber(selectedPlan) : 1}
         onClose={() => setSelectedPlan(null)}
       />
     </>

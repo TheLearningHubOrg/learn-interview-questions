@@ -105,8 +105,9 @@ export function StudyPlanModal({ plan, isOpen, onClose, initialDayNumber }: Stud
 
   const handleStartPractice = () => {
     if (targetQuestion) {
+      setActiveStudyPlanId(plan.id);
       onClose();
-      router.push(`/sections/${targetQuestion.trackSlug}/${targetQuestion.questionNumber}`);
+      router.push(`/sections/${targetQuestion.trackSlug}/${targetQuestion.questionNumber}?sprint=${plan.id}`);
     }
   };
 
@@ -296,8 +297,11 @@ export function StudyPlanModal({ plan, isOpen, onClose, initialDayNumber }: Stud
                       </div>
 
                       <Link
-                        href={`/sections/${q.trackSlug}/${q.questionNumber}`}
-                        onClick={onClose}
+                        href={`/sections/${q.trackSlug}/${q.questionNumber}?sprint=${plan.id}`}
+                        onClick={() => {
+                          setActiveStudyPlanId(plan.id);
+                          onClose();
+                        }}
                         className="text-sm font-bold text-foreground hover:text-purple-600 dark:hover:text-purple-400 transition-colors line-clamp-2"
                       >
                         {q.title}
@@ -307,8 +311,11 @@ export function StudyPlanModal({ plan, isOpen, onClose, initialDayNumber }: Stud
 
                   {/* Open Question Link */}
                   <Link
-                    href={`/sections/${q.trackSlug}/${q.questionNumber}`}
-                    onClick={onClose}
+                    href={`/sections/${q.trackSlug}/${q.questionNumber}?sprint=${plan.id}`}
+                    onClick={() => {
+                      setActiveStudyPlanId(plan.id);
+                      onClose();
+                    }}
                     className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-muted hover:bg-purple-600 hover:text-white text-muted-foreground transition-all shrink-0 w-full sm:w-auto"
                   >
                     <span>Practice</span>

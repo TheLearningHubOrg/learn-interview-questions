@@ -376,23 +376,23 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href={`/sections/${track.slug}`}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all group font-semibold text-xs shadow-sm dark:shadow-none"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all group font-semibold text-xs shadow-sm dark:shadow-none shrink-0"
             >
               <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
               <span>Section Overview</span>
             </Link>
             <span className="text-border hidden sm:inline">•</span>
-            <span className="hidden sm:inline px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 font-bold text-xs">
+            <span className="hidden sm:inline px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 font-bold text-xs truncate max-w-[200px] md:max-w-none">
               Section {track.sectionNumber}: {track.shortTitle}
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-start sm:justify-end">
+          <div className="w-full sm:w-auto flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1.5 pt-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible sm:flex-wrap sm:justify-end scrollbar-none touch-pan-x">
             {/* Studied Toggle */}
             <button
               type="button"
               onClick={() => toggleStudied(question.number)}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none shrink-0 cursor-pointer ${
                 isCurrentStudied
                   ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -407,7 +407,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={handleToggleBookmark}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none shrink-0 cursor-pointer ${
                 isBookmarked
                   ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30 shadow-amber-500/10'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-amber-400/50'
@@ -423,7 +423,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={handleToggleFlashcardMode}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none shrink-0 cursor-pointer ${
                 isFlashcardMode
                   ? 'bg-purple-600 text-white border-purple-500 shadow-purple-600/25 ring-2 ring-purple-500/20'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -442,7 +442,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={() => setIsNotesOpen((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none shrink-0 cursor-pointer ${
                 isNotesOpen || hasNote
                   ? 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground hover:border-purple-400'
@@ -460,7 +460,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={() => setIsAiDrawerOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none cursor-pointer bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30 hover:border-purple-500"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shadow-sm dark:shadow-none shrink-0 cursor-pointer bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30 hover:border-purple-500"
               title="Explain with AI / Simplify Concept (Press E)"
             >
               <Sparkles className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400 fill-current" />
@@ -475,7 +475,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={() => setIsGridOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all text-xs font-semibold shadow-sm dark:shadow-none"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all text-xs font-semibold shadow-sm dark:shadow-none shrink-0 cursor-pointer"
               title="Jump to question (Press G)"
             >
               <Grid className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
@@ -486,7 +486,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <button
               type="button"
               onClick={handleCopyLink}
-              className="p-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-muted-foreground hover:text-foreground transition-all shadow-sm dark:shadow-none"
+              className="p-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-muted-foreground hover:text-foreground transition-all shadow-sm dark:shadow-none shrink-0 cursor-pointer"
               title="Copy Direct Question Link"
               aria-label="Copy Direct Question Link"
             >
@@ -501,11 +501,11 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-purple-600 text-white shadow-md shadow-purple-600/30 shrink-0">
               Q{question.number}
             </span>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-foreground">
                 Question {question.number} of {totalInTrack}
               </p>
-              <p className="text-[11px] text-muted-foreground truncate max-w-xs sm:max-w-md font-medium">
+              <p className="text-[11px] text-muted-foreground truncate max-w-full font-medium">
                 {question.part}
               </p>
             </div>
@@ -577,7 +577,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
       )}
 
       {/* Main Single Question & Answer Card */}
-      <article className="p-5 sm:p-8 md:p-10 rounded-2xl bg-card border border-border shadow-sm dark:shadow-xl mb-8 animate-in fade-in duration-200">
+      <article className="p-4 sm:p-7 md:p-9 rounded-2xl bg-card border border-border shadow-sm dark:shadow-xl mb-8 animate-in fade-in duration-200">
         {/* Question Header */}
         <div className="pb-5 sm:pb-6 mb-6 border-b border-border">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -608,7 +608,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               </button>
             ))}
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug break-words [overflow-wrap:anywhere]">
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug break-words [overflow-wrap:anywhere]">
             {question.title}
           </h1>
         </div>

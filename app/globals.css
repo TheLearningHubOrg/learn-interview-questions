@@ -79,6 +79,8 @@ code, pre, kbd {
   font-size: 0.875em;
   font-weight: 600;
   border: 1px solid #ddd6fe;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .dark :not(pre) > code {

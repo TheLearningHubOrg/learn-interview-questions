@@ -65,7 +65,7 @@ export function CodeBlock({ language, codeString, children }: CodeBlockProps) {
       </div>
 
       {/* Code Area */}
-      <pre className="p-4 sm:p-5 overflow-x-auto text-[13px] sm:text-sm font-mono leading-relaxed bg-slate-50 dark:bg-[#0b0d14] text-slate-900 dark:text-[#f1f5f9] scrollbar-thin scrollbar-thumb-border m-0 transition-colors">
+      <pre className="p-3.5 sm:p-5 overflow-x-auto text-[12px] sm:text-sm font-mono leading-relaxed bg-slate-50 dark:bg-[#0b0d14] text-slate-900 dark:text-[#f1f5f9] scrollbar-thin scrollbar-thumb-border m-0 transition-colors">
         <code className={`language-${cleanLang}`}>{children}</code>
       </pre>
     </div>

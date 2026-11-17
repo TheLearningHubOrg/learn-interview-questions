@@ -161,10 +161,10 @@ export function TrackRoadmapFlowchart({
 
                     {/* Stage Title & Subtitle */}
                     <div className="mb-3">
-                      <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1">
+                      <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2 min-h-[2.5rem] flex items-center">
                         {title}
                       </h3>
-                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed min-h-[2rem]">
                         {subtitle}
                       </p>
                     </div>
@@ -192,8 +192,8 @@ export function TrackRoadmapFlowchart({
                     </div>
                   </button>
 
-                  {/* Flow Connector Arrow on large screens for consecutive steps */}
-                  {index < parts.length - 1 && (
+                  {/* Flow Connector Arrow on large screens for consecutive steps within the same row */}
+                  {index < parts.length - 1 && (index + 1) % 5 !== 0 && (
                     <div className="hidden xl:block absolute -right-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none text-muted-foreground/30">
                       <ArrowRight className="h-3.5 w-3.5" />
                     </div>

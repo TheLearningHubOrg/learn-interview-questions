@@ -98,7 +98,7 @@ export function TrackRoadmapFlowchart({
       {/* Flowchart Content */}
       {isExpanded && (
         <div className="p-4 sm:p-6 bg-gradient-to-b from-card to-background">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 relative">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 xl:gap-6 relative">
             {parts.map((p, index) => {
               const stageNum = index + 1;
               const meta = trackMeta[stageNum];
@@ -195,10 +195,10 @@ export function TrackRoadmapFlowchart({
                     </div>
                   </button>
 
-                  {/* Flow Connector Arrow on large screens for consecutive steps within the same row */}
+                  {/* Flow Connector Arrow placed directly in the center between two consecutive cards in the row */}
                   {index < parts.length - 1 && (index + 1) % 5 !== 0 && (
-                    <div className="hidden xl:block absolute -right-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none text-muted-foreground/30">
-                      <ArrowRight className="h-3.5 w-3.5" />
+                    <div className="hidden xl:flex absolute -right-6 top-1/2 -translate-y-1/2 w-6 items-center justify-center z-10 pointer-events-none text-muted-foreground/60">
+                      <ArrowRight className="h-4 w-4" />
                     </div>
                   )}
                 </div>

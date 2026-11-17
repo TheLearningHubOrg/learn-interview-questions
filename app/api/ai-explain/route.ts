@@ -24,17 +24,17 @@ export async function POST(req: NextRequest) {
     let systemInstruction = '';
     let userPromptText = '';
 
-    if (mode === 'eli5') {
-      systemInstruction = 'You are an inspiring technical mentor explaining complex engineering concepts to a beginner. Use an intuitive, memorable real-world analogy. Keep it engaging, formatted with clear markdown sections, and free of unnecessary academic jargon.';
-      userPromptText = `Explain the following technical interview concept like I'm 5 years old:\n\nConcept: ${questionTitle}\n\nTechnical Reference:\n${(questionContent || '').slice(0, 3000)}`;
-    } else if (mode === 'staff') {
-      systemInstruction = 'You are a Principal / Staff Engineer at a top tier tech company (Google/Meta/Stripe). Break down this technical concept from a Staff-plus perspective: production failure modes, concurrency/race conditions, distributed systems trade-offs, and operational telemetry.';
-      userPromptText = `Provide a Staff-level architectural deep-dive and trade-off analysis for:\n\nTopic: ${questionTitle}\n\nReference Material:\n${(questionContent || '').slice(0, 3000)}`;
+    if (mode === 'simple' || mode === 'eli5') {
+      systemInstruction = 'You are an inspiring technical mentor explaining complex engineering concepts simply and clearly. Break down the concept in plain English with an intuitive everyday analogy. Structure your answer in 3 clean markdown sections:\n\n### 💡 Plain English Summary\n2-3 crystal-clear sentences that anyone can grasp immediately.\n\n### 🍎 Everyday Analogy\nA memorable, real-world comparison that makes the concept click instantly.\n\n### 🎙️ How to Answer in an Interview\n3 punchy bullet points ready to speak out loud in an interview.';
+      userPromptText = `Explain this concept simply:\n\nQuestion: ${questionTitle}\n\nTechnical Reference:\n${(questionContent || '').slice(0, 3000)}`;
+    } else if (mode === 'key_points' || mode === 'staff') {
+      systemInstruction = 'You are a senior tech lead. Summarize the essential engineering takeaways, practical gotchas, and production trade-offs in clean bullet points for an interview candidate:\n\n### ⚡ Core Takeaways\n3-4 essential technical facts you must know.\n\n### ⚠️ Common Pitfalls & Mistakes\nTop 2-3 mistakes engineers make and how to avoid them.\n\n### ⚖️ Production Trade-offs\nWhen to use this approach vs alternatives in real systems.';
+      userPromptText = `Provide key takeaways and trade-offs for:\n\nTopic: ${questionTitle}\n\nTechnical Reference:\n${(questionContent || '').slice(0, 3000)}`;
     } else if (mode === 'followups') {
-      systemInstruction = 'You are a Bar Raiser Technical Interviewer. Predict the top 3-4 toughest, most insightful follow-up questions an interviewer will ask after the candidate answers this question, along with punchy key points on how to answer each.';
-      userPromptText = `Given this interview question and answer:\n\nQuestion: ${questionTitle}\n\nAnswer Summary:\n${(questionContent || '').slice(0, 3000)}\n\nWhat are the top 3-4 interviewer follow-up questions?`;
+      systemInstruction = 'You are a Bar Raiser Technical Interviewer. Predict the top 3 toughest, most insightful follow-up questions an interviewer will ask after this question, with winning answers:\n\nFormat each follow-up with:\n### 1. [Follow-up Question Title]\n**What they test:** 1 sentence.\n**Winning Answer:** 2-3 punchy bullet points.';
+      userPromptText = `Interview Question: ${questionTitle}\n\nAnswer Summary:\n${(questionContent || '').slice(0, 3000)}\n\nWhat are the top 3 interviewer follow-up questions?`;
     } else {
-      systemInstruction = 'You are an expert technical interview tutor. Help the user clarify their specific doubt about this interview question. Give a direct, accurate, and practical explanation with concise code examples if helpful.';
+      systemInstruction = 'You are a helpful, clear technical interview tutor. Help the user clarify their specific doubt about this interview question. Give a direct, accurate, and practical explanation with concise code examples if helpful. Keep it concise, friendly, and easy to understand.';
       userPromptText = `Topic: ${questionTitle}\n\nContext:\n${(questionContent || '').slice(0, 2000)}\n\nUser Question / Doubt:\n${customPrompt || 'Explain this concept in more depth.'}`;
     }
 

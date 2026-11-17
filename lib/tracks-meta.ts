@@ -23,6 +23,7 @@ export interface ParsedQuestion {
   isMostAsked?: boolean;
   hasCode?: boolean;
   hasDiagram?: boolean;
+  tags?: string[];
 }
 
 export interface QuestionViewData {
@@ -45,6 +46,7 @@ export interface QuestionIndexItem {
   isMostAsked?: boolean;
   hasCode?: boolean;
   hasDiagram?: boolean;
+  tags?: string[];
 }
 
 export const TRACKS: TrackMeta[] = [

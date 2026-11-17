@@ -565,6 +565,15 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
                                 Code
                               </span>
                             )}
+                            {q.tags?.slice(0, 2).map((t) => (
+                              <span
+                                key={t}
+                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-card text-muted-foreground border border-border"
+                              >
+                                <span className="text-purple-500 font-bold">#</span>
+                                <span>{t}</span>
+                              </span>
+                            ))}
                           </div>
                           <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
                             {q.title}

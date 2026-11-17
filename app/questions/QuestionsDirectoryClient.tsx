@@ -500,6 +500,23 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
                           </span>
                         )}
 
+                        {item.tags?.slice(0, 2).map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSearchQuery(t);
+                            }}
+                            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-card text-muted-foreground border border-border hover:border-purple-400 hover:text-foreground transition-all cursor-pointer"
+                            title={`Filter questions by #${t}`}
+                          >
+                            <span className="text-purple-500 font-bold">#</span>
+                            <span>{t}</span>
+                          </button>
+                        ))}
+
                         {isStudied && (
                           <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold text-emerald-700 dark:text-emerald-400">
                             <CheckCircle2 className="h-2.5 w-2.5" />

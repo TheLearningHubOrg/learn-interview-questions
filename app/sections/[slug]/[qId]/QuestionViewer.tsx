@@ -24,9 +24,14 @@ import {
   Sparkles,
   ArrowRight,
   Zap,
-  PencilLine
+  PencilLine,
+  Flame,
+  Code2,
+  Layers,
+  Tag
 } from 'lucide-react';
 import { QuestionViewData } from '@/lib/tracks-meta';
+import { classifyQuestion } from '@/lib/question-classifier';
 import { CodeBlock } from '@/components/CodeBlock';
 import { MermaidBlock } from '@/components/MermaidBlock';
 import { MultiLangCodeTabs, LanguageBlock } from '@/components/MultiLangCodeTabs';
@@ -119,6 +124,20 @@ const renderMarkdownImage = ({ src, alt, ...props }: any) => {
 export function QuestionViewer({ data }: QuestionViewerProps) {
   const router = useRouter();
   const { track, question, allQuestions, prevQuestion, nextQuestion, totalInTrack } = data;
+
+  // Deterministic question classification for level, tags, high-yield frequency
+  const classification = classifyQuestion({
+    trackSlug: track.slug,
+    questionNumber: question.number,
+    title: question.title,
+    part: question.part,
+    content: question.content,
+  });
+  const qLevel = question.level || classification.level;
+  const isMostAsked = question.isMostAsked ?? classification.isMostAsked;
+  const hasCode = question.hasCode ?? classification.hasCode;
+  const hasDiagram = question.hasDiagram ?? classification.hasDiagram;
+  const questionTags = (question.tags && question.tags.length > 0) ? question.tags : classification.tags;
 
   const [copiedLink, setCopiedLink] = useState(false);
   const [isGridOpen, setIsGridOpen] = useState(false);
@@ -611,6 +630,76 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
           <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug break-words [overflow-wrap:anywhere]">
             {question.title}
           </h1>
+
+          {/* Question Metadata & Tags Row */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mt-3 pt-2.5 border-t border-border/50">
+            {/* Seniority Level Badge */}
+            <Link
+              href={`/questions?level=${qLevel}`}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border transition-all hover:scale-105 ${
+                qLevel === 'junior'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20'
+                  : qLevel === 'mid'
+                  ? 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/25 hover:bg-blue-500/20'
+                  : 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/25 hover:bg-purple-500/20'
+              }`}
+              title={`Difficulty: ${qLevel.toUpperCase()}. Click to explore all ${qLevel} questions.`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${
+                qLevel === 'junior' ? 'bg-emerald-500' : qLevel === 'mid' ? 'bg-blue-500' : 'bg-purple-500'
+              }`} />
+              <span className="capitalize">{qLevel} Level</span>
+            </Link>
+
+            {/* Most Asked High-Yield Badge */}
+            {isMostAsked && (
+              <Link
+                href="/questions?filter=most-asked"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 hover:bg-amber-500/20 transition-all hover:scale-105"
+                title="Frequently asked interview question. Click to see all most-asked questions."
+              >
+                <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                <span>Most Asked</span>
+              </Link>
+            )}
+
+            {/* Code Snippet Badge */}
+            {hasCode && (
+              <Link
+                href="/questions?filter=has-code"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted/80 text-foreground border border-border hover:border-purple-400 hover:bg-muted transition-all hover:scale-105"
+                title="Includes practical code example. Click to filter questions with code."
+              >
+                <Code2 className="w-3.5 h-3.5 text-muted-foreground" />
+                <span>Code Example</span>
+              </Link>
+            )}
+
+            {/* Architecture Diagram Badge */}
+            {hasDiagram && (
+              <Link
+                href="/questions?filter=has-diagram"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/25 hover:bg-indigo-500/20 transition-all hover:scale-105"
+                title="Includes architecture/flow diagram. Click to filter diagrams."
+              >
+                <Layers className="w-3.5 h-3.5 text-indigo-500" />
+                <span>Diagram</span>
+              </Link>
+            )}
+
+            {/* Topic Tags */}
+            {questionTags.map((tag) => (
+              <Link
+                key={tag}
+                href={`/questions?query=${encodeURIComponent(tag)}`}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-400 hover:bg-muted/50 transition-all hover:scale-105"
+                title={`Topic: ${tag}. Click to explore questions on ${tag}.`}
+              >
+                <Tag className="w-3 h-3 text-purple-500" />
+                <span>{tag}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Answer Content with Syntax-Highlighted Markdown & Self-Test Blur */}

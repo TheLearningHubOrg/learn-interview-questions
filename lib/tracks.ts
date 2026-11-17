@@ -53,6 +53,7 @@ export function parseTrackQuestionsFromMarkdown(markdown: string, trackSlug?: st
           isMostAsked: meta.isMostAsked,
           hasCode: meta.hasCode,
           hasDiagram: meta.hasDiagram,
+          tags: meta.tags,
         });
         currentQ = null;
         currentContent = [];
@@ -81,6 +82,7 @@ export function parseTrackQuestionsFromMarkdown(markdown: string, trackSlug?: st
             isMostAsked: meta.isMostAsked,
             hasCode: meta.hasCode,
             hasDiagram: meta.hasDiagram,
+            tags: meta.tags,
           });
         }
         currentQ = {
@@ -116,6 +118,7 @@ export function parseTrackQuestionsFromMarkdown(markdown: string, trackSlug?: st
       isMostAsked: meta.isMostAsked,
       hasCode: meta.hasCode,
       hasDiagram: meta.hasDiagram,
+      tags: meta.tags,
     });
   }
 
@@ -175,6 +178,7 @@ export async function getGlobalSearchIndex(): Promise<QuestionIndexItem[]> {
         isMostAsked: Boolean(q.isMostAsked),
         hasCode: Boolean(q.hasCode),
         hasDiagram: Boolean(q.hasDiagram),
+        tags: q.tags || [],
       });
     }
   }

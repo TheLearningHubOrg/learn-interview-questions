@@ -161,10 +161,13 @@ export function TrackRoadmapFlowchart({
 
                     {/* Stage Title & Subtitle */}
                     <div className="mb-3">
-                      <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2 min-h-[2.5rem] flex items-center">
+                      <h3 
+                        className="text-xs sm:text-[13px] 2xl:text-sm font-bold text-foreground leading-snug group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors truncate"
+                        title={title}
+                      >
                         {title}
                       </h3>
-                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed min-h-[2rem]">
+                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed h-[2rem]">
                         {subtitle}
                       </p>
                     </div>

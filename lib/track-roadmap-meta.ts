@@ -81,10 +81,10 @@ export const TRACK_ROADMAP_META: Record<string, Record<number, RoadmapStageMeta>
   'angular-ts': {
     1: { shortTitle: 'Core Components', subtitle: 'Templates, Data Binding, Component Lifecycle' },
     2: { shortTitle: 'Signals & State', subtitle: 'Signal Graph, Writable/Computed, Effects' },
-    3: { shortTitle: 'Control Flow & Directives', subtitle: '@if, @for, Structural vs Attribute Directives' },
+    3: { shortTitle: 'Directives & Control', subtitle: '@if, @for, Structural vs Attribute Directives' },
     4: { shortTitle: 'Dependency Injection', subtitle: 'Hierarchical Injectors, provideIn, InjectionToken' },
-    5: { shortTitle: 'RxJS & Reactive Streams', subtitle: 'Observables, Pipeable Operators, Subjects' },
-    6: { shortTitle: 'NgRx State Management', subtitle: 'Actions, Reducers, Selectors, Effects' },
+    5: { shortTitle: 'RxJS & Observables', subtitle: 'Observables, Pipeable Operators, Subjects' },
+    6: { shortTitle: 'NgRx & State Store', subtitle: 'Actions, Reducers, Selectors, Effects' },
     7: { shortTitle: 'Routing & Navigation', subtitle: 'Lazy Loading, Resolvers, Route Guards' },
     8: { shortTitle: 'Forms & Validation', subtitle: 'Reactive Forms, Async Validators, FormArray' },
     9: { shortTitle: 'Performance & SSR', subtitle: 'OnPush, Zoneless, Hydration, Defer Blocks' },

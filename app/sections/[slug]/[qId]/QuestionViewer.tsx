@@ -631,73 +631,63 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             {question.title}
           </h1>
 
-          {/* Question Metadata & Tags Row */}
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mt-3 pt-2.5 border-t border-border/50">
+          {/* Question Metadata & Tags Row (Read-only badges) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mt-3 pt-2.5 border-t border-border/50 select-none">
             {/* Seniority Level Badge */}
-            <Link
-              href={`/questions?level=${qLevel}`}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border transition-all hover:scale-105 ${
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${
                 qLevel === 'junior'
-                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25'
                   : qLevel === 'mid'
-                  ? 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/25 hover:bg-blue-500/20'
-                  : 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/25 hover:bg-purple-500/20'
+                  ? 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/25'
+                  : 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/25'
               }`}
-              title={`Difficulty: ${qLevel.toUpperCase()}. Click to explore all ${qLevel} questions.`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${
                 qLevel === 'junior' ? 'bg-emerald-500' : qLevel === 'mid' ? 'bg-blue-500' : 'bg-purple-500'
               }`} />
               <span className="capitalize">{qLevel} Level</span>
-            </Link>
+            </span>
 
             {/* Most Asked High-Yield Badge */}
             {isMostAsked && (
-              <Link
-                href="/questions?filter=most-asked"
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 hover:bg-amber-500/20 transition-all hover:scale-105"
-                title="Frequently asked interview question. Click to see all most-asked questions."
+              <span
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25"
               >
                 <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                 <span>Most Asked</span>
-              </Link>
+              </span>
             )}
 
             {/* Code Snippet Badge */}
             {hasCode && (
-              <Link
-                href="/questions?filter=has-code"
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted/80 text-foreground border border-border hover:border-purple-400 hover:bg-muted transition-all hover:scale-105"
-                title="Includes practical code example. Click to filter questions with code."
+              <span
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted/80 text-foreground border border-border"
               >
                 <Code2 className="w-3.5 h-3.5 text-muted-foreground" />
                 <span>Code Example</span>
-              </Link>
+              </span>
             )}
 
             {/* Architecture Diagram Badge */}
             {hasDiagram && (
-              <Link
-                href="/questions?filter=has-diagram"
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/25 hover:bg-indigo-500/20 transition-all hover:scale-105"
-                title="Includes architecture/flow diagram. Click to filter diagrams."
+              <span
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/25"
               >
                 <Layers className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Diagram</span>
-              </Link>
+              </span>
             )}
 
             {/* Topic Tags */}
             {questionTags.map((tag) => (
-              <Link
+              <span
                 key={tag}
-                href={`/questions?query=${encodeURIComponent(tag)}`}
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-400 hover:bg-muted/50 transition-all hover:scale-105"
-                title={`Topic: ${tag}. Click to explore questions on ${tag}.`}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-card border border-border text-muted-foreground"
               >
                 <Tag className="w-3 h-3 text-purple-500" />
                 <span>{tag}</span>
-              </Link>
+              </span>
             ))}
           </div>
         </div>

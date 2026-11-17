@@ -57,6 +57,14 @@ export function AiExplainDrawer({
   // Cache explanations per question and mode so switching tabs is instant
   const [cache, setCache] = useState<Record<string, string>>({});
   const inputRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top when mode or question changes
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [activeMode, questionTitle]);
 
   // Load saved API key from localStorage on mount
   useEffect(() => {
@@ -342,7 +350,7 @@ export function AiExplainDrawer({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 text-sm text-foreground space-y-4">
+        <div ref={contentRef} className="flex-1 overflow-y-auto p-4 sm:p-6 text-sm text-foreground space-y-4">
           {/* First-time API Key Onboarding Card */}
           {needsApiKey && (
             <div className="py-8 px-4 max-w-md mx-auto text-center space-y-4 animate-in fade-in">

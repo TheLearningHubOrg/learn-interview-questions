@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, ArrowRight, BookOpen, Hash, Loader2 } from 'lucide-react';
+import { Search, X, ArrowRight, BookOpen, Hash, Loader2, Flame } from 'lucide-react';
 import { QuestionIndexItem } from '@/lib/tracks-meta';
 
 interface SearchModalProps {
@@ -176,6 +176,23 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
                     <span className="text-xs text-muted-foreground font-semibold truncate">
                       {item.trackShortTitle}
                     </span>
+                    {item.isMostAsked && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-bold rounded bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/25 shrink-0">
+                        <Flame className="w-2.5 h-2.5 text-amber-500 fill-current" />
+                        Most Asked
+                      </span>
+                    )}
+                    {item.level && (
+                      <span className={`inline-block px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider shrink-0 ${
+                        item.level === 'junior'
+                          ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20'
+                          : item.level === 'mid'
+                          ? 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20'
+                          : 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-500/20'
+                      }`}>
+                        {item.level}
+                      </span>
+                    )}
                     <span className="text-xs text-muted-foreground/60 hidden sm:inline">•</span>
                     <span className="text-xs text-muted-foreground/75 truncate hidden sm:inline">
                       {item.part}

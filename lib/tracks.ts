@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 export * from './tracks-meta';
 import { TRACKS, TrackMeta, ParsedQuestion, QuestionViewData, QuestionIndexItem } from './tracks-meta';
+import { classifyQuestion } from './question-classifier';
 
 export async function getAllTracks(): Promise<TrackMeta[]> {
   return TRACKS;
@@ -21,7 +22,7 @@ export async function getTrackContent(filename: string): Promise<string> {
   }
 }
 
-export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestion[] {
+export function parseTrackQuestionsFromMarkdown(markdown: string, trackSlug?: string): ParsedQuestion[] {
   // Normalize CRLF to LF to prevent regex line-ending match failures
   const cleanMarkdown = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const lines = cleanMarkdown.split('\n');
@@ -36,11 +37,22 @@ export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestio
       if (currentQ) {
         let contentStr = currentContent.join('\n').trim();
         contentStr = contentStr.replace(/\n*---\s*$/, '').trim();
+        const meta = classifyQuestion({
+          trackSlug,
+          questionNumber: currentQ.number,
+          title: currentQ.title,
+          part: currentQ.part,
+          content: contentStr,
+        });
         questions.push({
           number: currentQ.number,
           title: currentQ.title,
           part: currentQ.part,
           content: contentStr,
+          level: meta.level,
+          isMostAsked: meta.isMostAsked,
+          hasCode: meta.hasCode,
+          hasDiagram: meta.hasDiagram,
         });
         currentQ = null;
         currentContent = [];
@@ -53,11 +65,22 @@ export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestio
         if (currentQ) {
           let contentStr = currentContent.join('\n').trim();
           contentStr = contentStr.replace(/\n*---\s*$/, '').trim();
+          const meta = classifyQuestion({
+            trackSlug,
+            questionNumber: currentQ.number,
+            title: currentQ.title,
+            part: currentQ.part,
+            content: contentStr,
+          });
           questions.push({
             number: currentQ.number,
             title: currentQ.title,
             part: currentQ.part,
             content: contentStr,
+            level: meta.level,
+            isMostAsked: meta.isMostAsked,
+            hasCode: meta.hasCode,
+            hasDiagram: meta.hasDiagram,
           });
         }
         currentQ = {
@@ -77,11 +100,22 @@ export function parseTrackQuestionsFromMarkdown(markdown: string): ParsedQuestio
   if (currentQ) {
     let contentStr = currentContent.join('\n').trim();
     contentStr = contentStr.replace(/\n*---\s*$/, '').trim();
+    const meta = classifyQuestion({
+      trackSlug,
+      questionNumber: currentQ.number,
+      title: currentQ.title,
+      part: currentQ.part,
+      content: contentStr,
+    });
     questions.push({
       number: currentQ.number,
       title: currentQ.title,
       part: currentQ.part,
       content: contentStr,
+      level: meta.level,
+      isMostAsked: meta.isMostAsked,
+      hasCode: meta.hasCode,
+      hasDiagram: meta.hasDiagram,
     });
   }
 
@@ -97,7 +131,7 @@ export async function getTrackQuestions(slug: string): Promise<ParsedQuestion[]>
   const track = await getTrackBySlug(slug);
   if (!track) return [];
   const content = await getTrackContent(track.filename);
-  const questions = parseTrackQuestionsFromMarkdown(content);
+  const questions = parseTrackQuestionsFromMarkdown(content, track.slug);
   questionsCache.set(slug, questions);
   return questions;
 }
@@ -137,6 +171,10 @@ export async function getGlobalSearchIndex(): Promise<QuestionIndexItem[]> {
         questionNumber: q.number,
         title: q.title,
         part: q.part,
+        level: q.level || 'mid',
+        isMostAsked: Boolean(q.isMostAsked),
+        hasCode: Boolean(q.hasCode),
+        hasDiagram: Boolean(q.hasDiagram),
       });
     }
   }

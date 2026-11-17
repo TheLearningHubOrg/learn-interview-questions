@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame } from 'lucide-react';
+import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame, Sparkles } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { TRACKS } from '@/lib/tracks-meta';
 import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
@@ -128,6 +128,15 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               <span>Tracks</span>
             </Link>
 
+            {/* Desktop All Questions Explorer Link */}
+            <Link
+              href="/questions"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-muted-foreground hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-all shrink-0"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+              <span>All Questions</span>
+            </Link>
+
             {/* Daily Study Streak Counter */}
             <button
               type="button"
@@ -235,11 +244,24 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
                   setMobileMenuOpen(false);
                   onOpenSearch?.();
                 }}
-                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-3 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground text-sm font-medium shadow-sm dark:shadow-none"
+                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-2.5 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground text-sm font-medium shadow-sm dark:shadow-none"
               >
                 <Search className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 <span>Search 1,849+ questions...</span>
               </button>
+
+              {/* Mobile All Questions Explorer in Drawer */}
+              <Link
+                href="/questions"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-2.5 rounded-xl bg-purple-500/10 border border-purple-500/25 text-purple-700 dark:text-purple-300 text-sm font-bold shadow-xs active:scale-95 transition-all"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Sparkles className="h-4 w-4 fill-current text-purple-600 dark:text-purple-400" />
+                  <span>All 1,849 Questions Hub</span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-purple-500" />
+              </Link>
 
               {/* Mobile Daily Streak in Drawer */}
               <button

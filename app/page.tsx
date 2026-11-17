@@ -114,6 +114,14 @@ export default async function HomePage() {
             <ArrowRight className="h-4 w-4 ml-1" />
           </Link>
 
+          <Link
+            href="/questions"
+            className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:border-purple-500 transition-all shadow-sm active:scale-95"
+          >
+            <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            <span>Browse All {totalQuestions}+ Questions</span>
+          </Link>
+
           <a
             href="https://github.com/TheLearningHubOrg/learn-interview-questions"
             target="_blank"

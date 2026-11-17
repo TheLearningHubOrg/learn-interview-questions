@@ -12,11 +12,17 @@ export interface TrackMeta {
   tags: string[];
 }
 
+export type QuestionLevel = 'junior' | 'mid' | 'senior';
+
 export interface ParsedQuestion {
   number: number;
   title: string;
   part: string;
   content: string;
+  level?: QuestionLevel;
+  isMostAsked?: boolean;
+  hasCode?: boolean;
+  hasDiagram?: boolean;
 }
 
 export interface QuestionViewData {
@@ -35,6 +41,10 @@ export interface QuestionIndexItem {
   questionNumber: number;
   title: string;
   part: string;
+  level?: QuestionLevel;
+  isMostAsked?: boolean;
+  hasCode?: boolean;
+  hasDiagram?: boolean;
 }
 
 export const TRACKS: TrackMeta[] = [

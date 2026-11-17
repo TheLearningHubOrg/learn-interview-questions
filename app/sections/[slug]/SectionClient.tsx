@@ -13,7 +13,11 @@ import {
   BookmarkCheck,
   Bookmark,
   CheckCircle2,
-  X
+  X,
+  Flame,
+  Code2,
+  SlidersHorizontal,
+  GraduationCap
 } from 'lucide-react';
 import { TrackMeta, ParsedQuestion } from '@/lib/tracks-meta';
 import { getTrackLastRead, READING_UPDATE_EVENT } from '@/lib/reading-history';
@@ -35,6 +39,9 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
   const [query, setQuery] = useState('');
   const [lastReadNum, setLastReadNum] = useState<number | null>(null);
   const [filterTab, setFilterTab] = useState<'all' | 'studied' | 'bookmarked'>('all');
+  const [levelFilter, setLevelFilter] = useState<'all' | 'junior' | 'mid' | 'senior'>('all');
+  const [mostAskedOnly, setMostAskedOnly] = useState<boolean>(false);
+  const [hasCodeOnly, setHasCodeOnly] = useState<boolean>(false);
   const [studiedMap, setStudiedMap] = useState<Record<number, boolean>>({});
   const [bookmarkedSet, setBookmarkedSet] = useState<Set<number>>(new Set());
   const [selectedRoadmapPart, setSelectedRoadmapPart] = useState<string | null>(null);
@@ -74,6 +81,12 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
 
   const bookmarkedCount = bookmarkedSet.size;
 
+  const mostAskedCount = useMemo(() => questions.filter((q) => q.isMostAsked).length, [questions]);
+  const juniorCount = useMemo(() => questions.filter((q) => q.level === 'junior').length, [questions]);
+  const midCount = useMemo(() => questions.filter((q) => q.level === 'mid').length, [questions]);
+  const seniorCount = useMemo(() => questions.filter((q) => q.level === 'senior').length, [questions]);
+  const codeCount = useMemo(() => questions.filter((q) => q.hasCode).length, [questions]);
+
   // Compute full roadmap stages from all questions
   const roadmapParts = useMemo<RoadmapPartInfo[]>(() => {
     const map = new Map<string, ParsedQuestion[]>();
@@ -92,7 +105,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
     }));
   }, [questions]);
 
-  // Filter questions based on selectedRoadmapPart, filterTab and query
+  // Filter questions based on selectedRoadmapPart, filterTab, level, mostAsked, code, and query
   const displayedQuestions = useMemo(() => {
     return questions.filter((item) => {
       // Roadmap part filter
@@ -101,6 +114,15 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
       // Tab filter
       if (filterTab === 'studied' && !studiedMap[item.number]) return false;
       if (filterTab === 'bookmarked' && !bookmarkedSet.has(item.number)) return false;
+
+      // Level filter
+      if (levelFilter !== 'all' && item.level !== levelFilter) return false;
+
+      // Most asked filter
+      if (mostAskedOnly && !item.isMostAsked) return false;
+
+      // Has code filter
+      if (hasCodeOnly && !item.hasCode) return false;
 
       // Query filter
       if (!query.trim()) return true;
@@ -111,7 +133,17 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
         item.number.toString() === q
       );
     });
-  }, [questions, selectedRoadmapPart, filterTab, query, studiedMap, bookmarkedSet]);
+  }, [
+    questions, 
+    selectedRoadmapPart, 
+    filterTab, 
+    levelFilter, 
+    mostAskedOnly, 
+    hasCodeOnly, 
+    query, 
+    studiedMap, 
+    bookmarkedSet
+  ]);
 
   // Group displayed questions by Part
   const groupedByPart = useMemo(() => {
@@ -125,7 +157,13 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
     return Array.from(map.entries());
   }, [displayedQuestions]);
 
-  const isFiltering = query.trim().length > 0 || filterTab !== 'all' || selectedRoadmapPart !== null;
+  const isFiltering = 
+    query.trim().length > 0 || 
+    filterTab !== 'all' || 
+    selectedRoadmapPart !== null ||
+    levelFilter !== 'all' ||
+    mostAskedOnly ||
+    hasCodeOnly;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -235,12 +273,12 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
       />
 
       {/* Filter Tabs: All Questions, Studied, Bookmarked */}
-      <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           <button
             type="button"
             onClick={() => setFilterTab('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               filterTab === 'all'
                 ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/20'
                 : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-card-hover'
@@ -252,7 +290,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
           <button
             type="button"
             onClick={() => setFilterTab('studied')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               filterTab === 'studied'
                 ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20'
                 : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-card-hover'
@@ -265,7 +303,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
           <button
             type="button"
             onClick={() => setFilterTab('bookmarked')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               filterTab === 'bookmarked'
                 ? 'bg-amber-600 text-white shadow-sm shadow-amber-600/20'
                 : 'bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-card-hover'
@@ -279,21 +317,117 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
         {isFiltering && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
             <span>Showing {displayedQuestions.length} of {questions.length}</span>
-            {isFiltering && (
-              <button
-                type="button"
-                onClick={() => {
-                  setQuery('');
-                  setFilterTab('all');
-                  setSelectedRoadmapPart(null);
-                }}
-                className="text-purple-600 dark:text-purple-400 hover:underline font-bold ml-1"
-              >
-                Reset filters
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                setQuery('');
+                setFilterTab('all');
+                setLevelFilter('all');
+                setMostAskedOnly(false);
+                setHasCodeOnly(false);
+                setSelectedRoadmapPart(null);
+              }}
+              className="text-purple-600 dark:text-purple-400 hover:underline font-bold ml-1 cursor-pointer"
+            >
+              Reset filters
+            </button>
           </div>
         )}
+      </div>
+
+      {/* Granular Level & High-Yield Filter Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl bg-card border border-border mb-6 shadow-xs">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none w-full sm:w-auto">
+          {/* Most Asked Pill */}
+          <button
+            type="button"
+            onClick={() => setMostAskedOnly((prev) => !prev)}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+              mostAskedOnly
+                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/25 ring-2 ring-amber-500/20'
+                : 'bg-muted hover:bg-muted/80 text-foreground border border-border hover:border-amber-400'
+            }`}
+            title="Show most frequently asked questions in technical interviews"
+          >
+            <Flame className={`w-3.5 h-3.5 ${mostAskedOnly ? 'text-white fill-current' : 'text-amber-500 fill-current'}`} />
+            <span>Most Asked ({mostAskedCount})</span>
+          </button>
+
+          <span className="h-4 w-px bg-border shrink-0" />
+
+          {/* Level Filter Pills */}
+          <button
+            type="button"
+            onClick={() => setLevelFilter('all')}
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              levelFilter === 'all'
+                ? 'bg-foreground text-background font-bold shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+            }`}
+          >
+            All Levels
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setLevelFilter((prev) => prev === 'junior' ? 'all' : 'junior')}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              levelFilter === 'junior'
+                ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                : 'text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+            <span>Junior ({juniorCount})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setLevelFilter((prev) => prev === 'mid' ? 'all' : 'mid')}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              levelFilter === 'mid'
+                ? 'bg-blue-600 text-white font-bold shadow-xs'
+                : 'text-muted-foreground hover:text-blue-600 hover:bg-blue-500/10'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+            <span>Mid ({midCount})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setLevelFilter((prev) => prev === 'senior' ? 'all' : 'senior')}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              levelFilter === 'senior'
+                ? 'bg-purple-600 text-white font-bold shadow-xs'
+                : 'text-muted-foreground hover:text-purple-600 hover:bg-purple-500/10'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 inline-block" />
+            <span>Senior ({seniorCount})</span>
+          </button>
+
+          <span className="h-4 w-px bg-border shrink-0" />
+
+          {/* Code Pill */}
+          <button
+            type="button"
+            onClick={() => setHasCodeOnly((prev) => !prev)}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              hasCodeOnly
+                ? 'bg-purple-600 text-white font-bold shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+            }`}
+          >
+            <Code2 className="w-3.5 h-3.5" />
+            <span>Code ({codeCount})</span>
+          </button>
+        </div>
+
+        {/* Counter */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium shrink-0 ml-auto">
+          <span>{displayedQuestions.length} of {questions.length} Qs</span>
+        </div>
       </div>
 
       {/* Questions List */}
@@ -402,6 +536,33 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
                               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30">
                                 <Bookmark className="h-2.5 w-2.5 fill-current" />
                                 Bookmarked
+                              </span>
+                            )}
+                            {q.isMostAsked && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25">
+                                <Flame className="h-2.5 w-2.5 text-amber-500 fill-current" />
+                                Most Asked
+                              </span>
+                            )}
+                            {q.level === 'junior' && (
+                              <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                                Junior
+                              </span>
+                            )}
+                            {q.level === 'mid' && (
+                              <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
+                                Mid
+                              </span>
+                            )}
+                            {q.level === 'senior' && (
+                              <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-500/20">
+                                Senior
+                              </span>
+                            )}
+                            {q.hasCode && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-muted text-muted-foreground border border-border">
+                                <Code2 className="h-2.5 w-2.5" />
+                                Code
                               </span>
                             )}
                           </div>

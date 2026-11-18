@@ -1,4 +1,4 @@
-# Core JavaScript Master Interview Question Bank (521 Questions)
+# Core JavaScript Master Interview Question Bank (522 Questions)
 
 ## Part 1: Core Objects, Prototypes, Functions & Scope (1 - 53)
 
@@ -9875,7 +9875,7 @@ console.log(evenNums); // [2, 4, 6]
 
 
 
-## Part 8: Modern JavaScript APIs, WeakRef, Proxy & Performance (464 - 521)
+## Part 8: Modern JavaScript APIs, WeakRef, Proxy & Performance (464 - 522)
 
 ### 464. What is the difference between map and forEach functions?
 
@@ -14789,6 +14789,126 @@ Optimizing bundle size improves load times, reduces bandwidth usage, and enhance
 ```
 
 
+
+
+### 522. How do you convert the digits of a number into words in JavaScript?
+
+A common practical coding interview problem is to convert an integer into its digit-by-digit word representation (e.g., input `1234` → output `"one two three four"`).
+
+#### 1. Array Index Lookup (Fastest & Most Idiomatic)
+Because individual decimal digits are strictly bounded between `0` and `9`, an array lookup provides instantaneous `O(1)` access per digit:
+
+```javascript
+function numberToWords(num) {
+  const words = [
+    "zero", "one", "two", "three", "four",
+    "five", "six", "seven", "eight", "nine"
+  ];
+
+  const isNegative = num < 0;
+  const absNum = Math.abs(num);
+
+  const result = String(absNum)
+    .split("")
+    .map(digit => words[Number(digit)])
+    .join(" ");
+
+  return isNegative ? `negative ${result}` : result;
+}
+
+console.log(numberToWords(1234)); // "one two three four"
+console.log(numberToWords(9874)); // "nine eight seven four"
+console.log(numberToWords(0));    // "zero"
+console.log(numberToWords(-42));  // "negative four two"
+```
+
+#### 2. Using an ES6 `Map`
+You can also use an explicit ES6 `Map` data structure to map integer keys to their corresponding string words:
+
+```javascript
+function numberToWordsMap(num) {
+  const wordMap = new Map([
+    [0, "zero"],
+    [1, "one"],
+    [2, "two"],
+    [3, "three"],
+    [4, "four"],
+    [5, "five"],
+    [6, "six"],
+    [7, "seven"],
+    [8, "eight"],
+    [9, "nine"]
+  ]);
+
+  const isNegative = num < 0;
+  const result = String(Math.abs(num))
+    .split("")
+    .map(digit => wordMap.get(Number(digit)))
+    .join(" ");
+
+  return isNegative ? `negative ${result}` : result;
+}
+
+console.log(numberToWordsMap(1234)); // "one two three four"
+console.log(numberToWordsMap(9874)); // "nine eight seven four"
+```
+
+#### 3. Pure Math Approach: Without Converting to String (Interview Follow-up)
+Interviewers frequently ask candidates to solve this **without typecasting to a string** (disallowing `String()`, `toString()`, or string split methods). You can extract digits from right to left using the modulo operator (`% 10`) and reduce the integer using division (`Math.floor(n / 10)`):
+
+```javascript
+function numberToWordsMath(num) {
+  if (num === 0) return "zero";
+
+  const words = [
+    "zero", "one", "two", "three", "four",
+    "five", "six", "seven", "eight", "nine"
+  ];
+
+  let n = Math.abs(num);
+  const result = [];
+
+  while (n > 0) {
+    const digit = n % 10;
+    result.push(words[digit]);
+    n = Math.floor(n / 10);
+  }
+
+  // Modulo extracts digits from right to left, so reverse to preserve original order
+  const wordString = result.reverse().join(" ");
+  return num < 0 ? `negative ${wordString}` : wordString;
+}
+
+console.log(numberToWordsMath(1234)); // "one two three four"
+console.log(numberToWordsMath(9874)); // "nine eight seven four"
+```
+
+#### 4. Handling Floating Point Numbers (Decimals)
+If the interviewer extends the prompt to support decimal places (e.g., `12.34` → `"one two point three four"`):
+
+```javascript
+function floatToWords(num) {
+  const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+  const isNegative = num < 0;
+
+  const result = String(Math.abs(num))
+    .split("")
+    .map(char => (char === "." ? "point" : words[Number(char)]))
+    .join(" ");
+
+  return isNegative ? `negative ${result}` : result;
+}
+
+console.log(floatToWords(12.34)); // "one two point three four"
+```
+
+#### Key Edge Cases & Interview Talking Points:
+- **Zero Handling**: Input `0` must return `"zero"` rather than an empty string.
+- **Negative Integers**: Check if `num < 0` and prefix with `"negative "`.
+- **Digit-by-digit vs. Place-value Words**: Clarify whether the interviewer wants digit-by-digit translation (`1234` → `"one two three four"`) or full natural English place-value words (`1234` → `"One Thousand Two Hundred Thirty Four"` as in LeetCode 273).
+- **Complexity**:
+  - **Time Complexity**: $\mathcal{O}(d)$, where $d$ is the number of digits in the integer ($\approx \lfloor \log_{10} N \rfloor + 1$).
+  - **Space Complexity**: $\mathcal{O}(d)$ to store the mapped string tokens.
 
 <!-- QUESTIONS_END -->
 

@@ -24,13 +24,13 @@
 | **Track 5: Backend Node.js** | Node.js Runtime, V8, Libuv Event Loop, Streams, Buffers, Express, Fastify | **60** | [Open Track 5](tracks/05-backend-nodejs.md) |
 | **Track 6: AWS Cloud Architecture** | AWS Well-Architected, VPC, Fargate, Lambda, S3, Aurora, IAM, KMS, SQS | **65** | [Open Track 6](tracks/06-cloud-aws-architecture.md) |
 | **Track 7: Data Structures & Algorithms** | Multi-Language: Python 3, Java, C++, TypeScript (Blind 75, NeetCode 150) | **100** | [Open Track 7](tracks/07-data-structures-algorithms.md) |
-| **Track 8: Core JavaScript Internals** | Core Language Bank: 521 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **521** | [Open Track 8](tracks/08-frontend-javascript.md) |
+| **Track 8: Core JavaScript Internals** | Core Language Bank: 522 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **522** | [Open Track 8](tracks/08-frontend-javascript.md) |
 | **Track 9: Behavioral, HR & Leadership** | General Intro, STAR Method (S-T-A-R), Incident Post-Mortems, Culture, Negotiation | **50** | [Open Track 9](tracks/09-general-behavioral-hr.md) |
 | **Track 10: System Design & Distributed Systems** | Distributed Trade-offs, TinyURL, Rate Limiter, WhatsApp, Twitter, Raft, Back-of-the-Envelope | **50** | [Open Track 10](tracks/10-system-design-distributed-systems.md) |
 | **Track 11: DevOps, Containers & Kubernetes** | Docker Internals, Kubernetes Control Plane, CNI/CSI, HPA/Karpenter, GitOps, CI/CD, Terraform, SRE | **50** | [Open Track 11](tracks/11-devops-containers-kubernetes.md) |
 | **Track 12: Web Security & OWASP Top 10** | OWASP Top 10, BOLA/IDOR, XSS, CSRF, SSRF, CSP Nonces, JWT, OAuth2 PKCE, Cryptography | **50** | [Open Track 12](tracks/12-web-security-owasp.md) |
 | **Track 13: AI Engineering & LLM Architecture** | RAG, Vector Search, PagedAttention/vLLM, KV Cache, Autonomous Agents, MCP, LoRA & DPO | **50** | [Open Track 13](tracks/13-ai-engineering-llm.md) |
-| **TOTAL** | **Full-Stack, Cloud, AI Systems, Security, DevOps & System Design Mastery** | **1,849** | — |
+| **TOTAL** | **Full-Stack, Cloud, AI Systems, Security, DevOps & System Design Mastery** | **1,850** | — |
 
 ---
 
@@ -116,7 +116,7 @@
 
 ---
 
-### 🟨 [Track 8: Core JavaScript Master (1 - 521)](tracks/08-frontend-javascript.md)
+### 🟨 [Track 8: Core JavaScript Master (1 - 522)](tracks/08-frontend-javascript.md)
 1. **Core Objects, Prototypes, Functions & Scope (Q1 - Q50)**: Ways to create objects, prototype chains, `call`/`apply`/`bind`, Map vs Object, arrow functions, currying, pure functions, `let` vs `var`, TDZ, IIFE, memoization, hoisting, closures, scopes, service workers, IndexedDB, cookies & web storage.
 2. **Promises, Callbacks, Async & Strict Mode (Q51 - Q100)**: Web workers, Promise states, callback hell, SSE, promise chaining, `Promise.all()`, strict mode, `typeof`, `null` vs `undefined`, `window` vs `document`, event flow, bubbling & capturing, SOP, compiled vs interpreted, case-sensitivity.
 3. **DOM, Event Flow, Timers & Browser APIs (Q101 - Q170)**: `preventDefault()` vs `stopPropagation()`, single-threaded model, event delegation, ECMAScript vs JS, `clearTimeout` / `clearInterval`, URL location properties, loops, polyfills, tree shaking, regex patterns, breakpoints.
@@ -124,7 +124,7 @@
 5. **ES6+ Modern Syntax, Classes, Modules & Destructuring (Q251 - Q325)**: Comma operator, TypeScript differences, class constructors & `super()`, prototype getters/setters, non-extensible objects, minification & obfuscation, constraint validation, ES6 features, template literals, destructuring, typed arrays.
 6. **Async Internals, Memory, Microtasks & Web APIs (Q326 - Q400)**: PostMessage security, JS paradigms, `~~` operator, `ArrayBuffer`, shallow vs deep copy, mixins, reflow vs repaint, AJAX, zero timeout, microtask queues, observables & RxJS.
 7. **Execution Context, Functional JS & V8 Engine (Q401 - Q460)**: Babel, Node.js concurrency, `this` keyword, memory leak causes, V8 optimization (hidden classes, inline caching), HOFs, ASI, compose & pipe functions.
-8. **Modern JavaScript APIs, WeakRef, Proxy & Performance (Q461 - Q521)**: Lexical scope, dark mode detection, `requestAnimationFrame`, `globalThis`, shadowing, `structuredClone`, `Promise.any()`, BigInt, private class fields, Array `.at()`, top-level await, WeakRef & FinalizationRegistry, Temporal API, Symbols, AbortController, Intersection Observer, Mutation Observer, Atomics API, bundle size optimization.
+8. **Modern JavaScript APIs, WeakRef, Proxy & Performance (Q461 - Q522)**: Lexical scope, dark mode detection, `requestAnimationFrame`, `globalThis`, shadowing, `structuredClone`, `Promise.any()`, BigInt, private class fields, Array `.at()`, top-level await, WeakRef & FinalizationRegistry, Temporal API, Symbols, AbortController, Intersection Observer, Mutation Observer, Atomics API, bundle size optimization, number digits to words conversion algorithms.
 
 ---
 

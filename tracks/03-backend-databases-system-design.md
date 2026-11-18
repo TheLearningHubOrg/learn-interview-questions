@@ -1,4 +1,4 @@
-# Full-Stack & Backend Database Master Interview Question Bank: SQL, NoSQL, Redis & System Design (1 - 60)
+# Full-Stack & Backend Database Master Interview Question Bank: SQL, NoSQL, Redis & System Design (1 - 65)
 
 > Simple, intuitive, and easy-to-explain technical interview questions and deep-dive answers covering Relational Databases (PostgreSQL, MySQL, ACID, Indexing, B-Trees, Joins, MVCC), NoSQL Stores (MongoDB, DynamoDB), In-Memory Caching (Redis), and Real-Time Scalability Architecture with clear SQL, Redis, and schema code examples.
 
@@ -955,4 +955,158 @@ LIMIT 5;
 SELECT client_addr, application_name,
   pg_wal_lsn_diff(pg_current_wal_lsn(), replay_lsn) AS replication_lag_bytes
 FROM pg_stat_replication;
+```
+
+---
+
+## Part 6: MySQL Architecture, InnoDB & Production Optimization (61 - 65)
+
+### 61. Explain the MySQL InnoDB Storage Engine Architecture: Buffer Pool, Redo Log, Undo Log, and Doublewrite Buffer.
+**In Simple Words:**
+**InnoDB** is MySQL's default ACID-compliant transactional storage engine. Rather than writing every modified row directly to disk synchronously, InnoDB buffers modifications in memory and uses a write-ahead log for durability.
+
+Key architectural components:
+1. **InnoDB Buffer Pool**:
+   - The primary in-memory cache holding data and index pages (typically sized to 70–80% of total system RAM on dedicated database hosts).
+   - Uses a modified LRU (Least Recently Used) algorithm with midpoint insertion to prevent full table scans from flushing out frequently accessed hotspot pages.
+2. **Redo Log (Write-Ahead Log)**:
+   - Fixed-size circular disk log (`ib_logfile0`, `ib_logfile1`).
+   - Ensures **Durability (ACID)**. When a transaction commits, dirty pages are flushed to the redo log sequentially before being asynchronously flushed to the tablespace (`.ibd`).
+   - Controlled by `innodb_flush_log_at_trx_commit`:
+     - `1` (Full ACID): Redo log flushed to disk at every commit.
+     - `2`: Flushed to OS cache at commit, flushed to disk every second (faster, risks losing 1 sec of data on OS crash).
+3. **Undo Log**:
+   - Stores pre-modification snapshots of rows.
+   - Powers **Rollback (Atomicity)** and **Multi-Version Concurrency Control (MVCC)** for consistent non-blocking reads (`SELECT` queries read undo log history matching their transaction snapshot).
+4. **Doublewrite Buffer**:
+   - Prevents partial page writes (torn pages) caused by OS crashes during a 16KB InnoDB page flush to 4KB OS disk blocks.
+   - Writes the page to a contiguous doublewrite area first before updating the actual tablespace.
+
+```sql
+-- Check Buffer Pool hit rate and memory allocation:
+SHOW ENGINE INNODB STATUS\G
+
+-- Check Buffer Pool sizing and dirty page metrics:
+SELECT 
+  VARIABLE_NAME, VARIABLE_VALUE 
+FROM performance_schema.global_status 
+WHERE VARIABLE_NAME IN (
+  'Innodb_buffer_pool_read_requests',
+  'Innodb_buffer_pool_reads',
+  'Innodb_buffer_pool_pages_dirty'
+);
+```
+
+### 62. How does MySQL Replication work: Statement-Based vs. Row-Based vs. Mixed, and what is GTID?
+**In Simple Words:**
+MySQL replication allows data from a primary (writer) instance to replicate to one or more read replicas asynchronously or semi-synchronously via the **Binary Log (Binlog)**.
+
+Replication Binlog Formats:
+1. **Statement-Based Replication (SBR)** (`binlog_format = STATEMENT`):
+   - Logs the exact SQL statements executed (`UPDATE orders SET status = 'shipped' WHERE id = 12`).
+   - *Pros*: Very compact log size.
+   - *Cons*: Non-deterministic functions (`NOW()`, `UUID()`, `RAND()`, `LIMIT` without `ORDER BY`) produce inconsistent data on replicas.
+2. **Row-Based Replication (RBR)** (`binlog_format = ROW` - **Production Standard**):
+   - Logs the exact before-and-after binary representation of each modified row.
+   - *Pros*: 100% deterministic, guarantees replica data consistency regardless of triggers or functions.
+   - *Cons*: High network and disk bandwidth during large bulk operations (`DELETE FROM logs WHERE created_at < ...` logs every deleted row).
+3. **Mixed Replication (MBR)** (`binlog_format = MIXED`):
+   - Defaults to Statement-Based, but automatically switches to Row-Based whenever a non-deterministic query is detected.
+
+**GTID (Global Transaction Identifier)**:
+- A unique identifier (`source_id:transaction_id`) assigned to each committed transaction across the replication topology.
+- Eliminates brittle replication based on binary log file names and byte offsets (`master-bin.000142, position 4892`).
+- Makes replica failover and promotion instantaneous because replicas track exactly which GTIDs they have applied.
+
+```sql
+-- Verify replication status and GTID execution state:
+SHOW REPLICA STATUS\G
+
+-- Check replication lag in seconds:
+SELECT 
+  CHANNEL_NAME, 
+  SERVICE_STATE, 
+  LAST_ERROR_NUMBER, 
+  SECONDS_BEHIND_SOURCE 
+FROM performance_schema.replication_connection_status;
+```
+
+### 63. What are the different types of locks in MySQL InnoDB: Record Locks, Gap Locks, and Next-Key Locks?
+**In Simple Words:**
+To guarantee Serializable and Repeatable Read isolation without locking the entire table, InnoDB employs fine-grained row-level and range locks:
+
+1. **Record Lock**:
+   - Locks the specific index record itself (e.g. `SELECT * FROM users WHERE id = 42 FOR UPDATE`).
+   - Prevents other transactions from updating or deleting row `42`.
+2. **Gap Lock**:
+   - Locks the "gap" (open space) between index records, or the gap before the first or after the last index record.
+   - *Purpose*: Prevents other transactions from inserting a new row into that gap, eliminating **Phantom Reads** under `REPEATABLE READ`.
+   - Example: If index has records `10` and `20`, a gap lock on `(10, 20)` blocks another transaction from running `INSERT INTO users (id) VALUES (15)`.
+3. **Next-Key Lock**:
+   - A combination of a **Record Lock** on the index record PLUS a **Gap Lock** on the gap preceding that index record.
+   - InnoDB's default locking algorithm in `REPEATABLE READ`.
+4. **Deadlock Detection**:
+   - InnoDB continuously checks a wait-for graph of transactions.
+   - When a circular dependency is detected, InnoDB automatically picks the transaction that has modified the fewest rows as the deadlock victim and rolls it back, allowing the other transaction to proceed.
+
+```sql
+-- Explicit locking reads in MySQL:
+-- Shared lock (blocks writes, allows other reads):
+SELECT * FROM products WHERE sku = 'PRD-882' LOCK IN SHARE MODE;
+
+-- Exclusive lock (blocks other reads and writes):
+SELECT * FROM bank_accounts WHERE account_no = 'ACC-1092' FOR UPDATE;
+
+-- Inspect active locks in MySQL 8:
+SELECT * FROM performance_schema.data_locks;
+```
+
+### 64. How do you analyze and optimize slow MySQL queries using `EXPLAIN FORMAT=JSON` and the MySQL Slow Query Log?
+**In Simple Words:**
+Optimizing slow MySQL queries involves capturing problematic queries from the Slow Query Log and inspecting the execution plan chosen by the Cost-Based Optimizer (CBO).
+
+1. **Slow Query Log Configuration**:
+   - Set `slow_query_log = ON`.
+   - Set `long_query_time = 0.5` (logs queries taking over 500ms).
+   - Set `log_queries_not_using_indexes = ON` to catch queries causing accidental table scans.
+2. **Key `EXPLAIN` Columns**:
+   - `type`: Access type from best to worst: `system` > `const` > `eq_ref` > `ref` > `range` > `index` > `ALL` (full table scan - RED FLAG).
+   - `possible_keys`: Indexes MySQL considered.
+   - `key`: The index MySQL actually chose.
+   - `rows`: Estimated number of rows MySQL must examine.
+   - `filtered`: Percentage of examined rows filtered by table conditions (higher is better; `10%` means 90% of read rows were discarded).
+   - `Extra`:
+     - `Using index`: **Covering index** (fastest: all columns found in B-Tree, no table lookup needed).
+     - `Using filesort`: MySQL had to sort rows in memory/disk buffer instead of using index order.
+     - `Using temporary`: MySQL created an in-memory or on-disk temp table for `GROUP BY` or `DISTINCT`.
+
+```sql
+-- Analyze query execution cost and index usage with JSON format:
+EXPLAIN FORMAT=JSON
+SELECT u.username, COUNT(o.id) as order_count
+FROM users u
+JOIN orders o ON u.id = o.user_id
+WHERE o.created_at >= '2026-01-01'
+GROUP BY u.username;
+```
+
+### 65. What are the key architectural differences between MySQL and PostgreSQL, and when should you choose which?
+**In Simple Words:**
+Both are world-class open-source relational databases, but they make fundamentally different architectural trade-offs:
+
+| Feature / Architecture | MySQL (InnoDB) | PostgreSQL |
+| :--- | :--- | :--- |
+| **Clustered Primary Key** | Required: Primary key is the clustered index (table data is physically stored in PK B-Tree). Secondary indexes point to PK. | Heap-based tables: Rows stored in arbitrary heap blocks; all indexes (including PK) point to tuple TID (tuple ID). |
+| **MVCC Implementation** | Uses Undo Logs. In-place row updates with previous versions stored in undo segments. VACUUM is unnecessary. | Writes new tuple version on each update. Requires `VACUUM` / autovacuum to clean dead tuples. |
+| **Extensibility & Types** | Fixed core types. Basic JSON support. | Massive extensibility: Custom types, GIN/GiST indexes, `pgvector`, PostGIS, foreign data wrappers (FDW). |
+| **Connection Concurrency** | Thread-per-connection model. Lightweight connection handling. | Process-per-connection model (`fork()`). Requires an external connection pooler (PgBouncer) for high concurrency. |
+| **Full-Text & Complex Queries** | Basic full-text search. Good for high-throughput OLTP with simple joins. | Advanced full-text search (`tsvector`), CTEs, parallel query execution, window functions, complex analytical SQL. |
+
+**When to Choose MySQL**:
+- High-throughput, predictable OLTP web applications where most access is by Primary Key (e.g. e-commerce catalogs, user authentication).
+- Existing infrastructure leveraging Managed MySQL / AWS Aurora MySQL / PlanetScale.
+
+**When to Choose PostgreSQL**:
+- Complex business logic, intricate relational joins, recursive CTEs, and advanced data types (JSONB, PostGIS spatial data, `pgvector` for AI embeddings).
+- Systems requiring strict transactional reliability with extensible custom indexing.
 ```

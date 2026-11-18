@@ -16,6 +16,9 @@ import {
   Network,
   Lock,
   Bot,
+  Coffee,
+  Code,
+  Sparkles,
   ArrowRight,
   Play,
   List,
@@ -39,6 +42,9 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Network,
   Lock,
   Bot,
+  Coffee,
+  Code,
+  Sparkles,
 };
 
 interface TrackCardProps {

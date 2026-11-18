@@ -83,13 +83,13 @@ export const TRACKS: TrackMeta[] = [
     sectionNumber: 3,
     slug: 'databases',
     title: 'Full-Stack & Backend Database Master: SQL, NoSQL, Redis & System Design',
-    shortTitle: 'Databases & System Design',
-    description: 'PostgreSQL, MySQL, ACID, B-Tree indexes, MVCC, MongoDB aggregation, DynamoDB single-table design, Redis caching, and real-time scaling.',
-    questionCount: 60,
+    shortTitle: 'Databases (PostgreSQL, MySQL, SQL)',
+    description: 'PostgreSQL, MySQL, Relational SQL design, ACID, B-Tree indexes, MVCC, MongoDB aggregation, DynamoDB, Redis caching, and real-time scaling.',
+    questionCount: 65,
     filename: '03-backend-databases-system-design.md',
     badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30',
     iconName: 'Database',
-    tags: ['PostgreSQL', 'MySQL', 'MongoDB', 'DynamoDB', 'Redis', 'ACID', 'Indexing']
+    tags: ['PostgreSQL', 'MySQL', 'SQL', 'MongoDB', 'DynamoDB', 'Redis', 'ACID', 'Indexing']
   },
   {
     id: '04',
@@ -220,5 +220,83 @@ export const TRACKS: TrackMeta[] = [
     badgeColor: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-500/15 dark:text-violet-400 dark:border-violet-500/30',
     iconName: 'Bot',
     tags: ['AI Engineering', 'RAG', 'Vector Search', 'vLLM', 'MCP', 'Agents', 'LoRA', 'DPO', 'OWASP for LLMs', 'FlashAttention']
+  },
+  {
+    id: '14',
+    sectionNumber: 14,
+    slug: 'java-spring',
+    title: 'Full-Stack & Enterprise Java Master: Core Java 21, Spring Boot 3, JPA & Microservices (50 Qs)',
+    shortTitle: 'Java & Spring Boot (50 Qs)',
+    description: 'JVM internals, ZGC/G1, Virtual Threads (Project Loom), Spring Boot 3 auto-configuration, Spring Data JPA, Hibernate L1/L2 caching, Spring Security 6, Kafka, and Microservices.',
+    questionCount: 50,
+    filename: '14-backend-java-spring-boot.md',
+    badgeColor: 'bg-red-50 text-red-800 border-red-200 dark:bg-red-500/15 dark:text-red-400 dark:border-red-500/30',
+    iconName: 'Coffee',
+    tags: ['Java 21', 'Spring Boot 3', 'Spring Data JPA', 'Hibernate', 'JVM', 'Virtual Threads', 'Spring Security', 'Kafka', 'Microservices']
+  },
+  {
+    id: '15',
+    sectionNumber: 15,
+    slug: 'dotnet-csharp',
+    title: 'Full-Stack & Enterprise .NET Master: C# 12, CLR Internals, ASP.NET Core & EF Core (50 Qs)',
+    shortTitle: '.NET & C# (50 Qs)',
+    description: 'CLR memory management, GC generations, Span<T>, ASP.NET Core middleware, Minimal APIs, Entity Framework Core 8, LINQ execution, Dapper, and Clean Architecture microservices.',
+    questionCount: 50,
+    filename: '15-backend-dotnet-csharp.md',
+    badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-400 dark:border-indigo-500/30',
+    iconName: 'Code',
+    tags: ['C# 12', '.NET 8/9', 'ASP.NET Core', 'EF Core', 'CLR', 'Span<T>', 'LINQ', 'Clean Architecture', 'Microservices']
+  },
+  {
+    id: '16',
+    sectionNumber: 16,
+    slug: 'modern-frameworks',
+    title: 'Modern Frontend Frameworks: Astro, Vue 3, Nuxt 3 & Svelte 5 (50 Qs)',
+    shortTitle: 'Astro, Vue 3 & Svelte (50 Qs)',
+    description: 'Astro Islands architecture, Server Islands, Content Collections, Zero-JS, Vue 3 Composition API & Proxy reactivity, Nuxt 3 Nitro SSR, and Svelte 5 Runes & surgical DOM compilation.',
+    questionCount: 50,
+    filename: '16-frontend-modern-frameworks-astro-vue-svelte.md',
+    badgeColor: 'bg-orange-50 text-orange-800 border-orange-200 dark:bg-orange-500/15 dark:text-orange-400 dark:border-orange-500/30',
+    iconName: 'Sparkles',
+    tags: ['Astro', 'Vue 3', 'Nuxt 3', 'Svelte 5', 'SvelteKit', 'Islands Architecture', 'Runes', 'Nitro Engine']
+  },
+  {
+    id: '17',
+    sectionNumber: 17,
+    slug: 'messaging-queues',
+    title: 'Distributed Messaging & Event Streaming: RabbitMQ & Apache Kafka (50 Qs)',
+    shortTitle: 'RabbitMQ & Kafka (50 Qs)',
+    description: 'RabbitMQ AMQP protocol, Exchanges, Dead Letter Queues, Quorum Queues, Apache Kafka distributed commit log, Partitions, Consumer Groups, Exactly-Once Semantics, and KRaft.',
+    questionCount: 50,
+    filename: '17-messaging-event-queues-rabbitmq-kafka.md',
+    badgeColor: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30',
+    iconName: 'Network',
+    tags: ['RabbitMQ', 'Apache Kafka', 'AMQP', 'DLQ', 'Quorum Queues', 'Consumer Groups', 'Exactly-Once', 'Event Sourcing']
+  },
+  {
+    id: '18',
+    sectionNumber: 18,
+    slug: 'terraform-iac',
+    title: 'Infrastructure as Code & Cloud Automation: Terraform, OpenTofu & GitOps (50 Qs)',
+    shortTitle: 'Terraform & IaC (50 Qs)',
+    description: 'Terraform state architecture, S3/DynamoDB remote locking, Modules, Drift detection, OpenTofu, Kubernetes IaC with Helm/ArgoCD, and Policy as Code.',
+    questionCount: 50,
+    filename: '18-devops-infrastructure-as-code-terraform.md',
+    badgeColor: 'bg-teal-50 text-teal-800 border-teal-200 dark:bg-teal-500/15 dark:text-teal-400 dark:border-teal-500/30',
+    iconName: 'Server',
+    tags: ['Terraform', 'OpenTofu', 'IaC', 'State Locking', 'GitOps', 'ArgoCD', 'Kubernetes', 'HCL', 'Drift Detection']
+  },
+  {
+    id: '19',
+    sectionNumber: 19,
+    slug: 'golang',
+    title: 'Full-Stack & Cloud-Native Go Master: Concurrency, Goroutines, Channels & Microservices (50 Qs)',
+    shortTitle: 'Go & Microservices (50 Qs)',
+    description: 'Go 1.22+ GMP Scheduler, Goroutines, Channels, Memory Model, Escape Analysis, Slices/Maps Internals, Context, gRPC, and High-Throughput Microservices.',
+    questionCount: 50,
+    filename: '19-backend-golang-microservices.md',
+    badgeColor: 'bg-cyan-50 text-cyan-800 border-cyan-200 dark:bg-cyan-500/15 dark:text-cyan-400 dark:border-cyan-500/30',
+    iconName: 'Cpu',
+    tags: ['Go 1.22+', 'Golang', 'Goroutines', 'Channels', 'GMP Scheduler', 'gRPC', 'Escape Analysis', 'Microservices', 'Clean Architecture']
   }
 ];

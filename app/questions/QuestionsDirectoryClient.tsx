@@ -24,7 +24,7 @@ import {
   STUDY_PROGRESS_UPDATE_EVENT 
 } from '@/lib/study-progress';
 import { TechStackSelector } from '@/components/TechStackSelector';
-import { getSelectedTechSlugs, setSelectedTechSlugs, TECH_STACK_UPDATE_EVENT } from '@/lib/tech-stack';
+import { getSelectedTechSlugs, setSelectedTechSlugs, TECH_STACK_UPDATE_EVENT, isQuestionInSelectedTech } from '@/lib/tech-stack';
 
 interface QuestionsDirectoryClientProps {
   initialItems: QuestionIndexItem[];
@@ -103,8 +103,8 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
   // Dynamic filter pipeline
   const filteredItems = useMemo(() => {
     return initialItems.filter((item) => {
-      // 0. Personalized Tech Stack Filter (Multi-select)
-      if (selectedTechSlugs.length > 0 && !selectedTechSlugs.includes(item.trackSlug)) {
+      // 0. Personalized Tech Stack Filter (Multi-select, supporting granular tech separation)
+      if (selectedTechSlugs.length > 0 && !isQuestionInSelectedTech(item, selectedTechSlugs)) {
         return false;
       }
 
@@ -235,9 +235,9 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
       />
 
       {/* Multi-Filter Control Console */}
-      <div className="p-4 sm:p-6 rounded-2xl bg-card border border-border mb-8 shadow-xs space-y-4">
+      <div className="p-3 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl bg-card border border-border mb-8 shadow-xs space-y-3 sm:space-y-4">
         {/* Row 1: Search Bar & Primary Status Tabs */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 sm:gap-3">
           {/* Instant Search Bar */}
           <div className="relative flex-1">
             <Search className="h-4 w-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -246,13 +246,13 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by keywords, algorithms, concepts, or question #..."
-              className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-background border border-border text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:border-purple-500 shadow-2xs"
+              className="w-full pl-9 pr-8 py-2 sm:py-2.5 rounded-xl bg-background border border-border text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:border-purple-500 shadow-2xs"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 cursor-pointer"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -260,14 +260,14 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
           </div>
 
           {/* Status Tabs: All / Studied / Bookmarked */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none shrink-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none touch-pan-x -mx-1 px-1 shrink-0">
             <button
               type="button"
               onClick={() => setStatusFilter('all')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shrink-0 cursor-pointer min-h-[34px] touch-manipulation ${
                 statusFilter === 'all'
                   ? 'bg-purple-600 text-white shadow-xs'
-                  : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border'
+                  : 'bg-slate-100 hover:bg-slate-200/90 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80'
               }`}
             >
               All ({initialItems.length})
@@ -276,10 +276,10 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
             <button
               type="button"
               onClick={() => setStatusFilter('studied')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shrink-0 cursor-pointer min-h-[34px] touch-manipulation ${
                 statusFilter === 'studied'
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border'
+                  : 'bg-slate-100 hover:bg-slate-200/90 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80'
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -289,10 +289,10 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
             <button
               type="button"
               onClick={() => setStatusFilter('bookmarked')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all shrink-0 cursor-pointer min-h-[34px] touch-manipulation ${
                 statusFilter === 'bookmarked'
                   ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border'
+                  : 'bg-slate-100 hover:bg-slate-200/90 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80'
               }`}
             >
               <Bookmark className="w-3.5 h-3.5 fill-current" />
@@ -302,16 +302,16 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
         </div>
 
         {/* Row 2: Seniority Level, Most Asked & Code Toggles */}
-        <div className="pt-3 border-t border-border flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <div className="pt-2.5 sm:pt-3 border-t border-border flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none touch-pan-x -mx-1 px-1">
             {/* Most Asked Pill */}
             <button
               type="button"
               onClick={() => setMostAskedOnly((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all shrink-0 cursor-pointer min-h-[32px] touch-manipulation ${
                 mostAskedOnly
-                  ? 'bg-amber-500 text-white shadow-sm ring-2 ring-amber-500/20'
-                  : 'bg-muted hover:bg-muted/80 text-foreground border border-border hover:border-amber-400'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm ring-2 ring-amber-500/20'
+                  : 'bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 hover:border-amber-400'
               }`}
               title="Show most frequently asked questions in top tech interviews"
             >
@@ -325,7 +325,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
             <button
               type="button"
               onClick={() => setSelectedLevel('all')}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all shrink-0 cursor-pointer min-h-[32px] touch-manipulation ${
                 selectedLevel === 'all'
                   ? 'bg-foreground text-background font-bold'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -337,39 +337,39 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
             <button
               type="button"
               onClick={() => setSelectedLevel((prev) => prev === 'junior' ? 'all' : 'junior')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all shrink-0 cursor-pointer min-h-[32px] touch-manipulation ${
                 selectedLevel === 'junior'
                   ? 'bg-emerald-600 text-white font-bold'
                   : 'text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10'
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />
               <span>Junior</span>
             </button>
 
             <button
               type="button"
               onClick={() => setSelectedLevel((prev) => prev === 'mid' ? 'all' : 'mid')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all shrink-0 cursor-pointer min-h-[32px] touch-manipulation ${
                 selectedLevel === 'mid'
                   ? 'bg-blue-600 text-white font-bold'
                   : 'text-muted-foreground hover:text-blue-600 hover:bg-blue-500/10'
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block shrink-0" />
               <span>Mid-Level</span>
             </button>
 
             <button
               type="button"
               onClick={() => setSelectedLevel((prev) => prev === 'senior' ? 'all' : 'senior')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all shrink-0 cursor-pointer min-h-[32px] touch-manipulation ${
                 selectedLevel === 'senior'
                   ? 'bg-purple-600 text-white font-bold'
                   : 'text-muted-foreground hover:text-purple-600 hover:bg-purple-500/10'
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 inline-block shrink-0" />
               <span>Senior / Staff</span>
             </button>
 
@@ -379,13 +379,13 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
             <button
               type="button"
               onClick={() => setHasCodeOnly((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all shrink-0 cursor-pointer min-h-[32px] touch-manipulation ${
                 hasCodeOnly
                   ? 'bg-purple-600 text-white font-bold shadow-xs'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
-              <Code2 className="w-3.5 h-3.5" />
+              <Code2 className="w-3.5 h-3.5 shrink-0" />
               <span>Has Code</span>
             </button>
           </div>

@@ -129,6 +129,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
       const q = query.toLowerCase();
       return (
         item.title.toLowerCase().includes(q) ||
+        (item.summary && item.summary.toLowerCase().includes(q)) ||
         item.part.toLowerCase().includes(q) ||
         item.number.toString() === q
       );
@@ -578,6 +579,11 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
                           <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
                             {q.title}
                           </p>
+                          {q.summary && (
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-1 leading-relaxed">
+                              {q.summary}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 shrink-0 mt-1 transform group-hover:translate-x-1 transition-transform" />

@@ -95,6 +95,7 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
     return items.filter(
       (item) =>
         item.title.toLowerCase().includes(q) ||
+        (item.summary && item.summary.toLowerCase().includes(q)) ||
         item.part.toLowerCase().includes(q) ||
         item.trackShortTitle.toLowerCase().includes(q) ||
         item.questionNumber.toString() === q
@@ -201,6 +202,11 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
                   <p className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
                     {item.title}
                   </p>
+                  {item.summary && (
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                      {item.summary}
+                    </p>
+                  )}
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-2" />
               </button>

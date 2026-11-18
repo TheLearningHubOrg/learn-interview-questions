@@ -22,6 +22,146 @@ export async function getTrackContent(filename: string): Promise<string> {
   }
 }
 
+export function cleanMarkdownText(text: string): string {
+  if (!text) return '';
+  return text
+    // Remove markdown images ![alt](url)
+    .replace(/!\[.*?\]\(.*?\)/g, '')
+    // Preserve React/Angular/TS component names in angle brackets like <StrictMode>, <Component>
+    .replace(/<([A-Z][A-Za-z0-9_]*)>/g, '$1')
+    // Remove remaining HTML tags
+    .replace(/<[^>]+>/g, '')
+    // Remove links but keep link text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Remove markdown bold / italics
+    .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')
+    .replace(/_{1,3}([^_]+)_{1,3}/g, '$1')
+    // Remove inline backticks
+    .replace(/`([^`]+)`/g, '$1')
+    // Remove LaTeX math markers
+    .replace(/\$([^$]+)\$/g, '$1')
+    // Remove ASCII table / diagram borders
+    .replace(/[┌┐└┘├┤┬┴┼─│|]/g, '')
+    // Remove leading list / quote markers
+    .replace(/^[>\s#*-]+/g, '')
+    // Clean up punctuation artifacts (e.g. ,- or :- or ,.)
+    .replace(/[:,-]+\s*\./g, '.')
+    .replace(/,\s*\./g, '.')
+    // Collapse multiple whitespace
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function formatOneSentence(text: string): string {
+  if (!text) return '';
+  const match = text.match(/^(.+?[.!?])(?:\s+[A-Z]|\s*$)/);
+  let sentence = match ? match[1].trim() : text.trim();
+
+  sentence = sentence.replace(/[:\-–—]\s*$/, '.');
+  sentence = sentence.replace(/,\s*$/, '.');
+  sentence = sentence.replace(/\.+$/, '.');
+
+  if (!/[.!?]$/.test(sentence)) {
+    sentence += '.';
+  }
+
+  if (sentence.length > 220) {
+    const cut = sentence.slice(0, 217);
+    const lastSpace = cut.lastIndexOf(' ');
+    sentence = (lastSpace > 120 ? cut.slice(0, lastSpace) : cut) + '...';
+  }
+  return sentence;
+}
+
+export function extractOneLineSummary(content: string, title?: string): string {
+  if (!content) return '';
+
+  // 1. Explicit **In Simple Words:** block
+  const simpleMatch = content.match(/\*{0,2}In Simple Words:?\*{0,2}\s*([\s\S]*?)(?=\n\s*\n|####|###|\n-|\n\d+\.|$)/i);
+  if (simpleMatch && simpleMatch[1]) {
+    const cleaned = cleanMarkdownText(simpleMatch[1]);
+    if (cleaned.length >= 15) {
+      return formatOneSentence(cleaned);
+    }
+  }
+
+  // 2. High-Yield Candid Answer blockquote (> "...")
+  const blockquoteMatch = content.match(/(?:^|\n)>\s*["“]?([^\r\n>]+)/);
+  if (blockquoteMatch && blockquoteMatch[1]) {
+    const rawQuote = blockquoteMatch[1].replace(/^["“]|["”]$/g, '').trim();
+    const cleaned = cleanMarkdownText(rawQuote);
+    if (cleaned.length >= 25 && !cleaned.toLowerCase().includes('handbook') && !cleaned.toLowerCase().includes('question bank')) {
+      return formatOneSentence(cleaned);
+    }
+  }
+
+  // 3. Scan lines for the first explanatory narrative paragraph
+  const lines = content.split('\n');
+  const paragraph: string[] = [];
+  let inCodeBlock = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+
+    // Skip headers, horizontal rules, tables, images, details/summary, diagrams
+    if (
+      trimmed.startsWith('#') ||
+      trimmed.startsWith('---') ||
+      trimmed.startsWith('|') ||
+      trimmed.startsWith('<') ||
+      trimmed.startsWith('![') ||
+      trimmed.startsWith('+--') ||
+      trimmed.startsWith('┌--')
+    ) {
+      if (paragraph.length > 0) break;
+      continue;
+    }
+
+    if (trimmed.startsWith('>')) {
+      const quoteText = trimmed.replace(/^>\s*/, '');
+      if (quoteText.length > 15 && !quoteText.includes('|')) {
+        paragraph.push(quoteText);
+        break;
+      }
+      continue;
+    }
+
+    if (trimmed.length > 0) {
+      if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || /^\d+\.\s/.test(trimmed)) {
+        if (paragraph.length === 0) {
+          paragraph.push(trimmed.replace(/^[-*]|\d+\.\s*/, ''));
+          break;
+        }
+      } else {
+        paragraph.push(trimmed);
+        if (trimmed.endsWith('.') || trimmed.endsWith(':') || paragraph.join(' ').length > 150) {
+          break;
+        }
+      }
+    } else if (paragraph.length > 0) {
+      break;
+    }
+  }
+
+  const rawText = paragraph.join(' ');
+  const cleaned = cleanMarkdownText(rawText);
+  if (cleaned.length >= 12) {
+    return formatOneSentence(cleaned);
+  }
+
+  if (title) {
+    const cleanTitle = title.replace(/\?$/, '').trim();
+    return formatOneSentence(cleanTitle);
+  }
+
+  return '';
+}
+
 export function parseTrackQuestionsFromMarkdown(markdown: string, trackSlug?: string): ParsedQuestion[] {
   // Normalize CRLF to LF to prevent regex line-ending match failures
   const cleanMarkdown = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -44,11 +184,13 @@ export function parseTrackQuestionsFromMarkdown(markdown: string, trackSlug?: st
           part: currentQ.part,
           content: contentStr,
         });
+        const summary = extractOneLineSummary(contentStr, currentQ.title);
         questions.push({
           number: currentQ.number,
           title: currentQ.title,
           part: currentQ.part,
           content: contentStr,
+          summary,
           level: meta.level,
           isMostAsked: meta.isMostAsked,
           hasCode: meta.hasCode,
@@ -73,11 +215,13 @@ export function parseTrackQuestionsFromMarkdown(markdown: string, trackSlug?: st
             part: currentQ.part,
             content: contentStr,
           });
+          const summary = extractOneLineSummary(contentStr, currentQ.title);
           questions.push({
             number: currentQ.number,
             title: currentQ.title,
             part: currentQ.part,
             content: contentStr,
+            summary,
             level: meta.level,
             isMostAsked: meta.isMostAsked,
             hasCode: meta.hasCode,
@@ -109,11 +253,13 @@ export function parseTrackQuestionsFromMarkdown(markdown: string, trackSlug?: st
       part: currentQ.part,
       content: contentStr,
     });
+    const summary = extractOneLineSummary(contentStr, currentQ.title);
     questions.push({
       number: currentQ.number,
       title: currentQ.title,
       part: currentQ.part,
       content: contentStr,
+      summary,
       level: meta.level,
       isMostAsked: meta.isMostAsked,
       hasCode: meta.hasCode,
@@ -174,6 +320,7 @@ export async function getGlobalSearchIndex(): Promise<QuestionIndexItem[]> {
         questionNumber: q.number,
         title: q.title,
         part: q.part,
+        summary: q.summary,
         level: q.level || 'mid',
         isMostAsked: Boolean(q.isMostAsked),
         hasCode: Boolean(q.hasCode),

@@ -19,6 +19,7 @@ export interface ParsedQuestion {
   title: string;
   part: string;
   content: string;
+  summary?: string;
   level?: QuestionLevel;
   isMostAsked?: boolean;
   hasCode?: boolean;
@@ -42,6 +43,7 @@ export interface QuestionIndexItem {
   questionNumber: number;
   title: string;
   part: string;
+  summary?: string;
   level?: QuestionLevel;
   isMostAsked?: boolean;
   hasCode?: boolean;

@@ -768,6 +768,30 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
               </div>
             )}
 
+            {/* 💡 1-Line Explanation Callout */}
+            {question.summary && (
+              <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-500/10 via-indigo-500/5 to-transparent border border-purple-500/25 shadow-xs">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0 mt-0.5 shadow-xs">
+                    <Zap className="w-4 h-4 fill-current" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-purple-700 dark:text-purple-300">
+                        1-Line Explanation
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                        Simple & Easy
+                      </span>
+                    </div>
+                    <p className="text-sm sm:text-base font-semibold text-foreground leading-relaxed">
+                      {question.summary}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="markdown-body">
               {(() => {
                 const parsed = parseQuestionContent(question.content);

@@ -124,6 +124,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
       const q = searchQuery.toLowerCase();
       return (
         item.title.toLowerCase().includes(q) ||
+        (item.summary && item.summary.toLowerCase().includes(q)) ||
         item.part.toLowerCase().includes(q) ||
         item.trackShortTitle.toLowerCase().includes(q) ||
         item.questionNumber.toString() === q
@@ -535,7 +536,14 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
                         {item.title}
                       </p>
 
-                      <p className="text-[11px] text-muted-foreground mt-1 truncate">
+                      {/* 1-Line Explanation Preview */}
+                      {item.summary && (
+                        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+                          {item.summary}
+                        </p>
+                      )}
+
+                      <p className="text-[11px] text-muted-foreground/75 mt-1.5 truncate">
                         {item.part}
                       </p>
                     </div>

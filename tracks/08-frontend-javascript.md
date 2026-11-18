@@ -1,4 +1,4 @@
-# Core JavaScript Master Interview Question Bank (528 Questions)
+# Core JavaScript Master Interview Question Bank (536 Questions)
 
 ## Part 1: Core Objects, Prototypes, Functions & Scope (1 - 53)
 
@@ -9875,7 +9875,7 @@ console.log(evenNums); // [2, 4, 6]
 
 
 
-## Part 8: Modern JavaScript APIs, WeakRef, Proxy & Performance (464 - 528)
+## Part 8: Modern JavaScript APIs, WeakRef, Proxy & Performance (464 - 536)
 
 ### 464. What is the difference between map and forEach functions?
 
@@ -15356,6 +15356,878 @@ console.log(formatCompactManual(1200));       // "1.2K"
 console.log(formatCompactManual(1000000));    // "1M"
 console.log(formatCompactManual(2550000, 2)); // "2.55M"
 console.log(formatCompactManual(-54300));     // "-54.3K"
+```
+
+---
+
+### 529. How do you implement a custom EventEmitter (Event Bus) with memory leak prevention and once subscriptions?
+
+**In Simple Words:**
+An **EventEmitter (Event Bus)** is a publish-subscribe design pattern implementation that enables decoupled communication between components by registering listener functions to named event keys and broadcasting arguments when those events trigger.
+
+#### Architectural Overview
+In event-driven architectures (like Node.js `events` module or browser Custom Events), components emit events without knowing which components are listening. A robust `EventEmitter` must handle:
+1. **Multiple Listeners**: Multiple subscribers for the same event key.
+2. **Order of Execution**: Synchronous invocation in order of registration.
+3. **One-Time Listeners (`once`)**: Auto-unsubscribing after first trigger.
+4. **Clean Unsubscription**: Returning an `{ unsubscribe }` object or `.off(event, fn)` method to prevent memory leaks.
+5. **Memory Leak Warning**: Alerting if an event exceeds a safety threshold (default 10 listeners).
+
+#### Complete Production-Grade Implementation
+
+```javascript
+class EventEmitter {
+  constructor(maxListeners = 10) {
+    this._events = new Map(); // Map<string, Set<Function>>
+    this._maxListeners = maxListeners;
+  }
+
+  // Subscribe to an event, returns an unsubscribe helper
+  on(event, listener) {
+    if (typeof listener !== 'function') {
+      throw new TypeError('Listener must be a function');
+    }
+
+    if (!this._events.has(event)) {
+      this._events.set(event, new Set());
+    }
+
+    const listeners = this._events.get(event);
+
+    // Guard against potential memory leaks
+    if (listeners.size >= this._maxListeners) {
+      console.warn(
+        `[Warning] Possible EventEmitter memory leak detected. ${listeners.size + 1} listeners added for event "${event}".`
+      );
+    }
+
+    listeners.add(listener);
+
+    // Return clean unsubscribe callback
+    return {
+      unsubscribe: () => this.off(event, listener)
+    };
+  }
+
+  // Remove a specific listener
+  off(event, listener) {
+    const listeners = this._events.get(event);
+    if (!listeners) return this;
+
+    listeners.delete(listener);
+    if (listeners.size === 0) {
+      this._events.delete(event);
+    }
+    return this;
+  }
+
+  // Subscribe for exactly one invocation
+  once(event, listener) {
+    if (typeof listener !== 'function') {
+      throw new TypeError('Listener must be a function');
+    }
+
+    const wrapper = (...args) => {
+      this.off(event, wrapper);
+      listener.apply(this, args);
+    };
+
+    // Store reference so .off(event, listener) works before it triggers
+    wrapper._originalListener = listener;
+
+    return this.on(event, wrapper);
+  }
+
+  // Emit event and call all registered listeners with arguments
+  emit(event, ...args) {
+    const listeners = this._events.get(event);
+    if (!listeners || listeners.size === 0) return false;
+
+    // Iterate over a snapshot array to prevent mutation issues during emission
+    const snapshot = Array.from(listeners);
+    for (const listener of snapshot) {
+      try {
+        listener.apply(this, args);
+      } catch (err) {
+        console.error(`Error in event listener for "${event}":`, err);
+      }
+    }
+    return true;
+  }
+
+  // Remove all listeners or all listeners for a given event
+  removeAllListeners(event) {
+    if (event) {
+      this._events.delete(event);
+    } else {
+      this._events.clear();
+    }
+    return this;
+  }
+
+  // Get active listener count
+  listenerCount(event) {
+    const listeners = this._events.get(event);
+    return listeners ? listeners.size : 0;
+  }
+}
+
+// Verification & Usage:
+const emitter = new EventEmitter();
+
+// 1. Standard Subscription with Unsubscribe Token
+const sub = emitter.on('user:login', (user) => {
+  console.log(`User logged in: ${user.name}`);
+});
+
+// 2. Once Subscription
+emitter.once('user:login', () => {
+  console.log('Welcome banner displayed (first login only)');
+});
+
+emitter.emit('user:login', { name: 'Alice' });
+// Output:
+// "User logged in: Alice"
+// "Welcome banner displayed (first login only)"
+
+emitter.emit('user:login', { name: 'Alice' });
+// Output:
+// "User logged in: Alice" (Once listener did not run)
+
+sub.unsubscribe();
+emitter.emit('user:login', { name: 'Alice' });
+// Output: (Nothing runs - all cleaned up)
+```
+
+---
+
+### 530. How do you implement polyfills for Promise.all, Promise.allSettled, Promise.any, and Promise.race from scratch?
+
+**In Simple Words:**
+Promise combinators coordinate multiple concurrent asynchronous operations: `Promise.all` fails fast on first rejection, `Promise.allSettled` always waits for all promises to finish, `Promise.any` returns the first fulfilled promise or an `AggregateError`, and `Promise.race` settles as soon as the first promise resolves or rejects.
+
+#### 1. `Promise.all` Polyfill (Fail-Fast)
+Waits for all promises to resolve. Rejects immediately if any promise rejects.
+
+```javascript
+function promiseAll(iterable) {
+  return new Promise((resolve, reject) => {
+    const items = Array.from(iterable);
+    if (items.length === 0) {
+      return resolve([]);
+    }
+
+    const results = new Array(items.length);
+    let completed = 0;
+
+    items.forEach((item, index) => {
+      // Wrap in Promise.resolve to handle primitive non-promise values
+      Promise.resolve(item).then(
+        (value) => {
+          results[index] = value; // Preserve original array index order
+          completed++;
+          if (completed === items.length) {
+            resolve(results);
+          }
+        },
+        (error) => {
+          reject(error); // Fail fast
+        }
+      );
+    });
+  });
+}
+```
+
+#### 2. `Promise.allSettled` Polyfill (Never Rejects)
+Waits until all promises settle (either resolved or rejected) and returns an array of status objects.
+
+```javascript
+function promiseAllSettled(iterable) {
+  return new Promise((resolve) => {
+    const items = Array.from(iterable);
+    if (items.length === 0) {
+      return resolve([]);
+    }
+
+    const results = new Array(items.length);
+    let completed = 0;
+
+    items.forEach((item, index) => {
+      Promise.resolve(item)
+        .then((value) => {
+          results[index] = { status: 'fulfilled', value };
+        })
+        .catch((reason) => {
+          results[index] = { status: 'rejected', reason };
+        })
+        .finally(() => {
+          completed++;
+          if (completed === items.length) {
+            resolve(results);
+          }
+        });
+    });
+  });
+}
+```
+
+#### 3. `Promise.any` Polyfill (First Fulfillment)
+Resolves with the first fulfilled promise value. Rejects only if ALL promises reject, throwing an `AggregateError`.
+
+```javascript
+function promiseAny(iterable) {
+  return new Promise((resolve, reject) => {
+    const items = Array.from(iterable);
+    if (items.length === 0) {
+      return reject(new AggregateError([], 'All promises were rejected'));
+    }
+
+    const errors = new Array(items.length);
+    let rejectedCount = 0;
+
+    items.forEach((item, index) => {
+      Promise.resolve(item).then(
+        (val) => {
+          resolve(val); // First fulfillment wins immediately
+        },
+        (err) => {
+          errors[index] = err;
+          rejectedCount++;
+          if (rejectedCount === items.length) {
+            reject(new AggregateError(errors, 'All promises were rejected'));
+          }
+        }
+      );
+    });
+  });
+}
+```
+
+#### 4. `Promise.race` Polyfill (First Settled)
+Settles as soon as any promise in the iterable settles (either resolved or rejected).
+
+```javascript
+function promiseRace(iterable) {
+  return new Promise((resolve, reject) => {
+    const items = Array.from(iterable);
+    for (const item of items) {
+      Promise.resolve(item).then(resolve, reject);
+    }
+  });
+}
+```
+
+---
+
+### 531. How do you implement a robust deepClone function handling circular references, Dates, RegExps, Sets, and Maps?
+
+**In Simple Words:**
+A robust **deep clone** recursively duplicates nested objects and arrays while using a `WeakMap` to track visited object references to prevent infinite call stack overflows on circular structures, and explicitly reconstructs special types like `Date`, `RegExp`, `Map`, and `Set`.
+
+#### Limitations of Naive Approaches
+- `JSON.parse(JSON.stringify(obj))`: Fails on circular references (throws `TypeError`), drops `undefined`, `functions`, and `Symbol` keys, converts `Date` objects to ISO strings, converts `Map` and `Set` to empty objects, and turns `NaN`/`Infinity` into `null`.
+- `Object.assign()` or spread `{ ...obj }`: Shallow copies only top-level properties; nested references are shared.
+- `structuredClone(obj)`: Native in modern browsers/Node.js 17+, but throws an error when trying to clone objects with function methods or DOM nodes.
+
+#### Production Deep Clone Implementation
+
+```javascript
+function deepClone(value, hash = new WeakMap()) {
+  // 1. Return primitives and functions directly (immutable or copied by reference)
+  if (value === null || typeof value !== 'object') {
+    return value;
+  }
+
+  // 2. Handle Dates
+  if (value instanceof Date) {
+    return new Date(value.getTime());
+  }
+
+  // 3. Handle Regular Expressions
+  if (value instanceof RegExp) {
+    return new RegExp(value.source, value.flags);
+  }
+
+  // 4. Handle Circular References via WeakMap memoization
+  if (hash.has(value)) {
+    return hash.get(value);
+  }
+
+  // 5. Handle Sets
+  if (value instanceof Set) {
+    const cloneSet = new Set();
+    hash.set(value, cloneSet);
+    for (const item of value) {
+      cloneSet.add(deepClone(item, hash));
+    }
+    return cloneSet;
+  }
+
+  // 6. Handle Maps
+  if (value instanceof Map) {
+    const cloneMap = new Map();
+    hash.set(value, cloneMap);
+    for (const [k, v] of value) {
+      cloneMap.set(deepClone(k, hash), deepClone(v, hash));
+    }
+    return cloneMap;
+  }
+
+  // 7. Handle Arrays and Plain Objects preserving prototype
+  const prototype = Object.getPrototypeOf(value);
+  const cloneObj = Array.isArray(value) ? [] : Object.create(prototype);
+
+  // Cache object BEFORE recursive descent to resolve circular references
+  hash.set(value, cloneObj);
+
+  // Copy own enumerable and Symbol properties
+  const allKeys = [...Object.keys(value), ...Object.getOwnPropertySymbols(value)];
+  for (const key of allKeys) {
+    cloneObj[key] = deepClone(value[key], hash);
+  }
+
+  return cloneObj;
+}
+
+// Verification with Circular Reference & Special Types:
+const original = {
+  name: "Deep Copy Test",
+  date: new Date(),
+  pattern: /^[a-z]+$/gi,
+  tags: new Set(["javascript", "node"]),
+  metadata: new Map([["version", 1.0]]),
+  details: { role: "Architect" }
+};
+// Add circular reference:
+original.self = original;
+
+const cloned = deepClone(original);
+console.log(cloned !== original);               // true
+console.log(cloned.details !== original.details); // true
+console.log(cloned.self === cloned);             // true (Cycle handled perfectly!)
+console.log(cloned.date instanceof Date);        // true
+console.log(cloned.tags.has("javascript"));      // true
+```
+
+---
+
+### 532. How do you implement advanced debounce and throttle functions with leading/trailing edge execution and cancellation?
+
+**In Simple Words:**
+**Debounce** postpones execution until a specified delay has elapsed since the last invocation, while **throttle** guarantees that a function executes at most once per defined time window, both optionally supporting immediate (leading) and delayed (trailing) edge triggers.
+
+#### 1. Advanced Debounce with Immediate (Leading) & Cancellation
+
+```javascript
+function debounce(fn, wait, options = {}) {
+  let timerId = null;
+  let lastArgs = null;
+  let lastThis = null;
+
+  const leading = Boolean(options.leading);
+  const trailing = options.trailing !== undefined ? Boolean(options.trailing) : true;
+
+  function debounced(...args) {
+    lastArgs = args;
+    lastThis = this;
+
+    const shouldCallNow = leading && !timerId;
+
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+
+    timerId = setTimeout(() => {
+      if (trailing && !shouldCallNow) {
+        fn.apply(lastThis, lastArgs);
+      }
+      timerId = null;
+      lastArgs = null;
+      lastThis = null;
+    }, wait);
+
+    if (shouldCallNow) {
+      fn.apply(lastThis, lastArgs);
+    }
+  }
+
+  // Cancel pending timer
+  debounced.cancel = function () {
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+    lastArgs = null;
+    lastThis = null;
+  };
+
+  // Immediately invoke pending execution
+  debounced.flush = function () {
+    if (timerId && lastArgs) {
+      fn.apply(lastThis, lastArgs);
+      debounced.cancel();
+    }
+  };
+
+  return debounced;
+}
+```
+
+#### 2. Advanced Throttle with Leading & Trailing Control
+
+```javascript
+function throttle(fn, wait, options = {}) {
+  let timerId = null;
+  let lastArgs = null;
+  let lastThis = null;
+  let lastCallTime = 0;
+
+  const leading = options.leading !== undefined ? Boolean(options.leading) : true;
+  const trailing = options.trailing !== undefined ? Boolean(options.trailing) : true;
+
+  function throttled(...args) {
+    const now = Date.now();
+    lastArgs = args;
+    lastThis = this;
+
+    if (!lastCallTime && !leading) {
+      lastCallTime = now;
+    }
+
+    const remaining = wait - (now - lastCallTime);
+
+    if (remaining <= 0 || remaining > wait) {
+      if (timerId) {
+        clearTimeout(timerId);
+        timerId = null;
+      }
+      lastCallTime = now;
+      fn.apply(lastThis, lastArgs);
+      lastArgs = null;
+      lastThis = null;
+    } else if (!timerId && trailing) {
+      timerId = setTimeout(() => {
+        lastCallTime = leading ? Date.now() : 0;
+        timerId = null;
+        fn.apply(lastThis, lastArgs);
+        lastArgs = null;
+        lastThis = null;
+      }, remaining);
+    }
+  }
+
+  throttled.cancel = function () {
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+    lastCallTime = 0;
+    lastArgs = null;
+    lastThis = null;
+  };
+
+  return throttled;
+}
+```
+
+---
+
+### 533. How do you implement a concurrency-limited asynchronous task runner (Parallel Worker Pool)?
+
+**In Simple Words:**
+A **concurrency-limited task runner** (`asyncPool`) processes a large collection of asynchronous tasks with an upper bound on simultaneous active executions (e.g. at most 3 requests concurrently), preserving the original result order without overloading servers or rate limits.
+
+#### Why Concurrency Control is Essential
+When making 500 API calls, running `Promise.all(tasks.map(t => t()))` launches 500 simultaneous socket connections, crashing Node.js with socket exhaustion or provoking HTTP 429 Too Many Requests errors. Sequential execution (`for (const t of tasks) await t()`) is too slow. A worker pool balances throughput and stability.
+
+#### Complete Implementation
+
+```javascript
+async function asyncPool(limit, tasks) {
+  const results = new Array(tasks.length);
+  const executing = new Set();
+  let currentIndex = 0;
+
+  async function enqueue() {
+    if (currentIndex >= tasks.length) {
+      return;
+    }
+
+    const index = currentIndex++;
+    const task = tasks[index];
+
+    // Wrap execution into a promise that cleans itself from active set on completion
+    const p = Promise.resolve().then(() => task());
+    results[index] = p; // Store promise in slot
+
+    executing.add(p);
+    const clean = () => executing.delete(p);
+    p.then(clean, clean);
+
+    // If active worker pool is saturated, wait for at least one worker to finish
+    let r = Promise.resolve();
+    if (executing.size >= limit) {
+      r = Promise.race(executing);
+    }
+
+    await r;
+    return enqueue();
+  }
+
+  // Launch initial batch of workers up to limit
+  const initialBatch = [];
+  while (currentIndex < limit && currentIndex < tasks.length) {
+    initialBatch.push(enqueue());
+  }
+
+  await Promise.all(initialBatch);
+  // Await all queued promises to resolve their final values
+  return Promise.all(results);
+}
+
+// Verification:
+const delay = (ms, val) => () =>
+  new Promise((res) => {
+    console.log(`Starting: ${val} (Active: ${Date.now() % 10000}ms)`);
+    setTimeout(() => {
+      console.log(`Finished: ${val}`);
+      res(val);
+    }, ms);
+  });
+
+const tasks = [
+  delay(300, 'Task 1'),
+  delay(100, 'Task 2'),
+  delay(200, 'Task 3'),
+  delay(150, 'Task 4'),
+  delay(50, 'Task 5')
+];
+
+// Run with concurrency limit of 2:
+asyncPool(2, tasks).then((results) => {
+  console.log('All completed in order:', results);
+  // ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5']
+});
+```
+
+---
+
+### 534. How do you implement an O(1) Least Recently Used (LRU) Cache in JavaScript?
+
+**In Simple Words:**
+An **LRU (Least Recently Used) Cache** is a fixed-capacity data structure that evicts the least recently accessed item when capacity is reached, achieving $O(1)$ time complexity for both `get` and `put` operations by leveraging ES6 `Map` insertion-order properties or a doubly linked list with a hash map.
+
+#### Approach 1: Modern JavaScript Implementation using `Map` (Optimal & Idiomatic)
+JavaScript ES6 `Map` objects remember the original insertion order of the keys. When a key is read or updated, deleting and re-inserting it pushes it to the back (most recent). The first element returned by `map.keys().next().value` is always the least recently used element.
+
+```javascript
+class LRUCacheMap {
+  constructor(capacity) {
+    this.capacity = capacity;
+    this.cache = new Map();
+  }
+
+  get(key) {
+    if (!this.cache.has(key)) return -1;
+
+    // Refresh position to most recently used
+    const val = this.cache.get(key);
+    this.cache.delete(key);
+    this.cache.set(key, val);
+    return val;
+  }
+
+  put(key, value) {
+    // If key already exists, delete it first to reset position
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.capacity) {
+      // Evict least recently used (first key in iteration order)
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
+    }
+
+    this.cache.set(key, value);
+  }
+}
+```
+
+#### Approach 2: Classic Doubly Linked List + Hash Map (Standard Data Structures Interview)
+When interviewers restrict native `Map` behavior, use a custom doubly linked list with pseudo head and tail sentinel nodes for $O(1)$ node removal and insertion.
+
+```javascript
+class Node {
+  constructor(key, value) {
+    this.key = key;
+    this.value = value;
+    this.prev = null;
+    this.next = null;
+  }
+}
+
+class LRUCache {
+  constructor(capacity) {
+    this.capacity = capacity;
+    this.map = new Map();
+
+    // Sentinel dummy head and tail
+    this.head = new Node(0, 0);
+    this.tail = new Node(0, 0);
+    this.head.next = this.tail;
+    this.tail.prev = this.head;
+  }
+
+  // Remove existing node from linked list: O(1)
+  _remove(node) {
+    node.prev.next = node.next;
+    node.next.prev = node.prev;
+  }
+
+  // Insert node right after head (most recently used): O(1)
+  _insert(node) {
+    node.next = this.head.next;
+    node.prev = this.head;
+    this.head.next.prev = node;
+    this.head.next = node;
+  }
+
+  get(key) {
+    if (!this.map.has(key)) return -1;
+    const node = this.map.get(key);
+    this._remove(node);
+    this._insert(node);
+    return node.value;
+  }
+
+  put(key, value) {
+    if (this.map.has(key)) {
+      const node = this.map.get(key);
+      node.value = value;
+      this._remove(node);
+      this._insert(node);
+    } else {
+      if (this.map.size >= this.capacity) {
+        // Evict LRU node right before tail
+        const lru = this.tail.prev;
+        this._remove(lru);
+        this.map.delete(lru.key);
+      }
+      const newNode = new Node(key, value);
+      this.map.set(key, newNode);
+      this._insert(newNode);
+    }
+  }
+}
+
+// Verification:
+const lru = new LRUCache(2);
+lru.put(1, 1); // cache is {1=1}
+lru.put(2, 2); // cache is {1=1, 2=2}
+console.log(lru.get(1)); // returns 1, marks 1 as MRU -> {2=2, 1=1}
+lru.put(3, 3); // evicts key 2 -> cache is {1=1, 3=3}
+console.log(lru.get(2)); // returns -1 (not found)
+lru.put(4, 4); // evicts key 1 -> cache is {3=3, 4=4}
+console.log(lru.get(1)); // returns -1 (not found)
+console.log(lru.get(3)); // returns 3
+console.log(lru.get(4)); // returns 4
+```
+
+---
+
+### 535. How do you implement a deep object diff function to detect added, modified, and deleted properties?
+
+**In Simple Words:**
+A **deep object diff** algorithm recursively compares two JSON trees to generate a patch summary identifying newly added keys, deleted keys, and modified values with their before-and-after states, essential for state synchronization, undo/redo stacks, and UI reconciliation.
+
+#### Implementation
+
+```javascript
+function isPlainObject(val) {
+  return val !== null && typeof val === 'object' && !Array.isArray(val);
+}
+
+function diffObjects(oldObj, newObj) {
+  const diff = {
+    added: {},
+    modified: {},
+    deleted: {}
+  };
+
+  const oldKeys = Object.keys(oldObj || {});
+  const newKeys = Object.keys(newObj || {});
+  const allKeys = new Set([...oldKeys, ...newKeys]);
+
+  for (const key of allKeys) {
+    const hasOld = Object.prototype.hasOwnProperty.call(oldObj || {}, key);
+    const hasNew = Object.prototype.hasOwnProperty.call(newObj || {}, key);
+
+    // 1. Key added in newObj
+    if (!hasOld && hasNew) {
+      diff.added[key] = newObj[key];
+      continue;
+    }
+
+    // 2. Key removed from newObj
+    if (hasOld && !hasNew) {
+      diff.deleted[key] = oldObj[key];
+      continue;
+    }
+
+    // 3. Key exists in both: check equality or nested objects
+    const oldVal = oldObj[key];
+    const newVal = newObj[key];
+
+    if (isPlainObject(oldVal) && isPlainObject(newVal)) {
+      const nestedDiff = diffObjects(oldVal, newVal);
+      if (
+        Object.keys(nestedDiff.added).length > 0 ||
+        Object.keys(nestedDiff.modified).length > 0 ||
+        Object.keys(nestedDiff.deleted).length > 0
+      ) {
+        diff.modified[key] = nestedDiff;
+      }
+    } else if (Array.isArray(oldVal) && Array.isArray(newVal)) {
+      if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+        diff.modified[key] = { from: oldVal, to: newVal };
+      }
+    } else if (oldVal !== newVal) {
+      diff.modified[key] = { from: oldVal, to: newVal };
+    }
+  }
+
+  // Clean empty sections
+  const result = {};
+  if (Object.keys(diff.added).length > 0) result.added = diff.added;
+  if (Object.keys(diff.modified).length > 0) result.modified = diff.modified;
+  if (Object.keys(diff.deleted).length > 0) result.deleted = diff.deleted;
+
+  return result;
+}
+
+// Verification:
+const originalUser = {
+  id: 101,
+  name: "Marcus",
+  role: "Engineer",
+  skills: ["JavaScript", "Python"],
+  profile: {
+    theme: "light",
+    notifications: true
+  }
+};
+
+const updatedUser = {
+  id: 101,
+  name: "Marcus Aurelius", // modified
+  // role is deleted
+  skills: ["JavaScript", "TypeScript"], // modified
+  department: "Infrastructure", // added
+  profile: {
+    theme: "dark", // nested modified
+    notifications: true
+  }
+};
+
+console.log(JSON.stringify(diffObjects(originalUser, updatedUser), null, 2));
+/*
+Output:
+{
+  "added": { "department": "Infrastructure" },
+  "modified": {
+    "name": { "from": "Marcus", "to": "Marcus Aurelius" },
+    "skills": { "from": ["JavaScript", "Python"], "to": ["JavaScript", "TypeScript"] },
+    "profile": {
+      "modified": {
+        "theme": { "from": "light", "to": "dark" }
+      }
+    }
+  },
+  "deleted": { "role": "Engineer" }
+}
+*/
+```
+
+---
+
+### 536. How do you implement polyfills for Array.prototype.flat and flatMap supporting custom and infinite recursion depth?
+
+**In Simple Words:**
+`Array.prototype.flat` recursively concatenates sub-array elements up to a specified depth (defaulting to 1, or `Infinity` for complete flattening), which can be implemented either recursively with array reduction or iteratively using a stack to prevent call stack overflow on deeply nested arrays.
+
+#### 1. Recursive Implementation with Depth Control
+
+```javascript
+function flatArrayRecursive(arr, depth = 1) {
+  if (!Array.isArray(arr) || depth <= 0) {
+    return Array.isArray(arr) ? [...arr] : [];
+  }
+
+  return arr.reduce((acc, item) => {
+    if (Array.isArray(item) && depth > 0) {
+      acc.push(...flatArrayRecursive(item, depth - 1));
+    } else {
+      acc.push(item);
+    }
+    return acc;
+  }, []);
+}
+```
+
+#### 2. Iterative Stack-Based Implementation (Prevents Call Stack Overflow)
+When dealing with arrays nested thousands of levels deep, recursion throws `RangeError: Maximum call stack size exceeded`. An iterative stack processes arbitrary depths safely in $O(N)$ space and time.
+
+```javascript
+function flatArrayIterative(arr, depth = 1) {
+  if (!Array.isArray(arr)) return [];
+  if (depth <= 0) return [...arr];
+
+  // Store elements paired with their remaining flattening depth
+  const stack = arr.map((item) => ({ item, depth }));
+  const result = [];
+
+  while (stack.length > 0) {
+    const { item, depth: d } = stack.pop();
+
+    if (Array.isArray(item) && d > 0) {
+      // Push in reverse to maintain left-to-right order on pop
+      for (let i = item.length - 1; i >= 0; i--) {
+        stack.push({ item: item[i], depth: d - 1 });
+      }
+    } else {
+      result.push(item);
+    }
+  }
+
+  return result;
+}
+```
+
+#### 3. Polyfill for `Array.prototype.flatMap`
+Maps each element using a mapping function and flattens the result by depth 1.
+
+```javascript
+function flatMapPolyfill(arr, callback, thisArg) {
+  return arr.map(callback, thisArg).reduce((acc, val) => {
+    if (Array.isArray(val)) {
+      acc.push(...val);
+    } else {
+      acc.push(val);
+    }
+    return acc;
+  }, []);
+}
+
+// Verification:
+const nested = [1, [2, [3, [4, 5]]]];
+
+console.log(flatArrayRecursive(nested, 1)); // [1, 2, [3, [4, 5]]]
+console.log(flatArrayRecursive(nested, 2)); // [1, 2, 3, [4, 5]]
+console.log(flatArrayIterative(nested, Infinity)); // [1, 2, 3, 4, 5]
+
+const phrases = ["hello world", "goodbye all"];
+console.log(flatMapPolyfill(phrases, s => s.split(" ")));
+// ["hello", "world", "goodbye", "all"]
 ```
 
 <!-- QUESTIONS_END -->

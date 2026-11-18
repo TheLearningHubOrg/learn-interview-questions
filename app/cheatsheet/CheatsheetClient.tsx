@@ -31,17 +31,14 @@ interface CheatsheetClientProps {
   tracks: TrackMeta[];
 }
 
-type CategoryPreset = 'all' | 'most-asked' | 'bookmarked' | 'frontend' | 'backend' | 'systems' | 'ai' | 'dsa' | 'behavioral';
+type StudyFocus = 'all' | 'most-asked' | 'bookmarked';
 
 export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTrack, setSelectedTrack] = useState<string>('all');
+  const [studyFocus, setStudyFocus] = useState<StudyFocus>('most-asked');
   const [selectedLevel, setSelectedLevel] = useState<'all' | 'junior' | 'mid' | 'senior'>('all');
-  const [mostAskedOnly, setMostAskedOnly] = useState<boolean>(true);
-  const [bookmarkedOnly, setBookmarkedOnly] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'compact' | 'grid'>('compact');
   const [copiedMarkdown, setCopiedMarkdown] = useState(false);
-  const [activePreset, setActivePreset] = useState<CategoryPreset>('most-asked');
 
   // Selected technologies from localStorage
   const [selectedTechSlugs, setSelectedTechSlugsState] = useState<string[]>([]);
@@ -95,28 +92,6 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     return map;
   }, [tracks]);
 
-  // Preset Handler
-  const handleSelectPreset = (preset: CategoryPreset) => {
-    setActivePreset(preset);
-    setSelectedTrack('all');
-    setSelectedLevel('all');
-    setSearchQuery('');
-
-    if (preset === 'all') {
-      setMostAskedOnly(false);
-      setBookmarkedOnly(false);
-    } else if (preset === 'most-asked') {
-      setMostAskedOnly(true);
-      setBookmarkedOnly(false);
-    } else if (preset === 'bookmarked') {
-      setMostAskedOnly(false);
-      setBookmarkedOnly(true);
-    } else {
-      setMostAskedOnly(false);
-      setBookmarkedOnly(false);
-    }
-  };
-
   // Filter pipeline
   const filteredItems = useMemo(() => {
     return initialItems.filter((item) => {
@@ -127,42 +102,20 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
         return false;
       }
 
-      // Preset domain filters
-      if (activePreset === 'frontend') {
-        if (!['javascript', 'react-nextjs', 'angular-ts'].includes(item.trackSlug)) return false;
-      } else if (activePreset === 'backend') {
-        if (!['nodejs', 'python', 'databases', 'aws'].includes(item.trackSlug)) return false;
-      } else if (activePreset === 'systems') {
-        if (!['system-design', 'devops-kubernetes', 'web-security-owasp'].includes(item.trackSlug)) return false;
-      } else if (activePreset === 'ai') {
-        if (item.trackSlug !== 'ai-engineering-llm') return false;
-      } else if (activePreset === 'dsa') {
-        if (item.trackSlug !== 'dsa') return false;
-      } else if (activePreset === 'behavioral') {
-        if (item.trackSlug !== 'behavioral-hr') return false;
+      // Study Focus Mode
+      if (studyFocus === 'most-asked' && !item.isMostAsked) {
+        return false;
       }
-
-      // Track filter
-      if (selectedTrack !== 'all' && item.trackSlug !== selectedTrack) {
+      if (studyFocus === 'bookmarked' && !bookmarkedSet.has(key)) {
         return false;
       }
 
-      // Level filter
+      // Seniority Level filter
       if (selectedLevel !== 'all' && item.level !== selectedLevel) {
         return false;
       }
 
-      // Most asked filter
-      if (mostAskedOnly && !item.isMostAsked) {
-        return false;
-      }
-
-      // Bookmarked filter
-      if (bookmarkedOnly && !bookmarkedSet.has(key)) {
-        return false;
-      }
-
-      // Search query
+      // Live Search query
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
       return (
@@ -177,11 +130,8 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
   }, [
     initialItems,
     selectedTechSlugs,
-    activePreset,
-    selectedTrack,
+    studyFocus,
     selectedLevel,
-    mostAskedOnly,
-    bookmarkedOnly,
     bookmarkedSet,
     searchQuery
   ]);
@@ -224,20 +174,14 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
   };
 
   const isFiltering =
-    activePreset !== 'all' ||
-    selectedTrack !== 'all' ||
+    studyFocus !== 'all' ||
     selectedLevel !== 'all' ||
-    mostAskedOnly ||
-    bookmarkedOnly ||
     selectedTechSlugs.length > 0 ||
     searchQuery.trim().length > 0;
 
   const handleResetFilters = () => {
-    setActivePreset('all');
-    setSelectedTrack('all');
+    setStudyFocus('all');
     setSelectedLevel('all');
-    setMostAskedOnly(false);
-    setBookmarkedOnly(false);
     setSearchQuery('');
   };
 
@@ -300,11 +244,11 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
           </div>
 
           {/* Action Buttons: Print PDF & Copy Markdown */}
-          <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap w-full lg:w-auto">
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/20 transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/20 transition-all active:scale-95 cursor-pointer w-full sm:w-auto justify-center"
               title="Print clean paper cheatsheet or save as PDF"
             >
               <Printer className="w-4 h-4" />
@@ -314,7 +258,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
             <button
               type="button"
               onClick={handleCopyMarkdown}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition-all active:scale-95 cursor-pointer ${
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition-all active:scale-95 cursor-pointer w-full sm:w-auto justify-center ${
                 copiedMarkdown
                   ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
                   : 'bg-card hover:bg-card-hover border-border text-foreground hover:border-purple-400'
@@ -343,126 +287,13 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
           tracks={tracks}
           selectedSlugs={selectedTechSlugs}
           onChange={handleTechStackChange}
+          isCollapsible={true}
         />
       </div>
 
-      {/* Quick Domain Presets (Hidden in Print) */}
-      <div className="mb-6 print:hidden">
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none touch-pan-x">
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'all' && !mostAskedOnly && !bookmarkedOnly
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            All Tracks (1,864 Qs)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('most-asked')}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'most-asked' || mostAskedOnly
-                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/20'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Flame className="w-3.5 h-3.5 fill-current" />
-            <span>Most Asked (High-Yield)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('bookmarked')}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'bookmarked' || bookmarkedOnly
-                ? 'bg-amber-600 text-white shadow-sm'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Bookmark className="w-3.5 h-3.5 fill-current" />
-            <span>My Bookmarks ({bookmarkedSet.size})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('frontend')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'frontend'
-                ? 'bg-purple-600 text-white'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Frontend (JS, React, Angular)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('backend')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'backend'
-                ? 'bg-purple-600 text-white'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Backend & SQL (Node, Python, DBs, AWS)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('systems')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'systems'
-                ? 'bg-purple-600 text-white'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            System Design & DevOps
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('ai')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'ai'
-                ? 'bg-purple-600 text-white'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            AI Engineering & LLMs
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('dsa')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'dsa'
-                ? 'bg-purple-600 text-white'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            DSA Patterns
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('behavioral')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-              activePreset === 'behavioral'
-                ? 'bg-purple-600 text-white'
-                : 'bg-card hover:bg-card-hover border border-border text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Behavioral & STAR
-          </button>
-        </div>
-      </div>
-
-      {/* Search & Granular Filter Controls (Hidden in Print) */}
-      <div className="mb-6 p-4 rounded-xl bg-card border border-border shadow-xs print:hidden">
+      {/* Streamlined Study Focus & Filter Toolbar (Hidden in Print) */}
+      <div className="mb-6 p-4 rounded-xl bg-card border border-border shadow-xs print:hidden space-y-3">
+        {/* Row 1: Instant Search & Granular Controls */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Live Search Bar */}
           <div className="relative flex-1">
@@ -485,73 +316,108 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
             )}
           </div>
 
-          {/* Track Dropdown */}
-          <select
-            value={selectedTrack}
-            onChange={(e) => setSelectedTrack(e.target.value)}
-            className="px-3 py-2 rounded-lg bg-background border border-border text-xs font-medium text-foreground focus:outline-none focus:border-purple-500 shrink-0 cursor-pointer"
-          >
-            <option value="all">All Tracks</option>
-            {tracks.map((t) => (
-              <option key={t.slug} value={t.slug}>
-                Section {t.sectionNumber}: {t.shortTitle}
-              </option>
-            ))}
-          </select>
-
-          {/* Level Filter */}
-          <select
-            value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value as any)}
-            className="px-3 py-2 rounded-lg bg-background border border-border text-xs font-medium text-foreground focus:outline-none focus:border-purple-500 shrink-0 cursor-pointer"
-          >
-            <option value="all">All Seniority Levels</option>
-            <option value="junior">Junior</option>
-            <option value="mid">Mid-Level</option>
-            <option value="senior">Senior / Staff</option>
-          </select>
-
-          {/* View Mode Toggle */}
-          <div className="flex items-center gap-1 border border-border rounded-lg p-0.5 bg-background shrink-0">
-            <button
-              type="button"
-              onClick={() => setViewMode('compact')}
-              className={`px-2.5 py-1 rounded text-xs font-semibold transition-all cursor-pointer ${
-                viewMode === 'compact'
-                  ? 'bg-purple-600 text-white'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+          <div className="flex items-center justify-between sm:justify-end gap-2 w-full md:w-auto shrink-0">
+            {/* Seniority Level Filter */}
+            <select
+              value={selectedLevel}
+              onChange={(e) => setSelectedLevel(e.target.value as any)}
+              className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-background border border-border text-xs font-semibold text-foreground focus:outline-none focus:border-purple-500 cursor-pointer"
             >
-              List
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={`px-2.5 py-1 rounded text-xs font-semibold transition-all cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-purple-600 text-white'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Cards
-            </button>
+              <option value="all">All Seniority Levels</option>
+              <option value="junior">Junior</option>
+              <option value="mid">Mid-Level</option>
+              <option value="senior">Senior / Staff</option>
+            </select>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-1 border border-border rounded-lg p-0.5 bg-background shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('compact')}
+                className={`px-2.5 py-1 rounded text-xs font-semibold transition-all cursor-pointer ${
+                  viewMode === 'compact'
+                    ? 'bg-purple-600 text-white'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                List
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`px-2.5 py-1 rounded text-xs font-semibold transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-purple-600 text-white'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Cards
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Stats & Reset Filter Bar */}
-        <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
-          <span>
-            Showing <strong className="text-foreground">{filteredItems.length}</strong> cheatsheet entries
-          </span>
-          {isFiltering && (
+        {/* Row 2: Study Focus Tabs (All / Most Asked / Bookmarks) & Counter */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-border/50 text-xs">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none touch-pan-x w-full sm:w-auto">
+            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mr-1 shrink-0">
+              Study Focus:
+            </span>
+
             <button
               type="button"
-              onClick={handleResetFilters}
-              className="text-purple-600 dark:text-purple-400 font-bold hover:underline cursor-pointer"
+              onClick={() => setStudyFocus('most-asked')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                studyFocus === 'most-asked'
+                  ? 'bg-amber-500 text-white shadow-xs ring-1 ring-amber-500/30'
+                  : 'bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border border-border'
+              }`}
             >
-              Reset Filters
+              <Flame className="w-3.5 h-3.5 fill-current" />
+              <span>Most Asked</span>
             </button>
-          )}
+
+            <button
+              type="button"
+              onClick={() => setStudyFocus('all')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                studyFocus === 'all'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border border-border'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>All Stack Qs</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStudyFocus('bookmarked')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                studyFocus === 'bookmarked'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border border-border'
+              }`}
+            >
+              <Bookmark className="w-3.5 h-3.5 fill-current" />
+              <span>Saved ({bookmarkedSet.size})</span>
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between sm:justify-end gap-3 text-muted-foreground w-full sm:w-auto pt-1 sm:pt-0 shrink-0">
+            <span>
+              Showing <strong className="text-foreground">{filteredItems.length}</strong> cheatsheet entries
+            </span>
+            {isFiltering && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="text-purple-600 dark:text-purple-400 font-bold hover:underline cursor-pointer"
+              >
+                Reset
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -702,7 +568,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
       )}
 
       {/* Floating Quick-Print Action Pill (Bottom Right, Hidden in Print) */}
-      <div className="fixed bottom-6 right-6 z-30 print:hidden">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 print:hidden">
         <button
           type="button"
           onClick={handlePrint}

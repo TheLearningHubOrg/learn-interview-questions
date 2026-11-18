@@ -143,31 +143,25 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               <span>All Questions</span>
             </Link>
 
-            {/* Desktop Revision Cheatsheet Link */}
+            {/* Desktop Revision Cheatsheet Link with Stack Indicator */}
             <Link
               href="/cheatsheet"
-              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/25 hover:bg-purple-500/20 transition-all shrink-0"
-              title="1-Page Quick Revision Cheatsheet & Printable PDF"
-            >
-              <FileText className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
-              <span>Cheatsheet</span>
-            </Link>
-
-            {/* Desktop My Stack Filter Button */}
-            <Link
-              href="/cheatsheet"
-              className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all shrink-0 ${
+              className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all shrink-0 ${
                 selectedTechCount > 0
                   ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-card border-border hover:border-purple-400/50'
+                  : 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/25 hover:bg-purple-500/20'
               }`}
-              title="Filter question bank by your interview tech stack"
+              title={
+                selectedTechCount > 0
+                  ? `Cheatsheet filtered to your ${selectedTechCount} active technologies`
+                  : '1-Page Quick Revision Cheatsheet & Printable PDF'
+              }
             >
-              <Cpu className="h-3.5 w-3.5" />
-              <span>My Stack</span>
+              <FileText className="h-3.5 w-3.5" />
+              <span>Cheatsheet</span>
               {selectedTechCount > 0 && (
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-white text-purple-700 leading-none">
-                  {selectedTechCount}
+                  {selectedTechCount} Stack
                 </span>
               )}
             </Link>
@@ -302,35 +296,22 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               <Link
                 href="/cheatsheet"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-2 rounded-xl bg-purple-600/15 border border-purple-500/30 text-purple-700 dark:text-purple-300 text-sm font-bold shadow-xs active:scale-95 transition-all"
-              >
-                <div className="flex items-center gap-2.5">
-                  <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  <span>Revision Cheatsheet (Print / PDF)</span>
-                </div>
-                <ChevronRight className="h-4 w-4 text-purple-500" />
-              </Link>
-
-              {/* Mobile My Stack Filter in Drawer */}
-              <Link
-                href="/cheatsheet"
-                onClick={() => setMobileMenuOpen(false)}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 mb-2.5 rounded-xl text-sm font-bold shadow-xs active:scale-95 transition-all border ${
                   selectedTechCount > 0
                     ? 'bg-purple-600 text-white border-purple-600'
-                    : 'bg-card border-border text-foreground hover:bg-card-hover'
+                    : 'bg-purple-600/15 border border-purple-500/30 text-purple-700 dark:text-purple-300'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Cpu className="h-4 w-4" />
-                  <span>My Tech Stack Filter</span>
+                  <FileText className="h-4 w-4" />
+                  <span>Revision Cheatsheet (Print / PDF)</span>
                 </div>
                 {selectedTechCount > 0 ? (
                   <span className="px-2 py-0.5 rounded-full text-xs font-black bg-white text-purple-700">
-                    {selectedTechCount} Active
+                    {selectedTechCount} Stack Active
                   </span>
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  <ChevronRight className="h-4 w-4 text-purple-500" />
                 )}
               </Link>
 

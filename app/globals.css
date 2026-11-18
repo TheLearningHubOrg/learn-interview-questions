@@ -429,8 +429,14 @@ code, pre, kbd {
   html.dark,
   body,
   body.dark,
+  body > div,
   main {
     color-scheme: light !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
     --background: #ffffff !important;
     --foreground: #000000 !important;
     --card: #ffffff !important;
@@ -488,11 +494,10 @@ code, pre, kbd {
     color: #000000 !important;
   }
 
-  /* Section Title Header in Print */
+  /* Section Title Header in Print - Keep section header itself from splitting, but allow content flow */
   .cheatsheet-section-header {
-    break-after: avoid !important;
-    page-break-after: avoid !important;
     break-inside: avoid !important;
+    page-break-inside: avoid !important;
     margin-top: 10px !important;
     margin-bottom: 6px !important;
   }
@@ -516,6 +521,7 @@ code, pre, kbd {
     margin-bottom: 6px !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
   }
 
   .cheatsheet-title {

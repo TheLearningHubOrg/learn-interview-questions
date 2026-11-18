@@ -115,6 +115,40 @@ export function TechStackSelector({
         </div>
       </div>
 
+      {/* Collapsed State Quick Preview */}
+      {!isExpanded && (
+        <div className="pt-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+            <span className="text-muted-foreground font-medium shrink-0">
+              {hasSelection ? 'Targeting:' : 'Active Stack:'}
+            </span>
+            {hasSelection ? (
+              tracks
+                .filter((t) => selectedSlugs.includes(t.slug))
+                .map((t) => (
+                  <span
+                    key={t.slug}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-semibold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/25 shrink-0"
+                  >
+                    {t.shortTitle}
+                  </span>
+                ))
+            ) : (
+              <span className="text-muted-foreground">
+                All 13 technologies (1,864 questions)
+              </span>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsExpanded(true)}
+            className="font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer self-start sm:self-auto shrink-0"
+          >
+            {hasSelection ? `Customize (${selectedQuestionCount} Qs) →` : 'Filter by My Stack →'}
+          </button>
+        </div>
+      )}
+
       {isExpanded && (
         <div className="pt-3.5 space-y-3.5 animate-in fade-in duration-150">
           {/* Quick Role Stacks Presets */}
@@ -210,7 +244,7 @@ export function TechStackSelector({
           </div>
 
           {/* Live Stack Count Status Footer */}
-          <div className="flex items-center justify-between pt-2.5 border-t border-border/50 text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2.5 border-t border-border/50 text-xs">
             <span className="text-muted-foreground font-medium">
               {hasSelection ? (
                 <>
@@ -223,7 +257,7 @@ export function TechStackSelector({
             </span>
 
             {hasSelection && (
-              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 shrink-0">
                 <Check className="w-3 h-3 stroke-[2.5]" />
                 Stack Filter Active
               </span>

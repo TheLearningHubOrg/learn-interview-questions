@@ -8,7 +8,6 @@ import {
   ArrowRight, 
   Flame, 
   Code2, 
-  Layers, 
   Filter, 
   CheckCircle2, 
   Bookmark, 
@@ -34,7 +33,6 @@ interface QuestionsDirectoryClientProps {
 
 export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDirectoryClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTrack, setSelectedTrack] = useState<string>('all');
   const [selectedLevel, setSelectedLevel] = useState<'all' | 'junior' | 'mid' | 'senior'>('all');
   const [mostAskedOnly, setMostAskedOnly] = useState<boolean>(false);
   const [hasCodeOnly, setHasCodeOnly] = useState<boolean>(false);
@@ -110,27 +108,22 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
         return false;
       }
 
-      // 1. Track filter
-      if (selectedTrack !== 'all' && item.trackSlug !== selectedTrack) {
-        return false;
-      }
-
-      // 2. Level filter
+      // 1. Level filter
       if (selectedLevel !== 'all' && item.level !== selectedLevel) {
         return false;
       }
 
-      // 3. Most asked filter
+      // 2. Most asked filter
       if (mostAskedOnly && !item.isMostAsked) {
         return false;
       }
 
-      // 4. Has code filter
+      // 3. Has code filter
       if (hasCodeOnly && !item.hasCode) {
         return false;
       }
 
-      // 5. Status filter
+      // 4. Status filter
       const key = `${item.trackSlug}:${item.questionNumber}`;
       if (statusFilter === 'studied' && !studiedSet.has(key)) {
         return false;
@@ -139,7 +132,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
         return false;
       }
 
-      // 6. Search query
+      // 5. Search query
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
       return (
@@ -153,7 +146,6 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
   }, [
     initialItems, 
     selectedTechSlugs,
-    selectedTrack, 
     selectedLevel, 
     mostAskedOnly, 
     hasCodeOnly, 
@@ -166,7 +158,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
   // Reset pagination when any filter changes
   useEffect(() => {
     setPageSize(40);
-  }, [selectedTechSlugs, selectedTrack, selectedLevel, mostAskedOnly, hasCodeOnly, statusFilter, searchQuery]);
+  }, [selectedTechSlugs, selectedLevel, mostAskedOnly, hasCodeOnly, statusFilter, searchQuery]);
 
   const pagedItems = useMemo(() => {
     return filteredItems.slice(0, pageSize);
@@ -174,7 +166,6 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
 
   const isFiltering = 
     selectedTechSlugs.length > 0 ||
-    selectedTrack !== 'all' || 
     selectedLevel !== 'all' || 
     mostAskedOnly || 
     hasCodeOnly || 
@@ -182,7 +173,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
     searchQuery.trim().length > 0;
 
   const handleResetFilters = () => {
-    setSelectedTrack('all');
+    handleTechStackChange([]);
     setSelectedLevel('all');
     setMostAskedOnly(false);
     setHasCodeOnly(false);
@@ -310,41 +301,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
           </div>
         </div>
 
-        {/* Row 2: Track Quick Selector Pills */}
-        <div className="pt-3 border-t border-border flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none touch-pan-x">
-          <span className="text-xs font-bold text-muted-foreground mr-1 shrink-0 flex items-center gap-1">
-            <Layers className="w-3.5 h-3.5 text-purple-500" />
-            Track:
-          </span>
-          <button
-            type="button"
-            onClick={() => setSelectedTrack('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
-              selectedTrack === 'all'
-                ? 'bg-purple-600 text-white shadow-xs'
-                : 'bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border border-border'
-            }`}
-          >
-            All Tracks (13)
-          </button>
-
-          {tracks.map((t) => (
-            <button
-              key={t.slug}
-              type="button"
-              onClick={() => setSelectedTrack((prev) => prev === t.slug ? 'all' : t.slug)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
-                selectedTrack === t.slug
-                  ? 'bg-purple-600 text-white font-bold shadow-xs'
-                  : 'bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border border-border'
-              }`}
-            >
-              {t.shortTitle}
-            </button>
-          ))}
-        </div>
-
-        {/* Row 3: Seniority Level, Most Asked & Code Toggles */}
+        {/* Row 2: Seniority Level, Most Asked & Code Toggles */}
         <div className="pt-3 border-t border-border flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             {/* Most Asked Pill */}
@@ -434,7 +391,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
           </div>
 
           {/* Results Counter & Reset */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium shrink-0 ml-auto">
+          <div className="flex items-center justify-between sm:justify-end gap-2 text-xs text-muted-foreground font-medium w-full sm:w-auto pt-1 sm:pt-0 shrink-0">
             <span>
               Showing <strong className="text-foreground">{filteredItems.length}</strong> of {initialItems.length} questions
             </span>

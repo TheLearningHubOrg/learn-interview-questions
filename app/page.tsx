@@ -12,9 +12,9 @@ import {
   CheckCircle2, 
   ArrowRight,
   ShieldCheck,
-  Github,
   Zap
 } from 'lucide-react';
+import { GithubIcon } from '@/components/GithubIcon';
 import { getAllTracks } from '@/lib/tracks';
 import { TrackCard } from '@/components/TrackCard';
 import { ContinueReadingBanner } from '@/components/ContinueReadingBanner';
@@ -137,7 +137,7 @@ export default async function HomePage() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm bg-card hover:bg-card-hover border border-border text-foreground transition-all shadow-sm dark:shadow-none active:scale-95"
           >
-            <Github className="h-4 w-4" />
+            <GithubIcon className="h-4 w-4" />
             <span>Star on GitHub</span>
           </a>
         </div>

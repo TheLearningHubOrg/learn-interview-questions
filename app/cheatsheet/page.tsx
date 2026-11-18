@@ -18,3 +18,4 @@ export default async function CheatsheetPage() {
 
   return <CheatsheetClient initialItems={items} tracks={tracks} />;
 }
+

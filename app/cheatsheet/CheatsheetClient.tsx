@@ -35,14 +35,35 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrack, setSelectedTrack] = useState<string>('all');
   const [selectedLevel, setSelectedLevel] = useState<'all' | 'junior' | 'mid' | 'senior'>('all');
-  const [mostAskedOnly, setMostAskedOnly] = useState<boolean>(false);
+  const [mostAskedOnly, setMostAskedOnly] = useState<boolean>(true);
   const [bookmarkedOnly, setBookmarkedOnly] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'compact' | 'grid'>('compact');
   const [copiedMarkdown, setCopiedMarkdown] = useState(false);
-  const [activePreset, setActivePreset] = useState<CategoryPreset>('all');
+  const [activePreset, setActivePreset] = useState<CategoryPreset>('most-asked');
 
   // Bookmarks from localStorage
   const [bookmarkedSet, setBookmarkedSet] = useState<Set<string>>(new Set());
+
+  // Bulletproof print handler that temporarily switches DOM to light mode
+  const handlePrint = () => {
+    if (typeof window === 'undefined') return;
+    const wasDark = document.documentElement.classList.contains('dark');
+    if (wasDark) {
+      document.documentElement.classList.remove('dark');
+    }
+
+    const restoreDark = () => {
+      if (wasDark) {
+        document.documentElement.classList.add('dark');
+      }
+      window.removeEventListener('afterprint', restoreDark);
+    };
+
+    window.addEventListener('afterprint', restoreDark);
+    setTimeout(() => {
+      window.print();
+    }, 80);
+  };
 
   useEffect(() => {
     const refreshBookmarks = () => {
@@ -251,13 +272,19 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
             <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 max-w-2xl leading-relaxed font-medium">
               Crisp 1-line takeaways to skim through 50–100 core concepts in minutes. Ideal for your pre-interview commute or quick revision.
             </p>
+            <div className="mt-2.5 flex items-center gap-2 text-[11px] text-purple-700 dark:text-purple-300 font-medium">
+              <span>💡 Print Estimate:</span>
+              <span className="font-bold underline">{filteredItems.length} questions will print on ~{Math.max(1, Math.ceil(filteredItems.length / 14))} pages</span>
+              <span>•</span>
+              <span className="text-muted-foreground">Select a Track or 'Most Asked' for a focused 4–8 page cheatsheet</span>
+            </div>
           </div>
 
           {/* Action Buttons: Print PDF & Copy Markdown */}
           <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={handlePrint}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/20 transition-all active:scale-95 cursor-pointer"
               title="Print clean paper cheatsheet or save as PDF"
             >
@@ -539,7 +566,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
                 </div>
 
                 {/* Questions Listing */}
-                <div className={viewMode === 'compact' ? 'space-y-2.5' : 'grid grid-cols-1 md:grid-cols-2 gap-3'}>
+                <div className={`${viewMode === 'compact' ? 'space-y-2.5' : 'grid grid-cols-1 md:grid-cols-2 gap-3'} cheatsheet-print-grid`}>
                   {items.map((item) => {
                     const key = `${item.trackSlug}:${item.questionNumber}`;
                     const isBookmarked = bookmarkedSet.has(key);
@@ -551,14 +578,14 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
                           isBookmarked
                             ? 'border-amber-300 dark:border-amber-500/40 shadow-xs'
                             : 'border-border'
-                        } hover:border-purple-400/80 transition-all group print:border-slate-300 print:p-2.5 print-page-break-avoid`}
+                        } hover:border-purple-400/80 transition-all group cheatsheet-item print:border-slate-300 print:p-2 print:bg-white print:text-black print-page-break-avoid`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-start gap-2.5 min-w-0 flex-1">
                             {/* Question Number Badge */}
                             <Link
                               href={`/sections/${item.trackSlug}/${item.questionNumber}`}
-                              className="px-2 py-0.5 rounded font-mono font-bold text-xs bg-muted text-foreground border border-border group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-colors shrink-0 mt-0.5"
+                              className="px-2 py-0.5 rounded font-mono font-bold text-xs bg-muted text-foreground border border-border group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-colors shrink-0 mt-0.5 print:bg-slate-100 print:text-black print:border-slate-300"
                               title="Open full question and deep-dive answer"
                             >
                               Q{item.questionNumber}
@@ -566,7 +593,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
 
                             <div className="min-w-0 flex-1">
                               {/* Metadata Badges */}
-                              <div className="flex items-center gap-1.5 flex-wrap mb-1 text-[10px]">
+                              <div className="flex items-center gap-1.5 flex-wrap mb-1 text-[10px] print:hidden">
                                 {item.isMostAsked && (
                                   <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-bold uppercase tracking-wider bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25">
                                     <Flame className="w-2.5 h-2.5 text-amber-500 fill-current" />
@@ -606,19 +633,19 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
                               {/* Question Title */}
                               <Link
                                 href={`/sections/${item.trackSlug}/${item.questionNumber}`}
-                                className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug block"
+                                className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug block cheatsheet-title print:text-black print:text-[10pt]"
                               >
                                 {item.title}
                               </Link>
 
                               {/* 1-Line Explanation Box */}
                               {item.summary && (
-                                <div className="mt-2 p-2.5 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20 print:bg-slate-50 print:border-slate-300">
+                                <div className="mt-2 p-2.5 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20 cheatsheet-summary-box print:bg-slate-50 print:border-slate-200 print:mt-1 print:p-1.5">
                                   <div className="flex items-start gap-1.5">
-                                    <span className="text-purple-600 dark:text-purple-400 font-bold shrink-0 text-xs">
+                                    <span className="text-purple-600 dark:text-purple-400 font-bold shrink-0 text-xs print:text-slate-700">
                                       💡
                                     </span>
-                                    <p className="text-xs font-medium text-foreground/90 leading-relaxed print:text-black">
+                                    <p className="text-xs font-medium text-foreground/90 leading-relaxed cheatsheet-summary-text print:text-slate-900 print:text-[9pt] print:leading-normal">
                                       {item.summary}
                                     </p>
                                   </div>
@@ -650,7 +677,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
       <div className="fixed bottom-6 right-6 z-30 print:hidden">
         <button
           type="button"
-          onClick={() => window.print()}
+          onClick={handlePrint}
           className="flex items-center gap-2 px-4 py-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs sm:text-sm shadow-xl shadow-purple-600/30 transition-all active:scale-95 cursor-pointer hover:shadow-2xl"
           title="Print or Export PDF"
         >
@@ -661,3 +688,4 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     </div>
   );
 }
+

@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { BookOpen, Github, ArrowUp, FileText } from 'lucide-react';
+import { BookOpen, ArrowUp, FileText } from 'lucide-react';
+import { GithubIcon } from './GithubIcon';
 
 export function Footer() {
   const scrollToTop = () => {
@@ -51,7 +52,7 @@ export function Footer() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background/60 hover:bg-muted hover:text-foreground transition-all font-medium"
             >
-              <Github className="h-3.5 w-3.5" />
+              <GithubIcon className="h-3.5 w-3.5" />
               <span>Star on GitHub</span>
             </a>
             <button

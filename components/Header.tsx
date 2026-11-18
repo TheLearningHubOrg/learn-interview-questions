@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame, Sparkles, FileText } from 'lucide-react';
+import { BookOpen, Search, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame, Sparkles, FileText } from 'lucide-react';
+import { GithubIcon } from './GithubIcon';
 import { ThemeToggle } from './ThemeToggle';
 import { TRACKS } from '@/lib/tracks-meta';
 import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
@@ -202,7 +203,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               aria-label="Star on GitHub"
               className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 dark:bg-purple-600/10 dark:text-purple-400 dark:border-purple-500/20 dark:hover:bg-purple-600/20 transition-all shadow-sm dark:shadow-none shrink-0"
             >
-              <Github className="h-4 w-4" />
+              <GithubIcon className="h-4 w-4" />
               <span>GitHub</span>
             </a>
 
@@ -360,7 +361,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold bg-card border border-border text-foreground hover:bg-card-hover transition-colors shadow-sm dark:shadow-none"
               >
-                <Github className="h-4 w-4" />
+                <GithubIcon className="h-4 w-4" />
                 <span>Star on GitHub</span>
                 <ExternalLink className="h-3 w-3 text-muted-foreground" />
               </a>

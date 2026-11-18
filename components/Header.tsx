@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame, Sparkles } from 'lucide-react';
+import { BookOpen, Search, Github, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame, Sparkles, FileText } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { TRACKS } from '@/lib/tracks-meta';
 import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
@@ -137,6 +137,16 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               <span>All Questions</span>
             </Link>
 
+            {/* Desktop Revision Cheatsheet Link */}
+            <Link
+              href="/cheatsheet"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/25 hover:bg-purple-500/20 transition-all shrink-0"
+              title="1-Page Quick Revision Cheatsheet & Printable PDF"
+            >
+              <FileText className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+              <span>Cheatsheet</span>
+            </Link>
+
             {/* Daily Study Streak Counter */}
             <button
               type="button"
@@ -254,11 +264,24 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               <Link
                 href="/questions"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-2.5 rounded-xl bg-purple-500/10 border border-purple-500/25 text-purple-700 dark:text-purple-300 text-sm font-bold shadow-xs active:scale-95 transition-all"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-2 rounded-xl bg-purple-500/10 border border-purple-500/25 text-purple-700 dark:text-purple-300 text-sm font-bold shadow-xs active:scale-95 transition-all"
               >
                 <div className="flex items-center gap-2.5">
                   <Sparkles className="h-4 w-4 fill-current text-purple-600 dark:text-purple-400" />
-                  <span>All 1,849 Questions Hub</span>
+                  <span>All 1,864+ Questions</span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-purple-500" />
+              </Link>
+
+              {/* Mobile Revision Cheatsheet in Drawer */}
+              <Link
+                href="/cheatsheet"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-2.5 rounded-xl bg-purple-600/15 border border-purple-500/30 text-purple-700 dark:text-purple-300 text-sm font-bold shadow-xs active:scale-95 transition-all"
+              >
+                <div className="flex items-center gap-2.5">
+                  <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  <span>Revision Cheatsheet (Print / PDF)</span>
                 </div>
                 <ChevronRight className="h-4 w-4 text-purple-500" />
               </Link>

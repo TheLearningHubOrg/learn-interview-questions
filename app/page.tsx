@@ -122,6 +122,15 @@ export default async function HomePage() {
             <span>Browse All {totalQuestions}+ Questions</span>
           </Link>
 
+          <Link
+            href="/cheatsheet"
+            className="flex items-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30 transition-all shadow-sm active:scale-95"
+            title="Rapid 1-Line Revision Cheatsheet & Printable PDF"
+          >
+            <Zap className="h-4 w-4 fill-current text-amber-500" />
+            <span>Revision Cheatsheet</span>
+          </Link>
+
           <a
             href="https://github.com/TheLearningHubOrg/learn-interview-questions"
             target="_blank"

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { BookOpen, Github, ArrowUp } from 'lucide-react';
+import Link from 'next/link';
+import { BookOpen, Github, ArrowUp, FileText } from 'lucide-react';
 
 export function Footer() {
   const scrollToTop = () => {
@@ -28,13 +29,20 @@ export function Footer() {
                 </span>
               </p>
               <p className="text-xs text-muted-foreground text-center sm:text-left">
-                Free & open-source engineering interview platform • 1,849+ Questions • 13 Specialized Tracks
+                Free & open-source engineering interview platform • 1,864+ Questions • 13 Specialized Tracks
               </p>
             </div>
           </div>
 
-          {/* Right Utilities: License, Star on GitHub, Back to Top */}
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          {/* Right Utilities: Cheatsheet, License, Star on GitHub, Back to Top */}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap justify-center sm:justify-end">
+            <Link
+              href="/cheatsheet"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-purple-500/25 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition-all font-medium"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              <span>Revision Cheatsheet</span>
+            </Link>
             <span className="hidden md:inline font-mono">MIT License</span>
             <span className="hidden md:inline">•</span>
             <a

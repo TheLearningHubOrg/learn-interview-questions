@@ -414,3 +414,18 @@ code, pre, kbd {
 .dark .markdown-body tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.02);
 }
+
+/* Print Optimization for Cheatsheet */
+@media print {
+  header, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .print-page-break-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

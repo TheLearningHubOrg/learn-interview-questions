@@ -1,4 +1,4 @@
-# Core JavaScript Master Interview Question Bank (522 Questions)
+# Core JavaScript Master Interview Question Bank (528 Questions)
 
 ## Part 1: Core Objects, Prototypes, Functions & Scope (1 - 53)
 
@@ -9875,7 +9875,7 @@ console.log(evenNums); // [2, 4, 6]
 
 
 
-## Part 8: Modern JavaScript APIs, WeakRef, Proxy & Performance (464 - 522)
+## Part 8: Modern JavaScript APIs, WeakRef, Proxy & Performance (464 - 528)
 
 ### 464. What is the difference between map and forEach functions?
 
@@ -14909,6 +14909,454 @@ console.log(floatToWords(12.34)); // "one two point three four"
 - **Complexity**:
   - **Time Complexity**: $\mathcal{O}(d)$, where $d$ is the number of digits in the integer ($\approx \lfloor \log_{10} N \rfloor + 1$).
   - **Space Complexity**: $\mathcal{O}(d)$ to store the mapped string tokens.
+
+
+### 523. How do you convert an integer into full English words with place values in JavaScript?
+
+Unlike digit-by-digit transliteration (`1234` → `"one two three four"`), this problem requires converting a non-negative integer into standard conversational English words with place values (e.g., `1234` → `"One Thousand Two Hundred Thirty Four"`). This is the classic **LeetCode 273 (Integer to English Words)** interview question.
+
+#### Core Algorithmic Strategy: 3-Digit Chunking
+English numbers are grouped into chunks of thousands:
+- Billions ($10^9$)
+- Millions ($10^6$)
+- Thousands ($10^3$)
+- Hundreds / Units ($10^0$)
+
+We can write a helper function that translates any 3-digit number ($1$ to $999$) into words, and then append the appropriate chunk suffix (`"Thousand"`, `"Million"`, `"Billion"`).
+
+#### Production Implementation:
+```javascript
+function numberToWords(num) {
+  if (num === 0) return "Zero";
+
+  const belowTwenty = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+    "Seventeen", "Eighteen", "Nineteen"
+  ];
+
+  const tens = [
+    "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+  ];
+
+  const thousands = ["", "Thousand", "Million", "Billion"];
+
+  // Helper function to process any number below 1000
+  function helper(n) {
+    if (n === 0) return "";
+    if (n < 20) return belowTwenty[n] + " ";
+    if (n < 100) return tens[Math.floor(n / 10)] + " " + helper(n % 10);
+    return belowTwenty[Math.floor(n / 100)] + " Hundred " + helper(n % 100);
+  }
+
+  let result = "";
+  let i = 0;
+
+  while (num > 0) {
+    const chunk = num % 1000;
+    if (chunk !== 0) {
+      const suffix = thousands[i] ? " " + thousands[i] : "";
+      result = helper(chunk).trim() + suffix + (result ? " " + result : "");
+    }
+    num = Math.floor(num / 1000);
+    i++;
+  }
+
+  return result.trim();
+}
+
+console.log(numberToWords(1234));
+// "One Thousand Two Hundred Thirty Four"
+
+console.log(numberToWords(1234567));
+// "One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven"
+
+console.log(numberToWords(1000010));
+// "One Million Ten"
+```
+
+#### Key Edge Cases & Talking Points:
+- **`0`**: Must explicitly return `"Zero"`.
+- **Teens (10–19)**: Irregular English naming (`Eleven`, `Twelve`, `Thirteen`) must be looked up directly from a dedicated array rather than combining `Ten` + unit.
+- **Empty chunks**: `1,000,010` has a middle chunk of `000` (thousands). The chunk helper must return empty string without adding a phantom `"Thousand"` word.
+- **Complexity**:
+  - **Time Complexity**: $\mathcal{O}(1)$ because standard 32-bit signed integers have at most 10 digits ($< 2^{31}-1$).
+  - **Space Complexity**: $\mathcal{O}(1)$ auxiliary memory.
+
+
+### 524. How do you convert between Roman Numerals and Integers in JavaScript?
+
+Converting between Roman numerals and integers is one of the most frequently asked practical coding interview challenges.
+
+#### 1. Integer to Roman Numeral (`intToRoman`)
+Using a **Greedy Algorithm** with a descending ordered list of Roman numeral symbols and their values (including the 6 subtractive edge cases: `IV`, `IX`, `XL`, `XC`, `CD`, `CM`):
+
+```javascript
+function intToRoman(num) {
+  const romanMap = [
+    [1000, "M"],
+    [900, "CM"],
+    [500, "D"],
+    [400, "CD"],
+    [100, "C"],
+    [90, "XC"],
+    [50, "L"],
+    [40, "XL"],
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"]
+  ];
+
+  let result = "";
+
+  for (const [val, symbol] of romanMap) {
+    if (num === 0) break;
+    const count = Math.floor(num / val);
+    if (count > 0) {
+      result += symbol.repeat(count);
+      num %= val;
+    }
+  }
+
+  return result;
+}
+
+console.log(intToRoman(1994)); // "MCMXCIV" (1000=M, 900=CM, 90=XC, 4=IV)
+console.log(intToRoman(58));   // "LVIII"   (50=L, 8=VIII)
+```
+
+#### 2. Roman Numeral to Integer (`romanToInt`)
+Traverse the string from left to right. If the current Roman symbol has a smaller value than the next symbol, subtract it; otherwise, add it:
+
+```javascript
+function romanToInt(s) {
+  const values = {
+    I: 1,
+    V: 5,
+    X: 10,
+    L: 50,
+    C: 100,
+    D: 500,
+    M: 1000
+  };
+
+  let total = 0;
+
+  for (let i = 0; i < s.length; i++) {
+    const current = values[s[i]];
+    const next = values[s[i + 1]];
+
+    // If a smaller value precedes a larger value, subtract it (e.g., IV = 5 - 1 = 4)
+    if (next && current < next) {
+      total -= current;
+    } else {
+      total += current;
+    }
+  }
+
+  return total;
+}
+
+console.log(romanToInt("MCMXCIV")); // 1994
+console.log(romanToInt("LVIII"));   // 58
+```
+
+#### Complexity Analysis:
+- **Time Complexity**: $\mathcal{O}(1)$ — Roman numbers are constrained between $1$ and $3999$ with a maximum length of 15 characters.
+- **Space Complexity**: $\mathcal{O}(1)$ lookup tables.
+
+
+### 525. How do you convert strings between camelCase, snake_case, and kebab-case in JavaScript?
+
+Fullstack and frontend engineers frequently receive `snake_case` payloads from backends (Python, Go, PostgreSQL) and need to transform them to `camelCase` for client models, or transform them to `kebab-case` for CSS class names and URL slugs.
+
+#### 1. Universal `toCamelCase` (handles snake_case and kebab-case)
+```javascript
+function toCamelCase(str) {
+  return str
+    .trim()
+    .replace(/[-_\s]+(.)?/g, (_, char) => (char ? char.toUpperCase() : ''));
+}
+
+console.log(toCamelCase("user_first_name")); // "userFirstName"
+console.log(toCamelCase("user-billing-id")); // "userBillingId"
+console.log(toCamelCase("created_at_timestamp")); // "createdAtTimestamp"
+```
+
+#### 2. `toSnakeCase` and `toKebabCase`
+```javascript
+function toSnakeCase(str) {
+  return str
+    .trim()
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/[-\s]+/g, '_')
+    .toLowerCase();
+}
+
+function toKebabCase(str) {
+  return str
+    .trim()
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/[_\s]+/g, '-')
+    .toLowerCase();
+}
+
+console.log(toSnakeCase("userFirstName")); // "user_first_name"
+console.log(toKebabCase("userFirstName")); // "user-first-name"
+```
+
+#### 3. Deep Object Keys Converter (Real-World Interview Question)
+Interviewers often ask: *"Write a recursive function that converts all keys of a nested API response object from `snake_case` to `camelCase`"*:
+
+```javascript
+function camelizeKeys(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map(item => camelizeKeys(item));
+  }
+  if (obj !== null && typeof obj === 'object' && !(obj instanceof Date) && !(obj instanceof RegExp)) {
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = key.replace(/_([a-z0-9])/gi, (_, char) => char.toUpperCase());
+      acc[camelKey] = camelizeKeys(obj[key]);
+      return acc;
+    }, {});
+  }
+  return obj;
+}
+
+const apiResponse = {
+  user_id: 101,
+  billing_details: {
+    card_type: "visa",
+    card_last_four: "4242"
+  },
+  order_history: [
+    { order_id: 1, total_amount: 99.99 }
+  ]
+};
+
+console.log(camelizeKeys(apiResponse));
+/* Output:
+{
+  userId: 101,
+  billingDetails: {
+    cardType: "visa",
+    cardLastFour: "4242"
+  },
+  orderHistory: [
+    { orderId: 1, totalAmount: 99.99 }
+  ]
+}
+*/
+```
+
+
+### 526. How do you implement Run-Length Encoding (RLE) string compression and decompression?
+
+Run-Length Encoding (RLE) is a lossless data compression algorithm where consecutive repeated characters are replaced by the character and its frequency count (e.g., `"aabcccccaaa"` → `"a2b1c5a3"`).
+
+#### 1. Compression (`compressString`)
+```javascript
+function compressString(str) {
+  if (!str) return "";
+
+  let compressed = "";
+  let count = 1;
+
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === str[i + 1]) {
+      count++;
+    } else {
+      compressed += str[i] + count;
+      count = 1;
+    }
+  }
+
+  // Interview rule: if compressed string is not shorter than original, return original
+  return compressed.length < str.length ? compressed : str;
+}
+
+console.log(compressString("aabcccccaaa")); // "a2b1c5a3"
+console.log(compressString("abcdef"));       // "abcdef" (compression adds overhead, returns original)
+```
+
+#### 2. Decompression (`decompressString`)
+```javascript
+function decompressString(compressedStr) {
+  if (!compressedStr) return "";
+
+  let result = "";
+  let i = 0;
+
+  while (i < compressedStr.length) {
+    const char = compressedStr[i];
+    i++;
+
+    // Extract multi-digit counts (e.g., "a12")
+    let countStr = "";
+    while (i < compressedStr.length && /\d/.test(compressedStr[i])) {
+      countStr += compressedStr[i];
+      i++;
+    }
+
+    const count = parseInt(countStr, 10);
+    result += char.repeat(count);
+  }
+
+  return result;
+}
+
+console.log(decompressString("a2b1c5a3")); // "aabcccccaaa"
+```
+
+#### Complexity:
+- **Time Complexity**: $\mathcal{O}(N)$ where $N$ is string length.
+- **Space Complexity**: $\mathcal{O}(N)$ to store the compressed/decompressed output.
+
+
+### 527. How do you deeply flatten and unflatten a nested JavaScript object with dot notation?
+
+A classic frontend machine-coding interview question testing recursion, object traversal, and nested reference construction.
+
+#### 1. Flattening an Object (`flattenObject`)
+Given a deeply nested object, transform it into a single-level object whose keys represent property paths separated by dots (`.`):
+
+```javascript
+function flattenObject(obj, prefix = '', result = {}) {
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey = prefix ? `${prefix}.${key}` : key;
+
+    if (
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      Object.keys(value).length > 0
+    ) {
+      flattenObject(value, newKey, result);
+    } else {
+      result[newKey] = value;
+    }
+  }
+  return result;
+}
+
+const user = {
+  name: "Sarah",
+  address: {
+    city: "San Francisco",
+    coordinates: {
+      lat: 37.7749,
+      lng: -122.4194
+    }
+  },
+  roles: ["admin", "editor"]
+};
+
+console.log(flattenObject(user));
+/* Output:
+{
+  "name": "Sarah",
+  "address.city": "San Francisco",
+  "address.coordinates.lat": 37.7749,
+  "address.coordinates.lng": -122.4194,
+  "roles": ["admin", "editor"]
+}
+*/
+```
+
+#### 2. Unflattening an Object (`unflattenObject`)
+The inverse operation: reconstructing the nested tree structure from dot-notation keys:
+
+```javascript
+function unflattenObject(flatObj) {
+  const result = {};
+
+  for (const [keyPath, value] of Object.entries(flatObj)) {
+    const keys = keyPath.split('.');
+    let current = result;
+
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+
+      if (i === keys.length - 1) {
+        current[key] = value;
+      } else {
+        if (!current[key] || typeof current[key] !== 'object') {
+          current[key] = {};
+        }
+        current = current[key];
+      }
+    }
+  }
+
+  return result;
+}
+
+const flat = {
+  "name": "Sarah",
+  "address.city": "San Francisco",
+  "address.coordinates.lat": 37.7749
+};
+
+console.log(unflattenObject(flat));
+// { name: "Sarah", address: { city: "San Francisco", coordinates: { lat: 37.7749 } } }
+```
+
+
+### 528. How do you format large numbers with compact metric suffixes (e.g., 1.2K, 3.4M) without external libraries?
+
+Social platforms (YouTube views, GitHub stars, Twitter followers) display abbreviated numbers (e.g., `1200` → `"1.2K"`, `1500000` → `"1.5M"`).
+
+#### 1. Native Modern Solution: `Intl.NumberFormat`
+```javascript
+function formatCompactNative(num) {
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    compactDisplay: 'short',
+    maximumFractionDigits: 1
+  }).format(num);
+}
+
+console.log(formatCompactNative(1250));        // "1.3K"
+console.log(formatCompactNative(1500000));     // "1.5M"
+console.log(formatCompactNative(2400000000));  // "2.4B"
+```
+
+#### 2. Custom Polyfill / Algorithm (Frequently Tested in Coding Screens)
+When interviewers require implementing this manually without `Intl.NumberFormat`:
+
+```javascript
+function formatCompactManual(num, decimals = 1) {
+  if (num === 0) return "0";
+
+  const isNegative = num < 0;
+  const absNum = Math.abs(num);
+
+  if (absNum < 1000) return (isNegative ? "-" : "") + absNum;
+
+  const suffixes = ["", "K", "M", "B", "T"];
+  // Determine exponent tier (0 for <1K, 1 for K, 2 for M, 3 for B, etc.)
+  const tier = Math.floor(Math.log10(absNum) / 3);
+
+  // Clamp tier to maximum available suffix
+  const actualTier = Math.min(tier, suffixes.length - 1);
+  const scale = Math.pow(10, actualTier * 3);
+  const scaledNum = absNum / scale;
+
+  // Format to decimal places and remove trailing zero if integer (e.g. 1.0K -> 1K)
+  const formatted = scaledNum.toFixed(decimals).replace(/\.0$/, "");
+  const result = formatted + suffixes[actualTier];
+
+  return isNegative ? `-${result}` : result;
+}
+
+console.log(formatCompactManual(999));        // "999"
+console.log(formatCompactManual(1200));       // "1.2K"
+console.log(formatCompactManual(1000000));    // "1M"
+console.log(formatCompactManual(2550000, 2)); // "2.55M"
+console.log(formatCompactManual(-54300));     // "-54.3K"
+```
 
 <!-- QUESTIONS_END -->
 

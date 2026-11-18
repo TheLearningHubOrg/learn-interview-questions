@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame, Sparkles, FileText } from 'lucide-react';
+import { BookOpen, Search, Layers, Menu, X, ChevronRight, ExternalLink, Bookmark, Flame, Sparkles, FileText, Cpu } from 'lucide-react';
 import { GithubIcon } from './GithubIcon';
 import { ThemeToggle } from './ThemeToggle';
 import { TRACKS } from '@/lib/tracks-meta';
 import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
 import { getStudyStreak, StudyStreakData, STREAK_UPDATE_EVENT } from '@/lib/study-streak';
+import { getSelectedTechSlugs, TECH_STACK_UPDATE_EVENT } from '@/lib/tech-stack';
 import { StreakModal } from './StreakModal';
 
 interface HeaderProps {
@@ -18,6 +19,7 @@ interface HeaderProps {
 export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [bookmarkCount, setBookmarkCount] = useState<number>(0);
+  const [selectedTechCount, setSelectedTechCount] = useState<number>(0);
   const [streakData, setStreakData] = useState<StudyStreakData>({
     currentStreak: 0,
     longestStreak: 0,
@@ -32,16 +34,19 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
     const refresh = () => {
       setBookmarkCount(getAllBookmarks().length);
       setStreakData(getStudyStreak());
+      setSelectedTechCount(getSelectedTechSlugs().length);
     };
 
     refresh();
     window.addEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
     window.addEventListener(STREAK_UPDATE_EVENT, refresh);
+    window.addEventListener(TECH_STACK_UPDATE_EVENT, refresh);
     window.addEventListener('storage', refresh);
 
     return () => {
       window.removeEventListener(BOOKMARKS_UPDATE_EVENT, refresh);
       window.removeEventListener(STREAK_UPDATE_EVENT, refresh);
+      window.removeEventListener(TECH_STACK_UPDATE_EVENT, refresh);
       window.removeEventListener('storage', refresh);
     };
   }, []);
@@ -146,6 +151,25 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
             >
               <FileText className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
               <span>Cheatsheet</span>
+            </Link>
+
+            {/* Desktop My Stack Filter Button */}
+            <Link
+              href="/cheatsheet"
+              className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all shrink-0 ${
+                selectedTechCount > 0
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-card border-border hover:border-purple-400/50'
+              }`}
+              title="Filter question bank by your interview tech stack"
+            >
+              <Cpu className="h-3.5 w-3.5" />
+              <span>My Stack</span>
+              {selectedTechCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-white text-purple-700 leading-none">
+                  {selectedTechCount}
+                </span>
+              )}
             </Link>
 
             {/* Daily Study Streak Counter */}
@@ -278,13 +302,36 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               <Link
                 href="/cheatsheet"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-2.5 rounded-xl bg-purple-600/15 border border-purple-500/30 text-purple-700 dark:text-purple-300 text-sm font-bold shadow-xs active:scale-95 transition-all"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 mb-2 rounded-xl bg-purple-600/15 border border-purple-500/30 text-purple-700 dark:text-purple-300 text-sm font-bold shadow-xs active:scale-95 transition-all"
               >
                 <div className="flex items-center gap-2.5">
                   <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   <span>Revision Cheatsheet (Print / PDF)</span>
                 </div>
                 <ChevronRight className="h-4 w-4 text-purple-500" />
+              </Link>
+
+              {/* Mobile My Stack Filter in Drawer */}
+              <Link
+                href="/cheatsheet"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 mb-2.5 rounded-xl text-sm font-bold shadow-xs active:scale-95 transition-all border ${
+                  selectedTechCount > 0
+                    ? 'bg-purple-600 text-white border-purple-600'
+                    : 'bg-card border-border text-foreground hover:bg-card-hover'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Cpu className="h-4 w-4" />
+                  <span>My Tech Stack Filter</span>
+                </div>
+                {selectedTechCount > 0 ? (
+                  <span className="px-2 py-0.5 rounded-full text-xs font-black bg-white text-purple-700">
+                    {selectedTechCount} Active
+                  </span>
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
               </Link>
 
               {/* Mobile Daily Streak in Drawer */}

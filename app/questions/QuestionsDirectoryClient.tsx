@@ -24,6 +24,8 @@ import {
   BOOKMARKS_UPDATE_EVENT,
   STUDY_PROGRESS_UPDATE_EVENT 
 } from '@/lib/study-progress';
+import { TechStackSelector } from '@/components/TechStackSelector';
+import { getSelectedTechSlugs, setSelectedTechSlugs, TECH_STACK_UPDATE_EVENT } from '@/lib/tech-stack';
 
 interface QuestionsDirectoryClientProps {
   initialItems: QuestionIndexItem[];
@@ -39,6 +41,9 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
   const [statusFilter, setStatusFilter] = useState<'all' | 'studied' | 'bookmarked'>('all');
   const [pageSize, setPageSize] = useState<number>(40);
 
+  // Selected technologies from tech stack filter
+  const [selectedTechSlugs, setSelectedTechSlugsState] = useState<string[]>([]);
+
   // Local state for bookmarks and studied questions
   const [bookmarkedSet, setBookmarkedSet] = useState<Set<string>>(new Set());
   const [studiedSet, setStudiedSet] = useState<Set<string>>(new Set());
@@ -49,6 +54,9 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
       const allB = getAllBookmarks();
       const bSet = new Set(allB.map((b) => `${b.trackSlug}:${b.questionNumber}`));
       setBookmarkedSet(bSet);
+
+      // Load tech stack
+      setSelectedTechSlugsState(getSelectedTechSlugs());
 
       // Load studied items from localStorage
       const sSet = new Set<string>();
@@ -69,14 +77,21 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
     refreshState();
     window.addEventListener(BOOKMARKS_UPDATE_EVENT, refreshState);
     window.addEventListener(STUDY_PROGRESS_UPDATE_EVENT, refreshState);
+    window.addEventListener(TECH_STACK_UPDATE_EVENT, refreshState);
     window.addEventListener('storage', refreshState);
 
     return () => {
       window.removeEventListener(BOOKMARKS_UPDATE_EVENT, refreshState);
       window.removeEventListener(STUDY_PROGRESS_UPDATE_EVENT, refreshState);
+      window.removeEventListener(TECH_STACK_UPDATE_EVENT, refreshState);
       window.removeEventListener('storage', refreshState);
     };
   }, [tracks]);
+
+  const handleTechStackChange = (slugs: string[]) => {
+    setSelectedTechSlugsState(slugs);
+    setSelectedTechSlugs(slugs);
+  };
 
   // Track map for fast metadata lookup
   const trackMap = useMemo(() => {
@@ -90,6 +105,11 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
   // Dynamic filter pipeline
   const filteredItems = useMemo(() => {
     return initialItems.filter((item) => {
+      // 0. Personalized Tech Stack Filter (Multi-select)
+      if (selectedTechSlugs.length > 0 && !selectedTechSlugs.includes(item.trackSlug)) {
+        return false;
+      }
+
       // 1. Track filter
       if (selectedTrack !== 'all' && item.trackSlug !== selectedTrack) {
         return false;
@@ -132,6 +152,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
     });
   }, [
     initialItems, 
+    selectedTechSlugs,
     selectedTrack, 
     selectedLevel, 
     mostAskedOnly, 
@@ -145,13 +166,14 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
   // Reset pagination when any filter changes
   useEffect(() => {
     setPageSize(40);
-  }, [selectedTrack, selectedLevel, mostAskedOnly, hasCodeOnly, statusFilter, searchQuery]);
+  }, [selectedTechSlugs, selectedTrack, selectedLevel, mostAskedOnly, hasCodeOnly, statusFilter, searchQuery]);
 
   const pagedItems = useMemo(() => {
     return filteredItems.slice(0, pageSize);
   }, [filteredItems, pageSize]);
 
   const isFiltering = 
+    selectedTechSlugs.length > 0 ||
     selectedTrack !== 'all' || 
     selectedLevel !== 'all' || 
     mostAskedOnly || 
@@ -196,6 +218,11 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-muted text-foreground border border-border">
               13 Tracks
             </span>
+            {selectedTechSlugs.length > 0 && (
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-600 text-white">
+                {selectedTechSlugs.length} Techs Selected ({filteredItems.length} Qs)
+              </span>
+            )}
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">
@@ -206,6 +233,15 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
           </p>
         </div>
       </div>
+
+      {/* Interactive Personalized Interview Tech Stack Selector */}
+      <TechStackSelector
+        tracks={tracks}
+        selectedSlugs={selectedTechSlugs}
+        onChange={handleTechStackChange}
+        isCollapsible={true}
+        className="mb-8"
+      />
 
       {/* Multi-Filter Control Console */}
       <div className="p-4 sm:p-6 rounded-2xl bg-card border border-border mb-8 shadow-xs space-y-4">

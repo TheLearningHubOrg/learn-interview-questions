@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import { QuestionIndexItem, TrackMeta } from '@/lib/tracks-meta';
 import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
+import { TechStackSelector } from '@/components/TechStackSelector';
+import { getSelectedTechSlugs, setSelectedTechSlugs, TECH_STACK_UPDATE_EVENT } from '@/lib/tech-stack';
 
 interface CheatsheetClientProps {
   initialItems: QuestionIndexItem[];
@@ -41,6 +43,9 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
   const [copiedMarkdown, setCopiedMarkdown] = useState(false);
   const [activePreset, setActivePreset] = useState<CategoryPreset>('most-asked');
 
+  // Selected technologies from localStorage
+  const [selectedTechSlugs, setSelectedTechSlugsState] = useState<string[]>([]);
+
   // Bookmarks from localStorage
   const [bookmarkedSet, setBookmarkedSet] = useState<Set<string>>(new Set());
 
@@ -50,11 +55,13 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     const wasDark = document.documentElement.classList.contains('dark');
     if (wasDark) {
       document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
     }
 
     const restoreDark = () => {
       if (wasDark) {
         document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
       }
       window.removeEventListener('afterprint', restoreDark);
     };
@@ -62,7 +69,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     window.addEventListener('afterprint', restoreDark);
     setTimeout(() => {
       window.print();
-    }, 80);
+    }, 120);
   };
 
   useEffect(() => {
@@ -72,15 +79,48 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
       setBookmarkedSet(bSet);
     };
 
+    const refreshTechStack = () => {
+      setSelectedTechSlugsState(getSelectedTechSlugs());
+    };
+
     refreshBookmarks();
+    refreshTechStack();
+
     window.addEventListener(BOOKMARKS_UPDATE_EVENT, refreshBookmarks);
+    window.addEventListener(TECH_STACK_UPDATE_EVENT, refreshTechStack);
     window.addEventListener('storage', refreshBookmarks);
+    window.addEventListener('storage', refreshTechStack);
+
+    // Auto-remove dark mode when browser triggers native print (e.g. via Ctrl+P)
+    const handleBeforePrint = () => {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+    };
+    const handleAfterPrint = () => {
+      const theme = localStorage.getItem('interviewhub-theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+      }
+    };
+
+    window.addEventListener('beforeprint', handleBeforePrint);
+    window.addEventListener('afterprint', handleAfterPrint);
 
     return () => {
       window.removeEventListener(BOOKMARKS_UPDATE_EVENT, refreshBookmarks);
+      window.removeEventListener(TECH_STACK_UPDATE_EVENT, refreshTechStack);
       window.removeEventListener('storage', refreshBookmarks);
+      window.removeEventListener('storage', refreshTechStack);
+      window.removeEventListener('beforeprint', handleBeforePrint);
+      window.removeEventListener('afterprint', handleAfterPrint);
     };
   }, []);
+
+  const handleTechStackChange = (slugs: string[]) => {
+    setSelectedTechSlugsState(slugs);
+    setSelectedTechSlugs(slugs);
+  };
 
   const trackMap = useMemo(() => {
     const map = new Map<string, TrackMeta>();
@@ -117,15 +157,20 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     return initialItems.filter((item) => {
       const key = `${item.trackSlug}:${item.questionNumber}`;
 
+      // Personalized Tech Stack Filter (Multi-select)
+      if (selectedTechSlugs.length > 0 && !selectedTechSlugs.includes(item.trackSlug)) {
+        return false;
+      }
+
       // Preset domain filters
       if (activePreset === 'frontend') {
         if (!['javascript', 'react-nextjs', 'angular-ts'].includes(item.trackSlug)) return false;
       } else if (activePreset === 'backend') {
         if (!['nodejs', 'python', 'databases', 'aws'].includes(item.trackSlug)) return false;
       } else if (activePreset === 'systems') {
-        if (!['system-design', 'devops', 'web-security'].includes(item.trackSlug)) return false;
+        if (!['system-design', 'devops-kubernetes', 'web-security-owasp'].includes(item.trackSlug)) return false;
       } else if (activePreset === 'ai') {
-        if (item.trackSlug !== 'ai-engineering') return false;
+        if (item.trackSlug !== 'ai-engineering-llm') return false;
       } else if (activePreset === 'dsa') {
         if (item.trackSlug !== 'dsa') return false;
       } else if (activePreset === 'behavioral') {
@@ -166,6 +211,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     });
   }, [
     initialItems,
+    selectedTechSlugs,
     activePreset,
     selectedTrack,
     selectedLevel,
@@ -218,6 +264,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     selectedLevel !== 'all' ||
     mostAskedOnly ||
     bookmarkedOnly ||
+    selectedTechSlugs.length > 0 ||
     searchQuery.trim().length > 0;
 
   const handleResetFilters = () => {
@@ -232,24 +279,26 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
       {/* Printable Watermark Header (Only visible in Print / PDF mode) */}
-      <div className="hidden print:block mb-8 pb-4 border-b-2 border-slate-900 text-black">
+      <div className="hidden print:block mb-6 pb-3 border-b-2 border-slate-900 text-black">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-black">
+            <h1 className="text-xl font-black tracking-tight text-black">
               InterviewHub PRO — Rapid Technical Revision Cheatsheet
             </h1>
-            <p className="text-xs text-slate-600 mt-1">
-              https://learn-interview-questions.vercel.app/cheatsheet • 1,864+ Technical Interview Bank
+            <p className="text-[10px] text-slate-700 mt-0.5">
+              {selectedTechSlugs.length > 0
+                ? `Personalized Stack (${selectedTechSlugs.map(s => trackMap.get(s)?.shortTitle || s).join(', ')}) • https://learn-interview-questions.vercel.app`
+                : 'https://learn-interview-questions.vercel.app/cheatsheet • 1,864+ Technical Interview Bank'}
             </p>
           </div>
-          <div className="text-right text-xs text-slate-500 font-mono">
-            {filteredItems.length} Questions • {new Date().toLocaleDateString()}
+          <div className="text-right text-[10px] text-slate-700 font-mono">
+            <strong>{filteredItems.length} Questions</strong> • {new Date().toLocaleDateString()}
           </div>
         </div>
       </div>
 
       {/* Top Banner (Hidden in Print) */}
-      <div className="mb-8 print:hidden">
+      <div className="mb-6 print:hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-7 rounded-2xl bg-gradient-to-r from-purple-900/20 via-indigo-900/15 to-transparent border border-purple-500/20 shadow-sm">
           <div>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -260,6 +309,11 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
               <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border">
                 {filteredItems.length} Questions
               </span>
+              {selectedTechSlugs.length > 0 && (
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-600 text-white">
+                  {selectedTechSlugs.length} Techs Selected
+                </span>
+              )}
               {bookmarkedSet.size > 0 && (
                 <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25">
                   {bookmarkedSet.size} Saved
@@ -272,11 +326,11 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
             <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 max-w-2xl leading-relaxed font-medium">
               Crisp 1-line takeaways to skim through 50–100 core concepts in minutes. Ideal for your pre-interview commute or quick revision.
             </p>
-            <div className="mt-2.5 flex items-center gap-2 text-[11px] text-purple-700 dark:text-purple-300 font-medium">
+            <div className="mt-2.5 flex items-center gap-2 text-[11px] text-purple-700 dark:text-purple-300 font-medium flex-wrap">
               <span>💡 Print Estimate:</span>
               <span className="font-bold underline">{filteredItems.length} questions will print on ~{Math.max(1, Math.ceil(filteredItems.length / 14))} pages</span>
               <span>•</span>
-              <span className="text-muted-foreground">Select a Track or 'Most Asked' for a focused 4–8 page cheatsheet</span>
+              <span className="text-muted-foreground">Select your Tech Stack below or 'Most Asked' for a focused 3–6 page printable cheatsheet</span>
             </div>
           </div>
 
@@ -316,6 +370,15 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Interactive Personalized Interview Tech Stack Selector (Hidden in Print) */}
+      <div className="mb-6 print:hidden">
+        <TechStackSelector
+          tracks={tracks}
+          selectedSlugs={selectedTechSlugs}
+          onChange={handleTechStackChange}
+        />
       </div>
 
       {/* Quick Domain Presets (Hidden in Print) */}

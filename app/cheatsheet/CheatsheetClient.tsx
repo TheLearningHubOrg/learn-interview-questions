@@ -277,9 +277,9 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 print:p-0 print:m-0 print:max-w-none">
       {/* Printable Watermark Header (Only visible in Print / PDF mode) */}
-      <div className="hidden print:block mb-6 pb-3 border-b-2 border-slate-900 text-black">
+      <div className="hidden print:block mb-3 pb-2 border-b-2 border-slate-900 text-black">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-black tracking-tight text-black">
@@ -607,14 +607,14 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
           </button>
         </div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-10 print:space-y-4">
           {groupedByTrack.map(([trackSlug, items]) => {
             const track = trackMap.get(trackSlug);
 
             return (
-              <section key={trackSlug} className="space-y-3.5 print-page-break-avoid">
+              <section key={trackSlug} className="space-y-3.5 print:space-y-2">
                 {/* Track Group Header */}
-                <div className="flex items-center justify-between pb-2.5 border-b border-border">
+                <div className="flex items-center justify-between pb-2.5 border-b border-border print:pb-1 cheatsheet-section-header">
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <span className={`px-2.5 py-0.5 rounded text-xs font-bold border ${track?.badgeColor || 'bg-muted text-muted-foreground'}`}>
                       Section {track?.sectionNumber}

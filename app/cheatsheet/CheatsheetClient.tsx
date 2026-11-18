@@ -49,27 +49,10 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
   // Bookmarks from localStorage
   const [bookmarkedSet, setBookmarkedSet] = useState<Set<string>>(new Set());
 
-  // Bulletproof print handler that temporarily switches DOM to light mode
+  // Native print handler (keeps user on-screen theme intact, @media print handles paper styling)
   const handlePrint = () => {
     if (typeof window === 'undefined') return;
-    const wasDark = document.documentElement.classList.contains('dark');
-    if (wasDark) {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
-    }
-
-    const restoreDark = () => {
-      if (wasDark) {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-      }
-      window.removeEventListener('afterprint', restoreDark);
-    };
-
-    window.addEventListener('afterprint', restoreDark);
-    setTimeout(() => {
-      window.print();
-    }, 120);
+    window.print();
   };
 
   useEffect(() => {
@@ -91,29 +74,11 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     window.addEventListener('storage', refreshBookmarks);
     window.addEventListener('storage', refreshTechStack);
 
-    // Auto-remove dark mode when browser triggers native print (e.g. via Ctrl+P)
-    const handleBeforePrint = () => {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
-    };
-    const handleAfterPrint = () => {
-      const theme = localStorage.getItem('interviewhub-theme');
-      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-      }
-    };
-
-    window.addEventListener('beforeprint', handleBeforePrint);
-    window.addEventListener('afterprint', handleAfterPrint);
-
     return () => {
       window.removeEventListener(BOOKMARKS_UPDATE_EVENT, refreshBookmarks);
       window.removeEventListener(TECH_STACK_UPDATE_EVENT, refreshTechStack);
       window.removeEventListener('storage', refreshBookmarks);
       window.removeEventListener('storage', refreshTechStack);
-      window.removeEventListener('beforeprint', handleBeforePrint);
-      window.removeEventListener('afterprint', handleAfterPrint);
     };
   }, []);
 

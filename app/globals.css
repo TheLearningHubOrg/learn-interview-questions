@@ -461,6 +461,23 @@ code, pre, kbd {
     text-shadow: none !important;
   }
 
+  /* Guarantee light text and backgrounds even when html has .dark class */
+  html.dark *,
+  body.dark * {
+    color-scheme: light !important;
+  }
+
+  html.dark .dark\:text-foreground,
+  html.dark [class*="dark:text-"] {
+    color: #000000 !important;
+  }
+
+  html.dark .dark\:bg-card,
+  html.dark .dark\:bg-background,
+  html.dark [class*="dark:bg-"] {
+    background-color: transparent !important;
+  }
+
   body {
     font-size: 8.5pt !important;
     line-height: 1.35 !important;

@@ -9,10 +9,17 @@ export async function getAllTracks(): Promise<TrackMeta[]> {
 }
 
 const LEGACY_SLUG_MAP: Record<string, string> = {
+  'angular-ts': 'angular',
   'react-nextjs': 'react',
   'databases': 'sql-databases',
   'devops-kubernetes': 'kubernetes',
-  'modern-frameworks': 'vue-nuxt',
+  'modern-frameworks': 'vue',
+  'vue-nuxt': 'vue',
+  'svelte-astro': 'svelte',
+  'html-css': 'html',
+  'web-vitals-accessibility': 'web-vitals',
+  'cicd-gitops': 'cicd',
+  'data-warehousing-dbt': 'data-warehousing',
   'messaging-queues': 'rabbitmq',
   'terraform-iac': 'terraform',
   'cloud-gcp-azure': 'gcp',
@@ -22,7 +29,7 @@ const LEGACY_SLUG_MAP: Record<string, string> = {
   'search-vector-databases': 'elasticsearch',
   'linux-os-shell': 'linux-os',
   'design-patterns-ddd': 'design-patterns',
-  'html-css-web-vitals': 'html-css',
+  'html-css-web-vitals': 'html',
   'rust-systems': 'rust',
 };
 

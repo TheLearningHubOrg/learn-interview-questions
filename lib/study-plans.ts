@@ -564,8 +564,8 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'Zone.js, Angular Signals, Dependency Injection',
         questions: [
           {
-            trackSlug: 'angular-ts',
-            trackName: 'Angular & TypeScript',
+            trackSlug: 'angular',
+            trackName: 'Angular 19 & Signals',
             questionNumber: 17,
             day: 5,
             topic: 'Dependency Injection',
@@ -573,8 +573,8 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'angular-ts',
-            trackName: 'Angular & TypeScript',
+            trackSlug: 'angular',
+            trackName: 'Angular 19 & Signals',
             questionNumber: 243,
             day: 5,
             topic: 'NgZone & Change Detection',
@@ -582,8 +582,8 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'HIGH_YIELD',
           },
           {
-            trackSlug: 'angular-ts',
-            trackName: 'Angular & TypeScript',
+            trackSlug: 'angular',
+            trackName: 'Angular 19 & Signals',
             questionNumber: 280,
             day: 5,
             topic: 'Angular Signals',

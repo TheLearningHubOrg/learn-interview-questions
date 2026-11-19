@@ -11,7 +11,27 @@ interface SectionPageProps {
 
 export async function generateStaticParams() {
   const tracks = await getAllTracks();
-  return tracks.map((t) => ({ slug: t.slug }));
+  const legacySlugs = [
+    'react-nextjs',
+    'databases',
+    'devops-kubernetes',
+    'modern-frameworks',
+    'messaging-queues',
+    'terraform-iac',
+    'cloud-gcp-azure',
+    'mobile-development',
+    'testing-qa-sre',
+    'data-engineering-spark',
+    'search-vector-databases',
+    'linux-os-shell',
+    'design-patterns-ddd',
+    'html-css-web-vitals',
+    'rust-systems',
+  ];
+  return [
+    ...tracks.map((t) => ({ slug: t.slug })),
+    ...legacySlugs.map((slug) => ({ slug })),
+  ];
 }
 
 export async function generateMetadata({ params }: SectionPageProps): Promise<Metadata> {

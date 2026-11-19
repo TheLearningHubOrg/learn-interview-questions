@@ -7,10 +7,10 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://learn-interview-questions.vercel.app'),
   title: {
-    default: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (2,719+ Questions across 30 Tracks)',
+    default: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (2,400+ Questions across 50 Separated Tracks)',
     template: '%s | InterviewHub PRO',
   },
-  description: 'Comprehensive, production-tested engineering interview question bank with 2,719+ questions and answers across 30 specialized tracks covering Go 1.22+, Rust, PHP 8.3 & Laravel 11, Java 21, Spring Boot 3, .NET 8/9, C# 12, Mobile (React Native, Flutter, iOS, Android), Testing & SRE (Playwright, Vitest, k6, OpenTelemetry), Networking Protocols, Linux OS & Shell, Design Patterns, Data Engineering & Spark, Search & Vector DBs, GCP & Azure, Angular, React, Vue, Svelte, Astro, RabbitMQ, Kafka, Terraform, Kubernetes, System Design, AI Engineering, Web Security, Python, Node.js, Databases, AWS Cloud, and DSA.',
+  description: 'Comprehensive, production-tested engineering interview question bank with 2,400+ questions and answers across 50 specialized, fully separated tracks: React, Next.js, Angular, Vue, Svelte, Astro, JavaScript, TypeScript, HTML/CSS, Web Vitals, Go, Rust, Java, .NET, PHP, Python, Node.js, PostgreSQL, MySQL, SQL, MongoDB, Redis, DynamoDB, AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD, Linux, Bash, RabbitMQ, Kafka, Elasticsearch, Vector DBs, Spark, Data Warehousing, React Native, Flutter, iOS, Android, Testing, SRE, Networking, Design Patterns, DDD, System Design, Security, AI/LLM, and DSA.',
   keywords: [
     'interview questions',
     'javascript interview questions',

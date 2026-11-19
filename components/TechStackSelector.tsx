@@ -23,16 +23,31 @@ interface TechStackSelectorProps {
   isCollapsible?: boolean;
 }
 
-type CategoryType = 'all' | 'Frontend' | 'Backend' | 'Databases & Cache' | 'Messaging & Streaming' | 'Cloud, DevOps & IaC' | 'Architecture & Core';
+type CategoryType =
+  | 'all'
+  | 'Frontend'
+  | 'Backend'
+  | 'Mobile'
+  | 'Databases & Cache'
+  | 'Data Engineering'
+  | 'Messaging & Streaming'
+  | 'Cloud Platforms'
+  | 'DevOps & Systems'
+  | 'Testing & SRE'
+  | 'Architecture & Core';
 
 const CATEGORIES: { id: CategoryType; label: string; icon: string }[] = [
   { id: 'all', label: 'All Techs', icon: '⚡' },
   { id: 'Frontend', label: 'Frontend', icon: '⚛️' },
   { id: 'Backend', label: 'Backend', icon: '☕' },
+  { id: 'Mobile', label: 'Mobile', icon: '📱' },
   { id: 'Databases & Cache', label: 'Databases', icon: '🐘' },
+  { id: 'Data Engineering', label: 'Data Engineering', icon: '📊' },
   { id: 'Messaging & Streaming', label: 'Messaging', icon: '🐇' },
-  { id: 'Cloud, DevOps & IaC', label: 'DevOps & IaC', icon: '☸️' },
-  { id: 'Architecture & Core', label: 'Architecture & Core', icon: '🏗️' },
+  { id: 'Cloud Platforms', label: 'Cloud Platforms', icon: '☁️' },
+  { id: 'DevOps & Systems', label: 'DevOps & Linux', icon: '☸️' },
+  { id: 'Testing & SRE', label: 'Testing & SRE', icon: '🧪' },
+  { id: 'Architecture & Core', label: 'Architecture & DSA', icon: '🏗️' },
 ];
 
 export function TechStackSelector({

@@ -1,4 +1,4 @@
-# Rust Systems Programming, Concurrency & High-Performance Web Services Master Interview Question Bank (1 - 50)
+# Rust Systems Programming, Concurrency & High-Performance Web Services Master Interview Question Bank (1 - 15)
 
 > Comprehensive, production-grade technical interview questions and architectural deep-dives covering Rust (Ownership, Borrow Checker, Lifetimes, Smart Pointers, Tokio Async Runtime, Axum Web, Fearless Concurrency, and Zero-Cost Abstractions).
 
@@ -145,3 +145,28 @@ async fn main() {
 5. Accessing fields of a `union`.
 
 *Justification*: Building foundational high-performance primitives (e.g. `Vec`, `Arc`, hardware drivers, OS kernels). Safe Rust code wraps unsafe primitives in a bulletproof, 100% safe public API!
+
+### 12. Rust Lifetimes and Elision Rules.
+**In Simple Words:**
+Every reference in Rust has a **lifetime** specifying the scope for which that reference is valid.
+- The borrow checker verifies that data does not outlive its owner (preventing dangling pointers).
+- **Lifetime Elision**: The compiler automatically assigns lifetimes to function parameters and return values in standard patterns (e.g. 1 input reference -> output shares its lifetime). Complex cases with multiple references require explicit generic lifetime annotations: `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`.
+
+### 13. Rust Smart Pointers: Box vs. Rc vs. Arc vs. RefCell.
+**In Simple Words:**
+1. **`Box<T>`**: Allocates memory on the heap; single owner. Used for recursive types and transferring large structs without copying.
+2. **`Rc<T>`**: Reference-counting pointer for single-threaded multiple ownership. Deallocates when ref count reaches zero.
+3. **`Arc<T>`**: Atomic Reference Counting pointer. Safe to share across threads using atomic operations.
+4. **`RefCell<T>`**: Provides interior mutability; enforces borrowing rules at runtime instead of compile time.
+
+### 14. Tokio Async Runtime and the Axum Web Framework.
+**In Simple Words:**
+- **Tokio**: A multi-threaded work-stealing async executor in Rust. When an I/O operation (socket read, DB query) yields, the OS thread switches immediately to execute other tasks without blocking.
+- **Axum**: High-performance modular web framework built on Tokio, Tower (middleware service abstraction), and Hyper (HTTP/1 and HTTP/2 engine). Provides zero-cost type-safe request routing.
+
+### 15. Rust Concurrency: Send and Sync Traits.
+**In Simple Words:**
+- **`Send`**: Indicates ownership of the type can be transferred safely across thread boundaries.
+- **`Sync`**: Indicates it is safe to share references to the type (`&T`) across multiple threads simultaneously (`T` is `Sync` if and only if `&T` is `Send`).
+- Types like `Rc<T>` are neither `Send` nor `Sync` because ref count increments are non-atomic.
+

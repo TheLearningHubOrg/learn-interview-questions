@@ -27,6 +27,8 @@ import {
   Search,
   Smartphone,
   Activity,
+  Zap,
+  Gauge,
   ArrowRight,
   Play,
   List,
@@ -61,6 +63,8 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Search,
   Smartphone,
   Activity,
+  Zap,
+  Gauge,
 };
 
 interface TrackCardProps {

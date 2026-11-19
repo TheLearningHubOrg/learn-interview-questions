@@ -8,8 +8,27 @@ export async function getAllTracks(): Promise<TrackMeta[]> {
   return TRACKS;
 }
 
+const LEGACY_SLUG_MAP: Record<string, string> = {
+  'react-nextjs': 'react',
+  'databases': 'sql-databases',
+  'devops-kubernetes': 'kubernetes',
+  'modern-frameworks': 'vue-nuxt',
+  'messaging-queues': 'rabbitmq',
+  'terraform-iac': 'terraform',
+  'cloud-gcp-azure': 'gcp',
+  'mobile-development': 'react-native',
+  'testing-qa-sre': 'software-testing',
+  'data-engineering-spark': 'apache-spark',
+  'search-vector-databases': 'elasticsearch',
+  'linux-os-shell': 'linux-os',
+  'design-patterns-ddd': 'design-patterns',
+  'html-css-web-vitals': 'html-css',
+  'rust-systems': 'rust',
+};
+
 export async function getTrackBySlug(slug: string): Promise<TrackMeta | undefined> {
-  return TRACKS.find((t) => t.slug === slug);
+  const mappedSlug = LEGACY_SLUG_MAP[slug] || slug;
+  return TRACKS.find((t) => t.slug === mappedSlug);
 }
 
 export async function getTrackContent(filename: string): Promise<string> {

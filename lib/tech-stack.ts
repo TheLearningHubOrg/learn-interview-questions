@@ -14,67 +14,84 @@ export interface RolePreset {
 export interface GranularTech {
   slug: string;
   name: string;
-  category: 'Frontend' | 'Backend' | 'Databases & Cache' | 'Messaging & Streaming' | 'Cloud, DevOps & IaC' | 'Architecture & Core';
+  category: 'Frontend' | 'Backend' | 'Mobile' | 'Databases & Cache' | 'Data Engineering' | 'Messaging & Streaming' | 'Cloud Platforms' | 'DevOps & Systems' | 'Testing & SRE' | 'Architecture & Core';
   icon: string;
   approxQuestionCount: number;
 }
 
 export const GRANULAR_TECHS: GranularTech[] = [
   // 1. Frontend Frameworks & Languages
-  { slug: 'react', name: 'React Core & Hooks', category: 'Frontend', icon: '⚛️', approxQuestionCount: 408 },
-  { slug: 'nextjs', name: 'Next.js & Full-Stack RSC', category: 'Frontend', icon: '▲', approxQuestionCount: 37 },
+  { slug: 'react', name: 'React Core & Hooks', category: 'Frontend', icon: '⚛️', approxQuestionCount: 407 },
+  { slug: 'nextjs', name: 'Next.js & Server Actions', category: 'Frontend', icon: '▲', approxQuestionCount: 37 },
   { slug: 'angular-ts', name: 'Angular 19 & Signals', category: 'Frontend', icon: '🅰️', approxQuestionCount: 283 },
-  { slug: 'typescript', name: 'TypeScript & Typings', category: 'Frontend', icon: '🔷', approxQuestionCount: 65 },
-  { slug: 'vue-nuxt', name: 'Vue 3 & Nuxt 3', category: 'Frontend', icon: '💚', approxQuestionCount: 20 },
-  { slug: 'astro', name: 'Astro (Islands & Zero-JS)', category: 'Frontend', icon: '🚀', approxQuestionCount: 15 },
-  { slug: 'svelte', name: 'Svelte 5 & SvelteKit', category: 'Frontend', icon: '🧡', approxQuestionCount: 15 },
-  { slug: 'html-css-web-vitals', name: 'HTML5, CSS & Web Vitals', category: 'Frontend', icon: '🎨', approxQuestionCount: 50 },
-  { slug: 'mobile-development', name: 'Mobile (RN, Flutter, iOS, Android)', category: 'Frontend', icon: '📱', approxQuestionCount: 50 },
-  { slug: 'javascript', name: 'Core JavaScript & Web', category: 'Frontend', icon: '🟨', approxQuestionCount: 536 },
+  { slug: 'typescript', name: 'TypeScript & Typings', category: 'Frontend', icon: '🔷', approxQuestionCount: 50 },
+  { slug: 'vue-nuxt', name: 'Vue 3 & Nuxt 3', category: 'Frontend', icon: '💚', approxQuestionCount: 17 },
+  { slug: 'svelte-astro', name: 'Svelte 5 & Astro', category: 'Frontend', icon: '🧡', approxQuestionCount: 33 },
+  { slug: 'javascript', name: 'Core JavaScript Internals', category: 'Frontend', icon: '🟨', approxQuestionCount: 536 },
+  { slug: 'html-css', name: 'Modern HTML5 & CSS3', category: 'Frontend', icon: '🎨', approxQuestionCount: 15 },
+  { slug: 'web-vitals-accessibility', name: 'Web Vitals & Accessibility', category: 'Frontend', icon: '♿', approxQuestionCount: 12 },
 
   // 2. Backend & Microservices
   { slug: 'golang', name: 'Go (Golang) & Concurrency', category: 'Backend', icon: '🐹', approxQuestionCount: 50 },
-  { slug: 'rust-systems', name: 'Rust & Systems Programming', category: 'Backend', icon: '🦀', approxQuestionCount: 50 },
+  { slug: 'rust', name: 'Rust & Systems Programming', category: 'Backend', icon: '🦀', approxQuestionCount: 15 },
   { slug: 'java-spring', name: 'Java 21 & Spring Boot 3', category: 'Backend', icon: '☕', approxQuestionCount: 50 },
   { slug: 'dotnet-csharp', name: '.NET 8/9 & C# 12', category: 'Backend', icon: '🔷', approxQuestionCount: 50 },
-  { slug: 'php-laravel', name: 'PHP 8.3 & Laravel 11', category: 'Backend', icon: '🐘', approxQuestionCount: 50 },
-  { slug: 'nodejs', name: 'Node.js & Express', category: 'Backend', icon: '🟩', approxQuestionCount: 60 },
+  { slug: 'php-laravel', name: 'PHP 8.3 & Laravel 11', category: 'Backend', icon: '🐘', approxQuestionCount: 15 },
+  { slug: 'nodejs', name: 'Node.js & Event Loop', category: 'Backend', icon: '🟩', approxQuestionCount: 60 },
   { slug: 'python', name: 'Python & FastAPI', category: 'Backend', icon: '🐍', approxQuestionCount: 65 },
   { slug: 'rest-api', name: 'REST APIs & HTTP', category: 'Backend', icon: '🌐', approxQuestionCount: 25 },
   { slug: 'graphql', name: 'GraphQL & Resolvers', category: 'Backend', icon: '🌸', approxQuestionCount: 15 },
   { slug: 'grpc', name: 'gRPC & Protocol Buffers', category: 'Backend', icon: '📡', approxQuestionCount: 15 },
 
-  // 3. Databases & In-Memory Caching (Explicitly Separated!)
-  { slug: 'postgresql', name: 'PostgreSQL', category: 'Databases & Cache', icon: '🐘', approxQuestionCount: 20 },
-  { slug: 'mysql', name: 'MySQL & InnoDB', category: 'Databases & Cache', icon: '🐬', approxQuestionCount: 15 },
-  { slug: 'sql', name: 'Relational SQL & DB Design', category: 'Databases & Cache', icon: '📊', approxQuestionCount: 25 },
-  { slug: 'mongodb', name: 'MongoDB & Document NoSQL', category: 'Databases & Cache', icon: '🍃', approxQuestionCount: 15 },
-  { slug: 'dynamodb', name: 'DynamoDB (AWS NoSQL)', category: 'Databases & Cache', icon: '⚡', approxQuestionCount: 10 },
-  { slug: 'redis', name: 'Redis & In-Memory Caching', category: 'Databases & Cache', icon: '⚡', approxQuestionCount: 15 },
-  { slug: 'search-vector-databases', name: 'Search & Vector DBs (ES/Pinecone)', category: 'Databases & Cache', icon: '🔍', approxQuestionCount: 50 },
-  { slug: 'data-engineering-spark', name: 'Data Engineering & Spark', category: 'Databases & Cache', icon: '📊', approxQuestionCount: 50 },
+  // 3. Mobile Engineering (Completely Separated!)
+  { slug: 'react-native', name: 'React Native & Expo', category: 'Mobile', icon: '📱', approxQuestionCount: 15 },
+  { slug: 'flutter', name: 'Flutter & Dart Engine', category: 'Mobile', icon: '💙', approxQuestionCount: 15 },
+  { slug: 'ios-swift', name: 'Native iOS & Swift 6', category: 'Mobile', icon: '🍎', approxQuestionCount: 11 },
+  { slug: 'android-kotlin', name: 'Native Android & Kotlin', category: 'Mobile', icon: '🤖', approxQuestionCount: 9 },
 
-  // 4. Messaging & Event Streaming
-  { slug: 'rabbitmq', name: 'RabbitMQ & AMQP', category: 'Messaging & Streaming', icon: '🐇', approxQuestionCount: 25 },
-  { slug: 'kafka', name: 'Apache Kafka & Streaming', category: 'Messaging & Streaming', icon: '🪵', approxQuestionCount: 25 },
+  // 4. Databases & In-Memory Caching (Completely Separated!)
+  { slug: 'postgresql', name: 'PostgreSQL Advanced', category: 'Databases & Cache', icon: '🐘', approxQuestionCount: 15 },
+  { slug: 'mysql', name: 'MySQL & InnoDB Engine', category: 'Databases & Cache', icon: '🐬', approxQuestionCount: 10 },
+  { slug: 'sql-databases', name: 'Relational SQL & DB Design', category: 'Databases & Cache', icon: '📊', approxQuestionCount: 17 },
+  { slug: 'mongodb', name: 'MongoDB & Document NoSQL', category: 'Databases & Cache', icon: '🍃', approxQuestionCount: 12 },
+  { slug: 'dynamodb', name: 'DynamoDB Key-Value NoSQL', category: 'Databases & Cache', icon: '⚡', approxQuestionCount: 6 },
+  { slug: 'redis', name: 'Redis & Distributed Cache', category: 'Databases & Cache', icon: '⚡', approxQuestionCount: 11 },
+  { slug: 'elasticsearch', name: 'Elasticsearch & Search Engines', category: 'Databases & Cache', icon: '🔍', approxQuestionCount: 7 },
+  { slug: 'vector-databases', name: 'Vector Databases & RAG', category: 'Databases & Cache', icon: '🧠', approxQuestionCount: 6 },
 
-  // 5. Cloud, DevOps & Infrastructure as Code (IaC)
-  { slug: 'terraform', name: 'Terraform & OpenTofu (IaC)', category: 'Cloud, DevOps & IaC', icon: '🟣', approxQuestionCount: 40 },
-  { slug: 'kubernetes', name: 'Kubernetes (K8s) & GitOps', category: 'Cloud, DevOps & IaC', icon: '☸️', approxQuestionCount: 35 },
-  { slug: 'docker', name: 'Docker & Containers', category: 'Cloud, DevOps & IaC', icon: '🐳', approxQuestionCount: 10 },
-  { slug: 'cicd', name: 'CI/CD & GitHub Actions', category: 'Cloud, DevOps & IaC', icon: '🔄', approxQuestionCount: 15 },
-  { slug: 'linux-os-shell', name: 'Linux OS & Shell Mastery', category: 'Cloud, DevOps & IaC', icon: '🐧', approxQuestionCount: 50 },
-  { slug: 'testing-qa-sre', name: 'Testing, QA Automation & SRE', category: 'Cloud, DevOps & IaC', icon: '🧪', approxQuestionCount: 50 },
-  { slug: 'aws', name: 'AWS Cloud Architecture', category: 'Cloud, DevOps & IaC', icon: '☁️', approxQuestionCount: 65 },
-  { slug: 'cloud-gcp-azure', name: 'GCP & Azure Cloud', category: 'Cloud, DevOps & IaC', icon: '☁️', approxQuestionCount: 50 },
+  // 5. Data Engineering & Big Data (Completely Separated!)
+  { slug: 'apache-spark', name: 'Apache Spark & PySpark', category: 'Data Engineering', icon: '💥', approxQuestionCount: 9 },
+  { slug: 'data-warehousing', name: 'Snowflake, BigQuery & dbt', category: 'Data Engineering', icon: '❄️', approxQuestionCount: 8 },
 
-  // 6. Architecture, Security & Core Engineering
-  { slug: 'networking-protocols', name: 'Networking & Web Protocols', category: 'Architecture & Core', icon: '🌐', approxQuestionCount: 50 },
-  { slug: 'design-patterns-ddd', name: 'Design Patterns, SOLID & DDD', category: 'Architecture & Core', icon: '🏛️', approxQuestionCount: 50 },
-  { slug: 'system-design', name: 'System Design & Distributed Systems', category: 'Architecture & Core', icon: '🏗️', approxQuestionCount: 50 },
+  // 6. Messaging & Event Streaming (Completely Separated!)
+  { slug: 'rabbitmq', name: 'RabbitMQ & AMQP Broker', category: 'Messaging & Streaming', icon: '🐇', approxQuestionCount: 25 },
+  { slug: 'kafka', name: 'Apache Kafka & Event Streaming', category: 'Messaging & Streaming', icon: '🪵', approxQuestionCount: 24 },
+
+  // 7. Cloud Platforms (Completely Separated!)
+  { slug: 'aws', name: 'AWS Cloud Architecture', category: 'Cloud Platforms', icon: '☁️', approxQuestionCount: 65 },
+  { slug: 'gcp', name: 'Google Cloud Platform (GCP)', category: 'Cloud Platforms', icon: '🌐', approxQuestionCount: 9 },
+  { slug: 'azure', name: 'Microsoft Azure Cloud', category: 'Cloud Platforms', icon: '🔷', approxQuestionCount: 7 },
+
+  // 8. DevOps, Containers & Systems (Completely Separated!)
+  { slug: 'docker', name: 'Docker & Containerization', category: 'DevOps & Systems', icon: '🐳', approxQuestionCount: 10 },
+  { slug: 'kubernetes', name: 'Kubernetes (K8s) Cloud Native', category: 'DevOps & Systems', icon: '☸️', approxQuestionCount: 25 },
+  { slug: 'terraform', name: 'Terraform & OpenTofu (IaC)', category: 'DevOps & Systems', icon: '🟣', approxQuestionCount: 50 },
+  { slug: 'cicd-gitops', name: 'CI/CD Pipelines & GitOps', category: 'DevOps & Systems', icon: '🔄', approxQuestionCount: 15 },
+  { slug: 'linux-os', name: 'Linux OS & Kernel Internals', category: 'DevOps & Systems', icon: '🐧', approxQuestionCount: 12 },
+  { slug: 'bash-shell', name: 'Bash & Shell Scripting', category: 'DevOps & Systems', icon: '💻', approxQuestionCount: 10 },
+
+  // 9. Testing & Site Reliability (Completely Separated!)
+  { slug: 'software-testing', name: 'Software Testing (Playwright/Vitest)', category: 'Testing & SRE', icon: '🧪', approxQuestionCount: 30 },
+  { slug: 'sre-observability', name: 'SRE, Prometheus & OpenTelemetry', category: 'Testing & SRE', icon: '📈', approxQuestionCount: 20 },
+
+  // 10. Architecture & Core Engineering (Completely Separated!)
+  { slug: 'networking-protocols', name: 'Networking & Web Protocols', category: 'Architecture & Core', icon: '🌐', approxQuestionCount: 25 },
+  { slug: 'design-patterns', name: 'GoF Design Patterns & SOLID', category: 'Architecture & Core', icon: '🏛️', approxQuestionCount: 10 },
+  { slug: 'domain-driven-design', name: 'Domain-Driven Design (DDD)', category: 'Architecture & Core', icon: '🧩', approxQuestionCount: 10 },
+  { slug: 'system-design', name: 'Large-Scale System Design', category: 'Architecture & Core', icon: '🏗️', approxQuestionCount: 50 },
   { slug: 'web-security-owasp', name: 'Web Security & OWASP Top 10', category: 'Architecture & Core', icon: '🛡️', approxQuestionCount: 50 },
-  { slug: 'ai-engineering-llm', name: 'AI Engineering & LLM Systems', category: 'Architecture & Core', icon: '🤖', approxQuestionCount: 50 },
-  { slug: 'dsa', name: 'DSA Patterns & Live Coding', category: 'Architecture & Core', icon: '🧩', approxQuestionCount: 100 },
+  { slug: 'ai-engineering-llm', name: 'AI Engineering & LLM Architecture', category: 'Architecture & Core', icon: '🤖', approxQuestionCount: 50 },
+  { slug: 'dsa', name: 'Data Structures & Algorithms', category: 'Architecture & Core', icon: '⚡', approxQuestionCount: 100 },
   { slug: 'behavioral-hr', name: 'Behavioral & Leadership (STAR)', category: 'Architecture & Core', icon: '🤝', approxQuestionCount: 50 },
 ];
 
@@ -101,25 +118,39 @@ export const ROLE_PRESETS: RolePreset[] = [
     techSlugs: ['nextjs', 'react', 'postgresql', 'typescript', 'javascript'],
   },
   {
-    id: 'mobile-engineer',
-    label: 'Mobile App Engineer',
+    id: 'mobile-react-native',
+    label: 'React Native Mobile Engineer',
     icon: '📱',
-    description: 'React Native, Flutter, Swift/iOS, Kotlin/Android & Mobile Security',
-    techSlugs: ['mobile-development', 'typescript', 'react'],
+    description: 'React Native, Expo, TypeScript, iOS & Android Internals',
+    techSlugs: ['react-native', 'typescript', 'react', 'ios-swift', 'android-kotlin'],
+  },
+  {
+    id: 'mobile-flutter',
+    label: 'Flutter Mobile Engineer',
+    icon: '💙',
+    description: 'Flutter Engine, Dart Architecture, State Management & Mobile APIs',
+    techSlugs: ['flutter', 'ios-swift', 'android-kotlin', 'rest-api'],
   },
   {
     id: 'sre-devops',
-    label: 'DevOps, SRE & Platform',
+    label: 'DevOps & SRE Platform',
     icon: '☸️',
-    description: 'Testing & SRE, Linux OS, Kubernetes, Terraform & AWS/GCP',
-    techSlugs: ['testing-qa-sre', 'linux-os-shell', 'kubernetes', 'terraform', 'aws', 'cloud-gcp-azure'],
+    description: 'SRE Observability, Linux OS, Kubernetes, Terraform & AWS',
+    techSlugs: ['sre-observability', 'linux-os', 'kubernetes', 'terraform', 'aws', 'docker'],
+  },
+  {
+    id: 'qa-automation',
+    label: 'QA & Test Automation',
+    icon: '🧪',
+    description: 'Playwright, Vitest, Jest, MSW, k6 Load Testing & CI/CD',
+    techSlugs: ['software-testing', 'cicd-gitops', 'typescript'],
   },
   {
     id: 'data-platform',
     label: 'Data & Search Platform',
     icon: '📊',
-    description: 'Apache Spark, Kafka, Vector DBs, Elasticsearch & PostgreSQL',
-    techSlugs: ['data-engineering-spark', 'search-vector-databases', 'kafka', 'postgresql', 'python'],
+    description: 'Apache Spark, Data Warehousing, Kafka, Elasticsearch & PostgreSQL',
+    techSlugs: ['apache-spark', 'data-warehousing', 'kafka', 'elasticsearch', 'postgresql', 'python'],
   },
   {
     id: 'golang-cloud',
@@ -133,14 +164,14 @@ export const ROLE_PRESETS: RolePreset[] = [
     label: 'Rust Systems & Low-Level',
     icon: '🦀',
     description: 'Rust, Linux OS, Networking Protocols & Distributed Systems',
-    techSlugs: ['rust-systems', 'linux-os-shell', 'networking-protocols', 'system-design'],
+    techSlugs: ['rust', 'linux-os', 'networking-protocols', 'system-design'],
   },
   {
     id: 'modern-frameworks-hub',
-    label: 'Astro, Vue & Svelte Hub',
+    label: 'Vue, Svelte & Modern Web',
     icon: '🚀',
-    description: 'Astro Islands, Vue 3/Nuxt 3, Svelte 5 & HTML/CSS Web Vitals',
-    techSlugs: ['astro', 'vue-nuxt', 'svelte', 'html-css-web-vitals', 'javascript'],
+    description: 'Vue 3/Nuxt 3, Svelte 5/Astro, HTML5/CSS3 & Web Vitals',
+    techSlugs: ['vue-nuxt', 'svelte-astro', 'html-css', 'web-vitals-accessibility', 'javascript'],
   },
   {
     id: 'java-enterprise',
@@ -154,49 +185,28 @@ export const ROLE_PRESETS: RolePreset[] = [
     label: '.NET & C# Enterprise',
     icon: '🔷',
     description: '.NET 8/9, C# 12, SQL, RabbitMQ, Docker & Clean Architecture',
-    techSlugs: ['dotnet-csharp', 'sql', 'rabbitmq', 'docker', 'system-design'],
+    techSlugs: ['dotnet-csharp', 'sql-databases', 'rabbitmq', 'docker', 'system-design'],
   },
   {
     id: 'php-fullstack',
     label: 'PHP & Laravel Full-Stack',
     icon: '🐘',
-    description: 'PHP 8.3, Laravel 11, MySQL, Redis, Vue & REST APIs',
-    techSlugs: ['php-laravel', 'mysql', 'redis', 'vue-nuxt', 'rest-api'],
+    description: 'PHP 8.3, Laravel 11, MySQL, Redis & REST APIs',
+    techSlugs: ['php-laravel', 'mysql', 'redis', 'rest-api'],
   },
   {
-    id: 'devops-platform',
-    label: 'DevOps, SRE & Platform',
-    icon: '☸️',
-    description: 'Terraform IaC, Kubernetes, Docker, CI/CD, AWS & Security',
-    techSlugs: ['terraform', 'kubernetes', 'docker', 'cicd', 'aws', 'web-security-owasp'],
+    id: 'gcp-cloud-architect',
+    label: 'Google Cloud (GCP) Architect',
+    icon: '🌐',
+    description: 'GCP GKE, Cloud Run, BigQuery, Spanner & Terraform',
+    techSlugs: ['gcp', 'kubernetes', 'terraform', 'system-design'],
   },
   {
-    id: 'event-driven-architect',
-    label: 'Event-Driven Architect',
-    icon: '🐇',
-    description: 'RabbitMQ, Apache Kafka, Redis Caching & Distributed System Design',
-    techSlugs: ['rabbitmq', 'kafka', 'redis', 'system-design'],
-  },
-  {
-    id: 'backend-python',
-    label: 'Python Cloud Backend',
-    icon: '🐍',
-    description: 'Python & FastAPI, PostgreSQL, Redis & AWS Cloud',
-    techSlugs: ['python', 'postgresql', 'redis', 'aws', 'system-design'],
-  },
-  {
-    id: 'ai-engineer',
-    label: 'AI & LLM Systems Engineer',
-    icon: '🤖',
-    description: 'AI Engineering/RAG, Python, PostgreSQL & System Design',
-    techSlugs: ['ai-engineering-llm', 'python', 'postgresql', 'system-design'],
-  },
-  {
-    id: 'coding-core',
-    label: 'Live Coding & Algorithms',
-    icon: '⚡',
-    description: 'DSA Patterns, TypeScript/JavaScript Internals & Behavioral STAR',
-    techSlugs: ['dsa', 'typescript', 'javascript', 'behavioral-hr'],
+    id: 'azure-cloud-architect',
+    label: 'Azure Cloud Architect',
+    icon: '🔷',
+    description: 'Azure AKS, Container Apps, Cosmos DB, Azure SQL & Terraform',
+    techSlugs: ['azure', 'kubernetes', 'terraform', 'system-design'],
   },
 ];
 
@@ -210,95 +220,114 @@ export function isQuestionInSelectedTech(
     // 1. PostgreSQL (Specific to Postgres)
     if (tech === 'postgresql') {
       return (
-        item.trackSlug === 'databases' &&
-        ((item.questionNumber >= 17 && item.questionNumber <= 24) ||
-          item.questionNumber === 59 ||
-          item.tags?.some((t) => t.toLowerCase().includes('postgres')) ||
-          (item.title && item.title.toLowerCase().includes('postgres')))
+        item.trackSlug === 'postgresql' ||
+        (item.trackSlug === 'databases' &&
+          ((item.questionNumber >= 17 && item.questionNumber <= 24) ||
+            item.questionNumber === 59 ||
+            item.tags?.some((t) => t.toLowerCase().includes('postgres')) ||
+            (item.title && item.title.toLowerCase().includes('postgres'))))
       );
     }
 
     // 2. MySQL (Specific to MySQL)
     if (tech === 'mysql') {
       return (
-        item.trackSlug === 'databases' &&
-        ((item.questionNumber >= 61 && item.questionNumber <= 65) ||
-          item.tags?.some((t) => t.toLowerCase().includes('mysql')) ||
-          (item.title && item.title.toLowerCase().includes('mysql')))
+        item.trackSlug === 'mysql' ||
+        (item.trackSlug === 'databases' &&
+          ((item.questionNumber >= 60 && item.questionNumber <= 65) ||
+            item.tags?.some((t) => t.toLowerCase().includes('mysql')) ||
+            (item.title && item.title.toLowerCase().includes('mysql'))))
       );
     }
 
-    // 3. Relational SQL & DB Fundamentals (ACID, Normalization, Joins, Indexes, B-Trees)
-    if (tech === 'sql') {
+    // 3. Relational SQL & DB Fundamentals
+    if (tech === 'sql-databases' || tech === 'sql') {
       return (
-        item.trackSlug === 'databases' &&
-        ((item.questionNumber >= 1 && item.questionNumber <= 16) ||
-          item.questionNumber === 19 ||
-          item.questionNumber === 20 ||
-          item.questionNumber === 21 ||
-          item.questionNumber === 22 ||
-          item.questionNumber === 25 ||
-          item.tags?.some((t) => t.toLowerCase().includes('acid') || t.toLowerCase().includes('sql') || t.toLowerCase().includes('index')))
+        item.trackSlug === 'sql-databases' ||
+        (item.trackSlug === 'databases' &&
+          ((item.questionNumber >= 1 && item.questionNumber <= 16) ||
+            item.questionNumber === 25 ||
+            item.tags?.some((t) => t.toLowerCase().includes('acid') || t.toLowerCase().includes('sql') || t.toLowerCase().includes('index'))))
       );
     }
 
     // 4. MongoDB & Document NoSQL
     if (tech === 'mongodb') {
       return (
-        item.trackSlug === 'databases' &&
-        ((item.questionNumber >= 26 && item.questionNumber <= 35) ||
-          item.questionNumber === 38 ||
-          item.questionNumber === 39 ||
-          item.tags?.some((t) => t.toLowerCase().includes('mongo') || t.toLowerCase().includes('nosql')) ||
-          (item.part && item.part.toLowerCase().includes('nosql')))
+        item.trackSlug === 'mongodb' ||
+        (item.trackSlug === 'databases' &&
+          ((item.questionNumber >= 26 && item.questionNumber <= 35) ||
+            item.questionNumber === 38 ||
+            item.questionNumber === 39 ||
+            item.tags?.some((t) => t.toLowerCase().includes('mongo'))))
       );
     }
 
     // 5. DynamoDB (AWS NoSQL)
     if (tech === 'dynamodb') {
       return (
-        item.trackSlug === 'databases' &&
-        (item.questionNumber === 36 ||
-          item.questionNumber === 37 ||
-          item.tags?.some((t) => t.toLowerCase().includes('dynamo')) ||
-          (item.title && item.title.toLowerCase().includes('dynamo')))
+        item.trackSlug === 'dynamodb' ||
+        (item.trackSlug === 'databases' &&
+          (item.questionNumber === 36 ||
+            item.questionNumber === 37 ||
+            item.tags?.some((t) => t.toLowerCase().includes('dynamo')) ||
+            (item.title && item.title.toLowerCase().includes('dynamo'))))
       );
     }
 
     // 6. Redis & In-Memory Caching
     if (tech === 'redis') {
       return (
+        item.trackSlug === 'redis' ||
         (item.trackSlug === 'databases' &&
-          ((item.questionNumber >= 41 && item.questionNumber <= 50) ||
-            item.tags?.some((t) => t.toLowerCase().includes('redis') || t.toLowerCase().includes('cache')))) ||
-        (item.trackSlug === 'messaging-queues' && item.questionNumber >= 33 && item.questionNumber <= 36)
+          ((item.questionNumber >= 40 && item.questionNumber <= 50) ||
+            item.tags?.some((t) => t.toLowerCase().includes('redis') || t.toLowerCase().includes('cache'))))
       );
     }
 
     // 7. RabbitMQ & AMQP
     if (tech === 'rabbitmq') {
       return (
-        item.trackSlug === 'messaging-queues' &&
-        (item.questionNumber <= 15 ||
-          item.questionNumber === 37 ||
-          item.questionNumber === 38 ||
-          item.tags?.some((t) => t.toLowerCase().includes('rabbitmq') || t.toLowerCase().includes('amqp')) ||
-          (item.title && item.title.toLowerCase().includes('rabbitmq')))
+        item.trackSlug === 'rabbitmq' ||
+        (item.trackSlug === 'messaging-queues' &&
+          (item.questionNumber <= 25 ||
+            item.tags?.some((t) => t.toLowerCase().includes('rabbitmq')) ||
+            (item.title && item.title.toLowerCase().includes('rabbitmq'))))
       );
     }
 
     // 8. Apache Kafka & Streaming
     if (tech === 'kafka') {
       return (
-        item.trackSlug === 'messaging-queues' &&
-        ((item.questionNumber >= 16 && item.questionNumber <= 32) ||
-          item.questionNumber >= 46 ||
-          item.tags?.some((t) => t.toLowerCase().includes('kafka')) ||
-          (item.title && item.title.toLowerCase().includes('kafka')))
+        item.trackSlug === 'kafka' ||
+        (item.trackSlug === 'messaging-queues' &&
+          (item.questionNumber >= 26 ||
+            item.tags?.some((t) => t.toLowerCase().includes('kafka')) ||
+            (item.title && item.title.toLowerCase().includes('kafka'))))
       );
     }
 
-    // 9. TypeScript & Typings
+    // 9. React Core (Excluding Next.js)
+    if (tech === 'react') {
+      return (
+        item.trackSlug === 'react' ||
+        (item.trackSlug === 'react-nextjs' &&
+          !(item.questionNumber >= 317 && item.questionNumber <= 353))
+      );
+    }
+
+    // 10. Next.js App Router
+    if (tech === 'nextjs') {
+      return (
+        item.trackSlug === 'nextjs' ||
+        (item.trackSlug === 'react-nextjs' &&
+          ((item.questionNumber >= 317 && item.questionNumber <= 353) ||
+            item.tags?.some((t) => t.toLowerCase().includes('next')) ||
+            (item.title && item.title.toLowerCase().includes('next'))))
+      );
+    }
+
+    // 11. TypeScript & Typings
     if (tech === 'typescript') {
       return (
         item.tags?.some((t) => t.toLowerCase().includes('typescript')) ||
@@ -307,61 +336,218 @@ export function isQuestionInSelectedTech(
       );
     }
 
-    // 10. Astro (Islands & Zero-JS)
-    if (tech === 'astro') {
+    // 12. Vue 3 & Nuxt 3
+    if (tech === 'vue-nuxt' || tech === 'vue') {
       return (
-        item.trackSlug === 'modern-frameworks' &&
-        (item.questionNumber <= 15 ||
-          item.tags?.some((t) => t.toLowerCase().includes('astro')) ||
-          (item.title && item.title.toLowerCase().includes('astro')))
+        item.trackSlug === 'vue-nuxt' ||
+        (item.trackSlug === 'modern-frameworks' &&
+          ((item.questionNumber >= 16 && item.questionNumber <= 32) ||
+            item.tags?.some((t) => t.toLowerCase().includes('vue') || t.toLowerCase().includes('nuxt')) ||
+            (item.title && (item.title.toLowerCase().includes('vue') || item.title.toLowerCase().includes('nuxt')))))
       );
     }
 
-    // 11. Vue 3 & Nuxt 3
-    if (tech === 'vue-nuxt') {
+    // 13. Svelte & Astro
+    if (tech === 'svelte-astro' || tech === 'svelte' || tech === 'astro') {
       return (
-        item.trackSlug === 'modern-frameworks' &&
-        ((item.questionNumber >= 16 && item.questionNumber <= 32) ||
-          item.tags?.some((t) => t.toLowerCase().includes('vue') || t.toLowerCase().includes('nuxt')) ||
-          (item.title && (item.title.toLowerCase().includes('vue') || item.title.toLowerCase().includes('nuxt'))))
+        item.trackSlug === 'svelte-astro' ||
+        (item.trackSlug === 'modern-frameworks' &&
+          (item.questionNumber <= 15 || item.questionNumber >= 33 ||
+            item.tags?.some((t) => t.toLowerCase().includes('svelte') || t.toLowerCase().includes('astro'))))
       );
     }
 
-    // 12. Svelte 5 & SvelteKit
-    if (tech === 'svelte') {
+    // 14. Google Cloud Platform (GCP)
+    if (tech === 'gcp') {
       return (
-        item.trackSlug === 'modern-frameworks' &&
-        ((item.questionNumber >= 33 && item.questionNumber <= 45) ||
-          item.tags?.some((t) => t.toLowerCase().includes('svelte')) ||
-          (item.title && item.title.toLowerCase().includes('svelte')))
+        item.trackSlug === 'gcp' ||
+        (item.trackSlug === 'cloud-gcp-azure' && item.questionNumber <= 4) ||
+        item.tags?.some((t) => t.toLowerCase().includes('gcp') || t.toLowerCase().includes('google cloud'))
       );
     }
 
-    // 13. React Core & Hooks (Excluding Next.js)
-    if (tech === 'react') {
+    // 15. Microsoft Azure
+    if (tech === 'azure') {
       return (
-        item.trackSlug === 'react-nextjs' &&
-        !(item.questionNumber >= 317 && item.questionNumber <= 353)
+        item.trackSlug === 'azure' ||
+        (item.trackSlug === 'cloud-gcp-azure' && item.questionNumber >= 5) ||
+        item.tags?.some((t) => t.toLowerCase().includes('azure'))
       );
     }
 
-    // 14. Next.js & Full-Stack RSC (Excluding pure React Core)
-    if (tech === 'nextjs') {
+    // 16. React Native
+    if (tech === 'react-native') {
       return (
-        item.trackSlug === 'react-nextjs' &&
-        ((item.questionNumber >= 317 && item.questionNumber <= 353) ||
-          item.tags?.some((t) => t.toLowerCase().includes('next')) ||
-          (item.title && item.title.toLowerCase().includes('next')) ||
-          (item.part && item.part.toLowerCase().includes('next')))
+        item.trackSlug === 'react-native' ||
+        (item.trackSlug === 'mobile-development' && item.questionNumber <= 15) ||
+        item.tags?.some((t) => t.toLowerCase().includes('react native'))
       );
     }
 
-    // 15. Golang & Microservices
-    if (tech === 'golang') {
-      return item.trackSlug === 'golang';
+    // 17. Flutter
+    if (tech === 'flutter') {
+      return (
+        item.trackSlug === 'flutter' ||
+        (item.trackSlug === 'mobile-development' && (item.questionNumber >= 16 && item.questionNumber <= 30)) ||
+        item.tags?.some((t) => t.toLowerCase().includes('flutter'))
+      );
     }
 
-    // 16. REST APIs & HTTP
+    // 18. Native iOS (Swift)
+    if (tech === 'ios-swift') {
+      return (
+        item.trackSlug === 'ios-swift' ||
+        (item.trackSlug === 'mobile-development' && ((item.questionNumber >= 31 && item.questionNumber <= 37) || item.questionNumber >= 47)) ||
+        item.tags?.some((t) => t.toLowerCase().includes('ios') || t.toLowerCase().includes('swift'))
+      );
+    }
+
+    // 19. Native Android (Kotlin)
+    if (tech === 'android-kotlin') {
+      return (
+        item.trackSlug === 'android-kotlin' ||
+        (item.trackSlug === 'mobile-development' && (item.questionNumber >= 38 && item.questionNumber <= 46)) ||
+        item.tags?.some((t) => t.toLowerCase().includes('android') || t.toLowerCase().includes('kotlin'))
+      );
+    }
+
+    // 20. Software Testing (Playwright / Vitest)
+    if (tech === 'software-testing') {
+      return (
+        item.trackSlug === 'software-testing' ||
+        (item.trackSlug === 'testing-qa-sre' && item.questionNumber <= 30) ||
+        item.tags?.some((t) => t.toLowerCase().includes('test') || t.toLowerCase().includes('playwright'))
+      );
+    }
+
+    // 21. SRE & Observability
+    if (tech === 'sre-observability') {
+      return (
+        item.trackSlug === 'sre-observability' ||
+        (item.trackSlug === 'testing-qa-sre' && item.questionNumber >= 31) ||
+        item.tags?.some((t) => t.toLowerCase().includes('sre') || t.toLowerCase().includes('prometheus') || t.toLowerCase().includes('observability'))
+      );
+    }
+
+    // 22. Elasticsearch
+    if (tech === 'elasticsearch') {
+      return (
+        item.trackSlug === 'elasticsearch' ||
+        (item.trackSlug === 'search-vector-databases' && item.questionNumber <= 4) ||
+        item.tags?.some((t) => t.toLowerCase().includes('elasticsearch') || t.toLowerCase().includes('lucene'))
+      );
+    }
+
+    // 23. Vector Databases
+    if (tech === 'vector-databases') {
+      return (
+        item.trackSlug === 'vector-databases' ||
+        (item.trackSlug === 'search-vector-databases' && item.questionNumber >= 5) ||
+        (item.trackSlug === 'ai-engineering-llm' && item.questionNumber >= 11 && item.questionNumber <= 20) ||
+        item.tags?.some((t) => t.toLowerCase().includes('vector') || t.toLowerCase().includes('hnsw'))
+      );
+    }
+
+    // 24. Apache Spark
+    if (tech === 'apache-spark') {
+      return (
+        item.trackSlug === 'apache-spark' ||
+        (item.trackSlug === 'data-engineering-spark' && item.questionNumber <= 5) ||
+        item.tags?.some((t) => t.toLowerCase().includes('spark'))
+      );
+    }
+
+    // 25. Data Warehousing
+    if (tech === 'data-warehousing') {
+      return (
+        item.trackSlug === 'data-warehousing' ||
+        (item.trackSlug === 'data-engineering-spark' && item.questionNumber >= 6) ||
+        item.tags?.some((t) => t.toLowerCase().includes('snowflake') || t.toLowerCase().includes('bigquery') || t.toLowerCase().includes('dbt'))
+      );
+    }
+
+    // 26. Linux OS
+    if (tech === 'linux-os') {
+      return (
+        item.trackSlug === 'linux-os' ||
+        (item.trackSlug === 'linux-os-shell' && item.questionNumber <= 8) ||
+        item.tags?.some((t) => t.toLowerCase().includes('linux') || t.toLowerCase().includes('kernel'))
+      );
+    }
+
+    // 27. Bash Shell
+    if (tech === 'bash-shell') {
+      return (
+        item.trackSlug === 'bash-shell' ||
+        (item.trackSlug === 'linux-os-shell' && item.questionNumber >= 9) ||
+        item.tags?.some((t) => t.toLowerCase().includes('bash') || t.toLowerCase().includes('shell'))
+      );
+    }
+
+    // 28. Design Patterns & SOLID
+    if (tech === 'design-patterns') {
+      return (
+        item.trackSlug === 'design-patterns' ||
+        (item.trackSlug === 'design-patterns-ddd' && item.questionNumber <= 6) ||
+        item.tags?.some((t) => t.toLowerCase().includes('solid') || t.toLowerCase().includes('pattern'))
+      );
+    }
+
+    // 29. Domain-Driven Design (DDD)
+    if (tech === 'domain-driven-design') {
+      return (
+        item.trackSlug === 'domain-driven-design' ||
+        (item.trackSlug === 'design-patterns-ddd' && item.questionNumber >= 7) ||
+        item.tags?.some((t) => t.toLowerCase().includes('ddd') || t.toLowerCase().includes('domain-driven'))
+      );
+    }
+
+    // 30. HTML & CSS
+    if (tech === 'html-css') {
+      return (
+        item.trackSlug === 'html-css' ||
+        (item.trackSlug === 'html-css-web-vitals' && item.questionNumber <= 8) ||
+        item.tags?.some((t) => t.toLowerCase().includes('html') || t.toLowerCase().includes('css'))
+      );
+    }
+
+    // 31. Web Vitals & Accessibility
+    if (tech === 'web-vitals-accessibility') {
+      return (
+        item.trackSlug === 'web-vitals-accessibility' ||
+        (item.trackSlug === 'html-css-web-vitals' && item.questionNumber >= 9) ||
+        item.tags?.some((t) => t.toLowerCase().includes('accessibility') || t.toLowerCase().includes('vitals') || t.toLowerCase().includes('wcag'))
+      );
+    }
+
+    // 32. Docker
+    if (tech === 'docker') {
+      return (
+        item.trackSlug === 'docker' ||
+        (item.trackSlug === 'devops-kubernetes' && item.questionNumber <= 10) ||
+        item.tags?.some((t) => t.toLowerCase().includes('docker'))
+      );
+    }
+
+    // 33. Kubernetes
+    if (tech === 'kubernetes') {
+      return (
+        item.trackSlug === 'kubernetes' ||
+        (item.trackSlug === 'devops-kubernetes' && item.questionNumber >= 11 && item.questionNumber <= 35) ||
+        item.tags?.some((t) => t.toLowerCase().includes('kubernetes') || t.toLowerCase().includes('k8s'))
+      );
+    }
+
+    // 34. CI/CD & GitOps
+    if (tech === 'cicd-gitops' || tech === 'cicd') {
+      return (
+        item.trackSlug === 'cicd-gitops' ||
+        (item.trackSlug === 'devops-kubernetes' && item.questionNumber >= 36) ||
+        item.tags?.some((t) => t.toLowerCase().includes('ci/cd') || t.toLowerCase().includes('gitops'))
+      );
+    }
+
+    // 35. REST APIs & HTTP
     if (tech === 'rest-api') {
       return (
         item.tags?.some((t) => t.toLowerCase().includes('rest') || t.toLowerCase().includes('http')) ||
@@ -369,7 +555,7 @@ export function isQuestionInSelectedTech(
       );
     }
 
-    // 17. GraphQL & Resolvers
+    // 36. GraphQL
     if (tech === 'graphql') {
       return (
         item.tags?.some((t) => t.toLowerCase().includes('graphql')) ||
@@ -377,7 +563,7 @@ export function isQuestionInSelectedTech(
       );
     }
 
-    // 18. gRPC & Protocol Buffers
+    // 37. gRPC
     if (tech === 'grpc') {
       return (
         (item.trackSlug === 'golang' && item.questionNumber === 31) ||
@@ -386,84 +572,7 @@ export function isQuestionInSelectedTech(
       );
     }
 
-    // 19. CI/CD & GitHub Actions
-    if (tech === 'cicd') {
-      return (
-        (item.trackSlug === 'devops-kubernetes' && item.questionNumber >= 36 && item.questionNumber <= 42) ||
-        (item.trackSlug === 'terraform-iac' && item.questionNumber >= 21 && item.questionNumber <= 25) ||
-        item.tags?.some((t) => t.toLowerCase().includes('ci/cd') || t.toLowerCase().includes('github action')) ||
-        (item.title && (item.title.toLowerCase().includes('ci/cd') || item.title.toLowerCase().includes('pipeline') || item.title.toLowerCase().includes('github action')))
-      );
-    }
-
-    // 20. Terraform & IaC
-    if (tech === 'terraform') {
-      return (
-        item.trackSlug === 'terraform-iac' ||
-        (item.trackSlug === 'devops-kubernetes' && (item.questionNumber === 43 || item.questionNumber === 44))
-      );
-    }
-
-    // 21. Kubernetes (K8s) & GitOps
-    if (tech === 'kubernetes') {
-      return (
-        (item.trackSlug === 'devops-kubernetes' && item.questionNumber >= 11 && item.questionNumber <= 35) ||
-        (item.trackSlug === 'terraform-iac' && item.questionNumber >= 26 && item.questionNumber <= 34)
-      );
-    }
-
-    // 22. Docker & Containers
-    if (tech === 'docker') {
-      return (
-        item.trackSlug === 'devops-kubernetes' &&
-        (item.questionNumber <= 10 ||
-          item.tags?.some((t) => t.toLowerCase().includes('docker') || t.toLowerCase().includes('container')) ||
-          (item.part && item.part.toLowerCase().includes('docker')))
-      );
-    }
-
-    // 23. Search & Vector Databases
-    if (tech === 'search-vector-databases') {
-      return (
-        item.trackSlug === 'search-vector-databases' ||
-        (item.trackSlug === 'ai-engineering-llm' && item.questionNumber >= 11 && item.questionNumber <= 20) ||
-        item.tags?.some((t) => t.toLowerCase().includes('vector') || t.toLowerCase().includes('search') || t.toLowerCase().includes('elasticsearch'))
-      );
-    }
-
-    // 24. Testing, QA Automation & SRE
-    if (tech === 'testing-qa-sre') {
-      return (
-        item.trackSlug === 'testing-qa-sre' ||
-        item.tags?.some((t) => t.toLowerCase().includes('test') || t.toLowerCase().includes('playwright') || t.toLowerCase().includes('sre'))
-      );
-    }
-
-    // 25. Mobile Development
-    if (tech === 'mobile-development') {
-      return (
-        item.trackSlug === 'mobile-development' ||
-        item.tags?.some((t) => t.toLowerCase().includes('react native') || t.toLowerCase().includes('flutter') || t.toLowerCase().includes('mobile'))
-      );
-    }
-
-    // 26. Cloud GCP & Azure
-    if (tech === 'cloud-gcp-azure') {
-      return (
-        item.trackSlug === 'cloud-gcp-azure' ||
-        item.tags?.some((t) => t.toLowerCase().includes('gcp') || t.toLowerCase().includes('azure'))
-      );
-    }
-
-    // 27. HTML, CSS & Web Vitals
-    if (tech === 'html-css-web-vitals') {
-      return (
-        item.trackSlug === 'html-css-web-vitals' ||
-        item.tags?.some((t) => t.toLowerCase().includes('html') || t.toLowerCase().includes('css') || t.toLowerCase().includes('accessibility'))
-      );
-    }
-
-    // Default 1:1 track match (e.g. java-spring, dotnet-csharp, angular-ts, python, nodejs, aws, dsa, etc.)
+    // Default 1:1 track match
     return item.trackSlug === tech;
   });
 }

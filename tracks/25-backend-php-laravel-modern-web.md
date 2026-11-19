@@ -1,4 +1,4 @@
-# Modern PHP 8.3+ & Laravel 11 Enterprise Architecture Master Interview Question Bank (1 - 50)
+# Modern PHP 8.3+ & Laravel 11 Enterprise Architecture Master Interview Question Bank (1 - 15)
 
 > Comprehensive, production-grade interview questions covering Modern PHP 8.3+ (JIT Compiler, Fibers, Typed Properties, Readonly Classes, Attributes), Laravel 11 Architecture (Service Container, Eloquent ORM, Queues, Octane, and Microservices).
 
@@ -80,3 +80,38 @@ Long-running jobs (sending emails, generating PDFs, charging Stripe) are pushed 
 2. Guard against N+1 query disasters using `Model::preventLazyLoading()`.
 3. Offload all external network calls and I/O tasks to queues via Horizon.
 4. Use Laravel Octane for high-throughput microservices while observing strict memory hygiene.
+
+### 10. PHP 8.3 Readonly Classes and Deep Cloning.
+**In Simple Words:**
+- In PHP 8.2+, marking a class as `readonly` automatically applies `readonly` to all declared properties, enforcing immutability after constructor initialization.
+- In PHP 8.3, readonly properties can now be re-initialized once inside the `__clone()` magic method, enabling deep cloning of immutable value objects and domain entities.
+
+### 11. Laravel 11 Service Container & Dependency Injection.
+**In Simple Words:**
+The **Service Container** is the heart of Laravel:
+- Automatically resolves dependencies via PHP Reflection:
+  `$this->app->singleton(PaymentGatewayInterface::class, StripePaymentGateway::class);`.
+- Contextual binding: specify different implementations for different controllers.
+- Method injection: controller actions automatically resolve typed dependencies (`public function store(OrderRequest $request, InvoiceService $invoices)`).
+
+### 12. Laravel Octane: Swoole vs. RoadRunner High-Throughput Execution.
+**In Simple Words:**
+Traditional PHP-FPM spawns a process, boots Laravel from scratch, executes the request, and destroys the process on every HTTP call ($20\text{ms}$ bootstrapping overhead).
+- **Laravel Octane** boots the application once in RAM and serves thousands of requests concurrently using **Swoole** or **RoadRunner** worker loops, reducing response times to $<2\text{ms}$.
+
+### 13. Eloquent ORM: Preventing N+1 Query Problems with Eager Loading.
+**In Simple Words:**
+Accessing relationships in loops (`foreach ($posts as $p) { echo $p->author->name; }`) triggers $N$ individual SQL queries.
+- **Eager Loading**: `Post::with('author')->get()` executes exactly 2 queries: one for posts and one `WHERE author_id IN (...)`.
+- Laravel 11 strict mode: `Model::preventLazyLoading()` throws an exception in local development if lazy loading is attempted.
+
+### 14. Laravel Queues and Horizon Redis Monitoring.
+**In Simple Words:**
+- **Queues**: Offload heavy jobs (sending emails, video transcoding, external API sync) to background Redis queues.
+- **Laravel Horizon**: Real-time dashboard and configuration system for Redis queues. Provides metrics on job throughput, wait times, failure rates, and auto-scales queue worker processes based on queue depth.
+
+### 15. PHP Fibers: Cooperative Multitasking Internals.
+**In Simple Words:**
+Introduced in PHP 8.1, **Fibers** are lightweight, stackable coroutines that can pause (`Fiber::suspend()`) and resume (`$fiber->resume()`) execution.
+- Enables asynchronous I/O frameworks (like Revolt / Amp) to run non-blocking concurrent network requests without blocking the single PHP thread.
+

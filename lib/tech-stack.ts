@@ -25,9 +25,12 @@ export const GRANULAR_TECHS: GranularTech[] = [
   // 2. Backend & Microservices
   { slug: 'golang', name: 'Go (Golang) & Concurrency', category: 'Backend', icon: '🐹', approxQuestionCount: 50 },
   { slug: 'rust', name: 'Rust & Systems Programming', category: 'Backend', icon: '🦀', approxQuestionCount: 35 },
-  { slug: 'java-spring', name: 'Java 21 & Spring Boot 3', category: 'Backend', icon: '☕', approxQuestionCount: 50 },
-  { slug: 'dotnet-csharp', name: '.NET 8/9 & C# 12', category: 'Backend', icon: '🔷', approxQuestionCount: 50 },
-  { slug: 'php-laravel', name: 'PHP 8.3 & Laravel 11', category: 'Backend', icon: '🐘', approxQuestionCount: 35 },
+  { slug: 'java', name: 'Java 21 Core & JVM', category: 'Backend', icon: '☕', approxQuestionCount: 35 },
+  { slug: 'spring-boot', name: 'Spring Boot 3 & Cloud', category: 'Backend', icon: '🍃', approxQuestionCount: 35 },
+  { slug: 'csharp', name: 'C# 12 & CLR Internals', category: 'Backend', icon: '🔷', approxQuestionCount: 35 },
+  { slug: 'aspnet-core', name: 'ASP.NET Core 8/9 & Web API', category: 'Backend', icon: '🌐', approxQuestionCount: 35 },
+  { slug: 'php', name: 'PHP 8.3+ & Zend Engine', category: 'Backend', icon: '🐘', approxQuestionCount: 35 },
+  { slug: 'laravel', name: 'Laravel 11 & Ecosystem', category: 'Backend', icon: '🔴', approxQuestionCount: 35 },
   { slug: 'nodejs', name: 'Node.js & Event Loop', category: 'Backend', icon: '🟩', approxQuestionCount: 60 },
   { slug: 'python', name: 'Python & FastAPI', category: 'Backend', icon: '🐍', approxQuestionCount: 65 },
   { slug: 'rest-api', name: 'REST APIs & HTTP', category: 'Backend', icon: '🌐', approxQuestionCount: 25 },
@@ -37,8 +40,10 @@ export const GRANULAR_TECHS: GranularTech[] = [
   // 3. Mobile Engineering (Completely Separated!)
   { slug: 'react-native', name: 'React Native & Expo', category: 'Mobile', icon: '📱', approxQuestionCount: 35 },
   { slug: 'flutter', name: 'Flutter & Dart Engine', category: 'Mobile', icon: '💙', approxQuestionCount: 35 },
-  { slug: 'ios-swift', name: 'Native iOS & Swift 6', category: 'Mobile', icon: '🍎', approxQuestionCount: 35 },
-  { slug: 'android-kotlin', name: 'Native Android & Kotlin', category: 'Mobile', icon: '🤖', approxQuestionCount: 35 },
+  { slug: 'swift', name: 'Modern Swift 6 & Concurrency', category: 'Mobile', icon: '🦅', approxQuestionCount: 35 },
+  { slug: 'ios', name: 'Native iOS & SwiftUI', category: 'Mobile', icon: '🍎', approxQuestionCount: 35 },
+  { slug: 'kotlin', name: 'Kotlin 2.0 & Coroutines', category: 'Mobile', icon: '🟣', approxQuestionCount: 35 },
+  { slug: 'android', name: 'Native Android & Jetpack Compose', category: 'Mobile', icon: '🤖', approxQuestionCount: 35 },
 
   // 4. Databases & In-Memory Caching (Completely Separated!)
   { slug: 'postgresql', name: 'PostgreSQL Advanced', category: 'Databases & Cache', icon: '🐘', approxQuestionCount: 35 },
@@ -52,7 +57,8 @@ export const GRANULAR_TECHS: GranularTech[] = [
 
   // 5. Data Engineering & Big Data (Completely Separated!)
   { slug: 'apache-spark', name: 'Apache Spark & PySpark', category: 'Data Engineering', icon: '💥', approxQuestionCount: 35 },
-  { slug: 'data-warehousing', name: 'Snowflake & BigQuery', category: 'Data Engineering', icon: '❄️', approxQuestionCount: 35 },
+  { slug: 'snowflake', name: 'Snowflake Data Cloud', category: 'Data Engineering', icon: '❄️', approxQuestionCount: 35 },
+  { slug: 'bigquery', name: 'Google BigQuery Architecture', category: 'Data Engineering', icon: '🔍', approxQuestionCount: 35 },
   { slug: 'dbt', name: 'dbt Analytics Engineering', category: 'Data Engineering', icon: '📦', approxQuestionCount: 35 },
 
   // 6. Messaging & Event Streaming (Completely Separated!)
@@ -79,7 +85,8 @@ export const GRANULAR_TECHS: GranularTech[] = [
 
   // 10. Architecture & Core Engineering (Completely Separated!)
   { slug: 'networking-protocols', name: 'Networking & Web Protocols', category: 'Architecture & Core', icon: '🌐', approxQuestionCount: 35 },
-  { slug: 'design-patterns', name: 'GoF Design Patterns & SOLID', category: 'Architecture & Core', icon: '🏛️', approxQuestionCount: 35 },
+  { slug: 'solid-principles', name: 'SOLID & OOP Principles', category: 'Architecture & Core', icon: '📐', approxQuestionCount: 35 },
+  { slug: 'design-patterns', name: 'Gang of Four (GoF) Patterns', category: 'Architecture & Core', icon: '🏛️', approxQuestionCount: 35 },
   { slug: 'domain-driven-design', name: 'Domain-Driven Design (DDD)', category: 'Architecture & Core', icon: '🧩', approxQuestionCount: 35 },
   { slug: 'system-design', name: 'Large-Scale System Design', category: 'Architecture & Core', icon: '🏗️', approxQuestionCount: 50 },
   { slug: 'web-security-owasp', name: 'Web Security & OWASP Top 10', category: 'Architecture & Core', icon: '🛡️', approxQuestionCount: 50 },
@@ -123,14 +130,14 @@ export const ROLE_PRESETS: RolePreset[] = [
     label: 'React Native Mobile Engineer',
     icon: '📱',
     description: 'React Native, Expo, TypeScript, iOS & Android Internals',
-    techSlugs: ['react-native', 'typescript', 'react', 'ios-swift', 'android-kotlin'],
+    techSlugs: ['react-native', 'typescript', 'react', 'swift', 'ios', 'kotlin', 'android'],
   },
   {
     id: 'mobile-flutter',
     label: 'Flutter Mobile Engineer',
     icon: '💙',
     description: 'Flutter Engine, Dart Architecture, State Management & Mobile APIs',
-    techSlugs: ['flutter', 'ios-swift', 'android-kotlin', 'rest-api'],
+    techSlugs: ['flutter', 'swift', 'ios', 'kotlin', 'android', 'rest-api'],
   },
   {
     id: 'sre-devops',
@@ -151,7 +158,7 @@ export const ROLE_PRESETS: RolePreset[] = [
     label: 'Data & Search Platform',
     icon: '📊',
     description: 'Apache Spark, Snowflake/BigQuery, dbt, Kafka, Elasticsearch & PostgreSQL',
-    techSlugs: ['apache-spark', 'data-warehousing', 'dbt', 'kafka', 'elasticsearch', 'postgresql', 'python'],
+    techSlugs: ['apache-spark', 'snowflake', 'bigquery', 'dbt', 'kafka', 'elasticsearch', 'postgresql', 'python'],
   },
   {
     id: 'golang-cloud',
@@ -179,21 +186,21 @@ export const ROLE_PRESETS: RolePreset[] = [
     label: 'Java Spring Enterprise',
     icon: '☕',
     description: 'Java 21, Spring Boot 3, PostgreSQL, Kafka & System Design',
-    techSlugs: ['java-spring', 'postgresql', 'kafka', 'docker', 'system-design'],
+    techSlugs: ['java', 'spring-boot', 'postgresql', 'kafka', 'docker', 'system-design'],
   },
   {
     id: 'dotnet-enterprise',
     label: '.NET & C# Enterprise',
     icon: '🔷',
     description: '.NET 8/9, C# 12, SQL, RabbitMQ, Docker & Clean Architecture',
-    techSlugs: ['dotnet-csharp', 'sql-databases', 'rabbitmq', 'docker', 'system-design'],
+    techSlugs: ['csharp', 'aspnet-core', 'sql-databases', 'rabbitmq', 'docker', 'system-design'],
   },
   {
     id: 'php-fullstack',
     label: 'PHP & Laravel Full-Stack',
     icon: '🐘',
     description: 'PHP 8.3, Laravel 11, MySQL, Redis & REST APIs',
-    techSlugs: ['php-laravel', 'mysql', 'redis', 'rest-api'],
+    techSlugs: ['php', 'laravel', 'mysql', 'redis', 'rest-api'],
   },
   {
     id: 'gcp-cloud-architect',
@@ -261,8 +268,14 @@ export function isQuestionInSelectedTech(
       return item.trackSlug === 'gitops' || (item.trackSlug === 'cicd-gitops' && item.tags?.some((t) => t.toLowerCase().includes('gitops') || t.toLowerCase().includes('argo')));
     }
 
+    if (tech === 'snowflake') {
+      return item.trackSlug === 'snowflake' || (item.trackSlug === 'data-warehousing' && item.tags?.some((t) => t.toLowerCase().includes('snowflake')));
+    }
+    if (tech === 'bigquery') {
+      return item.trackSlug === 'bigquery' || (item.trackSlug === 'data-warehousing' && item.tags?.some((t) => t.toLowerCase().includes('bigquery')));
+    }
     if (tech === 'data-warehousing') {
-      return item.trackSlug === 'data-warehousing';
+      return item.trackSlug === 'snowflake' || item.trackSlug === 'bigquery' || item.trackSlug === 'data-warehousing';
     }
     if (tech === 'dbt') {
       return item.trackSlug === 'dbt' || (item.trackSlug === 'data-warehousing' && item.tags?.some((t) => t.toLowerCase().includes('dbt')));
@@ -418,18 +431,34 @@ export function isQuestionInSelectedTech(
       );
     }
 
-    // 16. Native iOS (Swift)
+    // 16. Swift & iOS
+    if (tech === 'swift') {
+      return item.trackSlug === 'swift' || (item.trackSlug === 'ios-swift' && item.tags?.some((t) => t.toLowerCase().includes('swift')));
+    }
+    if (tech === 'ios') {
+      return item.trackSlug === 'ios' || (item.trackSlug === 'ios-swift' && item.tags?.some((t) => t.toLowerCase().includes('ios') || t.toLowerCase().includes('swiftui')));
+    }
     if (tech === 'ios-swift') {
       return (
+        item.trackSlug === 'swift' ||
+        item.trackSlug === 'ios' ||
         item.trackSlug === 'ios-swift' ||
         (item.trackSlug === 'mobile-development' && ((item.questionNumber >= 31 && item.questionNumber <= 37) || item.questionNumber >= 47)) ||
         item.tags?.some((t) => t.toLowerCase().includes('ios') || t.toLowerCase().includes('swift'))
       );
     }
 
-    // 17. Native Android (Kotlin)
+    // 17. Kotlin & Android
+    if (tech === 'kotlin') {
+      return item.trackSlug === 'kotlin' || (item.trackSlug === 'android-kotlin' && item.tags?.some((t) => t.toLowerCase().includes('kotlin')));
+    }
+    if (tech === 'android') {
+      return item.trackSlug === 'android' || (item.trackSlug === 'android-kotlin' && item.tags?.some((t) => t.toLowerCase().includes('android') || t.toLowerCase().includes('compose')));
+    }
     if (tech === 'android-kotlin') {
       return (
+        item.trackSlug === 'kotlin' ||
+        item.trackSlug === 'android' ||
         item.trackSlug === 'android-kotlin' ||
         (item.trackSlug === 'mobile-development' && (item.questionNumber >= 38 && item.questionNumber <= 46)) ||
         item.tags?.some((t) => t.toLowerCase().includes('android') || t.toLowerCase().includes('kotlin'))

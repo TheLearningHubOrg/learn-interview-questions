@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'InterviewHub PRO - 1,849+ Master Technical Interview Questions';
+export const alt = 'InterviewHub PRO - 2,719+ Master Technical Interview Questions Across 30 Tracks';
 export const size = {
   width: 1200,
   height: 630,
@@ -69,7 +69,7 @@ export default async function Image() {
             margin: '0 0 40px 0',
           }}
         >
-          1,849+ Battle-Tested Questions & Code Examples Across Angular 2-19, React 18/19, JavaScript Internals, System Design, AI Engineering, OWASP Security, DevOps, Cloud Architecture, and DSA.
+          2,719+ Battle-Tested Questions Across 30 Tracks: Go, Rust, PHP, Java, .NET, Mobile, Testing/SRE, Networking, Linux, Design Patterns, Spark, Vector DBs, Cloud, React, Angular & System Design.
         </p>
 
         <div

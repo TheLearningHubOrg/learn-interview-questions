@@ -28,12 +28,16 @@ export const GRANULAR_TECHS: GranularTech[] = [
   { slug: 'vue-nuxt', name: 'Vue 3 & Nuxt 3', category: 'Frontend', icon: '💚', approxQuestionCount: 20 },
   { slug: 'astro', name: 'Astro (Islands & Zero-JS)', category: 'Frontend', icon: '🚀', approxQuestionCount: 15 },
   { slug: 'svelte', name: 'Svelte 5 & SvelteKit', category: 'Frontend', icon: '🧡', approxQuestionCount: 15 },
+  { slug: 'html-css-web-vitals', name: 'HTML5, CSS & Web Vitals', category: 'Frontend', icon: '🎨', approxQuestionCount: 50 },
+  { slug: 'mobile-development', name: 'Mobile (RN, Flutter, iOS, Android)', category: 'Frontend', icon: '📱', approxQuestionCount: 50 },
   { slug: 'javascript', name: 'Core JavaScript & Web', category: 'Frontend', icon: '🟨', approxQuestionCount: 536 },
 
   // 2. Backend & Microservices
   { slug: 'golang', name: 'Go (Golang) & Concurrency', category: 'Backend', icon: '🐹', approxQuestionCount: 50 },
+  { slug: 'rust-systems', name: 'Rust & Systems Programming', category: 'Backend', icon: '🦀', approxQuestionCount: 50 },
   { slug: 'java-spring', name: 'Java 21 & Spring Boot 3', category: 'Backend', icon: '☕', approxQuestionCount: 50 },
   { slug: 'dotnet-csharp', name: '.NET 8/9 & C# 12', category: 'Backend', icon: '🔷', approxQuestionCount: 50 },
+  { slug: 'php-laravel', name: 'PHP 8.3 & Laravel 11', category: 'Backend', icon: '🐘', approxQuestionCount: 50 },
   { slug: 'nodejs', name: 'Node.js & Express', category: 'Backend', icon: '🟩', approxQuestionCount: 60 },
   { slug: 'python', name: 'Python & FastAPI', category: 'Backend', icon: '🐍', approxQuestionCount: 65 },
   { slug: 'rest-api', name: 'REST APIs & HTTP', category: 'Backend', icon: '🌐', approxQuestionCount: 25 },
@@ -47,6 +51,8 @@ export const GRANULAR_TECHS: GranularTech[] = [
   { slug: 'mongodb', name: 'MongoDB & Document NoSQL', category: 'Databases & Cache', icon: '🍃', approxQuestionCount: 15 },
   { slug: 'dynamodb', name: 'DynamoDB (AWS NoSQL)', category: 'Databases & Cache', icon: '⚡', approxQuestionCount: 10 },
   { slug: 'redis', name: 'Redis & In-Memory Caching', category: 'Databases & Cache', icon: '⚡', approxQuestionCount: 15 },
+  { slug: 'search-vector-databases', name: 'Search & Vector DBs (ES/Pinecone)', category: 'Databases & Cache', icon: '🔍', approxQuestionCount: 50 },
+  { slug: 'data-engineering-spark', name: 'Data Engineering & Spark', category: 'Databases & Cache', icon: '📊', approxQuestionCount: 50 },
 
   // 4. Messaging & Event Streaming
   { slug: 'rabbitmq', name: 'RabbitMQ & AMQP', category: 'Messaging & Streaming', icon: '🐇', approxQuestionCount: 25 },
@@ -57,9 +63,14 @@ export const GRANULAR_TECHS: GranularTech[] = [
   { slug: 'kubernetes', name: 'Kubernetes (K8s) & GitOps', category: 'Cloud, DevOps & IaC', icon: '☸️', approxQuestionCount: 35 },
   { slug: 'docker', name: 'Docker & Containers', category: 'Cloud, DevOps & IaC', icon: '🐳', approxQuestionCount: 10 },
   { slug: 'cicd', name: 'CI/CD & GitHub Actions', category: 'Cloud, DevOps & IaC', icon: '🔄', approxQuestionCount: 15 },
+  { slug: 'linux-os-shell', name: 'Linux OS & Shell Mastery', category: 'Cloud, DevOps & IaC', icon: '🐧', approxQuestionCount: 50 },
+  { slug: 'testing-qa-sre', name: 'Testing, QA Automation & SRE', category: 'Cloud, DevOps & IaC', icon: '🧪', approxQuestionCount: 50 },
   { slug: 'aws', name: 'AWS Cloud Architecture', category: 'Cloud, DevOps & IaC', icon: '☁️', approxQuestionCount: 65 },
+  { slug: 'cloud-gcp-azure', name: 'GCP & Azure Cloud', category: 'Cloud, DevOps & IaC', icon: '☁️', approxQuestionCount: 50 },
 
   // 6. Architecture, Security & Core Engineering
+  { slug: 'networking-protocols', name: 'Networking & Web Protocols', category: 'Architecture & Core', icon: '🌐', approxQuestionCount: 50 },
+  { slug: 'design-patterns-ddd', name: 'Design Patterns, SOLID & DDD', category: 'Architecture & Core', icon: '🏛️', approxQuestionCount: 50 },
   { slug: 'system-design', name: 'System Design & Distributed Systems', category: 'Architecture & Core', icon: '🏗️', approxQuestionCount: 50 },
   { slug: 'web-security-owasp', name: 'Web Security & OWASP Top 10', category: 'Architecture & Core', icon: '🛡️', approxQuestionCount: 50 },
   { slug: 'ai-engineering-llm', name: 'AI Engineering & LLM Systems', category: 'Architecture & Core', icon: '🤖', approxQuestionCount: 50 },
@@ -90,6 +101,27 @@ export const ROLE_PRESETS: RolePreset[] = [
     techSlugs: ['nextjs', 'react', 'postgresql', 'typescript', 'javascript'],
   },
   {
+    id: 'mobile-engineer',
+    label: 'Mobile App Engineer',
+    icon: '📱',
+    description: 'React Native, Flutter, Swift/iOS, Kotlin/Android & Mobile Security',
+    techSlugs: ['mobile-development', 'typescript', 'react'],
+  },
+  {
+    id: 'sre-devops',
+    label: 'DevOps, SRE & Platform',
+    icon: '☸️',
+    description: 'Testing & SRE, Linux OS, Kubernetes, Terraform & AWS/GCP',
+    techSlugs: ['testing-qa-sre', 'linux-os-shell', 'kubernetes', 'terraform', 'aws', 'cloud-gcp-azure'],
+  },
+  {
+    id: 'data-platform',
+    label: 'Data & Search Platform',
+    icon: '📊',
+    description: 'Apache Spark, Kafka, Vector DBs, Elasticsearch & PostgreSQL',
+    techSlugs: ['data-engineering-spark', 'search-vector-databases', 'kafka', 'postgresql', 'python'],
+  },
+  {
     id: 'golang-cloud',
     label: 'Go Cloud & Microservices',
     icon: '🐹',
@@ -97,11 +129,18 @@ export const ROLE_PRESETS: RolePreset[] = [
     techSlugs: ['golang', 'grpc', 'docker', 'kubernetes', 'system-design'],
   },
   {
+    id: 'systems-rust',
+    label: 'Rust Systems & Low-Level',
+    icon: '🦀',
+    description: 'Rust, Linux OS, Networking Protocols & Distributed Systems',
+    techSlugs: ['rust-systems', 'linux-os-shell', 'networking-protocols', 'system-design'],
+  },
+  {
     id: 'modern-frameworks-hub',
     label: 'Astro, Vue & Svelte Hub',
     icon: '🚀',
-    description: 'Astro Islands, Vue 3/Nuxt 3, Svelte 5 & Modern Web Vitals',
-    techSlugs: ['astro', 'vue-nuxt', 'svelte', 'javascript'],
+    description: 'Astro Islands, Vue 3/Nuxt 3, Svelte 5 & HTML/CSS Web Vitals',
+    techSlugs: ['astro', 'vue-nuxt', 'svelte', 'html-css-web-vitals', 'javascript'],
   },
   {
     id: 'java-enterprise',
@@ -116,6 +155,13 @@ export const ROLE_PRESETS: RolePreset[] = [
     icon: '🔷',
     description: '.NET 8/9, C# 12, SQL, RabbitMQ, Docker & Clean Architecture',
     techSlugs: ['dotnet-csharp', 'sql', 'rabbitmq', 'docker', 'system-design'],
+  },
+  {
+    id: 'php-fullstack',
+    label: 'PHP & Laravel Full-Stack',
+    icon: '🐘',
+    description: 'PHP 8.3, Laravel 11, MySQL, Redis, Vue & REST APIs',
+    techSlugs: ['php-laravel', 'mysql', 'redis', 'vue-nuxt', 'rest-api'],
   },
   {
     id: 'devops-platform',
@@ -373,6 +419,47 @@ export function isQuestionInSelectedTech(
         (item.questionNumber <= 10 ||
           item.tags?.some((t) => t.toLowerCase().includes('docker') || t.toLowerCase().includes('container')) ||
           (item.part && item.part.toLowerCase().includes('docker')))
+      );
+    }
+
+    // 23. Search & Vector Databases
+    if (tech === 'search-vector-databases') {
+      return (
+        item.trackSlug === 'search-vector-databases' ||
+        (item.trackSlug === 'ai-engineering-llm' && item.questionNumber >= 11 && item.questionNumber <= 20) ||
+        item.tags?.some((t) => t.toLowerCase().includes('vector') || t.toLowerCase().includes('search') || t.toLowerCase().includes('elasticsearch'))
+      );
+    }
+
+    // 24. Testing, QA Automation & SRE
+    if (tech === 'testing-qa-sre') {
+      return (
+        item.trackSlug === 'testing-qa-sre' ||
+        item.tags?.some((t) => t.toLowerCase().includes('test') || t.toLowerCase().includes('playwright') || t.toLowerCase().includes('sre'))
+      );
+    }
+
+    // 25. Mobile Development
+    if (tech === 'mobile-development') {
+      return (
+        item.trackSlug === 'mobile-development' ||
+        item.tags?.some((t) => t.toLowerCase().includes('react native') || t.toLowerCase().includes('flutter') || t.toLowerCase().includes('mobile'))
+      );
+    }
+
+    // 26. Cloud GCP & Azure
+    if (tech === 'cloud-gcp-azure') {
+      return (
+        item.trackSlug === 'cloud-gcp-azure' ||
+        item.tags?.some((t) => t.toLowerCase().includes('gcp') || t.toLowerCase().includes('azure'))
+      );
+    }
+
+    // 27. HTML, CSS & Web Vitals
+    if (tech === 'html-css-web-vitals') {
+      return (
+        item.trackSlug === 'html-css-web-vitals' ||
+        item.tags?.some((t) => t.toLowerCase().includes('html') || t.toLowerCase().includes('css') || t.toLowerCase().includes('accessibility'))
       );
     }
 

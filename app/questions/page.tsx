@@ -3,11 +3,11 @@ import { getAllTracks, getGlobalSearchIndex } from '@/lib/tracks';
 import { QuestionsDirectoryClient } from './QuestionsDirectoryClient';
 
 export const metadata: Metadata = {
-  title: 'All Questions Explorer — 1,849+ Master Technical Interview Bank',
-  description: 'Search, filter, and practice across all 1,849 technical interview questions. Filter by Track, Seniority Level (Junior, Mid, Senior), Most Asked Frequency, and Code Implementations.',
+  title: 'All Questions Explorer — 2,719+ Master Technical Interview Bank Across 30 Tracks',
+  description: 'Search, filter, and practice across all 2,719 technical interview questions. Filter by Track, Seniority Level (Junior, Mid, Senior), Most Asked Frequency, and Code Implementations.',
   openGraph: {
-    title: 'Explore All 1,849+ Master Interview Questions',
-    description: 'Filter across 13 Specialized Tracks: AI Engineering, React 18/19, Angular Signals, System Design, DevOps, Kubernetes, and Cloud Architecture.',
+    title: 'Explore All 2,719+ Master Interview Questions (30 Tracks)',
+    description: 'Filter across 30 Specialized Tracks: Go, Rust, PHP, Java, .NET, Mobile, Testing/SRE, Networking, Linux, Design Patterns, Spark, Vector DBs, Cloud, React, Angular & System Design.',
     url: 'https://learn-interview-questions.vercel.app/questions',
   },
 };

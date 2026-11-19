@@ -217,7 +217,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">
-            Explore All 1,849+ Interview Questions
+            Explore All {initialItems.length || '2,719'}+ Interview Questions
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
             Filter, search, and practice across the entire engineering curriculum. Filter by seniority level, high-frequency interview patterns, runnable code solutions, and individual technology tracks.

@@ -1,66 +1,339 @@
-# Apache Spark & Big Data Pipelines Master Interview Bank (1 - 9)
+# Apache Spark & Big Data Architecture Master Interview Bank (1 - 35)
 
-> Apache Spark Catalyst Optimizer, Tungsten execution engine, RDDs vs DataFrames, narrow vs wide transformations, shuffling bottlenecks, partition tuning, and Delta Lake ACID transactions.
-
----
-
-### 1. Explain the Apache Spark Distributed Architecture: Driver, Cluster Manager, Executors, Tasks, and Slots.
-**In Simple Words:**
-Apache Spark is a distributed computing framework for large-scale data processing:
-1. **Driver**: The master process. Contains the `SparkSession`, converts user code into a Directed Acyclic Graph (DAG) of stages and tasks, and coordinates execution via the Cluster Manager.
-2. **Cluster Manager**: Allocates physical resources (YARN, Kubernetes, Standalone).
-3. **Executors**: Worker processes running on cluster nodes. Each executor runs multiple concurrent **Tasks** in dedicated CPU **Slots** and manages memory for execution and caching.
-4. **Task**: The smallest atomic unit of work, sent to an executor slot to process a single data partition.
-
-### 2. Transformations vs. Actions: Narrow Transformations vs. Wide Transformations and the Shuffle Operation.
-**In Simple Words:**
-- **La
-
-### 3. How does the Spark Catalyst Optimizer work (Analysis, Logical Plan, and Physical Plan)?
-**In Simple Words:**
-Catalyst optimi
-
-### 4. Broadcast Hash Join vs. Sort-Merge Join in Apache Spark.
-**In Simple Words:**
-- **Sort-Merge Join (Default for large tables)**: Shuffles both tables across the network using the join key as the partitioner, sorts each partition on disk, and merges them. High network and disk overhead.
-- **Broadcast Hash Join (BHJ)**: Used when one table is small (default $< 10$MB, configurable via `spark.sql.autoBroadcastJoinThreshold`).
-  - The Driver downloads the small table, seriali
-
-### 5. What is Data Skew in Spark, and how do you resolve it (Salting Technique)?
-**In Simple Words:**
-Data Skew happens when one partition contains vastly more data than others (e.g. 90% of user activity belongs to `user_id = 'guest'`). One executor takes 2 hours while all others finish in 30 seconds.
-
-**The Salting Fix**:
-Append a random integer (salt: `0..N`) to the skewed join key in the large table, and replicate the corresponding rows in the lookup table with all salt values. This distributes the hotspot key evenly across $N$ partitions, restoring balanced parallel execution.
+> Apache Spark core internals, RDD vs DataFrame vs Dataset, Catalyst optimizer, Tungsten execution engine, Shuffle mechanics, memory management, Join strategies, Adaptive Query Execution (AQE), Structured Streaming, and Delta Lake ACID transactions.
 
 ---
 
-## Part 2: Cloud Data Warehouses & Lakehouses (16 - 32)
+## Part 1: Basic & Foundational Concepts (Junior / Entry-Level)
 
-### 6. Apache Spark Tungsten Engine: Off-Heap Memory and Whole-Stage Code Generation.
+### 1. What is Apache Spark and why is it faster than Hadoop MapReduce?
 **In Simple Words:**
-Tungsten is Spark's high-performance hardware execution engine:
-1. **Off-Heap Memory Management**: Manages raw binary memory using `sun.misc.Unsafe` instead of Java objects, eliminating JVM Garbage Collection overhead and object header bloat.
-2. **Cache-Aware Computation**: Organizes data structures in memory to match CPU L1/L2/L3 cache line boundaries.
-3. **Whole-Stage Code Generation**: Collapses multi-operator pipelines (filter -> map -> project) into a single tight bytecode loop generated at runtime via Janino, eliminating virtual function call overhead.
+Apache Spark is an open-source, distributed general-purpose cluster-computing engine:
+- **MapReduce Bottleneck**: Persisted all intermediate data between processing phases to physical disk (HDFS), incurring massive disk I/O and serialization penalties.
+- **Spark Innovation**: Performs computations in-memory (RAM) across cluster nodes and uses pipelined DAG execution, making it **up to 100x faster** for iterative machine learning, graph algorithms, and interactive analytics.
 
-### 7. Spark Narrow vs. Wide Dependencies (Transformations).
+### 2. What are the core components of the Apache Spark Architecture (Driver, Cluster Manager, Executors)?
 **In Simple Words:**
-- **Narrow Transformations (`map`, `flatMap`, `filter`)**: Each partition of the parent RDD is used by at most one partition of the child RDD. Data does not move across machines; executes in-memory concurrently.
-- **Wide Transformations (`groupByKey`, `reduceByKey`, `join`, `distinct`)**: Multiple child partitions depend on data from multiple parent partitions. Requires a **Shuffle** across the network to group matching keys onto the same executor nodes.
+1. **Driver**: The central process executing the main function of your program. Converts code into tasks, schedules them, and coordinates with Executors via the SparkContext.
+2. **Cluster Manager**: Allocates physical hardware resources across nodes (e.g. Kubernetes, Apache YARN, Mesos, or Spark Standalone).
+3. **Executors**: Worker processes running on cluster nodes. Responsible for executing tasks assigned by the Driver, storing cached data partitions in RAM/disk, and returning results.
 
-### 8. Spark Data Skew: Symptoms and Mitigation Strategies (Salting, Broadcast Joins).
+```text
+Spark Cluster Topology:
+                [Driver Program]
+                 (SparkContext)
+                       │
+             [Cluster Manager] (YARN / K8s / Standalone)
+                       │
+      ┌────────────────┴────────────────┐
+      ▼                                 ▼
+[Worker Node 1]                   [Worker Node 2]
+ ├─ Executor 1                     ├─ Executor 2
+ │   ├─ Task 1 (Core)              │   ├─ Task 1 (Core)
+ │   └─ Task 2 (Core)              │   └─ Task 2 (Core)
+ └─ Cache (RAM)                    └─ Cache (RAM)
+```
+
+### 3. What is an RDD (Resilient Distributed Dataset) and its 3 core characteristics?
 **In Simple Words:**
-**The Symptom**: 199 tasks finish in 5 seconds; 1 single task hangs for 20 minutes because 80% of data has the same key (e.g. `null` or high-volume customer).
-**Mitigation Tactics**:
-1. **Broadcast Hash Join**: If one DataFrame is small ($<10\text{MB}$ by default, or with `broadcast(smallDF)`), Spark copies the small dataset to every executor, completely eliminating the shuffle stage.
-2. **Salting**: Append random integer suffixes (`key_1`, `key_2`, ..., `key_N`) to the skewed key before grouping to distribute rows across multiple shuffle partitions, then aggregate again without the salt.
+An RDD is Spark's fundamental low-level data abstraction:
+1. **Resilient**: Fault-tolerant through lineage graphs. If a partition is lost due to node failure, Spark recomputes only the lost partition from source data.
+2. **Distributed**: Data is partitioned across multiple cluster nodes for parallel processing.
+3. **Dataset**: Represents an immutable collection of typed Java/Scala/Python objects.
 
-### 9. Delta Lake: ACID Transactions, Time Travel, and Schema Enforcement.
+### 4. What is the difference between RDD, DataFrame, and Dataset?
 **In Simple Words:**
-Delta Lake adds an open-source storage layer on top of Parquet files in object storage (S3/GCS):
-- **ACID Transaction Log (`_delta_log/`)**: Single source of truth. Mutations write new Parquet files and record atomic commit JSON logs.
-- **Time Travel**: Query data at a specific historical timestamp or commit version:
-  `spark.read.format("delta").option("versionAsOf", 12).load(path)`.
-- **Schema Enforcement & Evolution**: Rejects writes that don't match the table schema, preventing data lake corruption.
+- **RDD**: Low-level, unstructured objects, type-safe in Scala/Java, but lacks automatic query optimization.
+- **DataFrame**: Distributed collection of data organized into named columns (like a SQL table or Pandas dataframe). Highly optimized by the **Catalyst Optimizer** and **Tungsten Engine**. Untyped at compile time.
+- **Dataset**: Combines the best of both: full compile-time type safety of RDDs with the blistering optimization speed of DataFrames (available in Scala/Java; in Python, DataFrames are Datasets).
 
+```text
+Evolution of Spark Abstractions:
+RDD (Spark 1.0)       -> Raw objects, no query optimization
+DataFrame (Spark 1.3) -> Schema-aware, Catalyst optimizer, column store
+Dataset (Spark 1.6)   -> Type-safe + Catalyst optimizer
+```
+
+### 5. What is Lazy Evaluation in Apache Spark?
+**In Simple Words:**
+Spark does **not execute transformations immediately** when they are called:
+- Instead, it builds an execution plan recorded in a **DAG (Directed Acyclic Graph)**.
+- Execution only begins when an **Action** (e.g. `count()`, `collect()`, `write`) is called.
+- **Benefit**: Enables the Catalyst Optimizer to analyze the entire workflow, prune unused columns, push down predicates, and combine operations into a single execution stage!
+
+### 6. What is the difference between Transformations and Actions?
+**In Simple Words:**
+- **Transformations**: Lazy operations that produce a new DataFrame/RDD from an existing one: `map()`, `filter()`, `select()`, `groupBy()`, `join()`. Returns a DataFrame/RDD.
+- **Actions**: Eager operations that trigger computation across the cluster and return a value to the Driver or write data to external storage: `count()`, `collect()`, `take(N)`, `save()`, `show()`.
+
+### 7. What is the difference between Narrow Transformations and Wide Transformations?
+**In Simple Words:**
+- **Narrow Transformation**: Each input partition contributes to **only one** output partition. Requires **zero network data exchange** across nodes (e.g. `map()`, `filter()`, `flatMap()`).
+- **Wide Transformation**: Data from multiple partitions must be grouped and exchanged across cluster nodes (**Shuffle**). Extremely expensive in network I/O and disk write (e.g. `groupBy()`, `reduceByKey()`, `join()`, `distinct()`).
+
+```text
+Narrow vs Wide Transformation:
+Narrow (No Shuffle):     [Part 1] -> [Part 1']    [Part 2] -> [Part 2']
+Wide (Shuffle Required): [Part 1] ───┬───► [Part 1']
+                         [Part 2] ───┴───► [Part 2']
+```
+
+### 8. What is the execution hierarchy: Application -> Job -> Stage -> Task?
+**In Simple Words:**
+1. **Application**: The entire Spark program submitted to the cluster.
+2. **Job**: Created every time an **Action** is invoked in the application.
+3. **Stage**: A Job is split into multiple Stages separated by **Shuffle boundaries** (wide transformations).
+4. **Task**: The smallest unit of execution. A stage contains multiple Tasks, where each task processes **one single data partition** on a CPU core.
+
+### 9. How do you write a basic PySpark DataFrame application?
+**In Simple Words:**
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, avg
+
+# Initialize SparkSession:
+spark = SparkSession.builder \
+    .appName("ECommerceSalesAnalytics") \
+    .getOrCreate()
+
+# Read Parquet files:
+df = spark.read.parquet("s3://data-lake/orders/")
+
+# Transformation: filter, group, and calculate average order:
+result_df = df.filter(col("status") == "COMPLETED") \
+    .groupBy("customer_id") \
+    .agg(avg("total_amount").alias("avg_spent")) \
+    .filter(col("avg_spent") > 500)
+
+# Action: write back to S3:
+result_df.write.mode("overwrite").parquet("s3://data-lake/gold/top_customers/")
+```
+
+### 10. Why should you avoid using `collect()` on large DataFrames?
+**In Simple Words:**
+`collect()` pulls the **entire distributed dataset from all Executors into the Driver node's single memory space**:
+- If the DataFrame is 500 GB and the Driver has 8 GB of RAM, the Driver will instantly crash with a fatal `java.lang.OutOfMemoryError: Java heap space`.
+- Use `take(10)`, `limit(10).toPandas()`, or write results directly to storage instead.
+
+---
+
+## Part 2: Core Architecture & Implementation (Mid-Level)
+
+### 11. How does the Catalyst Optimizer optimize Spark SQL queries?
+**In Simple Words:**
+Catalyst is Spark's rule-based and cost-based query optimization engine. It operates in 4 phases:
+1. **Analysis**: Resolves table and column names against the Catalog to produce an Analyzed Logical Plan.
+2. **Logical Optimization**: Applies rule-based optimizations: **Predicate Pushdown** (filters pushed to storage source) and **Column Pruning** (reading only queried columns).
+3. **Physical Planning**: Generates multiple physical execution strategies and picks the cheapest one using a Cost-Based Optimizer (CBO).
+4. **Code Generation (CodeGen)**: Generates optimized Java bytecode on-the-fly for whole-stage execution.
+
+### 12. What is the Tungsten Execution Engine and how does it manage memory?
+**In Simple Words:**
+Tungsten optimizes Spark's CPU and memory efficiency down to bare metal:
+- **Off-Heap Memory Management**: Bypasses the JVM garbage collector by storing binary data off-heap using Java's `sun.misc.Unsafe`. Eliminates GC pause times for gigabytes of cached data!
+- **Cache-Aware Computation**: Designs algorithms to fit into L1/L2/L3 CPU caches.
+- **Whole-Stage Java Code Generation**: Flattens nested function calls into a single tight `for` loop, avoiding virtual method dispatch overhead.
+
+### 13. How does the Spark Shuffle mechanism work internally?
+**In Simple Words:**
+A shuffle redistributes data across cluster partitions when grouping or joining:
+1. **Shuffle Write (Map Side)**: Each task partitions its output into buckets and writes sorted blocks to local disk on the Executor.
+2. **Shuffle Spill**: If the memory buffer fills up, intermediate sorted partitions spill to local disk.
+3. **Shuffle Read (Reduce Side)**: Downstream tasks fetch their assigned partition blocks over the network from all upstream worker nodes and merge them.
+- **Optimization Goal**: Minimize shuffle volume by pre-aggregating data on the map side (e.g. `reduceByKey` instead of `groupByKey`).
+
+### 14. What is the difference between `repartition()` and `coalesce()`?
+**In Simple Words:**
+- **`repartition(N)`**: Reshuffles data evenly across N partitions using full network shuffle. Can increase or decrease partition count. High overhead, but balances skewed partitions.
+- **`coalesce(N)`**: Decreases the number of partitions **without a full shuffle** by merging adjacent partitions on the same worker node. Much faster, but can **only decrease** partition count.
+
+```python
+# Best practice when writing results to disk:
+# Avoid creating 200 tiny 50KB files:
+df.coalesce(4).write.parquet("s3://bucket/output/")
+```
+
+### 15. What are the memory regions in Spark's Unified Memory Manager?
+**In Simple Words:**
+An Executor's memory is divided into:
+1. **Reserved Memory (300 MB)**: Hardcoded for Spark internal system processes.
+2. **User Memory (25% of remaining)**: Stores user data structures, UDF variables, and metadata.
+3. **Spark Memory (75% of remaining)**:
+   - **Execution Memory**: Used for shuffles, joins, sorts, and aggregations.
+   - **Storage Memory**: Used for cached DataFrames (`cache()`, `persist()`) and broadcast variables.
+   - **Dynamic Borrowing**: Execution and Storage can dynamically borrow memory from each other! Execution has priority and can evict storage.
+
+### 16. What is the difference between `cache()` and `persist()`?
+**In Simple Words:**
+- **`cache()`**: Shortcut for `persist(StorageLevel.MEMORY_AND_DISK)` (in DataFrames) or `MEMORY_ONLY` (in RDDs).
+- **`persist(level)`**: Allows explicitly specifying the storage level:
+  - `MEMORY_ONLY`: Deserialized in RAM (fastest, high RAM usage).
+  - `MEMORY_ONLY_SER`: Serialized in RAM (saves 60% memory, slight CPU deserialize cost).
+  - `MEMORY_AND_DISK`: Spills to local disk when RAM is full.
+  - `DISK_ONLY`: Stored purely on local disk.
+
+### 17. What are Broadcast Variables and Accumulators?
+**In Simple Words:**
+- **Broadcast Variable**: Sends a read-only lookup table or dictionary to **every Executor node once**, instead of sending a copy with every single task. Drastically reduces network serialization traffic.
+- **Accumulator**: Write-only shared variable updated across tasks via associative addition (e.g. counting corrupted rows or tracking metrics across a distributed pipeline).
+
+```python
+# Broadcast a small lookup table:
+lookup_dict = {"US": "United States", "DE": "Germany", "JP": "Japan"}
+broadcast_countries = spark.sparkContext.broadcast(lookup_dict)
+
+def map_country(code):
+    return broadcast_countries.value.get(code, "Unknown")
+```
+
+### 18. What are Spark's Join Strategies (Broadcast Hash Join vs Sort-Merge Join vs Shuffle Hash Join)?
+**In Simple Words:**
+1. **Broadcast Hash Join (BHJ)**: If one table is small (< 10 MB default, configurable via `spark.sql.autoBroadcastJoinThreshold`), Spark broadcasts the small table to all executors and performs an in-memory hash join with **zero shuffle**. Fastest join!
+2. **Sort-Merge Join (SMJ - Default for large tables)**: Shuffles both tables on the join key, sorts each partition, and merges matching keys sequentially. Handles arbitrary table sizes without memory overflow.
+3. **Shuffle Hash Join**: Shuffles both tables and builds an in-memory hash table for each partition. Used when tables are medium-sized and sorting is expensive.
+
+### 19. What is Data Skew in Apache Spark and how do you resolve it?
+**In Simple Words:**
+Data skew occurs when one partition contains disproportionately more records than others (e.g. 90% of orders belong to `country = 'US'`):
+- **Symptom**: One task in a stage runs for 45 minutes while all other 199 tasks finish in 10 seconds!
+- **Solutions**:
+  1. **Salting**: Append a random integer (e.g. `key_0` to `key_9`) to the join key to distribute the skewed key across 10 partitions, joining against a replicated lookup table.
+  2. Enable **Adaptive Query Execution (AQE)** skew join handling.
+
+### 20. What is Adaptive Query Execution (AQE) in Spark 3.x?
+**In Simple Words:**
+AQE dynamically re-optimizes query plans at runtime based on actual stage execution statistics:
+1. **Dynamically Coalescing Shuffle Partitions**: Automatically combines hundreds of tiny shuffle partitions into optimal partition sizes.
+2. **Dynamically Switching Join Strategies**: Converts a Sort-Merge Join to a Broadcast Hash Join if a table's filtered runtime size turns out to be smaller than the broadcast threshold.
+3. **Dynamically Handling Data Skew**: Automatically splits skewed shuffle partitions into smaller sub-partitions.
+
+---
+
+## Part 3: Advanced Internals, Scale & Production Patterns (Senior / Lead)
+
+### 21. How does Spark Structured Streaming work (Micro-batch vs Continuous)?
+**In Simple Words:**
+Structured Streaming unifies batch and streaming APIs on top of the Catalyst engine:
+- **Micro-Batch Engine (Default)**: Ingests streaming events, processes them as mini-batches (e.g. every 100ms or 1 second) with end-to-end exactly-once guarantees.
+- **Continuous Processing Engine**: Sub-millisecond latency using continuous record-by-record processing (with at-least-once guarantees).
+- State is managed reliably using checkpointing and write-ahead logs in object storage (S3/HDFS).
+
+### 22. What are Watermarks in Spark Structured Streaming?
+**In Simple Words:**
+A Watermark defines how long Spark waits for late-arriving streaming events before discarding them from state memory:
+- `.withWatermark("timestamp", "10 minutes")` instructs Spark that events arriving more than 10 minutes past the current event-time threshold can be dropped.
+- Prevents streaming state stores from expanding infinitely and running out of memory.
+
+### 23. What is Delta Lake and how does it provide ACID transactions on Parquet files?
+**In Simple Words:**
+Delta Lake is an open storage layer that brings ACID transactions and reliability to data lakes:
+- **Architecture**: Stores raw columnar data in **Apache Parquet files** paired with a forward-only JSON transaction log (**`_delta_log/`**).
+- **ACID Guarantees**: Any write creates a new versioned commit file (`000001.json`). Every read accesses a snapshot of the transaction log, guaranteeing serializable isolation.
+
+```text
+Delta Lake Storage Structure:
+my_table/
+ ├─ _delta_log/
+ │   ├─ 000000.json (Commit 0: Adds Part 1 & Part 2)
+ │   ├─ 000001.json (Commit 1: Adds Part 3, Removes Part 1)
+ │   └─ 000001.checkpoint.parquet (State snapshot every 10 commits)
+ ├─ part-00001.parquet
+ ├─ part-00002.parquet
+ └─ part-00003.parquet
+```
+
+### 24. What are Delta Lake Time Travel, Vacuum, and Optimize (Z-Ordering)?
+**In Simple Words:**
+- **Time Travel**: Query previous table versions: `spark.read.format("delta").option("versionAsOf", 5).load(path)`.
+- **`OPTIMIZE` + Z-Order**: Compresses small files into large 1 GB Parquet files and clusters data multidimensionally along Z-order curves for optimal partition skipping.
+- **`VACUUM`**: Permanently deletes historical Parquet files that are older than the retention threshold (default 7 days) to reclaim storage.
+
+### 25. How do you calculate optimal Spark Executor Sizing for a cluster?
+**In Simple Words:**
+Assume a 6-node worker node cluster with 16 cores and 64 GB RAM per node:
+1. **Cores per Executor**: Set to **5 cores** (ideal balance for HDFS/S3 throughput and GC overhead).
+2. **Executors per Node**: (16 - 1 OS core) / 5 = 3 Executors per node. Total = 18 Executors.
+3. Reserve 1 Executor for the Driver -> **17 worker Executors**.
+4. **RAM per Executor**: (64 - 1 OS RAM) / 3 ≈ 21 GB.
+   - Memory Overhead (`spark.executor.memoryOverhead`): ~10% ≈ 2 GB.
+   - Executor Heap (`spark.executor.memory`): 21 - 2 = **19 GB**.
+
+### 26. What causes the fatal "Shuffle Fetch Failed" exception and how do you resolve it?
+**In Simple Words:**
+Occurs when a reducer executor attempts to fetch shuffle blocks from an upstream mapper executor that has crashed or timed out:
+- **Causes**:
+  1. Mapper executor crashed due to an OutOfMemory error (GC pause > 120s).
+  2. Node hardware failure or spot instance termination.
+  3. Excessive network congestion.
+- **Fixes**:
+  - Increase `spark.core.connection.ack.wait.timeout` (e.g. from 120s to 300s).
+  - Increase `spark.sql.shuffle.partitions` from the default 200 to 1000+ to reduce per-partition block size.
+  - Enable external shuffle service (`spark.shuffle.service.enabled`).
+
+### 27. What are the best practices for Garbage Collection (GC) tuning in Spark?
+**In Simple Words:**
+Long GC pauses (> 5s) trigger heartbeat timeouts and kill executors:
+1. Use **G1GC** (Garbage-First Garbage Collector): `-XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=35`.
+2. Use **DataFrames / Datasets** instead of RDDs; Tungsten's off-heap binary format generates zero Java garbage collection objects!
+3. If caching large collections, use `StorageLevel.MEMORY_ONLY_SER` to serialize objects into byte arrays.
+
+### 28. How does Spark handle Dynamic Resource Allocation?
+**In Simple Words:**
+Allows Spark to scale the number of allocated Executors dynamically based on queue workload:
+- Spawns additional Executors when tasks are backlogged in the task queue for more than `spark.dynamicAllocation.schedulerBacklogTimeout` (1s).
+- Deallocates and removes idle Executors when tasks finish for more than `executorIdleTimeout` (60s).
+- Requires an external shuffle service to preserve shuffle files when idle executors terminate.
+
+### 29. What is Predicate Pushdown and how does it save petabytes of data scan?
+**In Simple Words:**
+Predicate pushdown moves filter conditions (`WHERE country = 'US'`) down to the physical storage connector (Parquet, ORC, JDBC, Snowflake):
+- The Parquet reader inspects column metadata statistics in file footers without decompressing or parsing rows.
+- If a Parquet row group's `max_country < 'US'`, the entire multi-megabyte block is completely skipped!
+
+### 30. How do you implement custom User-Defined Functions (UDFs) vs Pandas Vectorized UDFs in PySpark?
+**In Simple Words:**
+- **Standard Python UDF**: Extremely slow! Deserializes JVM objects to Python processes row-by-row through IPC pipes.
+- **Pandas Vectorized UDF (PyArrow)**: Transmits chunks of columnar data in **Apache Arrow** format directly into vectorized Pandas / NumPy arrays, running **up to 100x faster**.
+
+```python
+from pyspark.sql.functions import pandas_udf
+import pandas as pd
+
+# Vectorized Pandas UDF:
+@pandas_udf("double")
+def calculate_vat(price: pd.Series) -> pd.Series:
+    return price * 0.20
+
+df = df.withColumn("vat", calculate_vat(df["price"]))
+```
+
+### 31. What is the difference between Checkpointing and Caching in Spark?
+**In Simple Words:**
+- **`cache()`**: Keeps DataFrame partitions in memory or local disk. **Preserves the lineage graph**; if an executor crashes, Spark re-evaluates the lineage.
+- **`checkpoint()`**: Truncates the lineage graph completely and saves physical data to durable distributed storage (HDFS/S3). Critical for long iterative algorithms (e.g. GraphX, Machine Learning) where lineages grow to thousands of stages and cause stack overflow.
+
+### 32. How do you debug Spark performance bottlenecks using the Spark Web UI?
+**In Simple Words:**
+1. **Stages Tab**: Look for stages with high duration. Check the ratio between Max Task Time and Median Task Time; a large difference indicates **Data Skew**.
+2. **Executors Tab**: Inspect GC time (should be < 10% of task time) and shuffle read/write volumes.
+3. **Storage Tab**: Check what percentage of cached DataFrames are resident in memory vs spilled to disk.
+4. **SQL Tab**: Inspect physical execution plans and DAG visualizations.
+
+### 33. What is the difference between Apache Iceberg and Delta Lake?
+**In Simple Words:**
+Both provide ACID table formats on cloud object storage:
+- **Delta Lake**: Deeply optimized for Apache Spark and Databricks ecosystems, uses JSON transaction logs and checkpoint Parquet files.
+- **Apache Iceberg**: Engine-agnostic from day one (equal first-class citizen support for Trino, Flink, Spark, Snowflake, BigQuery), tracks data files through explicit manifest files and manifest lists.
+
+### 34. What is the Spark Driver OOM problem and how do you resolve it?
+**In Simple Words:**
+Driver crashes occur when:
+1. Calling `collect()` on massive datasets.
+2. Broadcasting a table larger than driver memory (`spark.driver.memory`).
+3. Excessive broadcast joins exhausting driver heap during serialization.
+4. Lineage graph explosion in deep iterative loops (solve with `localCheckpoint()`).
+
+### 35. When should you use Apache Flink instead of Apache Spark?
+**In Simple Words:**
+- **Use Apache Flink**: When you require true event-driven, record-by-record processing with ultra-low sub-millisecond latency (fraud detection, real-time CEP - Complex Event Processing).
+- **Use Apache Spark**: When your workload mixes batch data processing, scheduled ELT pipelines, machine learning at scale, interactive SQL analytics, and micro-batch streaming.

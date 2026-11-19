@@ -1,220 +1,332 @@
-# Relational SQL & Database Architecture Master Interview Bank (1 - 17)
+# Relational SQL & Database Architecture Master Interview Bank (1 - 35)
 
-> Relational SQL design, ACID properties, isolation levels (Read Committed vs Repeatable Read vs Serializable), B-Tree indexes, normalization, joins, and query optimization.
-
----
-
-### 1. What is a Database Management System (DBMS), and what are the foundational differences between Relational (SQL) and Non-Relational (NoSQL) databases?
-**In Simple Words:**
-A **Database Management System (DBMS)** is speciali
-
-### 2. Walk me through your production database architecture experience and database selection criteria.
-**In Simple Words:**
-"In production, I have architected and operated **PostgreSQL**, **MySQL**, **MongoDB**, **Redis**, and **DynamoDB**.
-My database selection framework is guided by access patterns and consistency requirements:
-- **PostgreSQL**: My default standard for transactional services, relational integrity, ACID compliance, and JSONB flexibility.
-- **MongoDB**: For polymorphic documents and aggregates where entities are frequently read and written as complete nested units.
-- **Redis**: For ultra-low-latency in-memory caching, distributed locks, session stores, and rate limiters.
-- **DynamoDB**: For serverless architectures requiring predictable single-digit millisecond latency at arbitrary scale."
-
-```sql
--- Production PostgreSQL table with UUIDs, indexing, and JSONB document storage:
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email VARCHAR(255) UNIQUE NOT NULL,
-  metadata JSONB NOT NULL DEFAULT '{}',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_users_metadata_gin ON users USING GIN (metadata);
-```
-
-### 3. How do you handle schema migrations without downtime?
-**In Simple Words:**
-Use the **Expand/Contract Pattern**:
-1. **Expand**: Add new columns as nullable, and create new indexes concurrently (`CREATE INDEX CONCURRENTLY` in Postgres to avoid table locks).
-2. **Dual-Writing**: Update backend code to write to both old and new schema fields.
-3. **Backfill**: Run background scripts to backfill legacy rows.
-4. **Contract**: Switch reads to new columns, remove writes to old columns, and safely drop deprecated columns.
-
-```sql
--- Step 1 (Zero-downtime column addition & concurrent index):
-ALTER TABLE users ADD COLUMN phone_number VARCHAR(20) DEFAULT NULL;
-CREATE INDEX CONCURRENTLY idx_users_phone ON users(phone_number);
-
--- Step 2: Code writes to both 'phone' and 'phone_number'
--- Step 3: Backfill legacy rows in small batches:
-UPDATE users SET phone_number = phone WHERE phone_number IS NULL AND id IN (SELECT id FROM users LIMIT 1000);
-
--- Step 4: Drop old column safely:
-ALTER TABLE users DROP COLUMN phone;
-```
-
-### 4. Describe a severe database performance issue you resolved.
-**How to Explain in an Interview:**
-- **Problem**: Primary PostgreSQL CPU hit 100% and connection pool exhaustion caused 504 errors.
-- **Root Cause**: Running `EXPLAIN ANALYZE` revealed a sequential scan across 15M rows due to a missing composite index on a foreign key join.
-- **Fix**: Created the composite index concurrently on `(user_id, created_at DESC)`, added **PgBouncer** in transaction pooling mode to reuse connections, and cached hot catalog reads in Redis.
-
-```sql
--- Root Cause Diagnosis:
-EXPLAIN (ANALYZE, BUFFERS) 
-SELECT * FROM orders WHERE user_id = 'c8b21...' ORDER BY created_at DESC LIMIT 10;
--- Output showed: Seq Scan on orders (cost=0.00..385200.12 rows=15200000)
-
--- Resolution:
-CREATE INDEX CONCURRENTLY idx_orders_user_created ON orders (user_id, created_at DESC);
--- New plan: Index Scan using idx_orders_user_created (cost=0.43..8.45 rows=10)
-```
-
-### 5. Strategy for database security and connection pooling:
-**In Simple Words:**
-- **Networking**: Databases live in private VPC subnets with
-
-### 6. What are the ACID properties in relational databases?
-**In Simple Words:**
-ACID guarantees that database transactions are executed reliably:
-- **A - Atomicity ("All or Nothing")**: If one step of a transfer fails, the entire transaction rolls back.
-- **C - Consistency**: Data must always obey schema constraints (Foreign Keys, Unique checks).
-- **I - Isolation**: Concurrent transactions don't interfere with each other.
-- **D - Durability**: Once committed, data is written to disk (WAL) and won't be lost even on power failure.
-
-```sql
--- Atomicity demonstration: If balance check fails, ROLLBACK occurs
-BEGIN;
-UPDATE accounts SET balance = balance - 100 WHERE id = 1 AND balance >= 100;
--- If 0 rows updated, abort transaction:
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-COMMIT;
-```
-
-### 7. Normalization (1NF to BCNF) vs Denormalization:
-**In Simple Words:**
-- **Normali
-
-### 8. Primary Key vs Unique Key vs Foreign Key:
-**In Simple Words:**
-- **Primary Key**: Uniquely identifies each row; strictly unique and cannot be `NULL` (one per table).
-- **Unique Key**: Enforces unique values; allows `NULL` values.
-- **Foreign Key**: Links a column to the Primary Key of another table to maintain referential integrity.
-
-```sql
-CREATE TABLE orders (
-  id SERIAL PRIMARY KEY,                        -- Primary Key (NOT NULL & UNIQUE)
-  order_number VARCHAR(50) UNIQUE NOT NULL,      -- Unique Key
-  user_id INT REFERENCES users(id) ON DELETE CASCADE -- Foreign Key
-);
-```
-
-### 9. SQL Transaction Isolation Levels:
-**In Simple Words:**
-Controls how visible uncommitted changes from other transactions are:
-1. **Read Uncommitted**: Lowest isolation; allows dirty reads.
-2. **Read Committed** (Default in Postgres): Reads only committed rows.
-3. **Repeatable Read** (Default in MySQL InnoDB): Guarantees the same row read twice inside a transaction returns identical data.
-4. **Seriali
-
-### 10. Dirty Reads vs Non-Repeatable Reads vs Phantom Reads:
-**In Simple Words:**
-- **Dirty Read**: Reading uncommitted data written by another transaction that later rolls back.
-- **Non-Repeatable Read**: Re-reading a row and finding its values updated by another committed transaction.
-- **Phantom Read**: Re-running a range query (`WHERE age > 30`) and finding new rows inserted by another committed transaction.
-
-```sql
--- Non-Repeatable Read Example:
--- Tx 1:
-BEGIN;
-SELECT salary FROM employees WHERE id = 5; -- Returns 50,000
--- Tx 2 commits: UPDATE employees SET salary = 60,000 WHERE id = 5; COMMIT;
--- Tx 1 re-reads:
-SELECT salary FROM employees WHERE id = 5; -- In Read Committed, returns 60,000!
-```
-
-### 11. How do B-Tree indexes work internally?
-**In Simple Words:**
-B-Trees are self-balancing search trees with shallow depth and high branching fanout. Keys are kept sorted, allowing $O(\log N)$ search, insert, and delete operations. In B+Trees, all data pointers live in linked leaf nodes, making range queries (`BETWEEN`, `>`, `<`) exceptionally fast.
-
-```sql
--- Default index type in PostgreSQL is B-Tree:
-CREATE INDEX idx_products_price ON products USING btree (price);
-
--- B-Tree efficiently handles equality and range queries:
-SELECT * FROM products WHERE price BETWEEN 20.00 AND 50.00;
-```
-
-### 12. Clustered Index vs Non-Clustered Index:
-**In Simple Words:**
-- **Clustered Index**: Determines the physical on-disk storage order of table rows (only 1 per table, usually Primary Key). Leaf nodes contain the full row data.
-- **Non-Clustered Index**: A separate index structure whose leaf nodes contain the index key and a pointer back to the actual table row.
-
-```sql
--- In PostgreSQL, you can physically cluster a table using an existing index:
-CLUSTER orders USING idx_orders_user_created;
-```
-
-### 13. Composite Index and the "Leftmost Prefix Rule":
-**In Simple Words:**
-An index on `(A, B, C)` only accelerates queries that filter on the leftmost column `A`:
-- `WHERE A = 1 AND B = 2` -> Uses index.
-- `WHERE B = 2 AND C = 3` -> **Cannot** use index because leading column `A` is omitted.
-
-```sql
-CREATE INDEX idx_users_country_city_status ON users (country, city, status);
-
--- Uses index (country is leading column):
-SELECT * FROM users WHERE country = 'US' AND city = 'Austin';
-
--- CANNOT use index effectively (leading column missing):
-SELECT * FROM users WHERE city = 'Austin';
-```
-
-### 14. EXPLAIN vs EXPLAIN ANALYZE:
-**In Simple Words:**
-- `EXPLAIN`: Shows the optimi
-
-### 15. SQL Joins comparison:
-**In Simple Words:**
-- **INNER JOIN**: Returns rows only when keys match in both tables.
-- **LEFT JOIN**: Returns all left rows plus matched right rows (`NULL` if no match).
-- **CROSS JOIN**: Cartesian product ($M \times N$ rows; dangerous on large tables).
-
-```sql
--- LEFT JOIN: Find all users, including those who have never placed an order:
-SELECT u.id, u.name, o.id AS order_id
-FROM users u
-LEFT JOIN orders o ON u.id = o.user_id
-WHERE o.id IS NULL; -- Users with
-
-### 16. Join Execution Algorithms (Nested Loop, Hash Join, Merge Join):
-**In Simple Words:**
-- **Nested Loop**: For each row in outer table, scans inner table (great when inner table has an index).
-- **Hash Join**: Builds an in-memory hash table of smaller table, then scans larger table probing the hash table (best for large unindexed joins).
-- **Merge Join**: Both datasets must be pre-sorted on join keys; scans both in lockstep.
-
-```sql
--- Force query planner to use Hash Join for testing:
-SET enable_nestloop = off;
-SET enable_mergejoin = off;
-EXPLAIN SELECT * FROM large_table_a a JOIN large_table_b b ON a.key = b.key;
--- Plan displays: Hash Join (Hash Cond: (a.key = b.key))
-```
-
-### 17. The N+1 Query Problem in ORMs:
-**In Simple Words:**
-Fetching 100 users, and then executing 100 individual queries inside a loop to fetch each user's profile ($1 + 100 = 101$ queries).
-**Fix**: Use Eager Loading to fetch all profiles in a single query using `IN (...)`.
-
-```sql
--- The BAD N+1 pattern:
--- Query 1: SELECT * FROM users LIMIT 100;
--- Followed by 100 queries: SELECT * FROM profiles WHERE user_id = ?;
-
--- The EAGER LOADING fix (2 queries total):
--- Query 1: SELECT * FROM users LIMIT 100;
--- Query 2: SELECT * FROM profiles WHERE user_id IN (1, 2, 3, ... 100);
-```
+> Relational database fundamentals, SQL DDL vs DML vs DCL vs TCL, Normalization (1NF to BCNF) and denormalization, ACID properties, transaction isolation levels (Dirty, Non-repeatable, Phantom reads), Joins, Window Functions, B-Tree index structures, clustered vs non-clustered, query execution plan tuning, and deadlocks.
 
 ---
 
-## Part 3: NoSQL & Document Databases (MongoDB, DynamoDB) (26 - 40)
+## Part 1: Basic & Foundational Concepts (Junior / Entry-Level)
 
+### 1. What are the four sub-languages of SQL (DDL, DML, DCL, TCL)?
+**In Simple Words:**
+SQL commands are categorized into 4 operational sub-languages:
+1. **DDL (Data Definition Language)**: Defines and modifies database schema structure: `CREATE`, `ALTER`, `DROP`, `TRUNCATE`, `RENAME`.
+2. **DML (Data Manipulation Language)**: Modifies and queries data records: `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
+3. **DCL (Data Control Language)**: Manages permissions and security privileges: `GRANT`, `REVOKE`.
+4. **TCL (Transaction Control Language)**: Manages transactions and atomic commits: `COMMIT`, `ROLLBACK`, `SAVEPOINT`.
+
+```text
+SQL Sub-Languages:
+┌──────┬──────────────────────────────┬───────────────────────────────┐
+│ Type │ Scope                        │ Key Commands                  │
+├──────┼──────────────────────────────┼───────────────────────────────┤
+│ DDL  │ Table Structure & Schema     │ CREATE, ALTER, DROP, TRUNCATE │
+│ DML  │ Row Data & Queries           │ SELECT, INSERT, UPDATE, DELETE│
+│ DCL  │ Permissions & Security       │ GRANT, REVOKE                 │
+│ TCL  │ Transaction Boundaries       │ COMMIT, ROLLBACK, SAVEPOINT   │
+└──────┴──────────────────────────────┴───────────────────────────────┘
+```
+
+### 2. What is the difference between `DELETE`, `TRUNCATE`, and `DROP`?
+**In Simple Words:**
+- **`DELETE` (DML)**: Removes rows matching a `WHERE` condition one by one. Logs each row deletion in transaction logs, fires triggers, and can be rolled back inside a transaction. Slower on large tables.
+- **`TRUNCATE` (DDL)**: Deallocates entire physical data pages to empty the table. Resets auto-increment counters, does not fire row triggers, and runs significantly faster.
+- **`DROP` (DDL)**: Completely deletes both the data **and the table structure/schema definition** from the database catalog.
+
+### 3. What are Primary Keys, Foreign Keys, and Unique Constraints?
+**In Simple Words:**
+- **Primary Key**: A column (or set of columns) that uniquely identifies each row in a table. Must be unique and **cannot contain `NULL` values**. A table can have only one Primary Key.
+- **Unique Key**: Enforces uniqueness across values in a column. Unlike Primary Keys, unique columns **allow `NULL` values** (often multiple NULLs depending on SQL dialect).
+- **Foreign Key**: A column that references the Primary Key of another table, enforcing referential integrity.
+
+### 4. What are the different types of SQL Joins (INNER, LEFT, RIGHT, FULL, CROSS)?
+**In Simple Words:**
+- **INNER JOIN**: Returns only rows where there is a match in **both** tables.
+- **LEFT (OUTER) JOIN**: Returns all rows from the left table, plus matched rows from the right table (unmatched right columns return `NULL`).
+- **RIGHT (OUTER) JOIN**: Returns all rows from the right table, plus matched rows from the left table.
+- **FULL (OUTER) JOIN**: Returns rows when there is a match in either the left or right table.
+- **CROSS JOIN**: Produces the Cartesian product of two tables ($N \times M$ rows).
+
+```text
+Visual Venn Representation:
+INNER JOIN:     [   (A ∩ B)   ]
+LEFT JOIN:      [ (A + (A ∩ B)) ]
+FULL OUTER:     [ (A ∪ B)     ]
+CROSS JOIN:     [ A × B (Cartesian Product) ]
+```
+
+### 5. What is the difference between `WHERE` and `HAVING` clauses?
+**In Simple Words:**
+- **`WHERE`**: Filters individual rows **before** any aggregation (`GROUP BY`) is calculated. Cannot contain aggregate functions (e.g. `WHERE salary > 50000`).
+- **`HAVING`**: Filters grouped summary rows **after** aggregation has occurred. Evaluates aggregate functions (e.g. `HAVING COUNT(*) > 5` or `HAVING AVG(salary) > 80000`).
+
+### 6. What are the common SQL Aggregate Functions?
+**In Simple Words:**
+Aggregate functions perform a calculation on a set of values and return a single scalar value:
+- `COUNT(*)`: Counts total rows (including NULLs).
+- `COUNT(column)`: Counts non-null rows in that column.
+- `SUM(column)`: Returns the total mathematical sum.
+- `AVG(column)`: Returns the arithmetic mean.
+- `MIN(column)` / `MAX(column)`: Returns the lowest or highest value.
+
+### 7. What is Database Normalization and why is it used?
+**In Simple Words:**
+Normalization is the process of organizing database schema to eliminate **data redundancy** and avoid **insertion, update, and deletion anomalies**:
+- Prevents storing a customer's address in 50 separate order rows; if the customer moves, you only update a single row in the Customers table.
+- Standard forms range from 1NF to 5NF, with **Third Normal Form (3NF)** being the universal industry standard for OLTP systems.
+
+### 8. What are First, Second, and Third Normal Forms (1NF, 2NF, 3NF)?
+**In Simple Words:**
+1. **1NF (First Normal Form)**:
+   - Each column contains atomic (indivisible) values (no comma-separated lists!).
+   - Each row has a unique identifier (Primary Key).
+2. **2NF (Second Normal Form)**:
+   - Must be in 1NF.
+   - Eliminates **Partial Functional Dependencies**: All non-key columns must depend on the *entire* primary key (relevant for composite keys).
+3. **3NF (Third Normal Form)**:
+   - Must be in 2NF.
+   - Eliminates **Transitive Dependencies**: Non-key columns must not depend on other non-key columns ("Every non-key attribute must depend on the key, the whole key, and nothing but the key").
+
+### 9. What is Boyce-Codd Normal Form (BCNF)?
+**In Simple Words:**
+BCNF is a stricter version of 3NF:
+- A table is in BCNF if and only if for every functional dependency $X \rightarrow Y$, $X$ must be a **Superkey** (candidate key).
+- Resolves rare anomalies where a table has multiple overlapping composite candidate keys.
+
+### 10. When should you deliberately Denormalize a database?
+**In Simple Words:**
+Strict 3NF requires joining 6 to 10 tables to assemble a complete user profile or invoice, causing heavy CPU and memory join overhead:
+- **Denormalization**: Intentionally duplicating data into tables (e.g. storing `customer_name` directly in `orders`):
+  - Speeds up read-heavy queries by eliminating expensive JOIN operations.
+  - Used heavily in analytical reporting systems (Data Warehouses) and high-throughput read paths where read performance trumps write overhead.
+
+---
+
+## Part 2: Core Architecture & Implementation (Mid-Level)
+
+### 11. What are the ACID Properties in relational databases?
+**In Simple Words:**
+The 4 foundational guarantees of transactional databases:
+1. **Atomicity**: "All or nothing". Either every operation in a transaction succeeds, or the entire transaction is rolled back with zero partial changes.
+2. **Consistency**: A transaction transitions the database from one valid state to another, upholding all constraints, cascades, and schema rules.
+3. **Isolation**: Concurrent transactions execute without interfering with one another, preventing dirty reads and race conditions.
+4. **Durability**: Once a transaction is committed, its changes survive permanently on disk, even if power fails immediately afterward.
+
+### 12. What are the 4 ANSI SQL Transaction Isolation Levels and their read phenomena?
+**In Simple Words:**
+Isolation levels define how transactions interact concurrently:
+- **Dirty Read**: Reading uncommitted changes made by another concurrent transaction (which might subsequently roll back!).
+- **Non-Repeatable Read**: Re-reading a row within the same transaction returns different column values because another transaction modified and committed it.
+- **Phantom Read**: Re-running a range query (`WHERE age > 25`) returns newly inserted rows committed by another transaction.
+
+```text
+Isolation Matrix:
+┌──────────────────┬────────────┬─────────────────────┬──────────────┐
+│ Isolation Level  │ Dirty Read │ Non-Repeatable Read │ Phantom Read │
+├──────────────────┼────────────┼─────────────────────┼──────────────┤
+│ READ UNCOMMITTED │ YES        │ YES                 │ YES          │
+│ READ COMMITTED   │ NO         │ YES                 │ YES          │
+│ REPEATABLE READ  │ NO         │ NO                  │ YES (Standard)│
+│ SERIALIZABLE     │ NO         │ NO                  │ NO           │
+└──────────────────┴────────────┴─────────────────────┴──────────────┘
+```
+
+### 13. What are Window Functions and how do they differ from `GROUP BY`?
+**In Simple Words:**
+- **`GROUP BY`**: Collapses multiple rows into a single summary row.
+- **Window Functions (`OVER (PARTITION BY ... ORDER BY ...)`):** Performs calculations across a set of rows related to the current row, **while preserving the individual identity of each row**:
+```sql
+-- Calculate rank and running total without collapsing rows:
+SELECT
+  employee_id,
+  department,
+  salary,
+  RANK() OVER (PARTITION BY department ORDER BY salary DESC) as dept_rank,
+  SUM(salary) OVER (PARTITION BY department ORDER BY salary ASC) as running_total
+FROM employees;
+```
+
+### 14. What is the difference between `ROW_NUMBER()`, `RANK()`, and `DENSE_RANK()`?
+**In Simple Words:**
+When ranking rows with tied values (e.g. two employees with salary $100,000):
+- **`ROW_NUMBER()`**: Assigns strictly consecutive unique numbers regardless of ties ($1, 2, 3, 4$).
+- **`RANK()`**: Assigns the same rank to ties, and **skips subsequent ranks** to reflect the gap ($1, 2, 2, 4$).
+- **`DENSE_RANK()`**: Assigns the same rank to ties, but **never skips ranks** ($1, 2, 2, 3$).
+
+### 15. What are `LEAD()` and `LAG()` window functions used for?
+**In Simple Words:**
+Allows accessing data from preceding or succeeding rows without self-joins:
+- **`LAG(col, N)`**: Accesses value from $N$ rows *before* the current row (e.g. comparing today's revenue against yesterday's revenue).
+- **`LEAD(col, N)`**: Accesses value from $N$ rows *after* the current row (e.g. calculating duration until next user click event).
+
+```sql
+SELECT
+  order_date,
+  revenue,
+  revenue - LAG(revenue, 1) OVER (ORDER BY order_date) AS day_over_day_change
+FROM daily_sales;
+```
+
+### 16. What is the difference between Correlated and Non-Correlated Subqueries?
+**In Simple Words:**
+- **Non-Correlated Subquery**: Independent of the outer query. Evaluated **only once**; its result is reused by the outer query:
+  `SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees);`
+- **Correlated Subquery**: References columns from the outer query. Must be **re-evaluated for every single row** processed by the outer query:
+  `SELECT * FROM employees e WHERE salary > (SELECT AVG(salary) FROM employees WHERE department = e.department);`
+  (Can be slow; often better rewritten using Window Functions or JOINs).
+
+### 17. What is the difference between `EXISTS` and `IN`?
+**In Simple Words:**
+- **`IN`**: Evaluates all subquery results, builds a candidate set, and checks if the outer value exists in that set. Fails or produces unexpected results if subquery returns `NULL` with `NOT IN`.
+- **`EXISTS`**: Returns a boolean `true` as soon as the first matching row is found (**short-circuits immediately**). Much faster when the subquery touches a large table with an index.
+
+### 18. How does a B-Tree (and B+ Tree) Index work internally?
+**In Simple Words:**
+Relational databases store table indexes using self-balancing search trees (primarily B+ Trees):
+- **Root and Internal Branch Nodes**: Store routing keys and child page pointers to direct traversals.
+- **Leaf Nodes**: Hold the actual keys in sorted sequential order, connected horizontally via **doubly linked lists**.
+- **Search Efficiency**: Finding any record among millions of rows requires only 3 to 4 page reads ($O(\log N)$ tree depth).
+- **Range Queries**: The linked leaf nodes allow blazing fast range scans (`WHERE age BETWEEN 20 AND 30`) simply by finding the lower bound and scanning across leaf pointers.
+
+```text
+B+ Tree Architecture:
+                    [ Root Node: 50 ]
+                    ┌───────┴───────┐
+                    ▼               ▼
+          [ Branch: 20 ]         [ Branch: 80 ]
+          ┌──────┴──────┐        ┌──────┴──────┐
+          ▼             ▼        ▼             ▼
+      [Leaf: 10,15] ──► [Leaf: 20,30] ──► [Leaf: 80,90] (Linked Leaf Nodes!)
+```
+
+### 19. What is a Composite Index and the Leftmost Prefix Rule?
+**In Simple Words:**
+An index defined on multiple columns (e.g. `INDEX (country, city, postal_code)`):
+- The data is sorted by `country` first, then within each country by `city`, then by `postal_code`.
+- **Leftmost Prefix Rule**: The query optimizer can only use the index if the query filters on the leftmost columns in order:
+  - `WHERE country = 'US'` -> Index used!
+  - `WHERE country = 'US' AND city = 'Chicago'` -> Full index used!
+  - `WHERE city = 'Chicago'` -> **Index CANNOT be used!** (violates leftmost prefix).
+
+### 20. What is SQL Injection and how do Parameterized Queries (Prepared Statements) prevent it?
+**In Simple Words:**
+SQL injection occurs when untrusted user input is concatenated directly into a SQL query string (e.g. `' OR '1'='1`):
+- **Parameterized Queries**: Separates query SQL code from incoming data parameters:
+  ```typescript
+  // SECURE: Parameterized Query
+  const query = "SELECT * FROM users WHERE email = $1 AND password_hash = $2";
+  await db.query(query, [userEmail, hashedPassword]);
+  ```
+- The database compiles the query execution AST plan **first**. User input is treated strictly as literal data values, never executable code!
+
+---
+
+## Part 3: Advanced Internals, Scale & Production Patterns (Senior / Lead)
+
+### 21. What is the difference between Clustered and Non-Clustered Indexes?
+**In Simple Words:**
+- **Clustered Index**: Determines the physical, on-disk storage order of rows. Leaf nodes contain the **actual full row data**. A table can have only **one** clustered index (usually the Primary Key).
+- **Non-Clustered Index**: A separate structure from data rows. Leaf nodes contain index keys and a **pointer/row-locator** (Primary Key value or physical Row ID) pointing to the data row in the clustered index/heap.
+
+### 22. What are the three primary physical Join Algorithms (Nested Loop, Hash Join, Merge Join)?
+**In Simple Words:**
+1. **Nested Loop Join**: Outer loop iterates through Table A, inner loop looks up Table B via index. Best for small outer table and indexed inner table.
+2. **Hash Join**: In-memory hash table is built from Table A on the join key. Table B is scanned, probing the hash table. Best for large unindexed equijoins.
+3. **Sort-Merge Join**: Both tables are sorted by join key, then merged in a single coordinated sequential scan. Ideal for large sorted tables.
+
+### 23. What is a Deadlock and how do databases detect and resolve them?
+**In Simple Words:**
+A deadlock is a circular lock wait dependency where Transaction A waits for a resource locked by Transaction B, and Transaction B waits for a resource locked by Transaction A:
+- **Detection**: The database maintains a **Wait-For Graph**. Cycles in the graph indicate deadlocks.
+- **Resolution**: The engine aborts ("kills") one of the transactions (the **Victim**, typically the one that has done the least work) with an error (`Transaction rolled back`), allowing the other transaction to complete.
+- **Prevention**: Always access and lock resources in the **exact same alphabetical/numerical order** across all application transactions!
+
+### 24. What are Pessimistic Locking vs Optimistic Locking?
+**In Simple Words:**
+- **Pessimistic Locking**: Assumes conflicts will happen. Locks the row immediately upon reading using `SELECT ... FOR UPDATE`:
+  - Other transactions attempting to modify the row are blocked until commit. High safety, lower concurrency.
+- **Optimistic Locking**: Assumes conflicts are rare. Does not acquire database locks.
+  - Adds a `version_number` column.
+  - Writes verify version: `UPDATE accounts SET balance = 50, version = version + 1 WHERE id = 1 AND version = 3;`
+  - If rows affected is 0, another transaction modified the row; application retries. High throughput for web apps.
+
+```sql
+-- Optimistic Concurrency Control SQL pattern:
+UPDATE products
+SET stock_count = stock_count - 1, version = version + 1
+WHERE id = 101 AND version = 4;
+-- If 0 rows updated -> Conflict detected! Retry.
+```
+
+### 25. What is Table Partitioning and Partition Pruning?
+**In Simple Words:**
+Table Partitioning divides a multi-million row table into physical child tables based on a key (Range, List, Hash):
+- **Partition Pruning**: During query execution, the optimizer inspects the query `WHERE` clause and automatically skips reading partition files that cannot match the condition.
+- Example: A query filtering on `WHERE sale_date = '2026-03-15'` reads only the `sales_2026_03` partition, ignoring years of historical data!
+
+### 26. What is a Covering Index and how does it eliminate Table Lookups?
+**In Simple Words:**
+A covering index contains all the columns needed to satisfy a query in its index tree (using index keys or `INCLUDE (colA, colB)`):
+- The database retrieves all requested data directly from the index leaf nodes without touching the physical table heap pages.
+- Results in **Index-Only Scans**, eliminating expensive random disk I/O.
+
+### 27. What is SARGability (Search Argument Able) in SQL queries?
+**In Simple Words:**
+A query is SARGable if the optimizer can leverage an index range seek:
+- **Non-SARGable (Bad)**: Wrapping indexed columns in functions disables the index!
+  `WHERE YEAR(created_at) = 2026;` (forces full table scan on 10 million rows).
+- **SARGable (Good)**: Keep the column naked:
+  `WHERE created_at >= '2026-01-01' AND created_at < '2027-01-01';` (executes fast B-Tree index seek).
+
+### 28. What are Phantom Reads vs Non-Repeatable Reads?
+**In Simple Words:**
+- **Non-Repeatable Read**: Focuses on **modifications/updates** to an existing row. Row 1 has salary $50K; after another transaction updates it, Row 1 has salary $60K.
+- **Phantom Read**: Focuses on **inserts/deletions** affecting a range. Query returns 5 rows matching `WHERE department = 'IT'`; after another transaction inserts a new developer, the exact same query returns 6 rows.
+
+### 29. What is Two-Phase Commit (2PC) in Distributed Databases?
+**In Simple Words:**
+Guarantees atomic transactions across multiple distributed database nodes:
+1. **Prepare Phase**: Coordinator asks all participant nodes if they can commit. Each node acquires locks, writes to WAL, and responds `VOTE_COMMIT` or `VOTE_ABORT`.
+2. **Commit Phase**: If all vote commit, coordinator sends `GLOBAL_COMMIT`. If any node votes abort, coordinator sends `GLOBAL_ABORT`.
+- **Drawback**: Blocking protocol; if coordinator crashes mid-commit, participants remain locked in doubt.
+
+### 30. What is Database Connection Starvation and how do you size Connection Pools?
+**In Simple Words:**
+Assigning 1,000 connections to a database with 16 CPU cores causes connection starvation:
+- CPU spends 90% of its time context switching between 1,000 threads rather than executing queries!
+- **HikariCP Formula for Pool Sizing**:
+  $$\text{Pool Size} = (\text{CPU Cores} \times 2) + \text{Disk Spindle Count}$$
+- A 16-core database server typically performs best with a pool of **30 to 40 connections**, handling thousands of web requests via queuing!
+
+### 31. How do you optimize Deep Pagination (`OFFSET 1000000 LIMIT 10`)?
+**In Simple Words:**
+Traditional `OFFSET` scans and discards $1,000,000$ rows:
+- **Keyset Pagination (Seek Method)**:
+  `WHERE id > :last_seen_id ORDER BY id ASC LIMIT 10;`
+  Executes in $O(1)$ constant time regardless of how deep the user paginates.
+
+### 32. What is Write Amplification in Relational Databases?
+**In Simple Words:**
+The ratio of bytes written to physical storage compared to the logical bytes written by the user:
+- Inserting a 100-byte row into a table with 6 indexes:
+  - Writes to Table Heap (16 KB page).
+  - Writes to 6 separate B-Tree Index pages ($6 \times 16\text{ KB}$).
+  - Writes to Write-Ahead Log (WAL / Redo log).
+- Can cause write amplification of 20x to 50x! Minimize unnecessary indexes on write-heavy tables.
+
+### 33. What is the difference between Optimistic Concurrency Control (OCC) and Multi-Version Concurrency Control (MVCC)?
+**In Simple Words:**
+- **MVCC**: Database engine architecture where updates create new versions of rows, allowing concurrent readers to read consistent snapshots without locking writers.
+- **OCC**: Application-level design pattern using version numbers or timestamps to detect conflicts before committing updates without holding locks during user think-time.
+
+### 34. What is Database Sharding (Horizontal Partitioning) and what are its trade-offs?
+**In Simple Words:**
+Splitting a database across multiple independent physical servers:
+- **Pros**: Unlimited horizontal storage and write capacity scaling.
+- **Cons**: Distributed transactions across shards become slow/complex, cross-shard joins are impossible without application mediation, and re-sharding hot keys is difficult.
+
+### 35. When should you choose a Relational SQL Database over NoSQL?
+**In Simple Words:**
+1. **Strict Financial / Transactional Consistency**: Banking, payments, ledger systems requiring ACID guarantees.
+2. **Complex Entity Relationships**: Systems requiring multi-table joins and relational integrity enforcement (Users, Roles, Permissions, Orders).
+3. **Structured Schemas with Unknown Future Query Patterns**: Relational SQL allows running arbitrary ad-hoc queries, aggregations, and joins that were not planned when the schema was initially designed.
+`;

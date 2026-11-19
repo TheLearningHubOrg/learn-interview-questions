@@ -546,3 +546,4 @@ Slow CI pipelines cost developer productivity.
 | **Configuration** | Groovy `Jenkinsfile` (procedural / script-heavy) | Declarative YAML configuration |
 | **Plugin Ecosystem** | Massive plugin jar files installed on controller (maintenance nightmare) | Composable marketplace actions (`uses: org/action@v1`) |
 | **State & Maintenance** | Requires server backups, OS patches, Jenkins version upgrades | Zero infrastructure maintenance for SaaS; minimal for ARC runners |
+

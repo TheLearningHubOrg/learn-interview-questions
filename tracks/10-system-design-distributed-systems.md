@@ -36,7 +36,7 @@ flowchart TD
     Gateway --> SvcB["Analytics & Search Service"]
     SvcA --> Cache["Distributed Cache (Redis Cluster)"]
     SvcA --> DB_Primary["Primary DB (PostgreSQL / DynamoDB)"]
-    DB_Primary -.->|"Async Replication"| DB_Replica["Read Replicas"]
+    DB_Primary -.->|Async Replication| DB_Replica["Read Replicas"]
     SvcA --> Queue["Event Stream / Message Broker (Kafka)"]
     Queue --> Worker["Background Async Workers"]
 ```
@@ -360,10 +360,10 @@ flowchart LR
         P2["Partition 2 [Offset 0, 1, 2, 3...]"]
     end
 
-    Producer["Order Service Producer"] -->|"Partition Key: orderId"| KafkaCluster
-    KafkaCluster -->|"Consumer Group A (Offset 3)"| Billing["Billing Consumer"]
-    KafkaCluster -->|"Consumer Group B (Offset 1)"| Fraud["Fraud Detection Engine"]
-    KafkaCluster -->|"Consumer Group C (Replay)"| Analytics["Data Warehouse Sync"]
+    Producer["Order Service Producer"] -->|Partition Key: orderId| KafkaCluster
+    KafkaCluster -->|Consumer Group A (Offset 3)| Billing["Billing Consumer"]
+    KafkaCluster -->|Consumer Group B (Offset 1)| Fraud["Fraud Detection Engine"]
+    KafkaCluster -->|Consumer Group C (Replay)| Analytics["Data Warehouse Sync"]
 ```
 
 ---
@@ -407,12 +407,12 @@ Design a scalable service that converts long URLs (e.g. 150 characters) into con
 
 ```mermaid
 flowchart TD
-    Client["User Browser"] -->|"1. GET /a8X9k2"| CDN["Edge CDN / Cloudflare"]
-    CDN -->|"Cache Miss"| LB["Load Balancer"]
+    Client["User Browser"] -->|1. GET /a8X9k2| CDN["Edge CDN / Cloudflare"]
+    CDN -->|Cache Miss| LB["Load Balancer"]
     LB --> WebApp["URL Redirection Service"]
     WebApp --> Redis["Redis Cluster (LRU Hot Cache)"]
-    Redis -.->|"Cache Miss"| DB["NoSQL Storage (DynamoDB / Cassandra)"]
-    WebApp -->|"301 / 302 Redirect"| Client
+    Redis -.->|Cache Miss| DB["NoSQL Storage (DynamoDB / Cassandra)"]
+    WebApp -->|301 / 302 Redirect| Client
 ```
 
 ```typescript
@@ -562,13 +562,13 @@ Connect drivers with nearby riders in real-time while processing location update
 
 ```mermaid
 flowchart TD
-    Driver["Driver Phone App"] -->|"GPS Update Every 4s"| LB["Geo-DNS / Envoy LB"]
+    Driver["Driver Phone App"] -->|GPS Update Every 4s| LB["Geo-DNS / Envoy LB"]
     LB --> LocationSvc["Location Ingestion Service"]
     LocationSvc --> RedisGeo["Redis Geospatial Engine (GEOADD / GEORADIUS)"]
     
-    Rider["Rider App"] -->|"Find Rides Near (Lat, Lon)"| MatchSvc["Ride Dispatcher Engine"]
+    Rider["Rider App"] -->|Find Rides Near (Lat, Lon)| MatchSvc["Ride Dispatcher Engine"]
     MatchSvc --> RedisGeo
-    RedisGeo -.->|"Return Top-10 Drivers within 3km"| MatchSvc
+    RedisGeo -.->|Return Top-10 Drivers within 3km| MatchSvc
     MatchSvc --> DispatchSvc["Optimal Routing & Notification"]
 ```
 
@@ -676,7 +676,7 @@ flowchart TD
     Fetcher --> Downloader["Download Content"]
     Downloader --> Dedup["Bloom Filter (Seen URL Check)"]
     Dedup --> Parser["HTML Link Extractor & Storage"]
-    Parser -->|"Discovered Links"| Frontier
+    Parser -->|Discovered Links| Frontier
 ```
 
 ---
@@ -740,7 +740,7 @@ flowchart TD
     Client["Client App"] --> ChunkEngine["Chunking Engine (4MB Chunks)"]
     ChunkEngine --> Hasher["SHA-256 Hash Generator"]
     Hasher --> MetaSvc["Metadata Service (PostgreSQL)"]
-    MetaSvc -->|"Check if Chunk Exists"| S3["AWS S3 / GCS Object Storage"]
+    MetaSvc -->|Check if Chunk Exists| S3["AWS S3 / GCS Object Storage"]
     Hasher --> S3
 ```
 
@@ -803,8 +803,8 @@ flowchart LR
     Services["Triggering Microservices"] --> API["Notification Gateway"]
     API --> Prefs["User Opt-Out & Quiet Hours Filter"]
     Prefs --> PriorityRouter{"Priority Router"}
-    PriorityRouter -->|"High Priority (OTP)"| UrgentQueue["Kafka High-Priority Topic"]
-    PriorityRouter -->|"Low Priority (News)"| BulkQueue["Kafka Bulk Topic"]
+    PriorityRouter -->|High Priority (OTP)| UrgentQueue["Kafka High-Priority Topic"]
+    PriorityRouter -->|Low Priority (News)| BulkQueue["Kafka Bulk Topic"]
     UrgentQueue --> Workers["Delivery Workers"]
     Workers --> APNs["Apple APNs"]
     Workers --> FCM["Google FCM"]
@@ -886,7 +886,7 @@ Ingest, aggregate, and query 10 billion daily user interaction events (pageviews
 
 ```mermaid
 flowchart LR
-    SDK["Browser / Mobile JS SDK"] -->|"HTTP POST (Batched)"| Collector["Event Ingestion Gateway"]
+    SDK["Browser / Mobile JS SDK"] -->|HTTP POST (Batched)| Collector["Event Ingestion Gateway"]
     Collector --> Kafka["Apache Kafka Cluster"]
     Kafka --> Flink["Apache Flink (Real-time Window Aggregation)"]
     Kafka --> ClickHouse["ClickHouse Columnar Storage"]

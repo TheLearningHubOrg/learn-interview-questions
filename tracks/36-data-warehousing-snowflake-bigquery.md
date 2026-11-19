@@ -423,3 +423,4 @@ Historically, Snowflake was strictly an OLAP data warehouse.
 **In Simple Words:**
 1. **Metadata & Storage Replication**: Continuously replicate database micro-partitions and Iceberg metadata from the primary cloud region (e.g. AWS us-east-1) to a secondary region or cloud provider (e.g. GCP us-central1).
 2. **Failover Groups**: Configure automated failover groups that redirect client connection strings to the secondary region if the primary region encounters a total cloud outage, achieving near-zero RTO (Recovery Time Objective) and RPO (Recovery Point Objective).
+

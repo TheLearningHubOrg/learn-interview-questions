@@ -105,7 +105,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
             >
               <div className="flex items-center gap-2 min-w-0">
                 <Search className="h-4 w-4 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors shrink-0" />
-                <span className="text-xs sm:text-sm font-medium truncate">Search 2,719+ interview questions...</span>
+                <span className="text-xs sm:text-sm font-medium truncate">Search 3,400+ interview questions...</span>
               </div>
               <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[11px] font-mono bg-muted border border-border rounded text-muted-foreground font-semibold shrink-0">
                 ⌘K
@@ -276,7 +276,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
                 className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mb-2.5 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground text-sm font-medium shadow-sm dark:shadow-none"
               >
                 <Search className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                <span>Search 2,719+ questions...</span>
+                <span>Search 3,400+ questions...</span>
               </button>
 
               {/* Mobile All Questions Explorer in Drawer */}

@@ -600,3 +600,4 @@ Managing CSS at scale across 200 developers without conflicts:
   6. **Components**: UI pieces (`.card`, `.btn`).
   7. **Utilities**: High-specificity overrides (`.text-center`).
 - Combined with Cascade Layers (`@layer`), prevents specificity conflicts permanently.
+

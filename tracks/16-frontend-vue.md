@@ -517,3 +517,4 @@ Host applications (React, Angular, or plain HTML) can consume the widget without
 8. **Lazy-load routes and heavy components with `defineAsyncComponent`**.
 9. **Enforce TypeScript strict mode across all props and emits**.
 10. **Use `<Teleport>` for modals to preserve semantic layering**.
+

@@ -634,3 +634,4 @@ Unlike older standards (HTML 4.01, XHTML) managed by the W3C with slow 5-year ve
 - HTML is now governed by the **WHATWG (Web Hypertext Application Technology Working Group)** as a continuously evolving **Living Standard**.
 - Browser vendors (Google, Apple, Mozilla, Microsoft) collaborate directly.
 - **TC39 & W3C Collaboration**: Features progress through standardized incubation stages (proposal, prototype behind flags, cross-engine interoperability via **Interop**, and final Baseline inclusion).
+

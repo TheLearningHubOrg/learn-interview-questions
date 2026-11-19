@@ -467,3 +467,4 @@ Modern platform engineering teams integrate GitOps with developer portals like *
 2. Backstage scaffolds the repository and opens a GitOps PR adding the new service to the cluster's `ApplicationSet`.
 3. The PR is merged, ArgoCD provisions the deployment, secrets, and DNS automatically.
 4. The developer gets a running production URL in under 2 minutes without writing a single line of Kubernetes YAML.
+

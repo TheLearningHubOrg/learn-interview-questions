@@ -50,28 +50,25 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'diagram' | 'source'>('diagram');
   const [copied, setCopied] = useState(false);
-  const renderId = useRef(`mermaid-${Math.random().toString(36).substring(2, 9)}`);
 
   useEffect(() => {
     let isMounted = true;
 
-    const purgeMermaidBodyArtifacts = () => {
+    const purgeErrorArtifacts = () => {
       if (typeof document === 'undefined') return;
       document
-        .querySelectorAll('body > svg[id^="mermaid-"], body > svg.error-icon, body > [id^="dmermaid"]')
-        .forEach((el) => el.remove());
+        .querySelectorAll('body > svg.error-icon, body > [id^="dmermaid"]')
+        .forEach((el) => {
+          try {
+            el.remove();
+          } catch {
+            // ignore
+          }
+        });
     };
-
-    // Purge any stale Mermaid error elements on mount
-    purgeMermaidBodyArtifacts();
 
     getMermaid()
       .then(async (mermaid) => {
-        // Prevent mermaid from writing unstyled error SVGs directly to document.body
-        mermaid.parseError = () => {
-          purgeMermaidBodyArtifacts();
-        };
-
         const isDark = document.documentElement.classList.contains('dark');
         mermaid.initialize({
           startOnLoad: false,
@@ -101,25 +98,33 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
         try {
           // Clean and defensively sanitize chart input
           let cleanChart = chart.trim();
+
           // Normalize invalid sequence arrows in flowcharts
           if (/^(flowchart|graph)\s+/m.test(cleanChart)) {
             cleanChart = cleanChart.replace(/-->>/g, '-->').replace(/<<--/g, '<--');
           }
-          const { svg: renderedSvg } = await mermaid.render(renderId.current, cleanChart);
-          purgeMermaidBodyArtifacts();
+
+          // Normalize quotes inside pipe labels: |"text"| -> |text|
+          cleanChart = cleanChart
+            .replace(/\|"([^"]+)"\|/g, '|$1|')
+            .replace(/\|'([^']+)'\|/g, '|$1|');
+
+          const renderId = `mermaid-${Math.random().toString(36).substring(2, 9)}-${Date.now()}`;
+          const { svg: renderedSvg } = await mermaid.render(renderId, cleanChart);
+          
           if (isMounted) {
             setSvg(renderedSvg);
             setError(null);
           }
         } catch (renderErr: any) {
-          purgeMermaidBodyArtifacts();
+          purgeErrorArtifacts();
           if (isMounted) {
             setError(renderErr?.message || 'Diagram syntax parse error');
           }
         }
       })
       .catch((loadErr) => {
-        purgeMermaidBodyArtifacts();
+        purgeErrorArtifacts();
         if (isMounted) {
           setError('Unable to load diagram rendering engine (offline mode)');
         }
@@ -127,7 +132,7 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
 
     return () => {
       isMounted = false;
-      purgeMermaidBodyArtifacts();
+      purgeErrorArtifacts();
     };
   }, [chart]);
 

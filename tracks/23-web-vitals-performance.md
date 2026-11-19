@@ -472,3 +472,4 @@ Preventing regressions from entering production:
 1. **SLO Formulation**: 95% of real-world page views must have LCP $< 2.5\text{s}$, INP $< 200\text{ms}$, and CLS $< 0.1$.
 2. **Alerting**: PagerDuty alerts triggered if 7-day rolling CrUX P75 INP breaches 250ms.
 3. **Automated Rollback**: If a deployment spikes INP or CLS in real-time RUM telemetry, edge routing reverts to the previous canary version within 2 minutes.
+

@@ -489,3 +489,4 @@ export const cartTotal = computed(cartItems, (items) =>
 - **Choose SvelteKit when**: Building rich, interactive, state-heavy web applications (SaaS dashboards, real-time collaboration tools).
 - **Choose Next.js when**: The team is deeply invested in the React ecosystem or requires React Native cross-platform code sharing.
 - **Avoid Gatsby**: Outdated architecture with slow build times and heavy client-side GraphQL runtime overhead.
+

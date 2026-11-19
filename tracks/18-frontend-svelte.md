@@ -630,3 +630,4 @@ socket.on('order_updated', () => {
 - **Choose Next.js 15 when**:
   - You have massive existing React component ecosystem investments.
   - You require shared code with React Native mobile apps.
+

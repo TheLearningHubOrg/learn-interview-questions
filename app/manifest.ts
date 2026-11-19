@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'InterviewHub PRO - Master Technical Interview Question Bank',
     short_name: 'InterviewHub',
-    description: '2,719+ production-tested questions across 30 specialized tracks: Go, Rust, PHP, Java, .NET, Mobile, Testing & SRE, Networking, Linux, Design Patterns, Data Engineering, Search DBs, Cloud, React, Angular, and more.',
+    description: '3,400+ production-tested questions across 57 specialized tracks: TypeScript, Angular, React, Next.js, Vue, Nuxt, Svelte, Astro, Go, Rust, Java, .NET, Mobile, Testing & SRE, Networking, Linux, Design Patterns, Data Engineering, Cloud, and more.',
     start_url: '/',
     display: 'standalone',
     background_color: '#090a0f',

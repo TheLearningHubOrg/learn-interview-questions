@@ -803,3 +803,4 @@ Instead of ORMs that hide SQL or raw strings with zero type checking, type-safe 
 - **TS 5.3**: Import attributes and type-only imports (`import type ... with { type: "json" }`).
 - **TS 5.4**: `NoInfer<T>` utility type to block unwanted inference in generic functions.
 - **TS 5.5+**: Inferred Type Predicates (functions like `arr.filter(x => x !== null)` automatically narrow to non-null), and `isolatedDeclarations` for ultrafast parallel toolchain builds.
+

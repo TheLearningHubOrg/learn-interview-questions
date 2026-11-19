@@ -181,7 +181,7 @@ export function TechStackSelector({
                 ))
             ) : (
               <span className="text-muted-foreground text-[11px] sm:text-xs">
-                All {GRANULAR_TECHS.length} technologies (2,719+ questions)
+                All {GRANULAR_TECHS.length} technologies (3,400+ questions)
               </span>
             )}
           </div>
@@ -345,7 +345,7 @@ export function TechStackSelector({
                   <strong className="text-purple-600 dark:text-purple-400">{selectedQuestionCount}</strong> Q&As
                 </>
               ) : (
-                <>Showing all {GRANULAR_TECHS.length} technologies (2,719+ questions) • Pick technologies above to personalize</>
+                <>Showing all {GRANULAR_TECHS.length} technologies (3,400+ questions) • Pick technologies above to personalize</>
               )}
             </span>
 

@@ -712,3 +712,4 @@ Migrating from Nuxt 2 to Nuxt 3 requires bridging the generational gap between V
 3. **Adopt Native Script Setup**: Refactor component methods, computed properties, and props to `<script setup lang="ts">`.
 4. **Replace Vuex with Pinia**: Replace Vuex stores with Pinia composables or Nuxt's native `useState()`.
 5. **Update Server Middleware**: Migrate Express/Connect middleware to `h3` event handlers.
+

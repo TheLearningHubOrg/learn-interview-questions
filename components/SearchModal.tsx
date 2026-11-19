@@ -129,7 +129,7 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search 2,719+ interview questions (e.g. React, Go, Rust, K8s, System Design, SRE, Mobile)..."
+            placeholder="Search 3,400+ interview questions (e.g. React, Go, Rust, K8s, System Design, SRE, Mobile)..."
             className="flex-1 bg-transparent text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
             autoFocus
           />

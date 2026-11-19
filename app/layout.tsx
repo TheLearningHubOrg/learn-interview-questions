@@ -72,13 +72,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://learn-interview-questions.vercel.app',
     siteName: 'InterviewHub PRO - The Learning Hub Org',
-    title: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (2,719+ Qs across 30 Tracks)',
-    description: '2,719+ production-tested questions with 100% code coverage across 30 tracks: Go, Rust, PHP/Laravel, Java, .NET, Mobile, Testing/SRE, Networking, Linux, Design Patterns, Spark, Vector DBs, GCP, Azure, React, Angular, AWS, and more.',
+    title: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (3,400+ Qs across 57 Tracks)',
+    description: '3,400+ production-tested questions with 100% code coverage across 57 tracks: TypeScript, Angular, React, Vue, Nuxt, Svelte, Astro, Go, Rust, Java, .NET, Mobile, Testing/SRE, Networking, Linux, Design Patterns, Snowflake, BigQuery, dbt, Cloud, and more.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank',
-    description: '2,719+ production-tested engineering interview questions across 30 tracks with 100% code examples.',
+    description: '3,400+ production-tested engineering interview questions across 57 tracks with 100% code examples.',
     creator: '@TheLearningHub',
   },
 };

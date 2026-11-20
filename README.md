@@ -1,13 +1,13 @@
 # The Master Full-Stack, Cloud, AI Engineering, React & System Design Interview Question Bank 🚀
 
-> **1,849+ Production-Tested Master Interview Questions and Deep-Dive Answers** across AI Engineering & LLM Architecture, Angular 2-19, Core React, React 18/19, Core JavaScript Internals, System Design & Distributed Architecture, Web Security & OWASP, DevOps & Kubernetes, Cloud Infrastructure, Backend, Databases, and Algorithms.
+> **3,600+ Production-Tested Master Interview Questions and Deep-Dive Answers** across 64 specialized tracks: AI Engineering & LLM Architecture, Frontend (TypeScript, React, Next.js, Angular, Vue, Nuxt, Svelte, Astro, HTML, CSS), Backend (Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Node.js, Python), Mobile (Swift, iOS, Kotlin, Android, React Native, Flutter), Databases (PostgreSQL, MySQL, SQL, MongoDB, DynamoDB, Redis), Cloud & DevOps (AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD, Linux, Bash), Data Engineering (Spark, Snowflake, BigQuery, dbt), Architecture (SOLID Principles, Design Patterns, DDD, System Design), and Algorithms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
 [![Live App](https://img.shields.io/badge/Live_App-learn--interview--questions.vercel.app-000000.svg?logo=vercel)](https://learn-interview-questions.vercel.app)
-[![Curriculum: 13 Tracks](https://img.shields.io/badge/Tracks-13%20Specialized%20Tracks-purple.svg)](#-master-navigation--tracks)
-[![Questions: 1849+](https://img.shields.io/badge/Questions-1849%2B%20Master%20Bank-success.svg)](#-master-navigation--tracks)
+[![Curriculum: 64 Tracks](https://img.shields.io/badge/Tracks-64%20Specialized%20Tracks-purple.svg)](#-master-navigation--tracks)
+[![Questions: 3600+](https://img.shields.io/badge/Questions-3600%2B%20Master%20Bank-success.svg)](#-master-navigation--tracks)
 
 🌐 **Interactive Web Portal**: [https://learn-interview-questions.vercel.app](https://learn-interview-questions.vercel.app)
 

@@ -197,7 +197,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
             <p className="text-[10px] text-slate-700 mt-0.5">
               {selectedTechSlugs.length > 0
                 ? `Personalized Stack (${selectedTechSlugs.map(s => trackMap.get(s)?.shortTitle || s).join(', ')}) • https://learn-interview-questions.vercel.app`
-                : 'https://learn-interview-questions.vercel.app/cheatsheet • 1,864+ Technical Interview Bank'}
+                : 'https://learn-interview-questions.vercel.app/cheatsheet • 3,600+ Technical Interview Bank'}
             </p>
           </div>
           <div className="text-right text-[10px] text-slate-700 font-mono">

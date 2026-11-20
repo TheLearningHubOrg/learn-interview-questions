@@ -7,10 +7,10 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://learn-interview-questions.vercel.app'),
   title: {
-    default: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (2,400+ Questions across 50 Separated Tracks)',
+    default: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (3,600+ Questions across 64 Separated Tracks)',
     template: '%s | InterviewHub PRO',
   },
-  description: 'Comprehensive, production-tested engineering interview question bank with 2,400+ questions and answers across 50 specialized, fully separated tracks: React, Next.js, Angular, Vue, Svelte, Astro, JavaScript, TypeScript, HTML/CSS, Web Vitals, Go, Rust, Java, .NET, PHP, Python, Node.js, PostgreSQL, MySQL, SQL, MongoDB, Redis, DynamoDB, AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD, Linux, Bash, RabbitMQ, Kafka, Elasticsearch, Vector DBs, Spark, Data Warehousing, React Native, Flutter, iOS, Android, Testing, SRE, Networking, Design Patterns, DDD, System Design, Security, AI/LLM, and DSA.',
+  description: 'Comprehensive, production-tested engineering interview question bank with 3,600+ questions and answers across 64 specialized, fully separated tracks: React, Next.js, Angular, Vue, Svelte, Astro, JavaScript, TypeScript, HTML/CSS, Web Vitals, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Python, Node.js, PostgreSQL, MySQL, SQL, MongoDB, Redis, DynamoDB, AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD, Linux, Bash, RabbitMQ, Kafka, Elasticsearch, Vector DBs, Spark, Snowflake, BigQuery, React Native, Flutter, Swift, iOS, Kotlin, Android, Testing, SRE, Networking, SOLID Principles, Design Patterns, DDD, System Design, Security, AI/LLM, and DSA.',
   keywords: [
     'interview questions',
     'javascript interview questions',

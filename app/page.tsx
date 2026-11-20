@@ -31,7 +31,7 @@ export default async function HomePage() {
     '@type': 'EducationalOrganization',
     name: 'InterviewHub - The Learning Hub Org',
     url: 'https://learn-interview-questions.vercel.app',
-    description: 'Comprehensive, production-tested interview question bank with 2,400+ questions across 50 specialized, fully separated tracks covering React, Next.js, Angular, Vue, Svelte, Astro, JavaScript, TypeScript, HTML/CSS, Web Vitals, Go, Rust, Java, Spring Boot, .NET, C#, PHP, Laravel, Python, Node.js, PostgreSQL, MySQL, Relational SQL, MongoDB, Redis, DynamoDB, AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD & GitOps, Linux OS, Bash Scripting, RabbitMQ, Kafka, Elasticsearch, Vector Databases, Spark, Data Warehousing, React Native, Flutter, iOS Swift, Android Kotlin, Playwright Testing, SRE Observability, Networking, Design Patterns, DDD, System Design, OWASP Security, AI/LLMs, and DSA.',
+    description: 'Comprehensive, production-tested interview question bank with 3,600+ questions across 64 specialized, fully separated tracks covering React, Next.js, Angular, Vue, Svelte, Astro, JavaScript, TypeScript, HTML, CSS, Web Vitals, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Python, Node.js, PostgreSQL, MySQL, Relational SQL, MongoDB, Redis, DynamoDB, AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD, Linux OS, Bash Scripting, RabbitMQ, Kafka, Elasticsearch, Vector Databases, Spark, Snowflake, BigQuery, React Native, Flutter, Swift, iOS, Kotlin, Android, Playwright Testing, SRE Observability, Networking, SOLID Principles, Design Patterns, DDD, System Design, OWASP Security, AI/LLMs, and DSA.',
     knowsAbout: [
       'JavaScript',
       'Angular',

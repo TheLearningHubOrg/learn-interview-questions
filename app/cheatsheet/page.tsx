@@ -3,7 +3,7 @@ import { getAllTracks, getGlobalSearchIndex } from '@/lib/tracks';
 import { CheatsheetClient } from './CheatsheetClient';
 
 export const metadata: Metadata = {
-  title: 'Last-Minute Interview Revision Cheatsheet — 1,864+ 1-Line Summaries',
+  title: 'Last-Minute Interview Revision Cheatsheet — 3,600+ 1-Line Summaries',
   description: 'Instant 1-line technical interview takeaways for rapid pre-interview recall. Filter by Track, Most Asked, or Bookmarks, and export a clean printable PDF.',
   openGraph: {
     title: 'Last-Minute Interview Revision Cheatsheet & Printable PDF',

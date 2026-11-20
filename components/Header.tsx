@@ -287,7 +287,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
               >
                 <div className="flex items-center gap-2.5">
                   <Sparkles className="h-4 w-4 fill-current text-purple-600 dark:text-purple-400" />
-                  <span>All 1,864+ Questions</span>
+                  <span>All 3,600+ Questions</span>
                 </div>
                 <ChevronRight className="h-4 w-4 text-purple-500" />
               </Link>

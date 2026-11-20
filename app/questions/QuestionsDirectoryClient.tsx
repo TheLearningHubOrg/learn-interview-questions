@@ -207,7 +207,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
               {initialItems.length} Master Questions
             </span>
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-muted text-foreground border border-border">
-              13 Tracks
+              {tracks.length} Tracks
             </span>
             {selectedTechSlugs.length > 0 && (
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-600 text-white">
@@ -217,7 +217,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">
-            Explore All {initialItems.length || '2,719'}+ Interview Questions
+            Explore All {initialItems.length || '3,600'}+ Interview Questions
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
             Filter, search, and practice across the entire engineering curriculum. Filter by seniority level, high-frequency interview patterns, runnable code solutions, and individual technology tracks.

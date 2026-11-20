@@ -101,7 +101,10 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
 
           // Normalize invalid sequence arrows in flowcharts
           if (/^(flowchart|graph)\s+/m.test(cleanChart)) {
-            cleanChart = cleanChart.replace(/-->>/g, '-->').replace(/<<--/g, '<--');
+            cleanChart = cleanChart
+              .replace(/-->>/g, '-->')
+              .replace(/<<--/g, '<--')
+              .replace(/-{1,}\.{2,}>/g, '-.->');
           }
 
           // Normalize quotes inside pipe labels: |"text"| -> |text|
@@ -119,7 +122,11 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
         } catch (renderErr: any) {
           purgeErrorArtifacts();
           if (isMounted) {
-            setError(renderErr?.message || 'Diagram syntax parse error');
+            const rawMsg = renderErr?.message || '';
+            const friendlyMsg = rawMsg.includes('firstChild') || rawMsg.includes('null')
+              ? 'Flowchart syntax parsing error'
+              : rawMsg || 'Diagram syntax parse error';
+            setError(friendlyMsg);
           }
         }
       })

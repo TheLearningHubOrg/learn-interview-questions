@@ -368,3 +368,191 @@ Swift enums are sum types that can carry strongly typed payloads for each case, 
 ### 35. When should you choose Swift on the Server (Vapor / Hummingbird) over Node.js or Go?
 **In Simple Words:**
 Choose Server-Side Swift for teams sharing models and validation logic between iOS clients and backend services, combined with high throughput and predictable memory usage without GC pauses.
+
+
+---
+
+### 36. Swift 6 Complete Concurrency and Data-Race Safety: Strict checking, `@Sendable`, and region-based isolation.
+
+**In Simple Words:**
+Swift 6 introduces **Compile-Time Data-Race Freedom**:
+- Code that mutates shared mutable state concurrently across threads without protection is rejected at compile time.
+- **`@Sendable` Closures**: Closures that can safely cross concurrency boundaries. Cannot capture mutable local variables by reference.
+- **Region-Based Isolation**: The compiler tracks the lifetime and mutation regions of non-Sendable objects. If an object is created and passed to another concurrency domain without further local mutation, the compiler proves it is safe and permits the transfer without compiler errors.
+
+---
+
+### 37. Swift Macros (Freestanding vs Attached): Metaprogramming with SwiftSyntax.
+
+**In Simple Words:**
+Swift Macros replace fragile pre-processor templates with type-safe compile-time code generation:
+- **Freestanding Macros (`#`)**:
+  - `#expression`: Produces a value (e.g. `#URL("https://apple.com")` validates the URL at compile time).
+  - `#declaration`: Generates one or more declarations (e.g. `#warning`).
+- **Attached Macros (`@`)**:
+  - `@attached(member)`: Adds new members to a type (e.g. `@Observable` automatically generates getters, setters, and observation registers).
+  - `@attached(peer)`: Generates companion declarations alongside the target.
+
+---
+
+### 38. Method Dispatch in Swift: Static vs Table vs Message Dispatch.
+
+**In Simple Words:**
+How the CPU resolves which function implementation to execute:
+1. **Static / Direct Dispatch (Fastest)**: Resolved at compile time. The CPU jumps directly to memory address. Used for `final` classes, structs, enums, and protocol extensions.
+2. **Table Dispatch (V-Table & Witness Table)**: Looked up via function pointer arrays at runtime. Used for standard class inheritance (V-Table) and protocol conformance (Witness Table).
+3. **Message Dispatch (Most Dynamic / Slowest)**: Uses Objective-C runtime (`objc_msgSend`). Supports swizzling and dynamic resolution. Enabled with `@objc dynamic`.
+
+---
+
+### 39. ARC Memory Management: Strong, Weak, Unowned, and resolving Retain Cycles.
+
+**In Simple Words:**
+Automatic Reference Counting (ARC) automatically tracks and manages memory:
+- **Strong Reference**: Increments retain count. Object stays in memory as long as retain count $> 0$.
+- **Weak Reference**: Does not increment retain count. Automatically sets pointer to `nil` when target object deallocates (always an optional `weak var`).
+- **Unowned Reference**: Does not increment retain count. Assumes the target will *never* be nil during the pointer's lifetime. Accessing after deallocation crashes with a memory fault.
+- **Closure Retain Cycle Fix**: Always capture `[weak self]` when a closure is retained by an instance property or callback listener.
+
+---
+
+### 40. Copy-on-Write (CoW) in Custom Value Types: Implementing CoW using `isKnownUniquelyReferenced()`.
+
+**In Simple Words:**
+Standard Swift collections (Array, Dictionary, String) are value types that copy cheaply:
+- When you assign `b = a`, memory is **not duplicated immediately**; both variables point to the exact same underlying buffer.
+- Memory is copied only when one variable attempts a write (**Copy-on-Write**).
+- **Custom CoW Implementation**:
+  Wrap a reference type class inside a struct, and check `isKnownUniquelyReferenced(&ref)` before modifying the internal buffer. If multiple structs point to the same class buffer, allocate a fresh cloned copy.
+
+---
+
+### 41. Existential Any vs Opaque Some Types (`any Protocol` vs `some Protocol`).
+
+**In Simple Words:**
+- **Opaque Types (`some View` / `some Protocol`)**:
+  - Represents a specific, fixed concrete type chosen by the implementation, hidden from the caller.
+  - Zero performance overhead (static dispatch).
+- **Existential Types (`any Protocol`)**:
+  - A dynamic box that can hold *any* arbitrary type conforming to the protocol at runtime.
+  - Incurs memory heap allocation for values larger than 3 words (Existential Container) and dynamic witness table dispatch.
+
+---
+
+### 42. Property Wrappers (`@propertyWrapper`): Wrapped value, projected value, and composition.
+
+**In Simple Words:**
+Adds reusable management logic to property read/write access:
+```swift
+@propertyWrapper
+struct Clamped<T: Comparable> {
+  var value: T
+  let range: ClosedRange<T>
+  var wrappedValue: T {
+    get { value }
+    set { value = min(max(newValue, range.lowerBound), range.upperBound) }
+  }
+  var projectedValue: Bool { value == range.upperBound } // Accessed via $
+}
+
+struct Player {
+  @Clamped(range: 0...100) var health: Int = 100
+}
+```
+
+---
+
+### 43. Result Builders (`@resultBuilder`): How SwiftUI declarative body DSL is compiled.
+
+**In Simple Words:**
+Result builders allow writing declarative list-like syntax without commas or return statements (e.g. SwiftUI `VStack { Text("A"); Text("B") }`):
+- The compiler rewrites the block into static calls on the builder type:
+  - `buildBlock(_ parts: Component...)`
+  - `buildEither(first:)` and `buildEither(second:)` for `if/else` statements.
+  - `buildOptional(_:)` for optional statements.
+
+---
+
+### 44. KeyPaths in Swift: Type-safe property referencing and functional composition.
+
+**In Simple Words:**
+KeyPaths allow referencing properties as first-class un-invoked values:
+```swift
+struct User { let name: String; var score: Int }
+
+let nameKeyPath = User.name // KeyPath<User, String>
+let user = User(name: "Elena", score: 95)
+print(user[keyPath: nameKeyPath]) // "Elena"
+
+// Functional mapping with KeyPaths:
+let names = users.map(.name)
+let sorted = users.sorted(by: .score)
+```
+
+---
+
+### 45. Concurrency: Actors vs Global Actors (`@MainActor`) and Actor Reentrancy hazards.
+
+**In Simple Words:**
+- **Actors**: Reference types that protect internal mutable state by synchronizing access through a private serial mailbox queue.
+- **`@MainActor`**: A global actor that guarantees code executes strictly on the primary UI thread (crucial for view updates).
+- **Actor Reentrancy Hazard**: When an actor method calls `await`, it releases its execution thread while waiting. Other tasks can execute on the actor in the meantime, potentially mutating internal state before the original method resumes! Always re-verify assumptions after every `await` point.
+
+---
+
+### 46. Error Handling: `Result`, typed throws in Swift 6 (`throws(MyError)`), and `rethrows`.
+
+**In Simple Words:**
+- **Untyped Throws (Classic Swift)**: `func fetch() throws` erases error types to `any Error`.
+- **Typed Throws (Swift 6)**:
+  ```swift
+  enum NetworkError: Error { case timeout, unauthorized }
+  func request() throws(NetworkError) -> Data { ... }
+  ```
+  Callers receive a strongly typed `NetworkError` in `catch` blocks without type casting!
+- **`rethrows`**: A function throws an error only if one of its closure arguments throws an error (e.g. `map`, `filter`).
+
+---
+
+### 47. C and C++ Interoperability: Direct C++20 standard library calls and Objective-C bridging.
+
+**In Simple Words:**
+Swift 5.9+ supports bidirectional, zero-overhead C++ interop:
+- Include C++ headers directly into Swift modules via `module.modulemap`.
+- Swift can directly instantiate C++ classes, invoke methods, and pass `std::string` and `std::vector` without writing Objective-C++ (`.mm`) wrapper shims.
+
+---
+
+### 48. Unsafe Swift: `UnsafePointer`, `UnsafeMutableRawPointer`, and memory alignment.
+
+**In Simple Words:**
+Direct manual memory manipulation for high-frequency low-level algorithms:
+- `UnsafePointer<T>`: Equivalent to C `const T*`.
+- `UnsafeMutablePointer<T>`: Equivalent to C `T*`.
+- `UnsafeMutableRawPointer`: Equivalent to C `void*` (untyped byte buffer).
+- `MemoryLayout<T>`: Inspects `size` (contiguous bytes), `stride` (distance to next element in array), and `alignment` rules enforced by CPU hardware.
+
+---
+
+### 49. Custom String Interpolation and `ExpressibleByLiteral` protocols.
+
+**In Simple Words:**
+- **`ExpressibleByStringLiteral` / `ExpressibleByIntegerLiteral`**: Allows custom types to be initialized directly from literals (`let id: UserID = 1042`).
+- **Custom String Interpolation**: Extend `String.StringInterpolation` to create secure, type-safe formatters:
+  ```swift
+  extension String.StringInterpolation {
+    mutating func appendInterpolation(privacy value: String) {
+      appendLiteral("***" + value.suffix(4))
+    }
+  }
+  print("SSN: (privacy: ssn)") // "SSN: ***1234"
+  ```
+
+---
+
+### 50. Swift Package Manager (SPM): Binary targets, plugins, and dependency resolution.
+
+**In Simple Words:**
+SPM is Apple's native dependency manager integrated into Xcode:
+- **Binary Targets (`.xcframework`)**: Distributes closed-source, pre-compiled multi-architecture libraries supporting iOS devices, Simulators, and Mac Catalyst in a single bundle.
+- **Package Plugins (`BuildToolPlugin`)**: Executes automated code generators (SwiftGen, Sourcery, Protobuf compilers) seamlessly as part of Xcode's native build process.

@@ -38,11 +38,8 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Prevent Mermaid from injecting unstyled error bomb SVGs into document.body */
-body > svg[id^="mermaid-"],
-body > svg.error-icon,
-body > div[id^="dmermaid"],
-body > [id^="mermaid-"] {
+/* Hide stray Mermaid error icons or unstyled error fallbacks injected into document.body */
+body > svg.error-icon {
   display: none !important;
 }
 

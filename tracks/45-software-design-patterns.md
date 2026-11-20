@@ -434,8 +434,7 @@ Applying GoF patterns blindly where simple procedural code is sufficient ("Patte
 - Introducing 5 layers of Factories, Builders, and Adapters for a CRUD service that will only ever query a single PostgreSQL table.
 - Increases cognitive load, makes debugging painful, and inflates codebase size.
 - **Rule of Thumb**: Follow **YAGNI (You Aren't Gonna Need It)** and the **Rule of Three**: write simple code first; refactor to a design pattern only when duplication and complexity organically demand it.
-`;
-
+`
 ---
 
 ### 30. What is the Abstract Factory Pattern and how does it differ from Factory Method?
@@ -473,3 +472,170 @@ The **Flyweight Pattern** shares common, immutable data (**Intrinsic State**) ac
 ### 35. What is the Visitor Pattern and how does it add new operations without modifying existing classes?
 **In Simple Words:**
 The **Visitor Pattern** uses **Double Dispatch** (`element.accept(visitor)` -> `visitor.visit(element)`) to separate an algorithm from the object structure on which it operates, allowing new operations to be added without modifying the element classes.
+
+
+---
+
+### 36. Chain of Responsibility Pattern: Middleware pipelines and event bubbling.
+
+**In Simple Words:**
+Avoids coupling the sender of a request to its receiver by giving multiple objects a chance to handle the request:
+- Handlers are chained together sequentially. Each handler decides either to process the request and/or pass it to the `next()` handler in the chain.
+- **Real-World Examples**:
+  - Web framework HTTP middleware (Express.js, ASP.NET Core, Spring Filters): `CorsMiddleware -> AuthMiddleware -> RateLimitMiddleware -> Controller`.
+  - DOM event bubbling and UI event responders in macOS / iOS.
+
+---
+
+### 37. State Pattern vs Strategy Pattern: Structural similarities and behavioral differences.
+
+**In Simple Words:**
+Both patterns look structurally identical (a Context class delegating to an interface):
+- **Strategy Pattern**: The client configures the Context with a specific algorithm (e.g. `FastRouteStrategy` vs `ScenicRouteStrategy`). The strategies are completely independent and usually do **not** know about each other.
+- **State Pattern**: The Context transitions through a **Finite State Machine** (e.g. Order: `Draft` -> `Paid` -> `Shipped` -> `Delivered`). Concrete state classes know about other states and actively trigger transitions on the Context object based on method invocations.
+
+---
+
+### 38. Mediator Pattern: Decoupling communication dependencies into a central hub.
+
+**In Simple Words:**
+When dozens of components communicate directly with each other, they form a chaotic $O(N^2)$ web of tight coupling:
+- **Mediator Pattern**: Components (Colleagues) communicate strictly through a central Mediator object.
+- **Real-World Example**:
+  - Air Traffic Control tower: Airplanes do not radio each other to coordinate landings; they communicate exclusively through the ATC tower.
+  - **MediatR** in .NET / CQRS: Decouples HTTP controllers from domain query/command handlers via in-process mediation.
+
+---
+
+### 39. Memento Pattern: Snapshotting internal state for undo/redo workflows.
+
+**In Simple Words:**
+Captures and externalizes an object's internal state so the object can be restored to this state later, without violating encapsulation:
+- **Originator**: The business object (e.g. Text Editor canvas). Creates a Memento containing its private state snapshot and can restore itself from a Memento.
+- **Memento**: Immutable state snapshot container.
+- **Caretaker**: Manages the undo/redo stack (holds array of Mementos), but **never reads or modifies** the state inside the Memento.
+
+---
+
+### 40. Interpreter Pattern: Building Domain-Specific Languages (DSLs) and rule engines.
+
+**In Simple Words:**
+Given a language, defines a representation for its grammar along with an interpreter that evaluates sentences in the language:
+- Represents grammar rules as an Abstract Syntax Tree (AST) composed of **Terminal Expressions** (literal numbers, variable names) and **Non-Terminal Expressions** (operators like `+`, `*`, `AND`, `OR`).
+- Commonly used in custom SQL query parsers, cron expression parsers, and financial trading rule engines.
+
+---
+
+### 41. Service Locator Anti-Pattern vs Dependency Injection.
+
+**In Simple Words:**
+- **Service Locator**: A central registry object that classes query to fetch dependencies:
+  ```typescript
+  class OrderService {
+    process() {
+      const db = ServiceLocator.get(Database); // Hidden dependency!
+    }
+  }
+  ```
+  - **Why it's an Anti-Pattern**: Hides dependencies from the class contract. Looking at the constructor, you have no idea what services the class requires until it crashes with a runtime `NullPointerException`!
+- **Dependency Injection**: Dependencies are passed explicitly into the constructor (`new OrderService(database)`), making all requirements visible and trivially mockable in tests.
+
+---
+
+### 42. Saga Pattern (Choreography vs Orchestration): Distributed transactions.
+
+**In Simple Words:**
+In a microservices architecture, you cannot use distributed ACID database locks (2PC) across services without catastrophic latency.
+A **Saga** is a sequence of local transactions:
+- If Step 3 (Payment) fails, the Saga executes **Compensating Transactions** in reverse order (e.g. cancel reserved inventory, cancel pending order).
+- **Choreography (Event-Driven)**: Services publish and listen to Kafka events without a central coordinator. Fast, decentralized; can become difficult to track across complex workflows.
+- **Orchestration**: A dedicated orchestrator service (e.g. Temporal, AWS Step Functions) tells each participant service what step to execute next and triggers compensating rollbacks on failure.
+
+---
+
+### 43. Strangler Fig Pattern: Incrementally modernizing legacy monolithic systems.
+
+**In Simple Words:**
+Named after strangler fig trees that grow around host trees and gradually replace them:
+- Instead of attempting a high-risk "Big Bang" rewrite of a 10-year-old monolith:
+  1. Place an **API Gateway / Reverse Proxy** in front of the monolith.
+  2. Implement new features or extract single domains (e.g. `/billing`) as modern microservices.
+  3. Route `/billing` traffic at the API Gateway to the new microservice; route all other routes to the legacy monolith.
+  4. Gradually strangulate the monolith domain by domain until the old codebase is safely retired.
+
+---
+
+### 44. Bulkhead Pattern: Isolating critical resources to prevent total system collapse.
+
+**In Simple Words:**
+Derived from naval ship hulls that divide the ship into watertight compartments (bulkheads): if water leaks into one section, the ship stays afloat:
+- In software, partition resources (thread pools, connection pools, memory):
+  - Dedicate 50 threads to the core Checkout service.
+  - Dedicate 10 threads to the third-party Recommendation service.
+- If the Recommendation service hangs and exhausts its 10 threads, the Checkout service continues processing orders at full speed!
+
+---
+
+### 45. Ambassador Pattern: Offloading client-side connectivity to a local proxy.
+
+**In Simple Words:**
+Deploys a helper service alongside a client application (typically as a localhost process or Kubernetes sidecar):
+- The application connects to `localhost:8080` using standard plaintext HTTP.
+- The **Ambassador Proxy** handles:
+  - Routing to remote cloud services.
+  - mTLS certificate encryption.
+  - Automatic retries with exponential backoff and jitter.
+  - Circuit breaking and distributed tracing header injection.
+- Keeps client application code clean and free of networking boilerplate.
+
+---
+
+### 46. Sharding / Partitioning Pattern: Horizontal data scaling.
+
+**In Simple Words:**
+When a single database server hits physical CPU or disk capacity limits:
+- Split the dataset horizontally across multiple distinct database servers (**Shards**):
+  - **Range-Based Sharding**: Shard 1 holds IDs 1 - 1,000,000; Shard 2 holds 1,000,001 - 2,000,000. Risk of hot spots if new traffic concentrates on latest IDs.
+  - **Hash-Based Sharding**: `hash(customer_id) % num_shards`. Distributes traffic evenly.
+  - **Directory-Based Sharding**: A lookup service maps customer IDs to physical shard endpoints.
+
+---
+
+### 47. Gateway Aggregation / Backend-for-Frontend (BFF) Pattern.
+
+**In Simple Words:**
+- **Gateway Aggregation**: An API Gateway aggregates multiple backend microservice calls into a single HTTP round-trip, saving cellular network bandwidth for mobile clients.
+- **Backend-for-Frontend (BFF)**: Instead of a single monolithic API Gateway serving all clients, create dedicated gateway layers tailored to specific client form factors:
+  - **iOS/Android BFF**: Returns compact, minimal payloads with pre-computed localized labels for small screens.
+  - **Desktop Web BFF**: Returns rich, multi-column analytics data payloads.
+
+---
+
+### 48. Competing Consumers Pattern: Scalable concurrent message processing.
+
+**In Simple Words:**
+When the message production rate exceeds the processing capacity of a single consumer:
+- Multiple identical consumer instances attach to a **single shared message queue** (RabbitMQ queue, AWS SQS).
+- The message broker dispenses each message to strictly **one consumer** in the pool.
+- System scales horizontally: add more consumer pods during traffic surges to drain queues faster with zero application code changes.
+
+---
+
+### 49. Claim Check Pattern: Handling large message payloads in event-driven systems.
+
+**In Simple Words:**
+Message brokers (Kafka, RabbitMQ, SQS) are designed for small payloads (< 256 KB); sending 50MB PDF files or 4K videos directly through message queues degrades broker memory and throughput:
+- **Claim Check Workflow**:
+  1. Producer uploads the 50MB file directly to cloud object storage (AWS S3 / GCS).
+  2. Producer publishes a lightweight event message to the queue containing only the metadata and a storage pointer: `{ file_id: "101", s3_uri: "s3://bucket/video.mp4" }` (**The Claim Check**).
+  3. Downstream consumers receive the event and download the file directly from S3 when ready.
+
+---
+
+### 50. Architectural Anti-Patterns: Golden Hammer, Lava Flow, and Big Ball of Mud.
+
+**In Simple Words:**
+Recognizing toxic architectural anti-patterns:
+- **Golden Hammer**: Assuming a single favorite technology (e.g. Microservices, GraphQL, or MongoDB) is the universal solution for every single problem.
+- **Lava Flow (Dead Legacy Code)**: Geological layers of obsolete, abandoned code and undocumented database columns that nobody dares delete because nobody knows what might break.
+- **Big Ball of Mud**: A haphazardly structured, spaghetti-code monolith with zero discernible architecture, arbitrary cross-module dependencies, and high regression rates.

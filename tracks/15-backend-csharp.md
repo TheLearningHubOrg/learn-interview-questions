@@ -485,3 +485,171 @@ When a lambda captures an outer local variable (a **closure**), the Roslyn compi
 ### 35. When should you choose C# / .NET over Go, Java, or Rust for enterprise distributed systems?
 **In Simple Words:**
 Choose C# and .NET for high-throughput enterprise systems requiring expressive language features (async/await, LINQ, pattern matching) combined with zero-allocation low-level performance (`Span<T>`, Native AOT, SIMD) and premier tooling.
+
+---
+
+### 36. Value Types vs Reference Types: Stack, Heap, and Boxing.
+
+**In Simple Words:**
+- **Value Types (`struct`, `enum`, `int`, `double`, `bool`)**: Stored where declared (typically on the thread stack or inline inside containing objects). Copied by value. Zero garbage collection pressure.
+- **Reference Types (`class`, `interface`, `delegate`, `string`, `object`)**: Stored on the managed heap. Variables hold references (pointers). Cleaned up by GC.
+- **Boxing & Unboxing**: Converting a value type to `object` allocates an object on the heap (**Boxing**), causing GC allocations. Casting it back (**Unboxing**) reads the raw value.
+- **`readonly struct`**: Enforces immutability and informs the compiler to pass the struct by reference (`in` keyword) without defensive memory copying.
+
+---
+
+### 37. Zero-Allocation Memory Slicing: `Span<T>` and `ReadOnlySpan<T>`.
+
+**In Simple Words:**
+Prior to `Span<T>`, string manipulation (`substring`, `split`) allocated millions of short-lived strings on the heap, triggering heavy GC pauses.
+- **`Span<T>` / `ReadOnlySpan<T>`**: A stack-only `ref struct` representing a contiguous region of arbitrary memory (managed array, native memory, or stackallocated buffer).
+- **Zero-Allocation Slicing**: Slicing a span (`span.Slice(0, 5)`) creates an offset view pointing directly into existing memory with **zero heap allocations**!
+
+```csharp
+ReadOnlySpan<char> text = "ORDER-2026-11-20".AsSpan();
+// Slices text with 0 heap allocation and 0 bytes garbage generated!
+ReadOnlySpan<char> yearSpan = text.Slice(6, 4);
+int year = int.Parse(yearSpan);
+```
+
+---
+
+### 38. Async/Await: `Task` vs `ValueTask<T>`.
+
+**In Simple Words:**
+- **`Task<T>`**: A reference type allocated on the heap every time an async method is called.
+- **`ValueTask<T>`**: A value type struct. If the result is already available synchronously (e.g. from an in-memory cache or dictionary lookup), `ValueTask<T>` returns the value with **zero heap allocation**! If asynchronous work is required, it wraps a regular `Task`.
+- **Rule**: Use `ValueTask<T>` for high-throughput methods that frequently return synchronously from cache.
+
+---
+
+### 39. .NET Garbage Collection: Generational GC and the Large Object Heap (LOH).
+
+**In Simple Words:**
+The .NET CLR uses a generational tracing garbage collector:
+1. **Gen 0**: Freshly allocated short-lived objects (collected in sub-milliseconds).
+2. **Gen 1**: Buffer generation acting as a ramp between short-lived and long-lived data.
+3. **Gen 2**: Long-lived objects (static caches, database connection pools).
+4. **Large Object Heap (LOH)**: Objects $\ge 85,000\text{ bytes}$ (such as large arrays). LOH objects bypass Gen 0/1 and are allocated directly in Gen 2; historically not compacted, risking memory fragmentation (use `GCSettings.LargeObjectHeapCompactionMode` to compact).
+5. **Server GC**: Spawns one GC thread and dedicated managed heap per logical CPU core for massive multi-threaded web servers.
+
+---
+
+### 40. Pattern Matching in Modern C# (C# 9 - 12+).
+
+**In Simple Words:**
+Pattern matching tests expressions against shapes, types, and values:
+- **Property Patterns**: Inspects object properties directly without nested null-checks.
+- **Relational & Logical Patterns**: Matches numeric thresholds with `and`, `or`, `not`, `>`, `<`.
+- **List Patterns (C# 11+)**: Matches elements within arrays or lists (`[var first, .., var last]`).
+
+```csharp
+public decimal CalculateDiscount(Order order) => order switch
+{
+    { TotalAmount: > 1000, Customer.IsVip: true } => 0.20m, // 20% discount
+    { TotalAmount: > 500 } => 0.10m,
+    { Items: [.., { IsClearance: true }] } => 0.05m, // List pattern check
+    _ => 0.0m
+};
+```
+
+---
+
+### 41. Records and Immutability: `record class` vs `record struct`.
+
+**In Simple Words:**
+Records are nominal types designed for immutable data:
+- Auto-generates value-based equality (`Equals()`, `==`), hash code, and `ToString()`.
+- **`init` accessors**: Properties can only be assigned during object construction.
+- **Non-destructive Mutation (`with` expression)**: Creates a new copy with modified properties while preserving the original.
+
+```csharp
+public record User(string Id, string Email, int Age);
+
+var user1 = new User("101", "alex@example.com", 28);
+// Clones user1 with updated email; user1 remains completely unchanged!
+var user2 = user1 with { Email = "alex.new@example.com" };
+```
+
+---
+
+### 42. Delegates vs Expression Trees.
+
+**In Simple Words:**
+- **Delegates (`Func<T, bool>`)**: Compiled IL code executed directly by the CPU in memory (e.g. `IEnumerable.Where()`).
+- **Expression Trees (`Expression<Func<T, bool>>`)**: Data structure representing the AST (Abstract Syntax Tree) of the code. Entity Framework parses Expression Trees at runtime and translates the C# logic into raw SQL queries executed by the database engine!
+
+---
+
+### 43. Thread Synchronization: `lock`, `SemaphoreSlim`, and `Interlocked`.
+
+**In Simple Words:**
+- **`lock(obj)`**: Synchronous mutual exclusion monitor. Fast, but **cannot be used inside async methods** across `await` points!
+- **`SemaphoreSlim`**: Supports async non-blocking lock acquisition (`await semaphore.WaitAsync()`). Ideal for async resource pools.
+- **`Interlocked` (`Increment`, `CompareExchange`)**: Atomic CPU-level lock-free operations with zero thread-blocking overhead.
+
+---
+
+### 44. LINQ Internals and Deferred Execution Traps.
+
+**In Simple Words:**
+LINQ uses **Deferred (Lazy) Execution**: query execution does not occur when the LINQ query is defined, but when enumerated (`foreach`, `.ToList()`, `.Count()`):
+- **Multiple Enumeration Bug**: Calling `.Count()` and then `.ToList()` on an `IEnumerable` that executes an HTTP request or DB query executes the expensive operation **twice**! Materialize with `.ToList()` or `.ToArray()` before multiple uses.
+
+---
+
+### 45. The IDisposable and IAsyncDisposable Pattern.
+
+**In Simple Words:**
+Managed GC does not automatically release unmanaged OS resources (file handles, database connections, sockets):
+- **`IDisposable`**: Releases resources synchronously via `.Dispose()`.
+- **`IAsyncDisposable` (C# 8+)**: Asynchronously releases unmanaged resources (`await using var stream = ...`) without blocking the thread pool during disk or network flushes.
+
+---
+
+### 46. Nullable Reference Types (NRT): Eliminating NullReferenceExceptions.
+
+**In Simple Words:**
+Enabled via `<Nullable>enable</Nullable>` in `.csproj`:
+- Distinguishes nullable strings (`string? name`) from non-nullable strings (`string name`).
+- The compiler runs static flow analysis, flagging any code path where a nullable variable is dereferenced without a prior null-check.
+- **Null-Forgiving Operator (`!`)**: Explicitly tells the compiler that a variable is guaranteed non-null at runtime (`user!.Profile`).
+
+---
+
+### 47. C# Source Generators: Compile-Time Metaprogramming.
+
+**In Simple Words:**
+Source Generators run as part of the `dotnet build` compiler pipeline:
+- Inspects code syntax trees and **generates additional C# source files** added directly to the compilation.
+- Replaces slow, runtime reflection (e.g. `System.Text.Json` source generation generates JSON serializers at compile time with zero reflection and zero startup latency!).
+
+---
+
+### 48. Native AOT Compilation in .NET 8 / 9.
+
+**In Simple Words:**
+**Native AOT** compiles C# directly into machine code (ELF/PE) without intermediate IL bytecode or the JIT compiler:
+- Starts in **$< 10\text{ms}$** with immediate peak performance.
+- Cuts binary memory footprint by 80% and eliminates JIT warm-up latency.
+- Requires trim-safe code and source-generated reflection.
+
+---
+
+### 49. Dependency Injection: The Captive Dependency Problem.
+
+**In Simple Words:**
+.NET provides three DI lifetimes:
+1. **Transient**: Created every time requested.
+2. **Scoped**: Created once per client request (HTTP request).
+3. **Singleton**: Created once for the application lifetime.
+- **The Captive Dependency Bug**: If a **Singleton** service injects a **Scoped** service (like an EF Core `DbContext`), the scoped service is kept alive forever by the singleton! This leads to memory leaks, concurrency crashes, and reading stale database state.
+
+---
+
+### 50. High-Performance I/O with `System.IO.Pipelines`.
+
+**In Simple Words:**
+Created to power Kestrel (the fastest web server in TechEmpower benchmarks):
+- Replaces raw `Stream` reading with `PipeReader` and `PipeWriter`.
+- Manages pooled memory buffers automatically, eliminating buffer copying and reducing GC allocations to zero when processing continuous high-speed TCP socket streams.

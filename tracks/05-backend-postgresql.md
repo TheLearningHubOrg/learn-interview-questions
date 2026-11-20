@@ -379,3 +379,196 @@ During a Checkpoint, PostgreSQL flushes thousands of dirty shared buffers to dis
 2. **Heavy in-place integer counter updates**: Updating a counter column 10,000 times/sec creates 10,000 dead row tuples via MVCC, causing table bloat (use Redis `INCR` or ClickHouse).
 3. **Petabyte-scale analytical columnar warehousing**: Distributed OLAP warehouses (Snowflake, BigQuery) are far superior for cross-table analytics over billions of rows.
 `;
+
+---
+
+### 36. PostgreSQL MVCC: Multi-Version Concurrency Control, Dead Tuples, and Table Bloat.
+
+**In Simple Words:**
+PostgreSQL handles concurrent reads and writes without blocking each other using **MVCC (Multi-Version Concurrency Control)**:
+- **How it Works**: An `UPDATE` does not overwrite the existing row in-place. Instead, it marks the old row version ("dead tuple") with an expiration transaction ID (`xmax`) and writes a completely new row version with an insertion transaction ID (`xmin`).
+- **Dead Tuples & Bloat**: Dead tuples remain on disk until cleaned up. If high-update tables are not vacuumed promptly, dead tuples accumulate, causing "table bloat" where sequential scans read gigabytes of obsolete data.
+
+---
+
+### 37. PostgreSQL `VACUUM` & `AUTOVACUUM` Tuning.
+
+**In Simple Words:**
+`VACUUM` reclaims storage space occupied by dead tuples and prevents **Transaction ID (XID) Wraparound**:
+1. **Standard `VACUUM`**: Scans pages, reclaims dead tuple space for future inserts in the table without acquiring an exclusive table lock.
+2. **`VACUUM FULL`**: Rewrites the entire table into a new disk file to return space to the OS; requires an exclusive table lock (`ACCESS EXCLUSIVE`) that blocks all reads and writes!
+3. **Transaction ID Wraparound**: PostgreSQL transaction IDs are 32-bit integers ($\approx 4\text{ Billion}$). If `VACUUM FREEZE` does not advance the oldest XID before 2 billion transactions pass, Postgres halts all write operations to prevent catastrophic data corruption.
+4. **Tuning `autovacuum`**: For large tables, lower `autovacuum_vacuum_scale_factor` from `0.2` (20%) to `0.02` (2%) so vacuuming runs in smaller, frequent batches.
+
+---
+
+### 38. PostgreSQL Index Types: B-Tree vs GIN vs GiST vs BRIN.
+
+**In Simple Words:**
+- **B-Tree (Default)**: Best for unique keys, equality (`=`), and range comparisons (`<`, `>`, `BETWEEN`, `ORDER BY`).
+- **GIN (Generalized Inverted Index)**: Indexes composite values where a single column contains multiple elements (JSONB, Arrays, Full-Text Search). Fast search, slower write updates.
+- **GiST (Generalized Search Tree)**: Hierarchical geometric and range structures (PostGIS spatial points, overlapping date ranges via `&&`).
+- **BRIN (Block Range Index)**: Extremely small index that stores the minimum and maximum value for each block of disk pages (e.g. 128 pages). Ideal for multi-billion row append-only tables sorted by timestamp, using 99% less RAM than a B-Tree!
+
+---
+
+### 39. JSONB Deep Dive: High-Performance Semi-Structured Storage.
+
+**In Simple Words:**
+- **`json` vs `jsonb`**: `json` stores the exact raw text string (preserving whitespace and key duplicates, slower to query). `jsonb` parses JSON into a decomposed binary format, eliminating duplicate keys and enabling indexing.
+- **JSONB Operators**:
+  - `data -> 'user'` (Returns JSON)
+  - `data ->> 'user'` (Returns text)
+  - `data @> '{"role": "admin"}'` (Containment check, utilizes GIN index!)
+
+```sql
+-- Creating GIN index on JSONB column for instant sub-millisecond lookups
+CREATE INDEX idx_users_metadata_gin ON users USING GIN (metadata jsonb_path_ops);
+
+-- Accelerated by GIN index
+SELECT * FROM users WHERE metadata @> '{"department": "Engineering", "active": true}';
+```
+
+---
+
+### 40. Full-Text Search in PostgreSQL: `tsvector`, `tsquery`, and GIN Indexes.
+
+**In Simple Words:**
+PostgreSQL includes native search engine capabilities:
+- **`to_tsvector('english', text)`**: Normalizes text into a sorted list of unique stemmed lexemes (e.g. "running", "runs" both reduce to "run").
+- **`to_tsquery('english', 'search & query')`**: Represents search query terms with boolean operators (`&`, `|`, `!`).
+- **`ts_rank`**: Ranks matching rows by keyword density and proximity.
+
+```sql
+-- Generated tsvector column with GIN index
+ALTER TABLE articles ADD COLUMN search_vector tsvector
+GENERATED ALWAYS AS (to_tsvector('english', title || ' ' || body)) STORED;
+
+CREATE INDEX idx_articles_search ON articles USING GIN (search_vector);
+
+SELECT title, ts_rank(search_vector, query) AS rank
+FROM articles, to_tsquery('english', 'database & performance') query
+WHERE search_vector @@ query
+ORDER BY rank DESC;
+```
+
+---
+
+### 41. Declarative Table Partitioning: Range, List, and Hash.
+
+**In Simple Words:**
+Partitioning splits a massive table into smaller physical child tables while maintaining a single logical table interface:
+- **Range Partitioning**: Partition by continuous intervals (e.g. `order_date` by month or year).
+- **List Partitioning**: Partition by discrete categorical values (e.g. `country_code IN ('US', 'CA')`).
+- **Hash Partitioning**: Partition by `MODULUS` hash keys to balance write traffic across disks.
+- **Partition Pruning**: The query planner automatically skips child partitions that do not match the `WHERE` clause conditions!
+
+```sql
+-- Creating a range-partitioned table by month
+CREATE TABLE telemetry_events (
+  id BIGSERIAL,
+  event_time TIMESTAMPTZ NOT NULL,
+  payload JSONB
+) PARTITION BY RANGE (event_time);
+
+CREATE TABLE telemetry_2026_11 PARTITION OF telemetry_events
+  FOR VALUES FROM ('2026-11-01') TO ('2026-12-01');
+```
+
+---
+
+### 42. PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)` Execution Plans.
+
+**In Simple Words:**
+- **`EXPLAIN`**: Shows the planner's estimated cost without running the query.
+- **`EXPLAIN (ANALYZE, BUFFERS)`**: Actually executes the query, showing true execution runtime ($ms$) and exact disk buffer usage:
+  - **`Seq Scan`**: Scans the entire table sequentially (slow for large tables).
+  - **`Index Scan`**: Traverses B-tree and fetches matching heap pages.
+  - **`Bitmap Index Scan / Bitmap Heap Scan`**: Creates a bitmap of matching pages from the index and reads heap pages in sequential physical disk order.
+  - **`Buffers: shared hit=400 read=10`**: Indicates 400 pages read from RAM cache, 10 read from disk.
+
+---
+
+### 43. PostgreSQL Streaming Replication & Replication Slots.
+
+**In Simple Words:**
+Streaming replication streams Write-Ahead Log (WAL) records continuously from a Primary server to Read Replicas over a TCP connection:
+- **Physical Replication**: Byte-for-byte exact replica of the primary database cluster.
+- **Replication Slots**: Prevents the Primary from recycling or deleting WAL segments until the replica has safely confirmed receiving them, eliminating replica desynchronization crashes during network partitions.
+
+---
+
+### 44. Foreign Data Wrappers (FDW): Querying Across Databases.
+
+**In Simple Words:**
+PostgreSQL supports the SQL/MED (Management of External Data) standard via **Foreign Data Wrappers (`postgres_fdw`)**. It allows querying remote PostgreSQL instances, MySQL databases, Redis, or CSV files directly as if they were local tables, supporting cross-database joins and push-down predicates!
+
+```sql
+CREATE EXTENSION postgres_fdw;
+CREATE SERVER remote_billing FOREIGN DATA WRAPPER postgres_fdw
+  OPTIONS (host '10.0.1.5', dbname 'billing_db', port '5432');
+```
+
+---
+
+### 45. Connection Pooling with PgBouncer: Sizing and Modes.
+
+**In Simple Words:**
+PostgreSQL uses a process-based model (each client connection spawns a new OS backend process consuming ~10MB RAM). **PgBouncer** multiplexes thousands of client connections onto a tiny pool of backend PostgreSQL connections:
+1. **Session Pooling**: Connection held for the lifetime of client connection.
+2. **Transaction Pooling (Most Common)**: Connection returned to pool as soon as `COMMIT` or `ROLLBACK` executes (enables 10,000 clients to share 50 DB connections!).
+3. **Statement Pooling**: Connection returned after every single SQL statement (does not support multi-statement transactions).
+
+---
+
+### 46. AI Vector Embeddings with `pgvector`.
+
+**In Simple Words:**
+The `pgvector` extension turns PostgreSQL into a high-performance Vector Database for AI and Retrieval-Augmented Generation (RAG):
+- Stores embeddings up to 16,000 dimensions using the `vector(n)` type.
+- Supports Cosine Distance (`<=>`), L2 Euclidean Distance (`<->`), and Inner Product (`<#>`).
+- Accelerates Approximate Nearest Neighbor (ANN) search using **HNSW (Hierarchical Navigable Small World)** and **IVFFlat** indexes.
+
+```sql
+CREATE EXTENSION vector;
+CREATE TABLE document_embeddings (id BIGSERIAL PRIMARY KEY, content TEXT, embedding vector(1536));
+CREATE INDEX ON document_embeddings USING hnsw (embedding vector_cosine_ops);
+
+-- Find top 5 most semantically similar documents
+SELECT content FROM document_embeddings ORDER BY embedding <=> '[0.012, -0.045, ...]' LIMIT 5;
+```
+
+---
+
+### 47. Partial & Expression (Functional) Indexes in PostgreSQL.
+
+**In Simple Words:**
+- **Partial Index**: Indexes only rows matching a `WHERE` condition (`CREATE INDEX idx_active ON users (email) WHERE is_active = true;`). Saves 90% disk space by indexing only the hot slice of data.
+- **Expression Index**: Indexes the result of a deterministic function (`CREATE INDEX idx_lower_email ON users (LOWER(email));`), allowing fast case-insensitive lookups without full-table scans.
+
+---
+
+### 48. Logical Replication: Publications and Subscriptions.
+
+**In Simple Words:**
+Unlike physical replication which mirrors the entire disk cluster, **Logical Replication** replicates individual tables based on row-level data changes:
+- Supported via `CREATE PUBLICATION` on publisher and `CREATE SUBSCRIPTION` on subscriber.
+- Enables zero-downtime major version upgrades (e.g. Postgres 14 to Postgres 17) and cross-platform data synchronization.
+
+---
+
+### 49. PostgreSQL Advisory Locks: Application-Level Distributed Locks.
+
+**In Simple Words:**
+PostgreSQL provides **Advisory Locks** (`pg_advisory_lock(int)` / `pg_try_advisory_lock(int)`) which create application-controlled locks without touching table rows or causing transaction deadlocks:
+- Perfect for leader election, coordinating scheduled cron jobs, and preventing duplicate payment processing across microservice instances.
+
+---
+
+### 50. High-Availability (HA) Architecture with Patroni and etcd.
+
+**In Simple Words:**
+Enterprise PostgreSQL HA uses **Patroni**:
+1. **etcd / Consul**: Distributed consensus store maintaining cluster state and leader lock.
+2. **Patroni Daemon**: Runs alongside each Postgres node, monitoring health and orchestrating automated failover.
+3. If Primary crashes, Patroni automatically selects the replica with the highest LSN (least data loss), promotes it to Primary within 10 seconds, and reconfigures remaining nodes to follow the new leader.

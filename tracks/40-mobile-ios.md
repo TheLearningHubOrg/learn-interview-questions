@@ -362,3 +362,184 @@ Use `LAContext.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics)`. Crypto
 ### 35. How does the SwiftUI Attribute Graph and Diffing Engine minimize redraws?
 **In Simple Words:**
 SwiftUI maintains an internal dependency graph of view nodes and state bindings (**Attribute Graph**). When state mutates, SwiftUI diffs the graph and triggers `body` evaluation only for views whose direct input dependencies changed.
+
+
+---
+
+### 36. SwiftUI State Management: `@State`, `@Binding`, and the `@Observable` Macro (iOS 17+).
+
+**In Simple Words:**
+- **`@State`**: Manages local, ephemeral view-owned value state.
+- **`@Binding`**: Creates a two-way connection to state owned by a parent view without duplicating data.
+- **`@Observable` (Observation Framework in iOS 17+)**: Replaces verbose `ObservableObject` and `@Published`:
+  - Uses Swift Macros to track property access at runtime.
+  - **Fine-Grained Invalidation**: In legacy `ObservableObject`, changing *any* property invalidated all views observing the object. With `@Observable`, a view re-renders *only* if the specific property read in its `body` mutates!
+
+---
+
+### 37. SwiftData Architecture: `@Model`, `ModelContext`, `ModelContainer`, and schema migrations.
+
+**In Simple Words:**
+SwiftData is Apple's modern persistence framework replacing complex Core Data boilerplate with native Swift macros:
+```swift
+@Model
+final class Order {
+  @Attribute(.unique) var id: UUID
+  var total: Decimal
+  @Relationship(deleteRule: .cascade) var items: [OrderItem]
+  init(total: Decimal) { self.id = UUID(); self.total = total; self.items = [] }
+}
+```
+- **`ModelContainer`**: Sets up the persistence backend and SQLite database file.
+- **`ModelContext`**: In-memory scratchpad tracking insertions, edits, and deletions before saving.
+- **`@Query` Macro**: Declaratively fetches, filters, and sorts models directly inside SwiftUI views with automatic UI updates upon mutation.
+
+---
+
+### 38. Combine Framework vs AsyncAlgorithms / AsyncSequence: Modern migration strategies.
+
+**In Simple Words:**
+- **Combine**: Functional reactive framework introduced in iOS 13 using `Publisher` / `Subscriber` chains and operators (`debounce`, `flatMap`, `combineLatest`).
+- **AsyncSequence & AsyncAlgorithms (Modern Swift)**: Replaces complex Combine pipelines with clean, imperative async/await syntax:
+  ```swift
+  for await query in searchField.textStream.debounce(for: .milliseconds(300)) {
+    let results = try await api.search(query)
+  }
+  ```
+- Cleaner stack traces, better compiler diagnostics, and native integration with Swift structured concurrency.
+
+---
+
+### 39. UIKit to SwiftUI Interoperability: `UIViewRepresentable` and `UIViewControllerRepresentable` with Coordinators.
+
+**In Simple Words:**
+Wrapping complex legacy UIKit views (like `MKMapView` or `WKWebView`) inside modern SwiftUI:
+- **`makeUIView(context:)`**: Instantiates and returns the underlying UIKit view.
+- **`updateUIView(uiView, context:)`**: Updates the UIKit view configuration when SwiftUI state properties change.
+- **`Coordinator`**: Acts as the UIKit delegate/target-action receiver, translating UIKit events back into SwiftUI state bindings.
+
+---
+
+### 40. Dynamic Island & Live Activities: ActivityKit, WidgetKit extensions, and APNs pushes.
+
+**In Simple Words:**
+Displaying real-time glanceable updates (ride tracking, food delivery) on the iPhone lock screen and Dynamic Island:
+- **ActivityKit**: Manages the lifecycle of the activity. Defines static attributes and dynamic content state (`ActivityAttributes`).
+- **WidgetKit UI**: Renders the Dynamic Island views in 4 configurations: Compact Leading, Compact Trailing, Minimal, and Expanded.
+- **Push Updates**: Update live content state directly over APNs using specialized token-authenticated activity push payloads without waking up the main app process.
+
+---
+
+### 41. iOS Memory Management & Out of Memory (OOM) Jetsam Crashes.
+
+**In Simple Words:**
+iOS does not have virtual memory swap space on disk. If physical RAM runs low:
+1. The OS kernel issues memory pressure warnings (`applicationDidReceiveMemoryWarning`).
+2. If memory continues climbing past the hard footprint limit, the kernel's **Jetsam daemon** terminates the app with `EXC_RESOURCE (RESOURCE_TYPE_MEMORY)`.
+3. **Jetsam crashes do not generate standard crash logs**! They are recorded in system diagnostic analytics logs as `jetsamEvent`. Mitigate by resizing image buffers downsample-on-decode and releasing heavy in-memory caches.
+
+---
+
+### 42. Background Execution Modes: `BGTaskScheduler`, Audio, and Location updates.
+
+**In Simple Words:**
+iOS strictly restricts background execution to preserve user battery:
+- **`BGAppRefreshTask`**: Short execution window (up to 30 seconds) scheduled by the OS when the user is likely to open the app.
+- **`BGProcessingTask`**: Long-running maintenance tasks (database cleanup, ML model training) executed only when the device is idle, connected to power, and connected to Wi-Fi.
+- **Special Background Modes**: Audio streaming, VoIP, Bluetooth peripheral communication, and continuous navigation turn-by-turn GPS.
+
+---
+
+### 43. Core Animation Render Pipeline: Commit transaction, Render Server, and Offscreen Rendering.
+
+**In Simple Words:**
+How pixels reach the iPhone display hardware:
+1. **Commit Transaction**: App prepares view layers and sends serialized hierarchy to the out-of-process **Render Server** (`backboardd`).
+2. **GPU Drawing**: The GPU computes shaders and draws layers into the frame buffer.
+3. **Offscreen Rendering Hazard**: Occurs when the GPU cannot draw content directly into the frame buffer in a single pass (e.g. unrounded shadows, masks, `cornerRadius` combined with `masksToBounds`).
+   - Forces the GPU to allocate an offscreen buffer and switch render targets twice per frame, cutting frame rates in half! Fix by setting `layer.shadowPath` explicitly.
+
+---
+
+### 44. Deep Linking Architecture: Universal Links vs Custom Schemes, and `apple-app-site-association`.
+
+**In Simple Words:**
+- **Custom Schemes (`myapp://path`)**: Insecure and can be claimed by rogue apps installed on the device.
+- **Universal Links (`https://myapp.com/item/101`)**:
+  - Secure two-way verification: Apple servers fetch `https://myapp.com/.well-known/apple-app-site-association` containing your Team ID and App Bundle ID.
+  - Tapping a link opens your app instantly with zero browser redirection.
+  - If the app is not installed, the link gracefully opens the web page in Safari.
+
+---
+
+### 45. In-App Purchases (IAP) & StoreKit 2: `Product.purchase()` and cryptographic JWS verification.
+
+**In Simple Words:**
+Apple's modern StoreKit 2 API simplifies purchases using native async/await:
+```swift
+let products = try await Product.products(for: ["monthly_sub_10"])
+let result = try await product.purchase()
+
+switch result {
+case .success(let verification):
+  let transaction = try checkVerified(verification)
+  await transaction.finish() // Must finish transaction to complete Apple ledger
+case .userCancelled, .pending:
+  break
+}
+```
+- Every transaction is cryptographically signed using **JSON Web Signature (JWS)**, allowing on-device verification without a backend receipt validation server.
+
+---
+
+### 46. iOS Modular Architecture: Frameworks vs Swift Packages and Dynamic vs Static Linking.
+
+**In Simple Words:**
+- **Static Linking (`.a` / Static Framework)**: Code is copied directly into the main app executable at compile time.
+  - Faster app launch time (zero `dyld` dynamic loader overhead).
+  - Slightly larger binary size if code is duplicated across extensions.
+- **Dynamic Linking (`.dylib` / Dynamic Framework)**: Linked at runtime by `dyld`.
+  - Can be shared between the main app and app extensions (Widget, Watch app).
+  - Having $> 10$ dynamic frameworks degrades pre-main app launch time.
+
+---
+
+### 47. Security in iOS: App Transport Security (ATS) and Keychain Services API.
+
+**In Simple Words:**
+- **App Transport Security (ATS)**: Enforces TLS 1.3 with forward secrecy for all HTTP network connections initiated via `URLSession`. Plaintext `http://` calls are blocked by default.
+- **Keychain Services**: Stores sensitive cryptographic keys and passwords in hardware-encrypted partitions:
+  - Accessible only when device is unlocked (`kSecAttrAccessibleWhenUnlocked`).
+  - Key material survives app reinstallation and device backups.
+
+---
+
+### 48. Accessibility (a11y) in iOS: VoiceOver traits and Dynamic Type scaling.
+
+**In Simple Words:**
+Building inclusive iOS applications:
+- **Dynamic Type**: Automatically scales typography using system text styles (`.body`, `.headline`). Use `@ScaledMetric` in SwiftUI to scale custom padding, icons, and spacing alongside text size changes.
+- **VoiceOver**: Annotate views with accessibility traits (`button`, `selected`, `header`), descriptive labels (`accessibilityLabel`), and actionable hints (`accessibilityHint`).
+
+---
+
+### 49. Xcode Instruments Deep Dive: Time Profiler, Leaks, and Allocations.
+
+**In Simple Words:**
+Essential performance diagnostic workflows:
+- **Time Profiler**: Samples call stacks at 1ms intervals, highlighting CPU hotspots and heavy background thread functions on a timeline.
+- **Allocations**: Tracks heap memory allocations over time. Filter by "Generations" to identify objects retained across screen navigation.
+- **Leaks**: Detects orphaned memory blocks that are no longer referenced by any pointer in the app.
+
+---
+
+### 50. App Launch Time Optimization: Pre-main (`dyld`) vs Post-main.
+
+**In Simple Words:**
+Achieving a sub-400ms launch time:
+1. **Pre-Main Time**: The time spent before `main()` executes:
+   - Minimize dynamic framework dependencies (merge into static libraries).
+   - Eliminate C++ static initializers and Objective-C `+load` methods (replace with `+initialize`).
+2. **Post-Main Time**: Time spent inside `application(_:didFinishLaunchingWithOptions:)`:
+   - Defer third-party SDK initializations (analytics, crash reporting, ads) onto background queues.
+   - Load only the visible initial root UIViewController; instantiate subsequent tabs and settings lazily.

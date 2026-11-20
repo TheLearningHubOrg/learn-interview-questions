@@ -635,3 +635,222 @@ Unlike older standards (HTML 4.01, XHTML) managed by the W3C with slow 5-year ve
 - Browser vendors (Google, Apple, Mozilla, Microsoft) collaborate directly.
 - **TC39 & W3C Collaboration**: Features progress through standardized incubation stages (proposal, prototype behind flags, cross-engine interoperability via **Interop**, and final Baseline inclusion).
 
+
+---
+
+### 36. The HTML Popover API: Native Tooltips, Menus, and Light-Dismiss.
+
+**In Simple Words:**
+The HTML Popover API provides built-in browser-managed popovers, menus, and toasts without requiring JavaScript libraries or z-index wars:
+- **`popover` attribute**: Marks an element as a top-layer popover (`popover="auto"` or `popover="manual"`).
+- **`popovertarget`**: Binds a button to toggle the popover natively.
+- **Top Layer**: Popovers automatically render in the browser's native `#top-layer`, above all `z-index` and `overflow: hidden` restrictions.
+- **Light Dismiss**: Clicking outside or pressing `Escape` automatically closes `auto` popovers.
+
+```html
+<!-- Native Popover without a single line of JavaScript -->
+<button popovertarget="my-menu">Toggle Menu</button>
+
+<div id="my-menu" popover>
+  <h4>Settings Menu</h4>
+  <ul>
+    <li>Profile</li>
+    <li>Security</li>
+    <li>Log Out</li>
+  </ul>
+</div>
+```
+
+---
+
+### 37. HTML `<dialog>` Element vs Custom `<div>` Modals: Focus Trapping and `::backdrop`.
+
+**In Simple Words:**
+The native `<dialog>` element replaces custom modal libraries:
+- **`dialog.showModal()`**: Opens a true accessible modal in the browser's `#top-layer`, disables interaction with the rest of the page (`inert`), automatically traps keyboard focus, and closes on `Escape`.
+- **`dialog.show()`**: Opens a non-modal dialog where background elements remain interactive.
+- **`::backdrop` pseudo-element**: Styles the dimmed overlay behind the modal.
+
+```html
+<dialog id="fav-dialog">
+  <form method="dialog">
+    <p>Confirm account deletion?</p>
+    <button value="cancel">Cancel</button>
+    <button value="confirm">Confirm</button>
+  </form>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('fav-dialog');
+  dialog.showModal(); // Opens with native focus trap and top-layer rendering
+  dialog.addEventListener('close', () => {
+    console.log('Dialog closed with return value:', dialog.returnValue);
+  });
+</script>
+```
+
+---
+
+### 38. HTML5 Form Validation API: `checkValidity()`, `reportValidity()`, and `:user-invalid`.
+
+**In Simple Words:**
+HTML5 provides built-in client-side validation using attributes (`required`, `pattern`, `minlength`, `type="email"`):
+- **`checkValidity()`**: Returns boolean without showing browser error bubbles.
+- **`reportValidity()`**: Evaluates validity and triggers native validation bubbles if invalid.
+- **`setCustomValidity(message)`**: Sets custom localized error messages.
+- **CSS `:user-invalid`**: Applies styling only **after** the user has interacted with the input and blurred, avoiding showing red error borders on freshly loaded forms!
+
+---
+
+### 39. Script Loading Strategies: `async` vs `defer` vs `type="module"`.
+
+**In Simple Words:**
+- **`<script src="...">` (Default)**: Blocks HTML parsing while downloading and executing immediately.
+- **`<script async src="...">`**: Downloads in background without blocking HTML parsing. Executes **immediately** when downloaded, interrupting parsing and executing out of order. Best for independent analytics scripts.
+- **`<script defer src="...">`**: Downloads in background without blocking. Executes only **after** HTML parsing completes, preserving original DOM document order before `DOMContentLoaded`. Best for application code.
+- **`<script type="module" src="...">`**: Behaves like `defer` by default, supports ES imports, and always executes in strict mode.
+
+---
+
+### 40. Resource Hints: `preload`, `prefetch`, `preconnect`, `dns-prefetch`, and `modulepreload`.
+
+**In Simple Words:**
+Resource hints optimize browser network loading priorities:
+1. **`dns-prefetch`**: Resolves DNS IP addresses of external domains in advance (low overhead).
+2. **`preconnect`**: Performs DNS resolution + TCP handshake + TLS negotiation in advance (e.g. for Google Fonts CDN).
+3. **`preload`**: High-priority instruction telling the browser to fetch a critical resource needed for the current page immediately (e.g. hero font or LCP image).
+4. **`prefetch`**: Low-priority hint telling the browser to fetch resources likely needed on the **next** user navigation when idle.
+5. **`modulepreload`**: Preloads and pre-parses ES module scripts into memory.
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="prefetch" href="/checkout.js">
+```
+
+---
+
+### 41. HTML Web Components: Custom Elements, Shadow DOM, and Templates.
+
+**In Simple Words:**
+Web Components are a suite of browser-native technologies for creating reusable custom HTML tags:
+1. **Custom Elements (`customElements.define`)**: JavaScript API to define custom HTML tags (`<user-avatar>`).
+2. **Shadow DOM (`element.attachShadow({ mode: 'open' })`)**: An isolated DOM subtree where CSS styles inside the shadow root do not leak out or get overridden by external styles.
+3. **`<template>` & `<slot>`**: Inert HTML markup cloned dynamically into shadow roots with projection placeholders.
+
+---
+
+### 42. Declarative Shadow DOM: Server-Side Rendering (SSR) for Web Components.
+
+**In Simple Words:**
+Historically, Shadow DOM required JavaScript (`attachShadow()`) to render, causing layout shift and rendering delays during SSR. **Declarative Shadow DOM** allows servers to output pre-rendered Shadow roots directly in pure HTML using `<template shadowrootmode="open">`:
+
+```html
+<user-card>
+  <template shadowrootmode="open">
+    <style>
+      .card { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; }
+    </style>
+    <div class="card">
+      <slot name="username">Anonymous</slot>
+    </div>
+  </template>
+  <span slot="username">Jane Doe</span>
+</user-card>
+```
+
+---
+
+### 43. Responsive Images: `<picture>` vs `<img>` with `srcset` and `sizes`.
+
+**In Simple Words:**
+- **`srcset` + `sizes` on `<img>` (Resolution Switching)**: Delivers identical image content in different pixel densities (1x, 2x, 3x) or widths so mobile devices don't download heavy desktop files.
+- **`<picture>` (Art Direction & Format Fallback)**: Crops/changes image composition for small screens or serves modern formats (`.avif`, `.webp`) with fallback to `.jpg`.
+
+```html
+<picture>
+  <source media="(min-width: 1024px)" srcset="/hero-wide.avif" type="image/avif">
+  <source media="(min-width: 640px)" srcset="/hero-medium.webp" type="image/webp">
+  <img src="/hero-mobile.jpg" alt="Interview Hero Banner" loading="lazy" decoding="async">
+</picture>
+```
+
+---
+
+### 44. Content Security Policy (CSP) in HTML Meta Tags: Preventing XSS.
+
+**In Simple Words:**
+A Content Security Policy restricts where scripts, images, styles, and frames can be loaded from. It can be delivered via HTTP header or HTML `<meta http-equiv="Content-Security-Policy">`:
+- **`default-src 'self'`**: Only load assets from the origin domain.
+- **`script-src 'self' 'nonce-rAnd0m'`**: Only executes scripts bearing a cryptographic nonce generated per-request, blocking injected inline script XSS payloads.
+
+---
+
+### 45. Structured Data with JSON-LD and Schema.org.
+
+**In Simple Words:**
+JSON-LD (JavaScript Object Notation for Linked Data) embeds machine-readable semantic metadata inside `<script type="application/ld+json">`. Search engines parse this data to display **Google Rich Snippets** (star ratings, event dates, recipe cooking times, FAQs):
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Full-Stack Web Development Interview Guide",
+  "author": { "@type": "Organization", "name": "InterviewHub PRO" },
+  "datePublished": "2026-11-20"
+}
+</script>
+```
+
+---
+
+### 46. Modern Semantic HTML Elements: `<article>`, `<section>`, `<aside>`, and `<nav>`.
+
+**In Simple Words:**
+Semantic HTML conveys meaning to browsers, screen readers, and search engine crawlers:
+- **`<main>`**: The unique central content of the document (only one visible `<main>` per page).
+- **`<article>`**: Self-contained composition that makes sense independently (blog post, forum comment, tweet).
+- **`<section>`**: Thematic grouping of content, typically with a heading.
+- **`<aside>`**: Tangentially related content (sidebar, callout box, advertising).
+- **`<nav>`**: Section holding major site navigation links.
+
+---
+
+### 47. Browser Parsing Pipeline: Tokenization, DOM Tree Construction, and CSSOM.
+
+**In Simple Words:**
+When HTML bytes arrive over the network:
+1. **Conversion**: Bytes are decoded into characters based on character encoding (`UTF-8`).
+2. **Tokenization**: Characters are converted into tokens (`StartTag: <div>`, `EndTag: </div>`).
+3. **DOM Tree**: Tokens are turned into node objects linked in a tree hierarchy.
+4. **CSSOM Tree**: External CSS stylesheets block rendering while building the CSS Object Model.
+5. **Render Tree**: Combines DOM and CSSOM to calculate layout geometry and paint pixels.
+
+---
+
+### 48. HTML Form Encoding Types: `enctype`.
+
+**In Simple Words:**
+The `enctype` attribute on `<form method="POST">` defines how data is serialized:
+- **`application/x-www-form-urlencoded` (Default)**: Keys and values are URL-encoded into strings (`key1=val1&key2=val2`).
+- **`multipart/form-data`**: Mandatory when uploading files (`<input type="file">`). Separates fields with boundary delimiters.
+- **`text/plain`**: Plain text without encoding (rarely used).
+
+---
+
+### 49. HTML Canvas vs SVG: Architectural Trade-Offs.
+
+**In Simple Words:**
+- **SVG (Scalable Vector Graphics)**: XML-based vector format. Uses **Retained Mode** graphics; elements exist in the DOM as nodes, can be styled with CSS, and listen to click events. Scales infinitely without pixelation. Best for logos, icons, and charts with few elements.
+- **Canvas (`<canvas>`)**: JavaScript raster API. Uses **Immediate Mode** graphics; draws pixels directly onto a bitmap with zero DOM overhead. High performance for games, complex 3D graphics (WebGL), and 100,000+ data points.
+
+---
+
+### 50. Client-Side Storage: `localStorage` vs `sessionStorage` vs `IndexedDB` vs Cookies.
+
+**In Simple Words:**
+- **Cookies**: ~4KB capacity. Sent with every HTTP request; supports `HttpOnly` and `SameSite` flags for secure authentication session tokens.
+- **`localStorage`**: ~5-10MB capacity per origin. Persistent until manually cleared. Synchronous API (can block main thread).
+- **`sessionStorage`**: ~5MB capacity. Cleared when browser tab/window is closed.
+- **`IndexedDB`**: Hundreds of megabytes / gigabytes. Asynchronous, transactional, NoSQL object database supporting indexing and binary blobs. Ideal for offline PWAs.

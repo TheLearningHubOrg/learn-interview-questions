@@ -337,3 +337,185 @@ Driver crashes occur when:
 **In Simple Words:**
 - **Use Apache Flink**: When you require true event-driven, record-by-record processing with ultra-low sub-millisecond latency (fraud detection, real-time CEP - Complex Event Processing).
 - **Use Apache Spark**: When your workload mixes batch data processing, scheduled ELT pipelines, machine learning at scale, interactive SQL analytics, and micro-batch streaming.
+
+
+---
+
+### 36. Catalyst Optimizer Deep Dive: Analysis, Logical Optimization, Physical Planning, and Cost-Based Optimizer (CBO).
+
+**In Simple Words:**
+The Catalyst Optimizer is Spark's query compiler that transforms DataFrame code and SQL into highly optimized bytecode:
+1. **Analysis**: Resolves table and column names against the Catalog / Metastore.
+2. **Logical Optimization**: Applies rule-based transformations:
+   - **Predicate Pushdown**: Moves filters as close to the data source as possible to minimize disk I/O.
+   - **Projection Pruning**: Discards unused columns early in the plan.
+3. **Physical Planning**: Generates multiple physical execution strategies (e.g. BroadcastHashJoin vs SortMergeJoin) and uses the **Cost-Based Optimizer (CBO)** with table statistics (row counts, histograms) to choose the cheapest plan.
+4. **Code Generation (Tungsten)**: Compiles the optimal physical plan into compact Java bytecode executed at runtime.
+
+---
+
+### 37. Tungsten Execution Engine: Off-heap memory management, cache-aware computation, and Whole-Stage Code Generation.
+
+**In Simple Words:**
+Before Tungsten, Spark spent massive CPU cycles on JVM object overhead, GC pauses, and CPU L1/L2 cache misses:
+- **Off-Heap Memory Management**: Manages raw binary memory using `sun.misc.Unsafe`, eliminating Java object wrapping overhead and completely bypassing JVM Garbage Collection for cached data.
+- **Cache-Aware Computation**: Aligns record pointers to fit inside CPU L1/L2/L3 hardware caches, maximizing memory bandwidth.
+- **Whole-Stage Code Generation**: Collapses entire pipeline stages (filtering, mapping, projecting) into a single tight bytecode for-loop, eliminating virtual function dispatch overhead.
+
+---
+
+### 38. Dynamic Partition Pruning (DPP): How star-schema joins skip reading hundreds of gigabytes of partition files.
+
+**In Simple Words:**
+In data warehousing star-schemas (joining a massive partitioned Fact table with a small Dimension table):
+```sql
+SELECT * FROM sales_fact f
+JOIN date_dim d ON f.date_key = d.date_key
+WHERE d.quarter = 'Q4_2024';
+```
+- Traditionally, Spark had to scan all 5 years of `sales_fact` partitions before joining.
+- **Dynamic Partition Pruning (DPP)**: Spark evaluates the filter on `date_dim` first, collects the matching `date_key` partition values into a broadcast variable, and pushes this filter dynamically into the `sales_fact` scan.
+- Skips reading 90%+ of Parquet partition directories directly at the storage level!
+
+---
+
+### 39. Adaptive Query Execution (AQE): Dynamic coalescing of shuffle partitions, dynamic switching to broadcast joins, and runtime skew join mitigation.
+
+**In Simple Words:**
+Before AQE (Spark 3.0+), Spark had to guess execution plans using static estimates:
+- **Dynamic Coalescing of Shuffle Partitions**: Automatically merges small post-shuffle partitions together, solving the `spark.sql.shuffle.partitions = 200` guessing game.
+- **Dynamic Join Strategy Conversion**: If a table was estimated at 50MB but filters reduce it to 5MB at runtime, Spark dynamically switches from an expensive SortMergeJoin to a lightning-fast **BroadcastHashJoin**.
+- **Dynamic Skew Join Handling**: Automatically detects skewed partitions exceeding size thresholds and splits them into smaller sub-partitions joined in parallel, eliminating slow straggler tasks.
+
+---
+
+### 40. Memory Management Architecture: Storage Memory vs Execution Memory, memory fractions, and off-heap memory.
+
+**In Simple Words:**
+Spark divides executor JVM heap into distinct pools:
+1. **Reserved Memory (300 MB)**: Reserved for Spark internal engine processes.
+2. **Spark Memory (`spark.memory.fraction = 0.6`)**: The remaining 60% of heap is dynamically shared between:
+   - **Execution Memory**: Used for shuffles, joins, sorts, and aggregations.
+   - **Storage Memory**: Used for cached DataFrames (`df.cache()`) and broadcast variables.
+   - **Dynamic Borrowing**: Execution can evict Storage memory if needed. Storage cannot evict Execution memory.
+3. **User Memory (40%)**: User data structures, UDF allocations, and internal metadata.
+
+---
+
+### 41. Spark on Kubernetes (K8s): Native Spark operator, executor pod lifecycle, dynamic PVC allocation, and spot instances.
+
+**In Simple Words:**
+Running Spark natively inside Kubernetes without YARN:
+- **Spark K8s Operator**: Manages Spark applications declaratively using custom resources (`SparkApplication`).
+- **Driver Pod**: Spun up first; acts as the controller that requests executor pods via the Kubernetes API server.
+- **Spot Instances & Graceful Decommissioning**: When cloud providers issue a 2-minute spot eviction notice, Spark's **Graceful Decommissioning** automatically migrates cached blocks and shuffle files off the doomed executor to surviving nodes before the pod is terminated.
+
+---
+
+### 42. Data Skew Resolution Techniques: Salting partition keys and two-stage aggregations.
+
+**In Simple Words:**
+When 90% of rows contain `user_id = 'GUEST'`, all those rows route to a single partition, leaving 99 executors idle while 1 executor runs for 45 minutes:
+- **Key Salting**:
+  1. Append a random integer (0 to 9) to the skewed key: `concat(key, "_", floor(rand() * 10))`.
+  2. The skewed data evenly disperses across 10 separate parallel partitions.
+  3. Perform the join or aggregation over salted keys.
+  4. Strip the salt in a secondary aggregation to merge final totals.
+
+---
+
+### 43. Spark Streaming Watermarking and Late Data Handling: Sliding vs Tumbling windows, event-time, and output modes.
+
+**In Simple Words:**
+In streaming pipelines, network delays mean events arrive out of order:
+- **Event-Time**: The timestamp embedded inside the record when the action occurred.
+- **Watermark (`withWatermark("timestamp", "10 minutes")`)**: Tells Spark how late data can arrive before being discarded. Spark maintains window aggregation state in memory only until `max(event_time) - 10 minutes`.
+- **Output Modes**:
+  - `Append`: Only finalized, completed windows are emitted downstream.
+  - `Update`: Emits updated aggregation values on every incoming event.
+  - `Complete`: Emits the entire aggregated table state on every micro-batch.
+
+---
+
+### 44. File Compaction Strategies: Small file problem mitigation in Delta Lake/Iceberg.
+
+**In Simple Words:**
+Streaming or hourly ingestion creates millions of tiny 1MB files. Query engines spend 90% of their time on object storage HTTP listing and opening file headers:
+- **The Solution**: Periodic file compaction:
+  ```sql
+  -- Delta Lake
+  OPTIMIZE sales_table ZORDER BY (customer_id);
+  
+  -- Apache Iceberg
+  CALL system.rewrite_data_files('sales_table');
+  ```
+- Rewrites millions of fragmented tiny files into optimal **128 MB to 512 MB Parquet files**, accelerating subsequent queries by up to 10x.
+
+---
+
+### 45. Parquet Format Deep Dive: Row Groups, Column Chunks, Dremel encoding, and predicate pushdown.
+
+**In Simple Words:**
+Apache Parquet is an open-source columnar storage format designed for analytics:
+- **Row Groups**: Logical horizontal partitions of data (typically 128MB to 512MB).
+- **Column Chunks**: Within a row group, all values for a single column are stored contiguously on disk.
+- **Column Metadata & Statistics**: Every column chunk stores min/max values and null counts in the file footer.
+- **Predicate Pushdown**: When running `WHERE age > 65`, Spark inspects the file footer statistics. If a Row Group's `max(age) == 54`, Spark **skips reading the entire byte block from disk**, delivering massive I/O savings.
+
+---
+
+### 46. Spark Executor Sizing Rules of Thumb: Cores, Memory, and Overhead.
+
+**In Simple Words:**
+Production best-practice executor sizing formulas:
+1. **Cores per Executor**: Keep between **4 and 5 cores** (`spark.executor.cores = 5`).
+   - $> 5$ cores leads to JVM Garbage Collection thrashing.
+   - 1 core per executor wastes shared broadcast memory.
+2. **Executor Overhead Memory (`spark.executor.memoryOverhead`)**:
+   - Calculated as `max(384MB, 10% of executor.memory)`.
+   - Allocate 15-20% if using heavy PySpark Arrow operations or off-heap shuffles.
+3. **Leave 1 Core and 1GB RAM per Node** for OS kernel and container runtime daemons.
+
+---
+
+### 47. Z-Ordering and Multi-Dimensional Clustering in Delta Lake.
+
+**In Simple Words:**
+Standard database partitioning works well on 1 column (e.g. `date`), but fails if queries filter on multiple dimensions (`date` AND `customer_id` AND `region`):
+- **Z-Ordering**: Maps multi-dimensional data onto a 1-dimensional space-filling curve (Morton Curve) while preserving spatial locality.
+- Data with similar values across all indexed columns are grouped into the same physical Parquet files.
+- Queries filtering on any subset of the Z-Ordered columns skip reading up to 95% of Parquet files using file min/max statistics.
+
+---
+
+### 48. PySpark Serialization Bottlenecks: Py4J socket IPC, CloudPickle overhead, and Arrow-optimized data transfers.
+
+**In Simple Words:**
+Why native PySpark was historically slower than Scala:
+- **Py4J Socket Bottleneck**: PySpark driver communicates with the JVM driver over local TCP sockets. In standard UDFs, rows are serialized into Python objects, processed in a Python sub-process, and serialized back to the JVM.
+- **Apache Arrow Solution**: Arrow provides a standardized columnar in-memory format. Zero-copy vectorized transfer directly exchanges Arrow record batches between JVM memory and Python Pandas processes without serialization overhead.
+
+---
+
+### 49. Spark Security: Kerberos authentication, TLS wire encryption, and fine-grained data masking via Apache Ranger.
+
+**In Simple Words:**
+Securing enterprise big data infrastructure:
+- **Kerberos**: Mutual authentication between Spark drivers, executors, HDFS, and Hive Metastore.
+- **Internal Wire Encryption (`spark.authenticate = true`, `spark.network.crypto.enabled = true`)**: Encrypts shuffle data transferred across nodes using AES-128.
+- **Apache Ranger / Privacera**: Enforces column-level security and dynamic data masking (e.g., masking credit card numbers for non-privileged analytics groups).
+
+---
+
+### 50. Debugging Executor OOM: `Java heap space` vs `Container killed by YARN/K8s for exceeding memory limits`.
+
+**In Simple Words:**
+Distinguishing the two distinct out-of-memory errors:
+1. **`java.lang.OutOfMemoryError: Java heap space`**:
+   - Occurs *inside* the JVM.
+   - **Root Cause**: Excessive memory allocations during large joins, aggregations, or huge arrays cached in memory.
+   - **Fix**: Increase `spark.executor.memory` or increase shuffle partitions (`spark.sql.shuffle.partitions`) to reduce partition size.
+2. **`Container killed by YARN / K8s for exceeding memory limits`**:
+   - The OS/Cgroup killed the executor container.
+   - **Root Cause**: Off-heap memory exceeded allocated overhead (PySpark Python memory, native C-libraries, heavy off-heap shuffle buffers).
+   - **Fix**: Increase `spark.executor.memoryOverhead` (e.g. from 10% to 25%).

@@ -473,3 +473,209 @@ Preventing regressions from entering production:
 2. **Alerting**: PagerDuty alerts triggered if 7-day rolling CrUX P75 INP breaches 250ms.
 3. **Automated Rollback**: If a deployment spikes INP or CLS in real-time RUM telemetry, edge routing reverts to the previous canary version within 2 minutes.
 
+
+---
+
+### 36. Interaction to Next Paint (INP) Deep Dive: The 3 Phases of Interaction Latency.
+
+**In Simple Words:**
+**Interaction to Next Paint (INP)** replaced First Input Delay (FID) as Google's responsiveness Core Web Vital. While FID measured only the first interaction's input delay, INP measures the **worst latency** across all clicks, taps, and keypresses throughout the entire user session.
+
+INP latency is divided into three distinct phases:
+1. **Input Delay**: Time between user interaction and when event handlers begin executing (caused by background main-thread tasks).
+2. **Processing Time**: Execution duration of all associated event callbacks (`click`, `keydown`).
+3. **Presentation Delay**: Time needed by the browser to recalculate layout, repaint styles, and present the updated frame on screen.
+
+Good INP is $\le 200\text{ms}$ at the 75th percentile of sessions.
+
+---
+
+### 37. Long Animation Frames API (LoAF): Debugging Main Thread Freezes.
+
+**In Simple Words:**
+The **Long Animation Frames API (LoAF)** is the browser-native successor to the Long Tasks API. It reports frames that took longer than $50\text{ms}$ to render and provides exact attribution:
+- Reports the specific script URL, function name, and character position that caused the lag.
+- Identifies whether the delay was caused by layout recalculation, style mutations, or excessive JavaScript execution.
+
+```javascript
+// Observing Long Animation Frames using PerformanceObserver
+const observer = new PerformanceObserver((list) => {
+  for (const entry of list.getEntries()) {
+    console.warn(`Long Frame (${entry.duration.toFixed(1)}ms):`, {
+      blockingDuration: entry.blockingDuration,
+      scripts: entry.scripts.map(s => ({
+        source: s.sourceURL,
+        invoker: s.invoker,
+        duration: s.duration
+      }))
+    });
+  }
+});
+
+observer.observe({ type: 'long-animation-frame', buffered: true });
+```
+
+---
+
+### 38. Speculative Rules API: Instant Page Navigations.
+
+**In Simple Words:**
+The **Speculation Rules API** allows pages to programmatically instruct the browser to pre-render full destination pages in a hidden background process before the user clicks a link:
+- **`prerender`**: Fetches the HTML and executes JavaScript in the background. Clicking the link results in an **instantaneous ($0\text{ms}$)** navigation!
+- **`prefetch`**: Fetches the HTML response document into browser cache.
+
+```html
+<script type="speculationrules">
+{
+  "prerender": [
+    {
+      "where": {
+        "and": [
+          { "href_matches": "/sections/*" },
+          { "not": { "href_matches": "/logout" } }
+        ]
+      },
+      "eagerness": "moderate"
+    }
+  ]
+}
+</script>
+```
+
+---
+
+### 39. Web Workers: Offloading Heavy Work from the Main Thread.
+
+**In Simple Words:**
+JavaScript is single-threaded; heavy tasks (CSV parsing, image compression, cryptographic hashing, vector search) freeze the main thread, spiking INP. **Web Workers** run scripts in a separate background thread with zero access to the DOM, communicating with the main thread via message passing (`postMessage`).
+
+```typescript
+// worker.ts: Background thread
+self.onmessage = (event) => {
+  const result = parseHeavyDataset(event.data);
+  self.postMessage(result);
+};
+
+// main.ts: Main UI thread remains fluid and responsive (0ms INP delay)
+const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+worker.postMessage(hugePayload);
+worker.onmessage = (e) => { updateUI(e.data); };
+```
+
+---
+
+### 40. Font Performance Optimization: `font-display: swap` and Size-Adjust.
+
+**In Simple Words:**
+Web fonts cause **FOIT (Flash of Invisible Text)** or **FOUT (Flash of Unstyled Text)** and trigger Cumulative Layout Shift (CLS):
+1. **`font-display: swap`**: Immediately displays system fallback font while the custom font downloads, ensuring fast First Contentful Paint.
+2. **Font Subsetting**: Stripping unused glyphs (e.g. Cyrillic, Kanji) reduces `.woff2` font sizes from 250KB to 15KB.
+3. **`size-adjust` and `ascent-override`**: Matches fallback system font dimensions to the web font, eliminating layout shift when the font swaps!
+
+```css
+@font-face {
+  font-family: 'FallbackInter';
+  src: local('Arial');
+  ascent-override: 90%;
+  size-adjust: 104%; /* Matches exact line-height to prevent CLS */
+}
+```
+
+---
+
+### 41. Third-Party Script Sandboxing & The Facade Pattern.
+
+**In Simple Words:**
+Third-party widgets (Google Tag Manager, Intercom chat, YouTube embeds) account for up to 60% of main thread blocking time.
+- **The Facade Pattern**: Render a lightweight static image/button that mimics the interactive widget. Only load the heavy third-party JavaScript bundle when the user actually hovers or clicks the widget!
+- **Partytown**: Executes third-party tracking scripts inside a Web Worker using synchronous Web Worker proxies to keep the main thread 100% idle.
+
+---
+
+### 42. HTTP/3 and QUIC: Network Performance Advances.
+
+**In Simple Words:**
+- **HTTP/1.1**: Subject to Head-of-Line (HoL) blocking on single TCP streams (requires 6 parallel connections).
+- **HTTP/2**: Multiplexes requests over 1 TCP connection, but a single lost packet blocks **all** multiplexed streams.
+- **HTTP/3 (QUIC)**: Runs over UDP. Packet loss on one resource stream does **not** stall unrelated streams (True zero Head-of-Line blocking), and connection migration keeps connections alive when switching from Wi-Fi to cellular.
+
+---
+
+### 43. Field Data (CrUX / RUM) vs Lab Data (Lighthouse).
+
+**In Simple Words:**
+- **Lab Data (Synthetic / Lighthouse)**: Tests a simulated page on a fixed machine with throttled CPU and network. Great for debugging, finding regressions in CI/CD, and repeatable tests.
+- **Field Data (CrUX / RUM)**: Aggregated measurements from actual real-world users visiting the site across thousands of different mobile phones, battery-saver modes, and 3G/4G/5G networks. **Google's search ranking algorithm exclusively uses Field Data (CrUX)**.
+
+---
+
+### 44. Enterprise Cache-Control Header Strategies.
+
+**In Simple Words:**
+- **Static Hashed Assets (`/static/app.a8f9c1.js`)**:
+  `Cache-Control: public, max-age=31536000, immutable`
+  Cached in browser for 1 year. The file hash changes on every code update, guaranteeing instant updates.
+- **Dynamic HTML Pages (`/` or `/sections`)**:
+  `Cache-Control: public, max-age=0, s-maxage=3600, stale-while-revalidate=86400`
+  CDN serves cached HTML immediately while revalidating in background.
+
+---
+
+### 45. Early Hints (HTTP 103): Server Preloading Before HTML Delivery.
+
+**In Simple Words:**
+While a backend database query takes 200ms to compute the dynamic HTML page, the server can immediately send an **HTTP 103 Early Hints** response containing `<link rel="preload">` headers. The browser starts downloading critical CSS and fonts immediately instead of idling while waiting for the HTML document.
+
+---
+
+### 46. Real User Monitoring (RUM) with `PerformanceObserver`.
+
+**In Simple Words:**
+Collect user-centric Core Web Vitals directly from users' browsers and beacon metrics back to observability endpoints:
+
+```javascript
+import { onCLS, onINP, onLCP } from 'web-vitals';
+
+function sendToAnalytics(metric) {
+  const body = JSON.stringify({ name: metric.name, value: metric.value, rating: metric.rating });
+  // navigator.sendBeacon ensures data delivery even if user closes the tab immediately
+  navigator.sendBeacon('/api/telemetry', body);
+}
+
+onCLS(sendToAnalytics);
+onINP(sendToAnalytics);
+onLCP(sendToAnalytics);
+```
+
+---
+
+### 47. DOM Virtualization & Windowing for 10,000+ Items.
+
+**In Simple Words:**
+Rendering 5,000 DOM nodes simultaneously consumes hundreds of megabytes of RAM and causes catastrophic style recalculation lag. **Virtualization** (e.g. `react-window` or `virtual-scroller`) calculates which items fit in the visible viewport (e.g. 15 items) and recycles a fixed pool of DOM elements as the user scrolls, maintaining 60 FPS scrolling regardless of list size.
+
+---
+
+### 48. Modern JavaScript Bundle Splitting & Tree-Shaking.
+
+**In Simple Words:**
+1. **Dynamic Route Splitting**: Route components are split into distinct `.js` chunks loaded only when visited (`() => import('./Page')`).
+2. **ESM Tree-Shaking**: Ensure libraries use ES module syntax (`import { map } from 'lodash-es'`) rather than CommonJS (`require('lodash')`), enabling bundlers to discard unused exported functions.
+
+---
+
+### 49. Service Worker Caching Strategies.
+
+**In Simple Words:**
+- **Cache First**: Serves from cache; falls back to network (ideal for immutable fonts and hashed images).
+- **Network First**: Attempts network; falls back to offline cache (ideal for live inventory or user balances).
+- **Stale While Revalidate**: Returns cached version instantaneously for instant load, while fetching latest version in background and updating cache for next visit.
+
+---
+
+### 50. Core Web Vitals and SEO: How Google Ranks User Experience.
+
+**In Simple Words:**
+Google integrates Core Web Vitals into its **Page Experience** ranking signal:
+- Sites must pass the 75th percentile threshold across all three Core Web Vitals (LCP $< 2.5\text{s}$, INP $< 200\text{ms}$, CLS $< 0.1$) to earn the maximum ranking boost.
+- If two pages have equally relevant content, the page passing Core Web Vitals is prioritized in organic search rankings and Google Discover.

@@ -494,3 +494,184 @@ Migrating an existing enterprise Kafka cluster from ZooKeeper to KRaft without i
 3. **Metadata Migration**: The KRaft active controller reads cluster metadata from ZooKeeper and writes it into the `@metadata` KRaft partition.
 4. **Switch Metadata Source**: Migrate brokers to read metadata exclusively from KRaft controllers.
 5. **Decommission ZooKeeper**: Once all brokers are KRaft-native, remove the migration config and safely shut down the ZooKeeper cluster.
+
+
+---
+
+### 36. Kafka Streams vs Apache Flink vs Spark Streaming: Architecture, state management (RocksDB), and stream-table duality.
+
+**In Simple Words:**
+- **Kafka Streams**: A lightweight client Java library that runs directly inside your application microservice. No separate cluster needed. Uses embedded RocksDB for stateful aggregations (joins, windowing). Best for event-driven microservices.
+- **Apache Flink**: True event-driven, distributed stream processing cluster with native support for complex event processing, out-of-order watermarks, and massive multi-terabyte state snapshots (Savepoints).
+- **Spark Streaming (Micro-Batching)**: Batches streaming data into discrete mini-intervals (e.g. 500ms). Best for unifying large-scale batch ETL with streaming analytics.
+- **Stream-Table Duality**: A `KStream` represents an append-only changelog stream; a `KTable` represents the current materialized view state. You can convert between them bidirectionally.
+
+---
+
+### 37. Consumer Rebalance Protocols: Eager Rebalance vs Cooperative Sticky Assignor (Incremental Cooperative Rebalance).
+
+**In Simple Words:**
+When a consumer joins or leaves a consumer group:
+- **Eager Rebalance (Legacy)**: Every single consumer in the group revokes all its assigned partitions and stops consuming ("stop-the-world" pause). Then the group coordinator reassigns partitions from scratch, causing massive latency spikes.
+- **Cooperative Sticky Rebalance (`CooperativeStickyAssignor`)**:
+  - Rebalances happen incrementally across multiple rounds.
+  - Consumers keep processing unaffected partitions without interruption.
+  - Only partitions that actually need to move between members are revoked and reassigned, eliminating consumer downtime.
+
+---
+
+### 38. Kafka Log Compaction Deep Dive: Cleaner threads, dirty ratio, compaction tombstone records, and `min.compaction.lag.ms`.
+
+**In Simple Words:**
+For key-value topics (e.g. user account profiles), log compaction guarantees that Kafka retains at least the **last known value for each record key** indefinitely:
+- **Log Cleaner Threads**: Background threads that scan log segments, building an in-memory hash map of the latest key offsets, and rewrite clean segments discarding superseded records.
+- **Tombstones (Deletions)**: A record with a valid key and a `null` value payload is a tombstone. Cleaner threads retain tombstones for `delete.retention.ms` (default 24h) to allow all consumers to observe the deletion before permanent disk purge.
+
+---
+
+### 39. Producer Partitioning Strategies: DefaultPartitioner (Murmur2 hash), RoundRobin, sticky partitioning, and custom key partitioners.
+
+**In Simple Words:**
+How Kafka determines which partition an event lands in:
+1. **Explicit Partition Specified**: Message is routed directly to that partition index.
+2. **Key Provided (Default)**: Kafka calculates `murmur2(key) % total_partitions`. Guarantees all events with the same key (e.g. `order_12345`) land in the exact same partition in strict sequential order.
+3. **No Key Provided (Sticky Partitioning in modern Kafka)**: Batches messages to a single partition until `batch.size` or `linger.ms` is reached, then rotates to the next partition. Dramatically reduces request count and improves batch compression.
+
+---
+
+### 40. Kafka MirrorMaker 2 (MM2) Architecture: Active-Active vs Active-Passive geo-replication and offset translation.
+
+**In Simple Words:**
+**MirrorMaker 2** leverages the Kafka Connect framework to replicate topics between distinct physical data centers or cloud regions:
+- **Active-Passive (DR)**: Replicates all topics from Region A to Region B. Consumers in Region B remain idle until primary region failover.
+- **Active-Active**: Producers in both US-East and EU-Central write locally. MM2 synchronizes topics with namespace prefixes (`us-east.orders` -> EU cluster, `eu-central.orders` -> US cluster) to prevent infinite circular replication loops.
+- **Checkpoint & Offset Translation**: Emits consumer group offset checkpoints, allowing failed-over consumers in Region B to resume reading from the exact matching logical offset without duplicate processing.
+
+---
+
+### 41. Exactly-Once Semantics (EOS) in Kafka Streams: Two-phase commit with transaction coordinator and marker messages.
+
+**In Simple Words:**
+Kafka's "Read-Process-Write" loop achieves transactional Exactly-Once processing across multiple topics and state stores:
+1. **Producer Transaction Coordinator**: Allocates a unique `transactional.id`.
+2. **Transaction Log (`__transaction_state`)**: Records transaction state transitions (`Ongoing`, `PrepareCommit`, `Committed`).
+3. **Control Markers**: The coordinator writes special commit marker messages directly into target topic partitions.
+4. Consumers set `isolation.level=read_committed`. They automatically buffer uncommitted records and yield them to the application strictly after the commit marker is observed.
+
+---
+
+### 42. Schema Evolution in Confluent Schema Registry: Backward, Forward, Full, and None compatibility modes with Avro/Protobuf.
+
+**In Simple Words:**
+Schema Registry enforces data governance at the broker boundary, preventing downstream consumers from crashing due to unexpected field removals or type changes:
+- **BACKWARD (Default)**: Consumers using the new schema can read data written with the previous schema. Allows upgrading consumers before producers. (Can delete fields or add optional fields).
+- **FORWARD**: Consumers using the previous schema can read data written with the new schema. Allows upgrading producers before consumers. (Can add new fields or delete optional fields).
+- **FULL**: Both backward and forward compatible. Upgrades can happen in any order.
+- **NONE**: Disables schema validation (dangerous for production).
+
+---
+
+### 43. Consumer Lag Monitoring and Mitigation: Prometheus JMX exporter, Burrow, and scaling partition-to-consumer mapping.
+
+**In Simple Words:**
+**Consumer Lag** is the delta between the latest offset written to a partition (Log End Offset) and the latest offset committed by a consumer group:
+- **Monitoring Tools**: Export metrics via **Kafka Exporter** or **Burrow** (`kafka_consumergroup_lag`).
+- **Mitigation Strategies**:
+  1. If lag is isolated to one partition -> Check for hot key skew.
+  2. If lag is spread across all partitions and consumer CPU is 100% -> Increase partition count and add more consumer instances up to total partition count.
+  3. If consumer thread is blocked on slow external database calls -> Decouple consumption from processing using an internal in-memory worker thread pool.
+
+---
+
+### 44. Handling Head-of-Line Blocking: Concurrency patterns with worker thread pools and out-of-order acknowledgment in consumers.
+
+**In Simple Words:**
+If message 5 in a partition takes 30 seconds to process (e.g. slow external API call), standard single-threaded consumers cannot process messages 6, 7, 8 behind it, stalling the entire partition.
+- **Worker Pool Pattern**: The Kafka consumer thread only fetches messages and dispatches them into an internal in-memory bounded queue (`BlockingQueue`) processed by a thread pool.
+- **Offset Tracking**: The consumer thread only commits an offset when all preceding offsets in the partition have confirmed completion, avoiding missing un-processed messages during consumer crashes.
+
+---
+
+### 45. Kafka Connect Architecture: Source vs Sink connectors, tasks distribution, converters, and Single Message Transforms (SMTs).
+
+**In Simple Words:**
+**Kafka Connect** is a distributed, fault-tolerant framework for streaming data between Kafka and external datastores:
+- **Source Connectors**: Pull data from datastores into Kafka (e.g., Debezium CDC from MySQL/PostgreSQL, Salesforce events).
+- **Sink Connectors**: Push data from Kafka to external systems (e.g., Elasticsearch, Snowflake, Amazon S3, MongoDB).
+- **Tasks**: Connectors break work into parallel independent Tasks distributed across a cluster of Connect worker nodes.
+- **Single Message Transforms (SMTs)**: Lightweight inline mutations (e.g., masking credit card fields, renaming fields, timestamp routing) applied to records before writing.
+
+---
+
+### 46. Kafka Broker Socket Request Handlers: Acceptor thread, network processor threads, and I/O worker threads.
+
+**In Simple Words:**
+Understanding Kafka's low-level multi-threaded network model:
+1. **Acceptor Thread (1 per port)**: Accepts new incoming TCP connections from clients and delegates the socket to a Network Thread in a round-robin pool.
+2. **Network Threads (`num.network.threads = 8`)**: Reads incoming request frames from client sockets, places them onto the **Request Queue**, and writes outgoing responses back to sockets.
+3. **I/O Threads (`num.io.threads = 16`)**: Worker threads that pull requests from the Request Queue, perform local disk reads/writes or memory page cache operations, and push results to the **Response Queue**.
+
+---
+
+### 47. Multi-DC Stretching vs Cluster Federation: Latency boundaries and witness nodes in quorum configurations.
+
+**In Simple Words:**
+- **Stretched Cluster (Single Cluster across 2-3 Availability Zones)**:
+  - Synchronous replication via ISR.
+  - Requires **RTT latency < 15ms** between data centers.
+  - Place brokers evenly across 3 AZs. If one AZ goes down, the remaining 2 AZs maintain a majority quorum without data loss.
+- **Cluster Federation (WAN / Cross-Region)**:
+  - Asynchronous replication using MirrorMaker 2 or Confluent Cluster Linking.
+  - Handles cross-continent latency (100ms+) gracefully because writes commit locally in each region without waiting for cross-ocean ACKs.
+
+---
+
+### 48. Zero-Copy Architecture Deep Dive: Linux `sendfile()` syscall, DMA transfer, and kernel page cache direct routing.
+
+**In Simple Words:**
+Traditional file transfer requires **4 context switches and 3 data copies** between kernel memory and user space.
+**Kafka's Zero-Copy Optimization with `sendfile()`**:
+1. Kafka instructs the Linux kernel to transfer data directly from the **OS Page Cache** to the **NIC Network Socket Buffer** via Direct Memory Access (DMA).
+2. Data **never copies into JVM user memory**.
+3. Results in near-zero CPU utilization, near-zero garbage collection pressure, and bus-saturating network transfer speeds.
+
+---
+
+### 49. Debugging Stalled Consumers: Diagnosing `CommitFailedException`, `poll()` timeout (`max.poll.interval.ms`), and heartbeat threads.
+
+**In Simple Words:**
+When consumers crash with:
+```
+org.apache.kafka.clients.consumer.CommitFailedException: Offset commit cannot be completed since the group has already rebalanced and assigned the partitions to another member.
+```
+- **Root Cause**: The consumer took longer to process a batch of records than **`max.poll.interval.ms`** (default 5 minutes). Kafka assumed the consumer was dead and triggered a rebalance.
+- **Fix**:
+  1. Decrease `max.poll.records` (e.g. from 500 down to 50) so each batch finishes well within the interval.
+  2. Increase `max.poll.interval.ms` to accommodate long-running processing tasks.
+  3. Separate heavy processing onto background threads while the main thread calls `poll()` promptly.
+
+---
+
+### 50. High-Throughput Producer Tuning: `linger.ms`, `batch.size`, compression algorithms (zstd vs lz4 vs snappy), and buffer memory exhaustion.
+
+**In Simple Words:**
+Maximizing Kafka producer throughput (achieving 100MB+/sec per node):
+
+```properties
+# Allow producer to wait up to 20ms to aggregate larger batches
+linger.ms=20
+
+# Increase batch size buffer to 64KB (default 16KB)
+batch.size=65536
+
+# Optimal compression algorithm:
+# - lz4: Lowest CPU overhead, blazing fast decompression
+# - zstd: Best compression ratio (reduces network bandwidth by up to 70%)
+compression.type=zstd
+
+# Maximum memory buffer for unsent messages before producer blocks
+buffer.memory=67108864 # 64MB
+
+# Max time producer.send() blocks when buffer.memory is full before throwing error
+max.block.ms=15000
+```

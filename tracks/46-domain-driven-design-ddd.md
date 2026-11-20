@@ -377,4 +377,201 @@ Applying full Tactical DDD to simple software:
 1. **Simple CRUD applications**: If an app simply reads and writes forms to database tables with minimal business rules, applying Aggregates, Repositories, and Value Objects is pure over-engineering.
 2. **Short-lived throwaway prototypes / MVPs**: Focus on product-market fit first before investing in deep domain models.
 3. **Pure algorithmic or ETL pipelines**: Systems focused on data transformations rather than evolving business rules.
-`;
+`
+
+---
+
+### 36. Ubiquitous Language in Practice: Resolving linguistic ambiguity across departments.
+
+**In Simple Words:**
+In large enterprises, different departments use the same word with completely different meanings:
+- To **Sales**, an `Account` is a sales prospect with a budget and contract negotiations.
+- To **Engineering / Security**, an `Account` is a login username, password hash, and permission roles.
+- To **Finance**, an `Account` is a general ledger balance of credits and debits.
+- **The DDD Solution**: Never create a single unified `Account` monolith model. Recognize that these are separate **Bounded Contexts** (`SalesContext`, `IdentityContext`, `BillingContext`). Each context builds its own distinct model where the term is strictly unambiguous!
+
+---
+
+### 37. Subdomains Classification: Core Domain vs Supporting vs Generic Subdomains.
+
+**In Simple Words:**
+Prioritizing engineering talent and budget:
+1. **Core Domain**: The unique secret sauce that provides competitive advantage and differentiates your business from competitors (e.g., Netflix recommendation algorithm, Uber dynamic matching engine). **Build in-house with top senior engineers!**
+2. **Supporting Subdomain**: Custom software that supports the core business but is not a differentiator (e.g. custom inventory catalog). Build in-house or outsource.
+3. **Generic Subdomain**: Standard business problems solved equally by hundreds of vendors (User Authentication, Billing/Invoicing, Email delivery). **Buy off-the-shelf SaaS (Auth0, Stripe, SendGrid)! Never build from scratch.**
+
+---
+
+### 38. Event Storming Workshop Methodology: Rapid domain discovery.
+
+**In Simple Words:**
+A collaborative, rapid modeling workshop uniting domain business experts with software engineers using colored sticky notes:
+1. **Domain Events (Orange Sticky Notes)**: Written in past tense (`OrderPlaced`, `InvoicePaid`, `AccountSuspended`) arranged chronologically on a wall.
+2. **Commands (Blue Notes)**: Triggers that produce events (`PlaceOrder`, `CancelSubscription`).
+3. **Aggregates / Entities (Yellow Notes)**: Business objects accepting commands and enforcing invariants.
+4. **Policies / Sagas (Lilac Notes)**: Reactive rules (`"Whenever OrderPlaced, send confirmation email"`).
+5. **Read Models (Green Notes)**: UI views needed by users to make decisions before invoking a command.
+
+---
+
+### 39. Context Mapping Patterns: Relationships between Bounded Contexts.
+
+**In Simple Words:**
+How different teams and systems integrate across context boundaries:
+- **Shared Kernel**: Two teams share a small common subset of code and database tables. High coordination required.
+- **Partnership**: Two teams succeed or fail together; features are planned jointly.
+- **Customer-Supplier**: Upstream (Supplier) builds what Downstream (Customer) requires.
+- **Conformist**: Downstream adopts the upstream model as-is without translation (e.g., integrating with a dominant payment provider).
+- **Anti-Corruption Layer (ACL)**: Downstream translates upstream concepts into its own clean domain model, isolating itself from messy external changes.
+- **Separate Ways**: Teams choose not to integrate because the cost of integration exceeds the value.
+
+---
+
+### 40. The 4 Aggregate Design Rules by Vaughn Vernon.
+
+**In Simple Words:**
+Essential guidelines for high-performance, maintainable Aggregates:
+1. **Rule 1: Model True Business Invariants**: An aggregate boundary should encapsulate only data that *must* be strictly consistent within a single database transaction.
+2. **Rule 2: Design Small Aggregates**: Large aggregates cause severe optimistic locking conflicts and memory bloat. Prefer 1 Entity with a few Value Objects.
+3. **Rule 3: Reference Other Aggregates by Identity Only**: Never hold direct object references to other Aggregate Roots (use `customerId: CustomerId`, not `customer: Customer`).
+4. **Rule 4: Update Other Aggregates Using Eventual Consistency**: If updating Aggregate A requires modifying Aggregate B, use asynchronous **Domain Events**, not distributed multi-table transactions!
+
+---
+
+### 41. Entity vs Value Object Deep Dive.
+
+**In Simple Words:**
+| Dimension | Entity | Value Object |
+| :--- | :--- | :--- |
+| **Identity** | Unique identifier that persists across mutations (`id: UUID`) | Defined purely by its attributes; no identity |
+| **Equality** | `a.id == b.id` | All fields equal (`a.currency == b.currency && a.amount == b.amount`) |
+| **Mutability** | Mutable state transitions over its lifetime | **Strictly Immutable**! |
+| **Lifecycle** | Tracked over time | Disposable, replaceable |
+| **Example** | `User`, `Order`, `BankAccount` | `Money`, `Address`, `DateRange`, `EmailAddress` |
+
+---
+
+### 42. Domain Services vs Application Services.
+
+**In Simple Words:**
+- **Domain Service**: Holds pure business logic that does not naturally belong to a single Entity or spans multiple Aggregate Roots (e.g. `TransferFundsService` checking limits across two accounts, or calculating currency conversion rates). Zero I/O, zero database queries, zero HTTP calls!
+- **Application Service (Use Case Orchestrator)**: The outer boundary coordinator:
+  - Opens database transaction.
+  - Loads Aggregate from Repository.
+  - Invokes Domain methods.
+  - Persists Aggregate and publishes Domain Events.
+  - Handles security authorization and logging.
+
+---
+
+### 43. Domain Events Lifecycle: Internal emission vs Outbox publishing.
+
+**In Simple Words:**
+How events travel from aggregate mutations to external message brokers:
+1. **Emitted Inside Aggregate**: Calling `order.cancel("Customer request")` records an internal event in an uncommitted in-memory list: `this.addDomainEvent(new OrderCancelled(...))`.
+2. **Repository Commit**: When `orderRepository.save(order)` runs, it commits both the order state change and writes the domain event into the **Transactional Outbox Table** within the *exact same local database transaction*.
+3. **Message Relay**: A background CDC engine (Debezium) or worker process reads the Outbox table and publishes the event to Apache Kafka / RabbitMQ with guaranteed zero-loss delivery.
+
+---
+
+### 44. Anti-Corruption Layer (ACL) Architecture: Facade, Adapter, and Translator.
+
+**In Simple Words:**
+When your clean modern domain must communicate with a 20-year-old legacy SOAP mainframe:
+- Never let the legacy system's confusing abbreviations (`CUST_MSTR_REC_01`) leak into your clean domain model!
+- **The ACL Trio**:
+  1. **Facade**: Simplifies the messy legacy API into a manageable interface.
+  2. **Adapter**: Implements the clean domain port interface expected by your application.
+  3. **Translator**: Pure mapping functions that translate legacy data structures into your clean, strongly typed Domain Value Objects and Entities.
+
+---
+
+### 45. Modeling Invariants: Eliminating public setters in Aggregate Roots.
+
+**In Simple Words:**
+- **Anemic Domain Anti-Pattern**: Entities full of getters and public setters (`order.setStatus("PAID")`, `order.setDiscount(0.2)`). Business logic leaks into callers, and invariants can be bypassed easily.
+- **Rich Domain Model**: Private setters. All state mutations must pass through explicit, intention-revealing business methods that validate rules:
+  ```typescript
+  class Order {
+    cancel(reason: string): void {
+      if (this.status === OrderStatus.Shipped) {
+        throw new DomainException("Cannot cancel an order that has already shipped");
+      }
+      this.status = OrderStatus.Cancelled;
+      this.addDomainEvent(new OrderCancelledEvent(this.id, reason));
+    }
+  }
+  ```
+
+---
+
+### 46. CQRS and Event Sourcing in DDD: State reconstruction and projections.
+
+**In Simple Words:**
+- **Event-Sourced Aggregate**: Has zero internal `update` statements. State is reconstructed from history:
+  ```typescript
+  class BankAccount {
+    replayEvents(history: DomainEvent[]): void {
+      history.forEach(event => this.apply(event));
+    }
+    private apply(event: MoneyDeposited): void {
+      this.balance += event.amount;
+    }
+  }
+  ```
+- **Read Model Projections**: As events occur, background workers project them into specialized denormalized read stores (Elasticsearch for search, Redis for caching, PostgreSQL for reports).
+
+---
+
+### 47. Factory Pattern in DDD: Enforcing invariants during object creation.
+
+**In Simple Words:**
+When creating an Aggregate Root requires complex business validation, loading child entities, or establishing initial invariants:
+- Direct instantiation via `new Order()` can lead to partially configured or invalid domain objects.
+- **Domain Factory**: Encapsulates atomic creation:
+  ```typescript
+  class OrderFactory {
+    static create(customerId: CustomerId, items: OrderItem[]): Order {
+      if (items.length === 0) throw new DomainException("Order must contain at least 1 item");
+      if (items.length > 50) throw new DomainException("Order exceeds maximum items limit");
+      return new Order(OrderId.generate(), customerId, items, OrderStatus.Pending);
+    }
+  }
+  ```
+
+---
+
+### 48. Integrating Legacy Systems: Bubble Contexts and Autonomous Bubbles.
+
+**In Simple Words:**
+When replacing a legacy system in phases:
+- **Bubble Context**: A clean, isolated island of new development carved out inside or alongside the legacy architecture.
+- Communicates with the legacy system strictly through an Anti-Corruption Layer (ACL).
+- Provides a safe sandbox where the team can establish Ubiquitous Language and modern practices without being poisoned by legacy technical debt.
+
+---
+
+### 49. Testing in DDD: Unit testing Domain Entities in pure isolation.
+
+**In Simple Words:**
+Because true Tactical DDD models have **zero dependencies on databases, ORMs, frameworks, or networks**:
+- Domain unit tests execute in **microseconds**:
+  ```typescript
+  test('withdrawing more than balance throws InsufficientFundsException', () => {
+    const account = new BankAccount(AccountId.generate(), Money.usd(100));
+    expect(() => account.withdraw(Money.usd(150))).toThrow(InsufficientFundsException);
+  });
+  ```
+- Thousands of core business rule tests can run in under 3 seconds in CI with zero Docker containers and zero test database setup!
+
+---
+
+### 50. Socio-Technical Architecture: Aligning Team Topologies with Bounded Contexts.
+
+**In Simple Words:**
+Conway's Law states: *"Organizations design systems that mirror their own communication structures"*:
+- If 3 separate teams work inside a single shared Bounded Context, they will suffer from constant merge conflicts, blocked deployments, and fractured domain language.
+- **Socio-Technical Alignment (Team Topologies)**:
+  - Assign exactly **one Stream-Aligned Team to own one (or a few closely related) Bounded Contexts**.
+  - Team boundaries align with architectural boundaries.
+  - Autonomous teams can deploy their microservice independently without cross-team synchronization meetings.

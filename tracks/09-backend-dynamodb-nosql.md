@@ -367,3 +367,144 @@ DynamoDB uses the **Paxos consensus protocol** within each three-replica storage
 2. **Heavy relational graph traversals**: Highly interconnected data requiring deep multi-hop joins (use Neo4j or Amazon Neptune).
 3. **Blob storage**: Storing large files (> 400 KB) directly in database records (use Amazon S3).
 4. **Unpredictable query patterns**: Where access patterns cannot be determined upfront before designing primary keys and indexes.
+
+---
+
+### 36. Primary Key Architecture: Partition Key (Hash) vs Composite Primary Key.
+
+**In Simple Words:**
+Every DynamoDB item is uniquely identified by its Primary Key:
+1. **Simple Primary Key (Partition Key only)**: Items are distributed across physical storage partitions using an internal hash function `MD5(PK)`. Lookups are exact equality matches (`PK = "user_123"`).
+2. **Composite Primary Key (Partition Key + Sort Key)**: `PK` determines the physical partition; `SK` determines physical sort order within that partition. Enables rich range queries:
+   - `begins_with(SK, "ORDER#2026")`
+   - `SK BETWEEN "2026-01-01" AND "2026-11-20"`
+   - `SK > "100"`
+
+---
+
+### 37. Global Secondary Indexes (GSI) vs Local Secondary Indexes (LSI).
+
+**In Simple Words:**
+- **Local Secondary Index (LSI)**: Must share the **same Partition Key** as the base table, with an alternative Sort Key. Can only be created when creating the table (cannot be added later). Shares the base table's provisioned throughput.
+- **Global Secondary Index (GSI)**: Can have a completely **different Partition Key and Sort Key**. Can be created or deleted dynamically on live tables at any time. Has its own independent provisioned throughput and scales independently.
+
+---
+
+### 38. Single-Table Design: Modeling Complex Domains in One Table.
+
+**In Simple Words:**
+Instead of creating 10 relational tables for Users, Orders, Products, and Reviews, **Single-Table Design** models all entities in **one physical DynamoDB table** using generic key names (`PK`, `SK`):
+- `User Entity`: `PK = "USER#101"`, `SK = "METADATA#101"`
+- `Order Entity`: `PK = "USER#101"`, `SK = "ORDER#2026-11-20#501"`
+- `Single Query Advantage`: With a single `Query` call on `PK = "USER#101"`, you retrieve both the User's profile AND their recent orders in **one single round-trip (<10ms)** without any relational joins!
+
+---
+
+### 39. Provisioned vs On-Demand (Pay-Per-Request) Capacity Modes.
+
+**In Simple Words:**
+- **On-Demand Mode**: Automatically handles up to double the previous peak traffic instantaneously. No capacity planning needed; you pay strictly per read/write request. Best for unpredictable or spiky workloads.
+- **Provisioned Mode**: You allocate specific RCU and WCU with Auto-Scaling. Costs up to 7x less than On-Demand for steady, predictable production traffic.
+
+---
+
+### 40. Calculating Capacity Units: RCU and WCU Math.
+
+**In Simple Words:**
+- **WCU (Write Capacity Unit)**: 1 WCU handles 1 write per second for an item up to **1 KB** in size.
+- **RCU (Read Capacity Unit)**:
+  - **Eventually Consistent Read**: 1 RCU reads two items per second up to **4 KB** each (0.5 RCU per 4KB).
+  - **Strongly Consistent Read**: 1 RCU reads one item per second up to **4 KB**.
+  - **Transactional Read / Write**: Consumes **2x** capacity (2 RCU per 4KB read, 2 WCU per 1KB write).
+
+---
+
+### 41. Partition Hotspots and Write Sharding (Key Salting).
+
+**In Simple Words:**
+A single DynamoDB physical partition can deliver at most **1,000 WCU** and **3,000 RCU**. If all writes target the same Partition Key (e.g. `PK = "2026-11-20"` or celebrity profile ID), the partition throttles (`ProvisionedThroughputExceededException`):
+- **Write Sharding (Salting)**: Append a random suffix between 1 and $N$ to the partition key:
+  `PK = "EVENT#2026-11-20#" + random(1, 10)`
+  Writes scatter across 10 distinct physical partitions, multiplying throughput by 10x!
+
+---
+
+### 42. DynamoDB Streams: Real-Time Event-Driven Architecture.
+
+**In Simple Words:**
+DynamoDB Streams captures a time-ordered sequence of item-level modifications:
+- Each stream record contains the change type (`INSERT`, `MODIFY`, `REMOVE`) and before/after item images.
+- Automatically triggers **AWS Lambda** functions to update search indexes (OpenSearch), invalidate Redis caches, or emit events to Amazon EventBridge.
+
+---
+
+### 43. DynamoDB Accelerator (DAX): Microsecond In-Memory Cache.
+
+**In Simple Words:**
+**DAX** is a fully managed, high-availability in-memory write-through cache designed specifically for DynamoDB:
+- Reduces read response times from milliseconds ($3-10\text{ms}$) to **sub-millisecond microseconds ($< 500\mu\text{s}$)**.
+- Drop-in SDK replacement; requires zero application-level cache invalidation logic.
+
+---
+
+### 44. Global Tables: Multi-Region Active-Active Replication.
+
+**In Simple Words:**
+DynamoDB Global Tables replicates tables across multiple AWS Regions (e.g. us-east-1, eu-west-1, ap-northeast-1) with typical replication latency under 1 second:
+- Applications read and write locally to their nearest AWS region for single-digit millisecond latency.
+- Conflict resolution uses **Last-Writer-Wins (LWW)** based on timestamps.
+
+---
+
+### 45. Multi-Item ACID Transactions in DynamoDB.
+
+**In Simple Words:**
+DynamoDB provides all-or-nothing transactional guarantees across multiple tables:
+- **`TransactWriteItems`**: Atomic write of up to 100 items (or 4MB total size).
+- **`TransactGetItems`**: Atomically reads up to 100 items.
+- If a condition check fails on any single item, the entire transaction rolls back cleanly with zero partial writes.
+
+---
+
+### 46. Conditional Writes and Optimistic Locking.
+
+**In Simple Words:**
+Prevents concurrent overwrite race conditions without database locks:
+- Add a `version` number attribute to the item.
+- Perform updates with a `ConditionExpression`:
+  `SET balance = balance - 50, version = version + 1 WHERE id = 1 AND version = 3`
+- If another process updated the version first, DynamoDB throws `ConditionalCheckFailedException`, allowing the application to retry.
+
+---
+
+### 47. Query vs Scan: Why Production Scans Cause Catastrophic Outages.
+
+**In Simple Words:**
+- **`Query`**: Finds items using the Primary Key (`PK = :val AND SK >= :val2`). Fast, efficient, and reads only matching items.
+- **`Scan` (Anti-pattern)**: Scans **every single item** in the entire multi-gigabyte table sequentially before applying filter expressions. Consumes massive RCU, spikes costs, and throttles online transactional traffic!
+
+---
+
+### 48. Handling the 400KB Item Limit with S3 Offloading.
+
+**In Simple Words:**
+DynamoDB enforces a hard ceiling of **400 KB per item** (including attribute names and values):
+- **The S3 Claim Check Pattern**: Store small metadata attributes (IDs, status, timestamps) in DynamoDB, and store large payloads (PDF documents, images, rich HTML bodies) in Amazon S3, storing the S3 URL pointer inside DynamoDB.
+
+---
+
+### 49. DynamoDB Time to Live (TTL): Automatic Zero-Cost Deletion.
+
+**In Simple Words:**
+DynamoDB TTL marks items for deletion based on an epoch timestamp attribute:
+- Background sweep processes automatically delete expired items within 48 hours.
+- **Zero Cost**: TTL deletions consume **zero WCU** and do not impact table provisioned throughput!
+- Deleted items are optionally captured in DynamoDB Streams for archiving to Amazon S3 Glacier.
+
+---
+
+### 50. Backup and Disaster Recovery: Point-in-Time Recovery (PITR).
+
+**In Simple Words:**
+- **Point-in-Time Recovery (PITR)**: Continuous automatic incremental backups for the past 35 days. Allows restoring table state to any exact second with zero impact on production table performance.
+- **On-Demand Backups**: Full manual snapshots preserved indefinitely for compliance and auditing.

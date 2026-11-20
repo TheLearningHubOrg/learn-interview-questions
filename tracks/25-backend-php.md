@@ -301,3 +301,173 @@ The GC root buffer tracks up to 10,000 suspect objects. When full, it performs a
 ### 35. When should you choose Modern PHP over Node.js, Python, or Go for backend services?
 **In Simple Words:**
 Choose Modern PHP for web applications requiring rapid business logic iteration, enterprise ORM capabilities, strict typing, and rock-solid request isolation with near-zero memory leak risk.
+
+---
+
+### 36. Modern PHP Features (PHP 8.1 - 8.4): Enums, Readonly Classes, and Property Hooks.
+
+**In Simple Words:**
+Modern PHP has evolved into a strictly typed, expressive object-oriented language:
+- **Backed Enums (PHP 8.1)**: Typed enumerations with scalar values (`enum Status: string { case Active = 'A'; }`) that can implement interfaces and contain methods.
+- **Readonly Classes (PHP 8.2)**: Declaring `readonly class` makes all properties immutable once initialized.
+- **First-Class Callables (PHP 8.1)**: Syntax `strlen(...)` creates closures without string references.
+- **Property Hooks (PHP 8.4)**: Native get/set accessors on class properties, eliminating verbose getter/setter boilerplate methods!
+
+```php
+// PHP 8.4 Property Hooks and Backed Enums
+enum UserRole: string {
+    case Admin = 'admin';
+    case Customer = 'customer';
+
+    public function canManage(): bool {
+        return $this === self::Admin;
+    }
+}
+
+class UserProfile {
+    // Property Hook (PHP 8.4)
+    public string $fullName {
+        get => "{$this->firstName} {$this->lastName}";
+        set (string $value) {
+            [$this->firstName, $this->lastName] = explode(' ', $value, 2);
+        }
+    }
+
+    public function __construct(
+        public string $firstName,
+        public string $lastName,
+        public readonly UserRole $role
+    ) {}
+}
+```
+
+---
+
+### 37. PHP Advanced Type System: Union Types, Intersection Types, and DNF Types.
+
+**In Simple Words:**
+- **Union Types (`T1 | T2`)**: Accepts either Type 1 or Type 2 (`int|float`).
+- **Intersection Types (`T1 & T2`)**: Value must satisfy **both** interfaces simultaneously (`Countable & Iterator`).
+- **Disjunctive Normal Form (DNF Types - PHP 8.2+)**: Combines unions and intersections with parentheses: `(HasTitle & HasAuthor) | null`.
+- **`never` return type**: Explicitly marks functions that never return (always throw an exception or call `exit()`).
+
+---
+
+### 38. PHP Fibers: Cooperative Multitasking and Asynchronous I/O.
+
+**In Simple Words:**
+Fibers (PHP 8.1+) provide low-level primitives for **coroutine concurrency**:
+- A Fiber is an interruptible execution block that can pause itself using `Fiber::suspend()` and resume execution later with `Fiber::resume()`.
+- Enables async event loops (like Revolt, Amp, and ReactPHP) to write non-blocking asynchronous code with synchronous-looking syntax.
+
+---
+
+### 39. PHP-FPM (FastCGI Process Manager) Architecture and Tuning.
+
+**In Simple Words:**
+PHP-FPM runs a master process that manages worker pools to execute PHP scripts:
+- **Share-Nothing Architecture**: Each HTTP request is handled by an isolated worker process. When the request finishes, the entire request memory is wiped clean, preventing memory leaks between requests.
+- **Process Manager Modes**:
+  - `static`: Fixed number of workers running continuously. Maximum performance for dedicated web servers.
+  - `dynamic`: Scales workers between `pm.min_spare_servers` and `pm.max_children` based on traffic.
+  - `ondemand`: Spawns workers only when requests arrive (ideal for low-traffic shared hosting).
+
+---
+
+### 40. OPcache, Preloading, and the PHP JIT Compiler.
+
+**In Simple Words:**
+- **OPcache**: Caches compiled PHP opcode in shared RAM, eliminating the need to parse and compile PHP source files on every request.
+- **OPcache Preloading (`opcache.preload`)**: Compiles framework classes (e.g. Laravel or Symfony core) into shared memory on server startup, making them permanently available to all requests without autoloading!
+- **PHP JIT (Just-In-Time) Compiler**: Compiles hot opcode into raw x86/ARM machine code at runtime, boosting CPU-bound workloads (math, image processing, 3D rendering).
+
+---
+
+### 41. PHP Garbage Collection and Memory Management.
+
+**In Simple Words:**
+PHP uses **Reference Counting with a Cyclic Garbage Collector**:
+- Every variable container (`zval`) has a reference counter (`refcount`). When a reference goes out of scope, `refcount` decrements; when it hits zero, the memory is freed immediately.
+- **Circular Reference Collector**: Objects pointing to each other (`$a->b = $b; $b->a = $a;`) prevent `refcount` from reaching zero. PHP runs a background cyclic GC buffer (collecting up to 10,000 root buffers) to detect and reclaim circular memory leaks.
+
+---
+
+### 42. PHP Magic Methods: Metaprogramming and Object Lifecycles.
+
+**In Simple Words:**
+Magic methods start with `__` and intercept object behaviors:
+- `__get($name)` / `__set($name, $val)`: Intercepts access to inaccessible/undefined properties (powers dynamic ORM models).
+- `__call($name, $args)`: Intercepts calls to undefined methods.
+- `__invoke()`: Allows an object instance to be called directly as a function.
+- `__serialize()` / `__unserialize()`: Secure custom serialization handlers (replaces unsafe `__sleep` / `__wakeup`).
+
+---
+
+### 43. PHP 8 Native Attributes vs Legacy PHPDoc Annotations.
+
+**In Simple Words:**
+Prior to PHP 8, frameworks relied on parsing unstructured docblock comments (`/** @Route("/api") */`) via reflection strings.
+- **Native Attributes (`#[Route("/api")]`)**: First-class structured metadata evaluated by the PHP compiler. Type-checked, autocompleted by IDEs, and queried in microseconds using `$reflection->getAttributes()`.
+
+---
+
+### 44. Weak References and `WeakMap` in PHP.
+
+**In Simple Words:**
+- **`WeakReference`**: Allows referencing an object without increasing its `refcount`.
+- **`WeakMap`**: A map where keys are objects. When an object key is unset or goes out of scope anywhere in the application, the entry is **automatically removed from the WeakMap**, preventing memory leaks when building object caches or metadata registries.
+
+---
+
+### 45. Modern Dependency Injection and PSR-11.
+
+**In Simple Words:**
+- **PSR-11 (`ContainerInterface`)**: Standardizes how Dependency Injection containers fetch objects (`$container->get('service')`).
+- **Autowiring**: Uses Reflection to inspect class constructor type-hints and automatically resolves and instantiates dependency graphs recursively without manual XML/YAML service declarations.
+
+---
+
+### 46. Core PHP-FIG PSR Standards.
+
+**In Simple Words:**
+The PHP Framework Interoperability Group (PHP-FIG) standardizes enterprise development:
+- **PSR-4**: Autoloading standard mapping namespace paths directly to directory structures.
+- **PSR-7 & PSR-15**: Standardizes HTTP message objects (`ServerRequestInterface`, `ResponseInterface`) and HTTP middleware pipelines.
+- **PSR-12**: Strict universal code formatting and styling guidelines.
+
+---
+
+### 47. Long-Running Application Servers: RoadRunner and Swoole.
+
+**In Simple Words:**
+Traditional PHP boots the framework on every HTTP request and dies. Long-running servers keep the framework in memory:
+- **RoadRunner (Go-based worker manager)**: Spawns persistent PHP worker processes communicating via binary IPC. Framework initializes once in memory, processing 10,000+ requests per second with sub-5ms response times.
+- **State Reset**: Workers must reset global state, database connections, and memory between requests to prevent data leakage across users.
+
+---
+
+### 48. Security in Modern PHP: Password Hashing and Input Sanitization.
+
+**In Simple Words:**
+- **Password Hashing API**: Always use `password_hash($pwd, PASSWORD_ARGON2ID)`. Automatically generates cryptographically secure salts and resists GPU brute-force attacks.
+- **Prepared Statements with PDO**: Always use `PDO::prepare()` with parameter placeholders to eliminate SQL injection.
+- **Session Security**: Set `session.cookie_httponly = 1`, `session.cookie_secure = 1`, and `session.cookie_samesite = 'Strict'`.
+
+---
+
+### 49. Error Hierarchy: `Throwable`, `Error`, and `Exception`.
+
+**In Simple Words:**
+Since PHP 7, fatal engine errors no longer crash the process abruptly:
+- All errors and exceptions implement the **`Throwable`** interface.
+- **`Error`**: Engine-level failures (`TypeError`, `ParseError`, `DivisionByZeroError`).
+- **`Exception`**: Application-level domain exceptions (`DatabaseException`, `ValidationException`).
+- Catching `Throwable` guarantees catching both fatal engine errors and application exceptions.
+
+---
+
+### 50. Performance Profiling: Blackfire.io and Xdebug.
+
+**In Simple Words:**
+- **Xdebug**: Indispensable for local step-debugging and code coverage, but introduces up to 200% overhead; **never enable in production!**
+- **Blackfire.io**: Production-safe profiler that measures exact CPU time, memory allocations, I/O waits, and SQL query counts across function call trees with minimal sampling overhead.

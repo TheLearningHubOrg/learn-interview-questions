@@ -713,3 +713,260 @@ Migrating from Nuxt 2 to Nuxt 3 requires bridging the generational gap between V
 4. **Replace Vuex with Pinia**: Replace Vuex stores with Pinia composables or Nuxt's native `useState()`.
 5. **Update Server Middleware**: Migrate Express/Connect middleware to `h3` event handlers.
 
+
+---
+
+### 36. Nuxt 3 Server Routes vs Server Middleware vs Server Plugins: Nitro Architecture.
+
+**In Simple Words:**
+Nuxt 3 uses Nitro as its server engine. Code inside `server/` runs exclusively on the server (or serverless edge runtime):
+- **Server Routes (`server/api/` or `server/routes/`)**: HTTP endpoints handling REST or GraphQL calls via `defineEventHandler()`.
+- **Server Middleware (`server/middleware/`)**: Runs on **every** incoming request before matching routes (used for auth headers, logging, rate limiting).
+- **Server Plugins (`server/plugins/`)**: Runs once when the Nitro engine initializes (used for database connection pools, Nitro lifecycle hooks).
+
+```typescript
+// server/api/users.ts: REST Endpoint
+export default defineEventHandler(async (event) => {
+  const query = getQuery(event);
+  const authHeader = getHeader(event, 'authorization');
+  return { status: 'success', data: [{ id: 1, name: 'Alex' }] };
+});
+
+// server/middleware/auth.ts: Interceptor
+export default defineEventHandler((event) => {
+  event.context.user = { role: 'admin' };
+});
+```
+
+---
+
+### 37. High-Performance Caching in Nitro: `defineCachedEventHandler` and `defineCachedFunction`.
+
+**In Simple Words:**
+Nitro provides built-in driver-agnostic caching (memory, Redis, filesystem) to cache HTTP handlers and expensive functions with Time-To-Live (TTL) and stale-while-revalidate policies.
+
+```typescript
+// server/api/metrics.ts: Cache API response for 60 seconds
+export default defineCachedEventHandler(
+  async (event) => {
+    const stats = await fetchDatabaseMetrics();
+    return { timestamp: Date.now(), stats };
+  },
+  {
+    maxAge: 60, // Cache for 60 seconds
+    name: 'api_metrics',
+    getKey: (event) => 'global_stats'
+  }
+);
+```
+
+---
+
+### 38. Nuxt 3 `useState()` vs Pinia: SSR Hydration and Cross-Request Leak Prevention.
+
+**In Simple Words:**
+- **`useState()`**: Built-in Nuxt primitive that creates an SSR-friendly, reactive ref shared across components. During SSR, state is serialized into the HTML payload and hydrated on the client without re-executing initializers.
+- **Why not vanilla `ref()` outside components?**: A module-level `const state = ref()` in a Node.js SSR server is shared across all concurrent requests from different users, leaking private data! `useState()` scopes state uniquely per request.
+
+```typescript
+// composables/useUser.ts
+export const useAuthUser = () => {
+  // Key 'auth_user' ensures unique hydration bridge between server and client
+  return useState<User | null>('auth_user', () => null);
+};
+```
+
+---
+
+### 39. `useAsyncData` vs `$fetch` in Nuxt 3: Deduplication and Hydration Lifecycle.
+
+**In Simple Words:**
+- **`$fetch`**: Nuxt's enhanced HTTP client. If called directly in `<script setup>` without `useAsyncData`, it executes **twice**: once on the server during SSR and once again on the client during hydration.
+- **`useAsyncData(key, () => $fetch(...))`**: Wraps `$fetch` in a unique key. It fetches on the server, serializes the response into the page HTML, and immediately resolves on the client from the cache without a duplicate network request.
+
+```typescript
+// ✅ Correct: Only 1 network request made during SSR + Client hydration
+const { data: profile, pending, error } = await useAsyncData(
+  'user-profile',
+  () => $fetch('/api/user/profile')
+);
+```
+
+---
+
+### 40. Route Middleware in Nuxt 3: Global, Named, and Anonymous Middleware.
+
+**In Simple Words:**
+Route middleware runs before navigating to a route.
+1. **Global Middleware (`middleware/*.global.ts`)**: Runs on every page navigation.
+2. **Named Middleware (`middleware/auth.ts`)**: Applied selectively on pages via `definePageMeta({ middleware: ['auth'] })`.
+3. **Anonymous Middleware**: Inline function inside `definePageMeta`.
+
+```typescript
+// middleware/auth.ts
+export default defineNuxtRouteMiddleware((to, from) => {
+  const auth = useAuthUser();
+  if (!auth.value && to.path !== '/login') {
+    return navigateTo('/login'); // Safe redirect helper
+  }
+});
+```
+
+---
+
+### 41. Nuxt 3 Nitro Deployment Presets: Deploying Across Any Runtime.
+
+**In Simple Words:**
+Nitro compiles Nuxt into standalone outputs configured for specific cloud environments using `NITRO_PRESET`:
+- **Node.js (`node-server`)**: Standalone Express/HTTP server for Docker or PM2.
+- **Vercel / Netlify (`vercel`, `netlify`)**: Output mapped to serverless and edge functions.
+- **Cloudflare Workers / Pages (`cloudflare-pages`)**: Zero-cold-start Edge V8 isolates with no Node.js runtime dependency.
+- **AWS Lambda (`aws-lambda`)**: Handlers tailored for API Gateway and Lambda invocations.
+
+---
+
+### 42. SEO & Meta Management in Nuxt 3: `useHead` vs `useSeoMeta`.
+
+**In Simple Words:**
+- **`useHead`**: Programmatically modifies all `<head>` tags (scripts, stylesheets, link tags).
+- **`useSeoMeta`**: Type-safe composable specifically optimized for SEO and social sharing tags (OpenGraph, Twitter Cards, canonical URLs), offering performance improvements through compile-time property flattening.
+
+```typescript
+useSeoMeta({
+  title: 'Senior Frontend Interview Guide',
+  description: 'Master Nuxt 3, Vue, and System Design with 50+ interview questions.',
+  ogTitle: 'Senior Frontend Interview Guide',
+  ogDescription: 'Master Nuxt 3, Vue, and System Design.',
+  ogImage: 'https://example.com/og-banner.png',
+  twitterCard: 'summary_large_image',
+});
+```
+
+---
+
+### 43. Nuxt 3 Error Handling Architecture: `createError`, `showError`, and `error.vue`.
+
+**In Simple Words:**
+Nuxt handles errors at multiple boundaries:
+1. **API / Server errors**: Throw using `createError({ statusCode: 404, statusMessage: 'Post Not Found' })`.
+2. **Client errors**: Handled via `<NuxtErrorBoundary>` component around subtrees.
+3. **Fatal / Full-page errors**: Catch-all page `app/error.vue` displays custom 404 or 500 error templates. Clear with `clearError({ redirect: '/' })`.
+
+```vue
+<!-- error.vue: Root error page -->
+<script setup lang="ts">
+import type { NuxtError } from '#app';
+
+const props = defineProps<{ error: NuxtError }>();
+const handleError = () => clearError({ redirect: '/' });
+</script>
+
+<template>
+  <div class="error-page">
+    <h1>Error {{ error.statusCode }}</h1>
+    <p>{{ error.message }}</p>
+    <button @click="handleError">Back to Home</button>
+  </div>
+</template>
+```
+
+---
+
+### 44. Nuxt Islands and Server Components: Zero-JavaScript UI Architecture.
+
+**In Simple Words:**
+**Nuxt Islands (`<NuxtIsland>`)** render components purely on the server and stream static HTML into the client without downloading or executing any component JavaScript bundle on the client.
+- **`.server.vue` components**: Ideal for markdown previewers, static banners, and database widgets that do not require interactive client event listeners.
+
+```vue
+<!-- components/NewsletterStats.server.vue -->
+<script setup lang="ts">
+// This code ONLY runs on the server; zero JS is shipped to the client!
+const subscriberCount = await db.subscribers.count();
+</script>
+
+<template>
+  <div class="stat-badge">Over {{ subscriberCount }} active subscribers!</div>
+</template>
+```
+
+---
+
+### 45. Nuxt 3 Module Authoring: `defineNuxtModule` and Build Lifecycle Extensions.
+
+**In Simple Words:**
+Nuxt modules extend the Nuxt compiler and runtime. Using `defineNuxtModule`, developers can inject custom plugins, register Nitro routes, modify Vite/Webpack configs, and auto-import composables.
+
+```typescript
+import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit';
+
+export default defineNuxtModule({
+  meta: { name: 'my-telemetry-module', configKey: 'telemetry' },
+  setup(options, nuxt) {
+    const resolver = createResolver(import.meta.url);
+    // Inject runtime plugin automatically
+    addPlugin(resolver.resolve('./runtime/plugin'));
+  }
+});
+```
+
+---
+
+### 46. Nuxt 3 Hybrid Rendering with `routeRules`.
+
+**In Simple Words:**
+Instead of choosing one rendering mode for the whole app, `routeRules` in `nuxt.config.ts` configures rendering behavior per route:
+- **`ssr: false`**: Client-side single page app (SPA) for dashboard pages.
+- **`prerender: true`**: Static Site Generation (SSG) at build time for marketing pages.
+- **`swr: 3600`**: Stale-While-Revalidate caching (revalidates in background after 1 hour).
+- **`redirect: '/new'`**: Permanent 301/302 redirects handled at edge.
+
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  routeRules: {
+    '/': { prerender: true },              // Pre-rendered at build time
+    '/blog/**': { swr: 3600 },             // Cached on CDN, regenerated hourly
+    '/admin/**': { ssr: false },           // Client-only SPA mode
+    '/api/**': { cors: true },             // Automatically append CORS headers
+  }
+});
+```
+
+---
+
+### 47. Nuxt 3 Internationalization (`@nuxtjs/i18n`): Strategies and SEO Hreflang.
+
+**In Simple Words:**
+The `@nuxtjs/i18n` module adds multi-language support:
+- **Prefix Strategies**: `prefix_except_default` (e.g. `/` for English, `/es/` for Spanish) vs `prefix` (all routes have language prefixes).
+- **SEO Integration**: Automatically generates `<link rel="alternate" hreflang="es" href="...">` tags to prevent duplicate content SEO penalties in Google search.
+
+---
+
+### 48. Nuxt Content: Document-Driven Headless CMS Engine.
+
+**In Simple Words:**
+`@nuxt/content` transforms a `/content` folder containing Markdown, YAML, CSV, or JSON into a searchable local database accessible via `queryContent()`:
+- **MDC (Markdown Components)**: Embed interactive Vue components inside Markdown documents (e.g. `::alert{type="warning"} Text ::`).
+- **Full-Text Search**: Built-in indexing allows fast client-side searching across documentation.
+
+---
+
+### 49. Nuxt Image (`@nuxt/image`): Next-Gen Image Optimization.
+
+**In Simple Words:**
+The `<NuxtImg>` and `<NuxtPicture>` components automate web image delivery:
+1. Converts images to next-gen formats (`webp`, `avif`) on the fly.
+2. Generates responsive `srcset` and `sizes` attributes for varied viewport widths.
+3. Automatically sets `loading="lazy"` and placeholder blur effects to prevent Cumulative Layout Shift (CLS).
+
+---
+
+### 50. Zero-Downtime Deployment and Health Checks for Nuxt 3 Containers.
+
+**In Simple Words:**
+Deploying Nuxt 3 inside Docker/Kubernetes in enterprise environments requires:
+1. **Multi-Stage Dockerfile**: Builds with `npm run build` and runs output `.output/server/index.mjs` on lightweight Node Alpine with no `devDependencies`.
+2. **Health Check Endpoint**: Create `server/routes/_healthz.ts` returning `{ status: 'healthy' }` for Kubernetes liveness and readiness probes.
+3. **Graceful Shutdown**: Listen for `SIGTERM` and allow Nitro to finish in-flight requests before container termination.

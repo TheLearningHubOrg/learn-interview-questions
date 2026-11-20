@@ -248,3 +248,205 @@ Allows implementing custom aggregation algorithms in SQL or writing JavaScript c
 ### 35. When should you choose Google BigQuery over Snowflake or Amazon Redshift?
 **In Simple Words:**
 Choose BigQuery for a completely hands-off serverless environment, native integration with Google Cloud AI / Vertex AI, and predictable slot reservation pricing.
+
+
+---
+
+### 36. BigQuery Architecture: Dremel Execution Engine, Colossus Storage, Borg, and Jupiter Network.
+
+**In Simple Words:**
+BigQuery is a completely serverless multi-tenant data warehouse powered by Google's internal infrastructure:
+1. **Dremel (Compute)**: A dynamic, tree-structured multi-stage execution engine that allocates thousands of transient worker slots to evaluate SQL in parallel.
+2. **Colossus (Storage)**: Google's global distributed filesystem. Data is stored in **Capacitor** (an advanced columnar format with RLE and dictionary encoding), completely decoupled from compute.
+3. **Jupiter Network**: Petabit-scale bisection bandwidth network mesh allowing compute slots to read from Colossus disks at up to **10 Terabits/sec**, eliminating traditional storage locality bottlenecks.
+4. **Borg**: Google's precursor to Kubernetes that schedules thousands of worker containers across data centers in milliseconds.
+
+---
+
+### 37. Partitioning vs Clustering in BigQuery: Architectural differences and best practices.
+
+**In Simple Words:**
+- **Partitioning**: Divides a table into physical date/timestamp, ingestion-time, or integer range segments (up to 4,000 partitions):
+  ```sql
+  CREATE TABLE orders (id INT64, order_date DATE, amount NUMERIC)
+  PARTITION BY order_date
+  OPTIONS (require_partition_filter = true);
+  ```
+  - Queries filtering by `order_date` skip unneeded partition files entirely, reducing billed scan bytes to near zero.
+- **Clustering**: Sorts and colocates rows within each partition by up to 4 columns (`CLUSTER BY customer_id, status`):
+  - Capacitor groups identical cluster keys into adjacent data blocks.
+  - Unlike partitioning, clustering has **no physical segment limit** and handles high-cardinality keys effortlessly.
+
+---
+
+### 38. BigQuery Slots and Capacity Planning: On-Demand pricing vs BigQuery Editions with Autoscaling.
+
+**In Simple Words:**
+- **On-Demand Billing**: You pay strictly for the **number of bytes scanned by queries** (typically $6.25 per TB). Ideal for ad-hoc exploration and unpredictable workloads.
+- **BigQuery Editions (Standard, Enterprise, Enterprise Plus)**:
+  - Billed for **Slot-Hours** (compute capacity).
+  - **Dynamic Slot Autoscaling**: BigQuery scales slots up during heavy query spikes and down to baseline when idle.
+  - Predictable monthly costs for enterprise production environments; unmetered query byte scanning.
+
+---
+
+### 39. BigQuery Storage Write API: Stream ingestion with gRPC, write offsets, and committed vs pending streams.
+
+**In Simple Words:**
+The modern high-throughput streaming ingestion API replacing legacy `tabledata.insertAll`:
+- Uses binary **gRPC and Protocol Buffers**, delivering 10x higher ingestion speeds at 50% lower cost.
+- **Committed Stream**: Records become immediately queryable in the table as soon as flushed.
+- **Pending Stream (Transactional Batch Ingestion)**:
+  - Workers stream millions of records into a temporary pending stream buffer.
+  - When the ETL batch finishes successfully, you execute an atomic `Commit`.
+  - If a worker crashes, the pending stream is discarded with zero partial write corruption.
+- Supports **Exactly-Once Semantics** using client-provided stream write offsets.
+
+---
+
+### 40. BigQuery Omni: Multi-cloud analytics querying data directly in AWS S3 and Azure Blob Storage.
+
+**In Simple Words:**
+Analyzing data spread across multiple clouds without costly egress fees or cross-cloud ETL pipelines:
+- **How it works**: Google deploys BigQuery's Dremel execution engine inside AWS and Microsoft Azure using Google Anthos.
+- You write standard BigQuery SQL inside the GCP console:
+  ```sql
+  SELECT customer_id, SUM(price)
+  FROM `aws-us-east-1.analytics.s3_external_sales`
+  GROUP BY customer_id;
+  ```
+- The query executes **locally inside AWS / Azure**; only the tiny aggregated final result set transfers back to GCP.
+
+---
+
+### 41. BigQuery BI Engine: In-memory acceleration service and sub-second dashboard performance.
+
+**In Simple Words:**
+Dashboards (Looker, Tableau, PowerBI) often require sub-second response times, but standard BigQuery queries take 2-4 seconds due to slot allocation overhead:
+- **BI Engine**: A fully managed in-memory execution service that caches hot table partitions in fast RAM.
+- Features a **vectorized execution engine** that evaluates SQL directly on compressed in-memory columnar data.
+- Yields sub-second dashboard refreshes and zero per-query byte scanning costs for cached data.
+
+---
+
+### 42. BigQuery ML (BQML): Training ML models directly with SQL.
+
+**In Simple Words:**
+Train and deploy machine learning models directly inside BigQuery without exporting data to Python or Pandas:
+```sql
+-- Train a customer churn model using XGBoost
+CREATE OR REPLACE MODEL `analytics.churn_model`
+OPTIONS(model_type='BOOSTED_TREE_CLASSIFIER', input_label_cols=['churned']) AS
+SELECT tenure, monthly_spend, support_calls, churned
+FROM `analytics.customer_features`;
+
+-- Run predictions in real-time SQL
+SELECT customer_id, predicted_churned
+FROM ML.PREDICT(MODEL `analytics.churn_model`, TABLE `analytics.active_customers`);
+```
+- Supports Linear Regression, Logistic Regression, K-Means clustering, Matrix Factorization, and remote Vertex AI Gemini models.
+
+---
+
+### 43. Query Plan Execution and Optimization: Diagnosing "Resources exceeded during query execution".
+
+**In Simple Words:**
+When a query fails with `Resources exceeded`:
+- **Root Cause**: The query exceeded the memory allocated to worker slots during an in-memory hash shuffle or sort.
+- **Troubleshooting Steps**:
+  1. Inspect **Query Plan Execution Details** in BigQuery console.
+  2. Look for stages with high **Wait Time** (indicates slot starvation) vs high **Compute Time**.
+  3. **Data Skew**: If one slot took 10 minutes while all others took 2 seconds, check for skewed join keys (e.g. `ON a.user_id = b.user_id` where `user_id` is frequently `NULL`).
+  4. Avoid `ORDER BY` on un-aggregated tables without a `LIMIT` clause.
+
+---
+
+### 44. Materialized Views in BigQuery: Smart tuning, automated query rewrite, and incremental maintenance.
+
+**In Simple Words:**
+- **Materialized Views**: Pre-computed query tables refreshed incrementally in the background as new rows land in base tables:
+  ```sql
+  CREATE MATERIALIZED VIEW `analytics.daily_revenue_mv` AS
+  SELECT order_date, region, SUM(amount) AS total_revenue
+  FROM `analytics.raw_orders`
+  GROUP BY order_date, region;
+  ```
+- **Smart Query Rewrite**: If a user runs a query against the raw `raw_orders` table, BigQuery's optimizer automatically detects the matching Materialized View and redirects the query to read the pre-computed summary instead, delivering 50x faster results at zero rewrite effort!
+
+---
+
+### 45. Column-Level Security (Policy Tags) and Row-Level Security in BigQuery.
+
+**In Simple Words:**
+- **Column-Level Security via Policy Tags (Data Catalog / Dataplex)**:
+  - Create taxonomy tags: `PII -> High_Confidentiality`.
+  - Attach the tag to the `ssn` column.
+  - Users without the **Fine-Grained Reader** IAM role receive an `Access Denied` error if they attempt to query that column.
+- **Row-Level Security**:
+  ```sql
+  CREATE ROW ACCESS POLICY emea_filter ON `sales`
+  GRANT TO ("group:emea-sales@corp.com")
+  FILTER USING (region = 'EMEA');
+  ```
+
+---
+
+### 46. Time Travel and Table Snapshots: Querying past data and zero-copy snapshots.
+
+**In Simple Words:**
+- **Time Travel (up to 7 days)**: Query the state of any table at a past timestamp:
+  ```sql
+  SELECT * FROM `analytics.orders`
+  FOR SYSTEM_TIME AS OF TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 3 HOUR);
+  ```
+- **Table Snapshots**: Create a point-in-time read-only copy of a table for long-term backup:
+  ```sql
+  CREATE SNAPSHOT TABLE `backup.orders_2024_q1`
+  CLONE `analytics.orders`;
+  ```
+  - Pointer-based zero-copy storage; you only pay storage for rows that are subsequently modified in the base table.
+
+---
+
+### 47. Search Indexes and Vector Search in BigQuery: `SEARCH()` and `VECTOR_SEARCH`.
+
+**In Simple Words:**
+- **BigQuery Search Index**: Builds text indexes over `STRING` and `JSON` columns for point lookups:
+  ```sql
+  CREATE SEARCH INDEX log_search_idx ON server_logs(ALL COLUMNS);
+  SELECT * FROM server_logs WHERE SEARCH(message, 'NullPointerException');
+  ```
+- **`VECTOR_SEARCH`**: Enables approximate nearest neighbor semantic search natively in SQL using cosine similarity or Euclidean distance over text/image embeddings generated via Vertex AI.
+
+---
+
+### 48. BigQuery Continuous Queries (BigQuery Streams): Real-time streaming SQL.
+
+**In Simple Words:**
+Traditionally, BigQuery was strictly a batch query engine. **Continuous Queries** turn BigQuery into a real-time stream processing platform:
+- Define SQL queries that run continuously over incoming Pub/Sub topics or BigQuery table streams.
+- As new events land, SQL transformations execute with low latency and write results directly to external Pub/Sub topics or Bigtable for reverse-ETL, without requiring separate Apache Beam / Dataflow infrastructure.
+
+---
+
+### 49. Cost Control Best Practices in BigQuery: Dry-run, maximum bytes billed, and partition filter enforcement.
+
+**In Simple Words:**
+Preventing developer queries from running multi-thousand-dollar scans:
+1. **Dry-Run Validation**: Call the API with `dryRun=true` or inspect the query validator in the console to verify exact byte scan volume before running.
+2. **Maximum Bytes Billed**: Set `maximum_bytes_billed = 107374182400` (100 GB). If a query's scan estimate exceeds 100 GB, it aborts instantly without incurring billing.
+3. **Enforce Partition Filters**:
+   ```sql
+   ALTER TABLE `analytics.events` SET OPTIONS (require_partition_filter = true);
+   ```
+   Any query without a `WHERE _PARTITIONDATE = ...` is automatically rejected by the compiler.
+
+---
+
+### 50. BigQuery Data Governance: Dataplex integration, automated data quality, and lineage.
+
+**In Simple Words:**
+Managing enterprise compliance across thousands of BigQuery datasets:
+- **Dataplex Universal Catalog**: Discovers, organizes, and classifies datasets across BigQuery and Cloud Storage lakes.
+- **Automated Data Quality (Auto DQ)**: Runs scheduled declarative quality rules (`NOT_NULL`, `REGEX_MATCH`, `VALUE_RANGE`) without custom scripts, publishing quality scorecards to Google Cloud Monitoring.
+- **End-to-End Data Lineage**: Automatically tracks upstream and downstream dependencies from Cloud Data Fusion pipelines, Dataform models, and Looker dashboards.

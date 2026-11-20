@@ -7,10 +7,10 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://learn-interview-questions.vercel.app'),
   title: {
-    default: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (3,600+ Questions across 64 Separated Tracks)',
+    default: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (4,300+ Questions across 64 Separated Tracks)',
     template: '%s | InterviewHub PRO',
   },
-  description: 'Comprehensive, production-tested engineering interview question bank with 3,600+ questions and answers across 64 specialized, fully separated tracks: React, Next.js, Angular, Vue, Svelte, Astro, JavaScript, TypeScript, HTML/CSS, Web Vitals, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Python, Node.js, PostgreSQL, MySQL, SQL, MongoDB, Redis, DynamoDB, AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD, Linux, Bash, RabbitMQ, Kafka, Elasticsearch, Vector DBs, Spark, Snowflake, BigQuery, React Native, Flutter, Swift, iOS, Kotlin, Android, Testing, SRE, Networking, SOLID Principles, Design Patterns, DDD, System Design, Security, AI/LLM, and DSA.',
+  description: 'Comprehensive, production-tested engineering interview question bank with 4,300+ questions and answers across 64 specialized, fully separated tracks: React, Next.js, Angular, Vue, Svelte, Astro, JavaScript, TypeScript, HTML/CSS, Web Vitals, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Python, Node.js, PostgreSQL, MySQL, SQL, MongoDB, Redis, DynamoDB, AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD, Linux, Bash, RabbitMQ, Kafka, Elasticsearch, Vector DBs, Spark, Snowflake, BigQuery, React Native, Flutter, Swift, iOS, Kotlin, Android, Testing, SRE, Networking, SOLID Principles, Design Patterns, DDD, System Design, Security, AI/LLM, and DSA.',
   keywords: [
     'interview questions',
     'javascript interview questions',
@@ -72,13 +72,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://learn-interview-questions.vercel.app',
     siteName: 'InterviewHub PRO - The Learning Hub Org',
-    title: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (3,600+ Qs across 64 Tracks)',
-    description: '3,600+ production-tested questions with 100% code coverage across 64 tracks: TypeScript, Angular, React, Vue, Nuxt, Svelte, Astro, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Swift, iOS, Kotlin, Android, Mobile, Testing/SRE, Networking, Linux, SOLID, Design Patterns, Snowflake, BigQuery, dbt, Cloud, and more.',
+    title: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (4,300+ Qs across 64 Tracks)',
+    description: '4,300+ production-tested questions with 100% code coverage across 64 tracks: TypeScript, Angular, React, Vue, Nuxt, Svelte, Astro, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Swift, iOS, Kotlin, Android, Mobile, Testing/SRE, Networking, Linux, SOLID, Design Patterns, Snowflake, BigQuery, dbt, Cloud, and more.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank',
-    description: '3,600+ production-tested engineering interview questions across 64 tracks with 100% code examples.',
+    description: '4,300+ production-tested engineering interview questions across 64 tracks with 100% code examples.',
     creator: '@TheLearningHub',
   },
 };

@@ -548,3 +548,175 @@ Manages distributed transactions across microservices without two-phase commit (
 - **Orchestration**: A central Saga Orchestrator coordinates each step and triggers **Compensating Transactions** (e.g., refund payment, release stock) if any intermediate step fails.
 
 ---
+
+---
+
+### 36. Spring Boot 3 Virtual Threads Integration: `spring.threads.virtual.enabled=true`.
+
+**In Simple Words:**
+In Spring Boot 3.2+, enabling Java 21 Virtual Threads requires a single configuration property:
+`spring.threads.virtual.enabled=true`
+- **What it Does**: Replaces Tomcat's platform thread pool with an unbounded Virtual Thread executor. Every incoming HTTP request and `@Async` task runs on its own virtual thread.
+- **Immediate Benefit**: Tomcat can handle **50,000+ concurrent blocking requests** (database queries, REST calls) with steady sub-second latency and minimal memory overhead without writing reactive `WebFlux` code!
+
+---
+
+### 37. `@Transactional` Internals: The Self-Invocation Anti-Pattern.
+
+**In Simple Words:**
+Spring manages transactions using AOP dynamic proxies:
+- **The Self-Invocation Trap**: If `MethodA()` calls `this.MethodB()` within the same class, and `MethodB()` is annotated with `@Transactional`, **the transaction is completely ignored!** Why? Because `this` bypasses the Spring AOP proxy wrapper and invokes the raw target method directly!
+- **Rollback Rule**: By default, Spring only rolls back for **unchecked exceptions** (`RuntimeException`, `Error`). To roll back on checked exceptions, you must explicitly specify:
+  `@Transactional(rollbackFor = Exception.class)`
+
+```java
+@Service
+public class OrderService {
+    // ❌ Anti-pattern: Internal call bypasses proxy!
+    public void processOrder() {
+        this.saveOrder(); // @Transactional on saveOrder is NOT executed!
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrder() { /* ... */ }
+}
+```
+
+---
+
+### 38. Spring Bean Lifecycle: Creation to Destruction.
+
+**In Simple Words:**
+1. **Instantiation**: JVM instantiates the bean class via reflection or factory method.
+2. **Populate Properties**: Injects dependencies (`@Autowired`, constructor args).
+3. **BeanNameAware / BeanFactoryAware**: Injects Spring internal context references.
+4. **`BeanPostProcessor::postProcessBeforeInitialization`**: Intercepts bean before custom init.
+5. **Initialization**: Invokes `@PostConstruct` method, followed by `InitializingBean::afterPropertiesSet`.
+6. **`BeanPostProcessor::postProcessAfterInitialization`**: Wraps bean in dynamic proxies (AOP, `@Transactional`, `@Async`).
+7. **Destruction**: On container shutdown, invokes `@PreDestroy` and `DisposableBean::destroy`.
+
+---
+
+### 39. Prototype Beans Inside Singleton Beans: The Scoped Proxy Solution.
+
+**In Simple Words:**
+A `@Scope("prototype")` bean is supposed to create a new instance on every request. However, if injected into a default `@Scope("singleton")` service:
+- The singleton is only created once at startup, so the prototype bean is only injected once, acting like a singleton!
+- **The Solution**: Set `@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)`. Spring injects a dynamic CGLIB proxy that fetches a brand-new prototype instance on every method invocation.
+
+---
+
+### 40. Spring Security 6 Architecture: Stateless SecurityFilterChain.
+
+**In Simple Words:**
+Spring Security 6 deprecated `WebSecurityConfigurerAdapter` in favor of component-based `SecurityFilterChain` beans:
+- Incoming HTTP requests pass through a chain of filters (`SecurityContextPersistenceFilter`, `JwtAuthenticationFilter`, `UsernamePasswordAuthenticationFilter`).
+- Stateless REST APIs disable CSRF and session management, setting `SessionCreationPolicy.STATELESS`.
+
+```java
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
+    return http
+        .csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .anyRequest().authenticated()
+        )
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+}
+```
+
+---
+
+### 41. Spring Boot Actuator and Micrometer Observability.
+
+**In Simple Words:**
+Actuator exposes production-ready operational metrics:
+- Health check endpoints (`/actuator/health`) reporting Kubernetes liveness and readiness probe states.
+- **Micrometer Tracing**: Integrates with OpenTelemetry, Jaeger, and Zipkin to propagate `traceId` and `spanId` across microservice boundaries in HTTP headers and logs.
+
+---
+
+### 42. Spring Data JPA: Resolving the N+1 Query Problem.
+
+**In Simple Words:**
+The **N+1 Problem** occurs when loading 100 parent records executes 1 query for the parents plus 100 separate sub-queries to fetch child relationships:
+1. **Solution 1: Join Fetch in JPQL**:
+   `@Query("SELECT o FROM Order o JOIN FETCH o.items")` (Fetches parent and children in 1 query).
+2. **Solution 2: `@EntityGraph`**:
+   `@EntityGraph(attributePaths = {"items", "customer"})`
+3. **Solution 3: DTO Projection**: Select only the exact columns needed into a Java Record.
+
+---
+
+### 43. Spring Cache with Redis: `@Cacheable`, `@CachePut`, and `@CacheEvict`.
+
+**In Simple Words:**
+Spring Cache provides declarative abstraction over caching layers:
+- **`@Cacheable(value = "users", key = "#id")`**: Returns cached value if present; otherwise runs method and stores result.
+- **`@CachePut(value = "users", key = "#user.id")`**: Always executes method and updates the cache.
+- **`@CacheEvict(value = "users", key = "#id")`**: Removes entry from cache on delete/update.
+
+---
+
+### 44. Spring Cloud Gateway vs Zuul.
+
+**In Simple Words:**
+- **Netflix Zuul 1**: Legacy blocking I/O model based on Java Servlets.
+- **Spring Cloud Gateway**: Built on non-blocking Netty and Project Reactor:
+  - Supports route predicates (matching path, host, headers) and filters (JWT auth validation, request rewriting, rate limiting via Redis token bucket).
+
+---
+
+### 45. Resilience4j: Circuit Breakers and Bulkheads in Spring Boot.
+
+**In Simple Words:**
+Resilience4j protects services from cascading downstream failures:
+- **Circuit Breaker (`@CircuitBreaker(name = "payment", fallbackMethod = "fallback")`)**: If error rate exceeds 50%, the circuit transitions to **OPEN**, failing fast without making network calls to allow the downstream system to recover.
+- **Bulkhead**: Limits concurrent calls to a downstream service (e.g. max 20 threads) to prevent one slow dependency from exhausting all server resources.
+
+---
+
+### 46. Spring Boot 3 AOT and GraalVM Native Compilation.
+
+**In Simple Words:**
+Spring Boot 3 natively supports **Ahead-Of-Time (AOT)** compilation with GraalVM:
+- Analyzes reflection, proxies, and resource loading at build time.
+- Compiles the application into a standalone Linux/Windows executable with **under 50ms startup times** and **$< 50\text{MB}$ memory footprint**, ideal for serverless AWS Lambda and instant Kubernetes auto-scaling.
+
+---
+
+### 47. Asynchronous Execution with `@Async` and Context Propagation.
+
+**In Simple Words:**
+Annotating a method with `@Async` executes it on a background thread pool:
+- **SecurityContext Loss**: Thread-local state (`SecurityContextHolder`, MDC correlation IDs) does **not** automatically transfer to the async thread!
+- **Fix**: Configure a `DelegatingSecurityContextAsyncTaskExecutor` to propagate security tokens and trace IDs to the background thread.
+
+---
+
+### 48. Spring Kafka: Idempotent Listeners and Dead Letter Queues (DLQ).
+
+**In Simple Words:**
+- **Dead Letter Topic (DLT)**: When message processing fails after maximum retries (e.g. 3 attempts), Spring Kafka's `DeadLetterPublishingRecoverer` automatically forwards the poison pill message to a `topic.DLT` topic for human inspection.
+- **Idempotency**: Store consumed Kafka offsets or business idempotency keys (`order_id`) in Redis/DB to prevent duplicate executions from message replays.
+
+---
+
+### 49. Transactional Application Events: `@TransactionalEventListener`.
+
+**In Simple Words:**
+Standard Spring `@EventListener` executes immediately when the event is published, even if the database transaction later rolls back!
+- **`@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)`**: Guarantees the listener executes **only after** the database transaction has successfully committed, preventing sending emails or Kafka messages for orders that rolled back!
+
+---
+
+### 50. Database Migrations: Flyway vs Liquibase in Enterprise CI/CD.
+
+**In Simple Words:**
+Automates version-controlled database schema changes on application startup:
+- **Flyway**: Uses plain SQL migration scripts (`V1__init.sql`, `V2__add_index.sql`). Simpler, fast, and transparent to DBAs.
+- **Liquibase**: Uses XML, YAML, or SQL change sets. Database-agnostic, but higher syntax abstraction overhead.

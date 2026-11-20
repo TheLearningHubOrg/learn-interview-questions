@@ -322,3 +322,150 @@ Azure Bastion provides secure, seamless RDP and SSH connectivity directly within
 2. **Enterprise Hybrid Cloud**: Azure Arc, Azure Stack HCI, and ExpressRoute offer industry-leading hybrid datacenter capabilities.
 3. **OpenAI Partnership**: First-class enterprise hosting of OpenAI models via Azure OpenAI Service with enterprise data governance and VNet isolation.
 `;
+
+---
+
+### 36. Azure Kubernetes Service (AKS): Azure CNI vs Kubenet Networking.
+
+**In Simple Words:**
+- **Kubenet (Basic Networking)**: Pods receive private IP addresses from an internal overlay network. When pods communicate outside the node, the node uses NAT (Network Address Translation). Conserves VNet IP addresses, but introduces minor NAT routing overhead.
+- **Azure CNI (Advanced Networking)**: Every single Pod receives a real, routable IP address directly from the Azure VNet subnet. Pods can communicate directly with on-premises networks and other Azure VMs with zero NAT latency, but requires large VNet CIDR blocks to accommodate max pod counts.
+
+---
+
+### 37. Azure Container Apps (ACA): Serverless Containers with KEDA and Dapr.
+
+**In Simple Words:**
+**Azure Container Apps** runs microservices on a serverless platform built on managed AKS, Envoy, KEDA, and Dapr:
+- **KEDA (Kubernetes Event-driven Autoscaling)**: Auto-scales container replicas from 0 to hundreds based on incoming HTTP requests, CPU, or message queue depth (Azure Service Bus, Kafka).
+- **Dapr (Distributed Application Runtime)**: Sidecar architecture providing built-in service-to-service invocation with mTLS, state management, and pub/sub abstractions.
+
+---
+
+### 38. Microsoft Entra ID: Service Principals vs Managed Identities.
+
+**In Simple Words:**
+- **Service Principal**: An identity created for an application or CI/CD runner. Requires managing secrets (passwords, certificates) that expire and must be rotated manually.
+- **Managed Identity (Recommended)**: An automated identity managed directly by Azure for Azure resources (VMs, App Services, Functions):
+  - **Zero Secrets**: Eliminates hardcoded passwords from configuration files!
+  - Azure handles automatic token acquisition and credential rotation transparently.
+
+---
+
+### 39. Azure Cosmos DB: The 5 Consistency Levels.
+
+**In Simple Words:**
+Cosmos DB is a globally distributed NoSQL database offering five precise consistency levels, allowing developers to balance latency against data freshness:
+1. **Strong**: Linearizable consistency; reads guaranteed to return the latest committed write (highest latency, single-region write).
+2. **Bounded Staleness**: Reads lag behind writes by at most $K$ versions or $T$ time.
+3. **Session (Default, 95% of apps)**: Monotonic reads and read-your-own-writes within the same client session.
+4. **Consistent Prefix**: Updates never seen out of order; may lag behind latest writes.
+5. **Eventual**: Lowest latency and highest availability; out-of-order reads possible until data converges.
+
+---
+
+### 40. Azure VNet Security: Network Security Groups (NSGs) vs Azure Firewall.
+
+**In Simple Words:**
+- **Network Security Group (NSG)**: Stateful Layer 4 packet filter attached to subnets or network interfaces (NICs). Filters traffic based on 5-tuple (source IP, source port, destination IP, destination port, protocol). Free and high-speed.
+- **Azure Firewall**: Managed Layer 7 cloud network security service. Performs stateful packet inspection, FQDN application filtering (e.g. allowing `*.github.com`), Threat Intelligence-based filtering, and TLS inspection.
+
+---
+
+### 41. Azure Private Link & Private Endpoints: Eliminating Public IPs.
+
+**In Simple Words:**
+By default, Azure PaaS services (Azure SQL, Storage Accounts, Cosmos DB) have public internet IP addresses protected by firewalls. **Private Endpoint** assigns a private IP address from your internal VNet directly to the PaaS resource:
+- All traffic flows exclusively over the secure Microsoft private backbone network.
+- Completely disables public internet access, eliminating DDoS attack vectors and complying with strict healthcare and banking regulations.
+
+---
+
+### 42. Azure App Service: Deployment Slots and Zero-Downtime Swaps.
+
+**In Simple Words:**
+App Service **Deployment Slots** (e.g. `staging` vs `production`) enable zero-downtime releases:
+1. Deploy new application build to the `staging` slot.
+2. Warm up the staging slot (pre-compiling caches, establishing database connection pools, executing smoke tests).
+3. **Slot Swap**: Azure switches the underlying virtual IP routing tables instantaneously ($0\text{ms}$ downtime). If an issue occurs, you can swap back immediately with zero data loss!
+
+---
+
+### 43. Azure Functions: Consumption vs Premium vs Durable Functions.
+
+**In Simple Words:**
+- **Consumption Plan**: Serverless pay-per-execution; scales to 0, subject to cold starts.
+- **Premium Plan**: Pre-warmed instances to eliminate cold starts, VNet integration, and unbounded execution runtimes.
+- **Durable Functions**: Extension allowing stateful orchestrations in serverless code using the async await pattern (Function Chaining, Fan-out/Fan-in, Human Interaction Approvals).
+
+---
+
+### 44. Azure Service Bus: Enterprise Message Brokering.
+
+**In Simple Words:**
+- **Queues**: Point-to-point delivery (one consumer processes each message).
+- **Topics & Subscriptions**: Publish-subscribe model; multiple independent consumer subscriptions receive a copy of matching messages using SQL-like filter rules.
+- **Sessions**: Guarantees First-In-First-Out (FIFO) message ordering and grouping by `SessionId`.
+- **Dead-Letter Queue (DLQ)**: Automatically isolates poisoned messages that exceed maximum delivery attempts.
+
+---
+
+### 45. Azure API Management (APIM): Gateways and Policies.
+
+**In Simple Words:**
+Acts as the central reverse proxy front-door for enterprise APIs:
+- **XML Policies**: Applied inbound, backend, outbound, and on-error:
+  - Enforcing JWT token validation and role checks.
+  - Rate limiting by client IP or subscription key (`rate-limit-by-key`).
+  - Transforming legacy XML SOAP payloads into modern JSON REST responses.
+
+---
+
+### 46. Azure Key Vault: Soft Delete and Purge Protection.
+
+**In Simple Words:**
+Secure centralized cloud storage for secrets, API tokens, cryptographic keys, and SSL certificates:
+- **Soft Delete**: When an administrator or script deletes a secret, it is retained in a soft-deleted state for 90 days.
+- **Purge Protection**: Prevents anyone (including subscription Owners) from permanently deleting secrets until the retention period expires, providing definitive defense against ransomware attacks!
+
+---
+
+### 47. Azure Arc: Unified Hybrid and Multi-Cloud Governance.
+
+**In Simple Words:**
+**Azure Arc** extends Azure resource management beyond Microsoft datacenters:
+- Connects Kubernetes clusters, bare-metal servers, and SQL instances running on-premises, in AWS, or in GCP into the Azure Resource Manager (ARM).
+- Apply centralized Azure Policies, RBAC access control, and Microsoft Defender security monitoring across your entire multi-cloud estate from a single dashboard.
+
+---
+
+### 48. Azure Monitor & Application Insights with KQL.
+
+**In Simple Words:**
+- **Application Insights**: APM SDK that auto-instruments .NET, Java, and Node.js apps to track request duration, failures, and dependency calls.
+- **Kusto Query Language (KQL)**: High-performance big data query language used across Azure Monitor and Sentinel to query terabytes of log records in seconds.
+
+```kusto
+// KQL Query: Top 5 slowest API dependencies in the last 24 hours
+dependencies
+| where timestamp > ago(24h)
+| summarize AvgDuration = avg(duration), Count = count() by target, name
+| order by AvgDuration desc
+| take 5
+```
+
+---
+
+### 49. Infrastructure as Code: Azure Bicep vs Terraform.
+
+**In Simple Words:**
+- **Azure Bicep**: Microsoft's domain-specific language (DSL) for ARM templates. Day-zero support for all new Azure features, zero state file management (reads state directly from live Azure resources), and clean syntax.
+- **Terraform**: Multi-cloud provider syntax with state file tracking, ideal for organizations spanning Azure, AWS, and Datadog.
+
+---
+
+### 50. Enterprise Governance: Azure Landing Zones and Azure Policy.
+
+**In Simple Words:**
+- **Azure Landing Zone**: Architectural blueprint establishing security, networking, logging, and identity across an enterprise cloud environment following the Cloud Adoption Framework (CAF).
+- **Azure Policy**: Enforces mandatory organizational rules at the API level (e.g. blocking the creation of unencrypted storage accounts, restricting VM creation to specific regions, or enforcing mandatory cost center resource tags).

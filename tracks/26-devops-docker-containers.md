@@ -701,3 +701,179 @@ In large enterprises with hundreds of microservices, letting each team write arb
 1. **No External Base Images**: Block pulling directly from Docker Hub; all images must pull from verified internal mirrors.
 2. **Immutable Digest Pinning**: Pin base images to cryptographic SHA256 digests (`FROM node@sha256:...`) instead of floating tags (`:latest`).
 3. **Automated Base Image Patching**: When an OS security patch is released, base images are rebuilt and downstream microservices auto-trigger rebuilds in CI/CD.
+
+---
+
+### 36. Linux Namespaces and cgroups v2: The Foundation of Containers.
+
+**In Simple Words:**
+Containers are not lightweight virtual machines; they are standard Linux processes isolated by two kernel primitives:
+1. **Namespaces (Isolation - What a process can see)**:
+   - `pid`: Process isolation (container process thinks it is PID 1).
+   - `net`: Isolated network interfaces, routing tables, and IP ports.
+   - `mnt`: Independent filesystem mount points.
+   - `ipc`: Inter-process communication isolation (semaphores, message queues).
+   - `uts`: Hostname and NIS domain isolation.
+   - `user`: Maps container `root` (UID 0) to an unprivileged host user (e.g. UID 10000).
+2. **Control Groups (cgroups v2 - What a process can use)**: Enforces hard resource ceilings on CPU cycles, RAM, swap space, and disk I/O throughput.
+
+---
+
+### 37. OverlayFS Storage Driver: Copy-on-Write (CoW) Architecture.
+
+**In Simple Words:**
+Docker uses **OverlayFS** to layer read-only image layers into a single unified filesystem:
+- **`lowerdir`**: Read-only base image layers stacked on top of each other.
+- **`upperdir`**: Read-write layer unique to the running container.
+- **`merged`**: Unified mount directory presented to the container process.
+- **Copy-on-Write (CoW)**: When a container modifies an existing image file, OverlayFS copies the file from the lower read-only layer up to the upper read-write layer before modifying it, ensuring base images remain 100% immutable and shareable across containers.
+
+---
+
+### 38. Multi-Stage Builds & Distroless Images: Shrinking Images by 95%.
+
+**In Simple Words:**
+Shipping build tools (compilers, npm, Maven, SDKs, bash) into production container images creates massive 1GB+ bloated images riddled with CVE security vulnerabilities:
+- **Multi-Stage Build**: Compile code in a fat build stage, then copy **only the final compiled artifact** into a minimal runtime base image.
+- **Google Distroless Images**: Contains *only* your application binary and minimal runtime dependencies (glibc/openssl). Contains **zero package managers and zero shell binaries (`/bin/sh`)**, completely neutralizing reverse-shell exploits!
+
+```dockerfile
+# Stage 1: Build environment
+FROM golang:1.22-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o server .
+
+# Stage 2: Distroless production container (Only 15MB total size!)
+FROM gcr.io/distroless/static-debian12
+COPY --from=builder /app/server /server
+USER nonroot:nonroot
+ENTRYPOINT ["/server"]
+```
+
+---
+
+### 39. Docker BuildKit: Parallelism, Cache Mounts, and Secret Mounts.
+
+**In Simple Words:**
+BuildKit (`DOCKER_BUILDKIT=1`) modernizes the Docker build engine:
+1. **Parallel Stage Execution**: Independent build stages execute concurrently across CPU cores.
+2. **Cache Mounts (`--mount=type=cache,target=/root/.cache`)**: Persists package manager caches (npm, Maven, Go modules) across builds without baking them into final image layers.
+3. **Secret Mounts (`--mount=type=secret,id=npmrc`)**: Securely mounts private tokens during build time without leaving any trace in intermediate image layers or Git history!
+
+---
+
+### 40. Container Networking Modes: Bridge, Host, Overlay, and Macvlan.
+
+**In Simple Words:**
+- **Bridge (Default `bridge`)**: Creates a virtual bridge (`docker0`) on host with NAT port mapping (`-p 8080:80`). Isolated private IP network.
+- **Host (`--network host`)**: Bypasses network isolation. Container attaches directly to the host's network stack with zero NAT overhead (maximum packet throughput).
+- **Overlay**: Multi-host networking spanning across multiple physical Docker hosts (powers Docker Swarm and Kubernetes Pod networks).
+- **Macvlan**: Assigns a real MAC address to the container, making it appear as a physical hardware device on the LAN router.
+
+---
+
+### 41. Container Security Hardening: Non-Root, Read-Only, and Dropping Capabilities.
+
+**In Simple Words:**
+Three golden rules to prevent container breakout exploits:
+1. **Run as Non-Root**: `USER 10001:10001`. A compromised process cannot modify host files.
+2. **Read-Only Root Filesystem (`--read-only`)**: Prevents attackers from downloading malicious scripts, web shells, or cryptocurrency miners into `/tmp` or `/app`. Use `--tmpfs /tmp` for temporary files.
+3. **Drop Capabilities (`--cap-drop=ALL`)**: Linux divides superuser privileges into discrete capabilities. Dropping all capabilities strips raw socket manipulation, kernel module loading, and chroot powers.
+
+---
+
+### 42. Signal Handling and the PID 1 Zombie Process Problem.
+
+**In Simple Words:**
+When a process runs as **PID 1** inside a container, Linux kernel default signal handlers are disabled. If a Java or Node.js process runs as PID 1:
+- It ignores standard `SIGTERM` signals sent by `docker stop`, forcing Docker to hang for 10 seconds before violently killing it with `SIGKILL` (causing database corruption).
+- It does not reap orphaned child processes, resulting in leaked "zombie" processes that exhaust the OS PID table.
+- **Solution**: Use **Tini (`docker run --init`)** or `dumb-init` as PID 1 to properly forward signals and reap zombie processes.
+
+---
+
+### 43. Vulnerability Scanning & SBOM Generation.
+
+**In Simple Words:**
+- **Trivy / Grype**: Scans container images in CI/CD pipelines, analyzing OS packages (Alpine/Debian) and application dependencies (npm, PyPI, Go) against the National Vulnerability Database (NVD).
+- **Software Bill of Materials (SBOM)**: Comprehensive inventory of every software component, library, and license bundled inside a container image (generated using `syft` or `docker buildx --sbom`).
+
+---
+
+### 44. Docker Storage: Volumes vs Bind Mounts vs Tmpfs.
+
+**In Simple Words:**
+- **Volumes (`docker volume create`)**: Managed by Docker in `/var/lib/docker/volumes/`. Isolated from host directory layout; safe, high-performance, and recommended for production databases.
+- **Bind Mounts (`-v /host/dir:/container/dir`)**: Mounts an arbitrary host directory into the container. Subject to host file permissions; ideal for local development hot-reloading.
+- **Tmpfs Mounts (`--tmpfs /app/cache`)**: Stored exclusively in host system RAM, never written to disk. Ideal for sensitive secrets and high-speed temporary caching.
+
+---
+
+### 45. Docker Compose: Production Healthchecks and Startup Dependencies.
+
+**In Simple Words:**
+Using `depends_on: [db]` only waits for the database container to start running, **not for the database engine to finish initializing!**
+- Use **Healthchecks** with `condition: service_healthy` to ensure the web service starts only after the database is fully ready to accept client connections:
+
+```yaml
+services:
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy # Starts ONLY after pg_isready succeeds!
+```
+
+---
+
+### 46. Multi-Architecture Builds with Docker Buildx.
+
+**In Simple Words:**
+Developers building on Apple Silicon (M1/M2/M3 - `arm64`) must build images compatible with production cloud servers (`amd64` / x86_64).
+- **`docker buildx build --platform linux/amd64,linux/arm64 -t myimage:latest --push .`**:
+  Uses QEMU emulation or remote native builders to compile multi-arch images and creates an OCI Manifest List pointing clients to the correct architecture automatically.
+
+---
+
+### 47. Memory Limits and the Linux Out-Of-Memory (OOM) Killer.
+
+**In Simple Words:**
+If a container has no memory limit (`--memory`), a memory leak will consume all host RAM, prompting the Linux kernel OOM Killer to terminate critical system processes!
+- Set hard limits: `--memory="2g" --memory-swap="2g"`.
+- If the container exceeds 2GB, the kernel OOM Killer terminates only the container process (`Exit Code 137`), protecting the rest of the host infrastructure.
+
+---
+
+### 48. Container Logging Drivers and Log Rotation.
+
+**In Simple Words:**
+By default, Docker writes stdout/stderr logs to JSON files (`json-file`). Without configuration, high-traffic applications generate hundreds of gigabytes of logs, filling up the server hard drive and crashing the host!
+- **Mitigation**: Configure log rotation in `/etc/docker/daemon.json`:
+  `"log-opts": { "max-size": "50m", "max-file": "5" }`
+
+---
+
+### 49. The OCI (Open Container Initiative) Specifications.
+
+**In Simple Words:**
+The OCI is an open governance body standardizing container virtualization:
+1. **Image Spec**: Defines image archive layout, manifests, and layers.
+2. **Runtime Spec (`runc`)**: Defines how to unpack and run an OCI container image using Linux namespaces and cgroups.
+3. Allows Kubernetes to run containers via **containerd** or **CRI-O** without depending on the Docker daemon.
+
+---
+
+### 50. Rootless Docker: Eliminating Privilege Escalation.
+
+**In Simple Words:**
+Standard Docker runs the `dockerd` daemon as host `root`. A user with access to the Docker socket can easily mount the host filesystem and take over the entire server.
+- **Rootless Docker**: Runs the Docker daemon and containers inside a user namespace without root privileges. Even in the event of a container breakout, the attacker only has access to an unprivileged user account on the host.

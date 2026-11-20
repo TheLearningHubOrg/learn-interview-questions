@@ -262,3 +262,192 @@ Marking a recursive function with the `tailrec` modifier informs the compiler to
 ### 35. How does Kotlin Reflection (kotlin-reflect) work and what is its performance overhead?
 **In Simple Words:**
 Kotlin reflection via `KClass`, `KProperty`, and `KFunction` reads Kotlin-specific metadata annotations (`@Metadata`) stored in compiled class bytecode. Because the `kotlin-reflect.jar` adds ~2.5MB and has runtime lookup costs, compile-time alternatives like KSP or Source Generators are strongly preferred in performance-critical code.
+
+
+---
+
+### 36. Kotlin 2.0 K2 Compiler Architecture: Performance improvements and smart cast enhancements.
+
+**In Simple Words:**
+The **K2 Compiler** in Kotlin 2.0 is a complete ground-up rewrite of the compiler frontend:
+- **Unified Pipeline**: Replaces separate compiler frontends for JVM, JS, and Native with a single unified **Frontend Intermediate Representation (FIR)**.
+- **Speed**: Compilation speeds are up to **2x faster**, significantly accelerating Gradle builds.
+- **Smarter Smart Casts**: Can smart cast properties through complex boolean logic, loops, and catch blocks where the legacy K1 compiler would require explicit unsafe casts (`as T`).
+
+---
+
+### 37. Kotlin Multiplatform (KMP): `expect`/`actual` declarations and shared architecture across iOS and Android.
+
+**In Simple Words:**
+KMP allows compiling pure Kotlin business logic (networking, local databases, ViewModels, analytics) to native code across iOS and Android:
+- **Shared Code (`commonMain`)**: Standard Kotlin code shared across all targets.
+- **Platform Bridging (`expect` / `actual`)**:
+  ```kotlin
+  // commonMain
+  expect fun getPlatformName(): String
+
+  // androidMain
+  actual fun getPlatformName(): String = "Android ${Build.VERSION.SDK_INT}"
+
+  // iosMain
+  actual fun getPlatformName(): String = UIDevice.currentDevice.systemName()
+  ```
+- Compiles into native `.aar` for Android and native Apple `.xcframework` for iOS with zero runtime bridge overhead.
+
+---
+
+### 38. Kotlin Coroutines Internals: Continuation-Passing Style (CPS) and State Machine compilation.
+
+**In Simple Words:**
+How does a coroutine "pause" and "resume" without blocking OS threads?
+1. The Kotlin compiler rewrites `suspend` functions into **Continuation-Passing Style (CPS)**, adding a hidden parameter: `Continuation<T>`.
+2. The compiler synthesizes an internal **State Machine class**:
+   - Each suspension point (`await()`, `delay()`) becomes a `case` label inside a `switch(label)` statement.
+   - When a suspension point completes, the runtime invokes `continuation.resumeWith(result)`, re-entering the state machine at the exact next label without allocating new thread stacks.
+
+---
+
+### 39. Coroutine Dispatchers and Context: `Dispatchers.Main`, `Dispatchers.IO`, and `Dispatchers.Default`.
+
+**In Simple Words:**
+- **`Dispatchers.Main`**: Confined to the UI thread (Android Main thread or JavaFX). Essential for UI mutations.
+- **`Dispatchers.IO`**: Designed for blocking I/O (files, networking, database queries). Backed by an elastic thread pool that scales up to 64 threads (or core count).
+- **`Dispatchers.Default`**: Designed for CPU-intensive computational work (sorting massive lists, JSON parsing). Thread pool size is strictly capped at the number of available CPU cores.
+- **`withContext(Dispatchers.IO) { ... }`**: Safely switches execution context and returns result to caller without callback nesting.
+
+---
+
+### 40. Structured Concurrency & Exception Handling: `Job` vs `SupervisorJob` and cancellation propagation.
+
+**In Simple Words:**
+- **Standard `Job`**: Follows strict cascading cancellation. If child coroutine A throws an unhandled exception, it immediately cancels its parent, which in turn cancels all sibling coroutines!
+- **`SupervisorJob`**: Isolates child failures. If child A crashes, child B and the parent continue executing unaffected.
+  - Essential for Android ViewModels (`viewModelScope` uses `SupervisorJob`) so one failed network request does not crash the entire screen.
+- **Cooperative Cancellation**: Coroutines must cooperate with cancellation by periodically checking `isActive` or calling cancellable functions (`delay`, `yield`).
+
+---
+
+### 41. Kotlin Flow Deep Dive: Cold Flows vs Hot Flows (`StateFlow`, `SharedFlow`).
+
+**In Simple Words:**
+- **Cold Flow (`flow { ... }`)**: On-demand stream. Code inside the builder block does not execute until a terminal operator (`collect()`) is called. Each collector gets its own independent execution.
+- **Hot Flows**: Emit values regardless of whether subscribers are currently listening:
+  - **`StateFlow`**: State-holder that retains the **latest single value** (like LiveData). Emits value immediately to new subscribers. Replay cache size = 1.
+  - **`SharedFlow`**: Event-emitter for one-off events (navigation, snackbars). Supports configurable `replay` buffer sizes and emits events to multiple parallel collectors.
+
+---
+
+### 42. Inline Functions, `noinline`, and `crossinline`: Non-local returns and bytecode inlining.
+
+**In Simple Words:**
+Passing lambdas in Kotlin creates runtime `Function` object allocations on the heap:
+- **`inline`**: Instructs the compiler to paste the function's bytecode and the lambda's bytecode directly into the call site, eliminating heap allocations.
+- **Non-Local Returns**: Inlined lambdas can return from the enclosing caller function directly (`return`).
+- **`crossinline`**: Allows inlining while forbidding non-local returns (required when the lambda is executed inside a local object or sub-thread).
+- **`noinline`**: Prevents inlining for specific lambda parameters if they need to be stored in a variable.
+
+---
+
+### 43. Reified Type Parameters (`inline fun <reified T>`): Preserving generic types at runtime.
+
+**In Simple Words:**
+On the JVM, generics undergo **Type Erasure** (e.g. `List<String>` becomes raw `List` at runtime; `T::class.java` fails to compile):
+- **`reified` Modifier**: Combined with `inline`, the compiler replaces occurrences of `T` with the concrete class type directly at the call site:
+  ```kotlin
+  inline fun <reified T> Gson.fromJson(json: String): T {
+    return fromJson(json, T::class.java)
+  }
+  val user: User = gson.fromJson(jsonString)
+  ```
+- Eliminates the need to pass explicit `Class<T>` arguments!
+
+---
+
+### 44. Type Projections & Variance: `out` covariant vs `in` contravariant.
+
+**In Simple Words:**
+- **Covariance (`out T` / Producer)**: Allows subtyping: `List<Dog>` is a subtype of `List<Animal>`.
+  - Can only produce/read `T`; cannot accept `T` as a method parameter.
+- **Contravariance (`in T` / Consumer)**: Inverses subtyping: `Comparable<Animal>` can be used where `Comparable<Dog>` is expected.
+  - Can only accept/write `T`; cannot return `T`.
+- **PECS Rule**: Producer-Extends (`out`), Consumer-Super (`in`).
+
+---
+
+### 45. Kotlin Delegated Properties: `by lazy`, `by Delegates.observable()`, and custom delegates.
+
+**In Simple Words:**
+Delegates property getter and setter logic to an external reusable object:
+- **`by lazy { ... }`**: Computes the value once on first access and caches it thread-safely.
+- **`by Delegates.observable(initialValue) { prop, old, new -> ... }`**: Triggers a callback whenever the property mutates.
+- **Custom Delegate**: Implement `ReadOnlyProperty<R, T>` or `ReadWriteProperty<R, T>` with `getValue` and `setValue` methods.
+
+---
+
+### 46. Scope Functions Matrix: `let`, `run`, `with`, `apply`, `also`.
+
+**In Simple Words:**
+| Function | Context Object | Return Value | Primary Use Case |
+| :--- | :--- | :--- | :--- |
+| **`let`** | `it` | Lambda result | Null-check safety (`user?.let { ... }`) and transformation |
+| **`run`** | `this` | Lambda result | Object configuration and computing a result |
+| **`with`** | `this` | Lambda result | Grouping multiple method calls on a non-null object |
+| **`apply`** | `this` | Context object | Object initialization (configuring builders/views) |
+| **`also`** | `it` | Context object | Additional side effects (logging, debugging intermediate steps) |
+
+---
+
+### 47. Value Classes (`@JvmInline value class`): Zero-allocation domain modeling.
+
+**In Simple Words:**
+Wrapping primitives (e.g. `UserId(val value: Long)`) in standard classes creates heap allocation overhead for millions of IDs:
+```kotlin
+@JvmInline
+value class UserId(val id: Long)
+```
+- **Compile-Time**: Provides strict type safety (cannot accidentally pass an `OrderId` into a function expecting a `UserId`).
+- **Runtime**: The JVM compiler strips the wrapper and passes raw primitive `long` values in registers with **zero heap memory allocation**!
+
+---
+
+### 48. Sealed Classes and Sealed Interfaces: Algebraic Data Types and pattern matching.
+
+**In Simple Words:**
+Restricts inheritance to subclasses declared within the same package and compilation module:
+```kotlin
+sealed interface NetworkState<out T> {
+  data object Loading : NetworkState<Nothing>
+  data class Success<T>(val data: T) : NetworkState<T>
+  data class Error(val exception: Throwable) : NetworkState<Nothing>
+}
+```
+- **Exhaustive `when`**: The compiler verifies that all cases are covered. No `else` branch is needed; if a new subclass is added, the compiler flags all unhandled `when` statements as errors.
+
+---
+
+### 49. Contract DSL in Kotlin: Teaching the compiler custom smart-casting rules.
+
+**In Simple Words:**
+Custom helper functions (e.g. `isNotNullOrEmpty()`) usually defeat the compiler's native smart-casting. **Contracts** inform the compiler of custom guarantees:
+```kotlin
+import kotlin.contracts.*
+
+fun requireValidUser(user: User?) {
+  contract {
+    returns() implies (user != null)
+  }
+  if (user == null) throw IllegalArgumentException()
+}
+```
+- After calling `requireValidUser(user)`, the compiler automatically smart-casts `user` to non-nullable `User` in subsequent lines!
+
+---
+
+### 50. Java Interoperability Annotations: `@JvmStatic`, `@JvmOverloads`, `@JvmField`.
+
+**In Simple Words:**
+Ensuring Kotlin code looks idiomatic when called from legacy Java codebases:
+- **`@JvmStatic`**: Generates a real static method on the companion object class in JVM bytecode.
+- **`@JvmOverloads`**: Generates multiple overloaded Java methods for Kotlin functions with default parameter values.
+- **`@JvmField`**: Exposes a property as a public field without generating getters and setters.
+- **`@file:JvmName("StringUtils")`**: Customizes the generated Java class name for top-level functions.

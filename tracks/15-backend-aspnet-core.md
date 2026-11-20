@@ -455,3 +455,178 @@ A high-performance RPC framework using **Protocol Buffers (protobuf)** binary se
 - Ideal for internal service-to-service microservice communication.
 
 ---
+
+---
+
+### 36. Minimal APIs vs Controller-Based APIs in ASP.NET Core.
+
+**In Simple Words:**
+- **Controllers (`[ApiController]`)**: Traditional approach. Uses reflection, model binding filters, and attribute routing. Organizes code in distinct controller classes.
+- **Minimal APIs (`app.MapGet(...)`)**: Introduced in .NET 6/7. Eliminates controller boilerplate and reflection overhead. Endpoints map directly to lambda expressions, improving startup performance and delivering up to 30% higher requests per second.
+- **Endpoint Filters (`AddEndpointFilter`)**: Intercepts requests on Minimal APIs for validation, logging, and metrics without creating complex controller action filters.
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.MapGet("/api/users/{id}", async (int id, IUserService userService) =>
+{
+    var user = await userService.GetByIdAsync(id);
+    return user is not null ? Results.Ok(user) : Results.NotFound();
+}).AddEndpointFilter(async (context, next) => {
+    // Reusable Minimal API filter
+    return await next(context);
+});
+
+app.Run();
+```
+
+---
+
+### 37. The Middleware Pipeline: Execution Order and Short-Circuiting.
+
+**In Simple Words:**
+ASP.NET Core processes requests through a bidirectional pipeline of middleware components:
+1. **Russian-Doll Model**: Each middleware executes logic before invoking `await next()`, passing control down the chain, and executes post-processing logic as the response unwinds.
+2. **Short-Circuiting**: If a middleware terminates the chain without calling `next()` (e.g. Authentication middleware rejecting an unauthenticated request with 401), downstream controllers/endpoints are **never executed**, saving server CPU resources.
+3. **Order Matters**: `UseExceptionHandler` -> `UseHsts` -> `UseRouting` -> `UseAuthentication` -> `UseAuthorization` -> `UseEndpoints`.
+
+---
+
+### 38. Kestrel Web Server Internals and Socket Transport.
+
+**In Simple Words:**
+**Kestrel** is the default cross-platform web server for ASP.NET Core:
+- Built on high-performance socket transport using Linux `epoll` and Windows `I/O Completion Ports (IOCP)`.
+- Uses `System.IO.Pipelines` to read and parse HTTP/1.1, HTTP/2, and HTTP/3 packets directly into pinned memory buffers without intermediate heap allocations.
+- Routinely ranks among the fastest web servers in the world in independent TechEmpower benchmarks.
+
+---
+
+### 39. Policy-Based Authorization: Requirements and Handlers.
+
+**In Simple Words:**
+Beyond simple role checks (`[Authorize(Roles = "Admin")]`), policy-based authorization decouples permissions from business logic:
+- **Policy**: Composed of one or more **Requirements** (e.g. `MinimumAgeRequirement(21)`).
+- **Handler (`AuthorizationHandler<T>`)**: Contains evaluation logic (e.g. checking user claims, inspecting database records). If condition is met, calls `context.Succeed(requirement)`.
+
+```csharp
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("CanEditArticle", policy =>
+        policy.Requirements.Add(new MinimumRankRequirement(Rank.SeniorEditor)));
+});
+```
+
+---
+
+### 40. Native Rate Limiting Middleware in .NET 7/8+.
+
+**In Simple Words:**
+Built-in rate limiting (`Microsoft.AspNetCore.RateLimiting`) protects endpoints from denial-of-service without external proxies:
+1. **Fixed Window**: Allows $N$ requests per calendar interval.
+2. **Sliding Window**: Smooths out traffic spikes across window segments.
+3. **Token Bucket**: Accumulates tokens up to a capacity and replenishes continuously; permits bursts while enforcing long-term limits.
+4. **Concurrency Limiter**: Limits the number of concurrent in-flight requests executing simultaneously.
+
+```csharp
+app.UseRateLimiter(new RateLimiterOptions()
+    .AddTokenBucketLimiter("api-policy", options => {
+        options.TokenLimit = 100;
+        options.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+        options.TokensPerPeriod = 20;
+    }));
+```
+
+---
+
+### 41. Output Caching vs Response Caching.
+
+**In Simple Words:**
+- **Response Caching (`UseResponseCaching`)**: Relies on HTTP headers (`Cache-Control`) respected by browser or proxy caches. Lacks server-side invalidation.
+- **Output Caching (`UseOutputCache` - .NET 7+)**: Enterprise server-side caching. Caches full rendered responses in RAM or Redis. Supports **Cache Tagging** (`Tag("products")`) and programmatic eviction (`evictByTag("products")`) when underlying data updates!
+
+---
+
+### 42. Background Tasks and Hosted Services with Channels.
+
+**In Simple Words:**
+- **`BackgroundService`**: Base class implementing `IHostedService` to run long-running background loops.
+- **`System.Threading.Channels`**: High-performance, lock-free producer-consumer queue in memory. Web controllers push background tasks (e.g. sending emails, generating reports) into a channel, and a `BackgroundService` consumes and processes items asynchronously without blocking user requests.
+
+---
+
+### 43. Entity Framework Core Performance: `AsNoTracking` and Split Queries.
+
+**In Simple Words:**
+1. **`AsNoTracking()`**: Tells EF Core not to cache entities in the `ChangeTracker`. Reduces memory consumption by 50% and speeds up read queries by 2-3x!
+2. **Split Queries (`AsSplitQuery()`)**: When loading multiple child collections (`.Include(o => o.Items).Include(o => o.Notes)`), relational databases produce Cartesian product duplication. `.AsSplitQuery()` generates separate SQL queries per collection, eliminating explosive row duplication.
+
+---
+
+### 44. Enterprise Health Checks: Readiness vs Liveness Probes.
+
+**In Simple Words:**
+Configured via `services.AddHealthChecks()`:
+- **Liveness Probe (`/healthz/live`)**: Reports if the process is running. If it fails, Kubernetes kills and restarts the pod container.
+- **Readiness Probe (`/healthz/ready`)**: Reports if the application is ready to accept user traffic (verifies database connections, Redis pings, and Kafka broker reachability). If it fails, Kubernetes stops routing traffic to the pod until it recovers.
+
+---
+
+### 45. Real-Time Communication with SignalR and Redis Backplane.
+
+**In Simple Words:**
+**SignalR** provides bidirectional real-time communication between server and clients:
+- Automatically negotiates best transport: **WebSockets** -> **Server-Sent Events** -> **Long Polling**.
+- **Redis Backplane**: In scaled environments with multiple web servers, Client A on Server 1 and Client B on Server 2 communicate via a Redis Pub/Sub backplane that distributes hub messages across all server instances.
+
+---
+
+### 46. FluentValidation vs DataAnnotations in ASP.NET Core.
+
+**In Simple Words:**
+- **DataAnnotations (`[Required]`, `[EmailAddress]`)**: Inlines validation rules as attributes on model classes. Tightly couples validation logic with data models and makes complex cross-field validation awkward.
+- **FluentValidation**: Separates validation rules into dedicated classes (`AbstractValidator<UserDTO>`). Supports dependency injection, conditional rules (`When(...)`), and clean unit testing.
+
+---
+
+### 47. Resilient HTTP Clients with Polly Resilience Pipelines.
+
+**In Simple Words:**
+Calling external microservices using raw `HttpClient` risks socket exhaustion and cascading outages.
+- **`IHttpClientFactory`**: Manages underlying `HttpMessageHandler` lifetimes to prevent DNS caching bugs and socket exhaustion.
+- **Polly Resilience Pipelines (.NET 8+)**: Composes retries with exponential backoff, circuit breakers, and rate limiters into a single fluent pipeline.
+
+```csharp
+builder.Services.AddHttpClient("PaymentService")
+    .AddStandardResilienceHandler(options => {
+        options.Retry.MaxRetryAttempts = 3;
+        options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
+    });
+```
+
+---
+
+### 48. Standardized Error Handling with Problem Details (RFC 7807).
+
+**In Simple Words:**
+**Problem Details (RFC 7807)** is an IETF standard defining a consistent JSON structure for HTTP error responses:
+- Includes `type`, `title`, `status`, `detail`, and `instance`.
+- In .NET 7/8+, `builder.Services.AddProblemDetails()` automatically formats all unhandled exceptions and validation errors into compliant RFC 7807 payloads.
+
+---
+
+### 49. Configuration & Options Pattern: `IOptions` vs `IOptionsSnapshot` vs `IOptionsMonitor`.
+
+**In Simple Words:**
+- **`IOptions<T>`**: Singleton lifetime. Evaluates configuration once on application startup. Does not reflect changes to `appsettings.json` without app restart.
+- **`IOptionsSnapshot<T>`**: Scoped lifetime. Re-evaluates configuration per HTTP request; reflects live changes in `appsettings.json`.
+- **`IOptionsMonitor<T>`**: Singleton lifetime. Listens for live file changes on disk and notifies via `OnChange()` events.
+
+---
+
+### 50. Multi-Tenant Architecture in ASP.NET Core.
+
+**In Simple Words:**
+1. **Database-per-Tenant**: Highest security isolation. Middleware resolves tenant from subdomain/header and dynamically configures EF Core connection string per request.
+2. **Schema-per-Tenant**: Shared database, separate schema per tenant.
+3. **Shared Database with Discriminator Column**: All tenants share tables with a `TenantId` column. Configured with EF Core **Global Query Filters** (`modelBuilder.Entity<T>().HasQueryFilter(e => e.TenantId == _currentTenantId)`), automatically preventing cross-tenant data leaks across all queries!

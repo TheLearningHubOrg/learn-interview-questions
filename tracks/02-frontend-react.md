@@ -863,7 +863,14 @@ Now React compares the Virtual DOM with Real DOM. It finds out the changed nodes
 ---
 
 ### 29. Does the lazy function support named exports?
-No, currently `React.la
+No, `React.lazy` currently supports default exports only. If the component you want to import is exported using named exports, you can create an intermediate module that re-exports it as the default, or resolve it using `.then()` on the dynamic import promise:
+
+```jsx
+// Resolving a named export with React.lazy
+const MyComponent = React.lazy(() =>
+  import('./MyComponents').then(module => ({ default: module.MyComponent }))
+);
+```
 
 ### 30. Why React uses className over class attribute?
 React uses **className** instead of **class** because of a JavaScript naming conflict with the class keyword.
@@ -1361,7 +1368,19 @@ const ComponentB = ({ isDisplay, ...domProps }) => (
 ---
 
 ### 48. How do you memoize a component?
-There are memoi
+In React, you can memoize a functional component using `React.memo()`. It wraps your component to prevent unnecessary re-renders if its props have not changed (via shallow comparison):
+
+```jsx
+import React from 'react';
+
+const UserProfile = React.memo(function UserProfile({ name, role }) {
+  return <div>{name} ({role})</div>;
+});
+
+export default UserProfile;
+```
+
+For class components, you can extend `React.PureComponent` which automatically implements `shouldComponentUpdate()` with a shallow prop and state comparison.
 
 ### 49. How you implement Server Side Rendering or SSR?
 React is already equipped to handle rendering on Node servers. A special version of the DOM renderer is available, which follows the same pattern as on the client side.
@@ -2254,10 +2273,24 @@ render() {
 
 
 
-#### React Internationali
+#### React Internationalization
 
 ### 89. What is React Intl?
-The _React Intl_ library makes internationali
+**React Intl** is an open-source internationalization (i18n) library created by FormatJS for React applications. It provides React components and an API to format dates, numbers, strings, and handle pluralization across different languages and locales.
+
+```jsx
+import { FormattedMessage, IntlProvider } from 'react-intl';
+
+function App() {
+  return (
+    <IntlProvider locale="en" defaultLocale="en">
+      <h1>
+        <FormattedMessage id="greeting" defaultMessage="Welcome back, {name}!" values={{ name: 'Alex' }} />
+      </h1>
+    </IntlProvider>
+  );
+}
+```
 
 ### 90. What are the main features of React Intl?
 Below are the main features of React Intl,
@@ -3473,16 +3506,36 @@ Redux is originally written in ES6 and transpiled for production into ES5 with W
 ---
 
 ### 155. How Redux Form initialValues get updated from state?
-You need to add `enableReinitiali
+In Redux Form, to re-initialize form fields when the Redux store state changes (for example, after fetching data asynchronously), you set the `enableReinitialize: true` configuration flag when wrapping your component with `reduxForm()`:
+
+```jsx
+import { reduxForm } from 'redux-form';
+
+let EditUserForm = (props) => {
+  const { handleSubmit } = props;
+  return <form onSubmit={handleSubmit}>...</form>;
+};
+
+EditUserForm = reduxForm({
+  form: 'editUser',
+  enableReinitialize: true, // Automatically reinitializes when initialValues prop changes
+})(EditUserForm);
+
+export default EditUserForm;
+```
+
+---
 
 ### 156. How React PropTypes allow different types for one prop?
-You can use `oneOfType()` method of `PropTypes`.
+You can use the `oneOfType()` method of `PropTypes`.
 
 For example, the height property can be defined with either `string` or `number` type as below:
 
 ```javascript
 Component.propTypes = {
-si
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+```
 
 ### 157. Can I import an SVG file as react component?
 You can import SVG directly as component instead of loading it as a file. This feature is available with `react-scripts@2.0.0` and higher.
@@ -3576,7 +3629,21 @@ const MyComponent = React.memo(function MyComponent(props) {
 ---
 
 ### 163. What is React lazy function?
-The `React.la
+The `React.lazy()` function lets you render a dynamic import as a regular component. This enables code-splitting by loading the bundle containing the component only when it is actually rendered on screen. It must be wrapped inside a `React.Suspense` boundary:
+
+```jsx
+import React, { Suspense, lazy } from 'react';
+
+const HeavyComponent = lazy(() => import('./HeavyComponent'));
+
+function MyPage() {
+  return (
+    <Suspense fallback={<div>Loading component...</div>}>
+      <HeavyComponent />
+    </Suspense>
+  );
+}
+```
 
 ### 164. How to prevent unnecessary updates using setState?
 You can compare the current value of the state with an existing state value and decide whether to rerender the page or not. If the values are the same then you need to return **null** to stop re-rendering otherwise return the latest state value.
@@ -4370,19 +4437,54 @@ console.log(math.add(10, 20));
 ---
 
 ### 196. What are loadable components?
-With the release of React 18, React.la
+**Loadable Components** (`@loadable/component`) is a code-splitting library for React that supports Server-Side Rendering (SSR). While `React.lazy` was originally designed for client-side rendering, Loadable Components allows dynamic chunk imports with full SSR support, preloading capabilities, and automatic script collection for hydration.
+
+```jsx
+import loadable from '@loadable/component';
+
+const OtherComponent = loadable(() => import('./OtherComponent'), {
+  fallback: <div>Loading...</div>,
+});
+
+function MyComponent() {
+  return <OtherComponent />;
+}
+```
+
+---
 
 ### 197. What is suspense component?
 React Suspense is a built-in feature that lets you delay rendering part of the UI until asynchronous work (such as loading a component or fetching data) is ready. While waiting, React shows a fallback UI (loading text, skeleton, spinner, etc.) defined by the nearest `<Suspense>` boundary.
 
 Common use cases:
+1. **Code splitting with `React.lazy`**: Displays a fallback while the dynamic chunk script downloads.
+2. **Data fetching (with Suspense-enabled frameworks)**: Delays rendering until asynchronous server data is available.
 
-1. **Code splitting with `React.la
+---
 
 ### 198. What is route based code splitting?
-One of the best place to do code splitting is with routes. The entire page is going to re-render at once so users are unlikely to interact with other elements in the page at the same time. Due to this, the user experience won't be disturbed.
+One of the best places to do code splitting is with routes. The entire page is going to re-render at once so users are unlikely to interact with other elements in the page at the same time. Due to this, the user experience won't be disturbed.
 
-Let us take an example of route based website using libraries like React Router with React.la
+Let us take an example of a route-based website using libraries like React Router with `React.lazy`:
+
+```jsx
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+const Home = lazy(() => import('./routes/Home'));
+const About = lazy(() => import('./routes/About'));
+
+const App = () => (
+  <Router>
+    <Suspense fallback={<div>Loading route...</div>}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </Suspense>
+  </Router>
+);
+```
 
 ### 199. What is the purpose of default value in context?
 The defaultValue argument is only used when a component does not have a matching Provider above it in the tree. This can be helpful for testing components in isolation without wrapping them.
@@ -6221,7 +6323,22 @@ app/
 ---
 
 ### 268. Can you describe the useMemo() Hook?
-The `useMemo()` Hook in React is used to **optimi
+The `useMemo()` Hook in React is used to optimize performance by caching the result of an expensive calculation between re-renders. It takes a calculate function and a list of dependencies, re-computing the value only when one of the dependencies has changed:
+
+```jsx
+import React, { useMemo } from 'react';
+
+function ProductList({ products, filterQuery }) {
+  // Re-computes filtered list only when products or filterQuery change
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => p.name.toLowerCase().includes(filterQuery.toLowerCase()));
+  }, [products, filterQuery]);
+
+  return <ul>{filteredProducts.map(p => <li key={p.id}>{p.name}</li>)}</ul>;
+}
+```
+
+---
 
 ### 269. Can Hooks be used in class components?
 No, Hooks cannot be used inside class components. They are specially designed for function components. This is because hooks depend on the sequence in which they are called during a component’s render, something that's only guaranteed in functional components. However, both class and function components can coexist in the same application.
@@ -7133,17 +7250,47 @@ The useImperativeHandler hook will be used in below cases:
 ---
 
 ### 302. How is useMemo different from useCallback?
-The following table compares both useMemo and useCallback:
+The following table compares both `useMemo` and `useCallback`:
 
 | Feature | `useMemo` | `useCallback` |
-| --- | --- | --- |
-| **Purpose** | Memoi
+| :--- | :--- | :--- |
+| **Purpose** | Memoizes the calculated result of a function | Memoizes the callback function instance itself |
+| **Returns** | The computed value (`fn()`) | The function definition (`fn`) |
+| **Use Case** | Expensive computations (sorting, filtering large lists) | Passing stable callbacks to optimized child components (`React.memo`) |
+| **Syntax** | `const val = useMemo(() => compute(), [deps])` | `const fn = useCallback(() => handler(), [deps])` |
+
+---
 
 ### 303. Does useMemo prevent re-rendering of child components?
-The `useMemo` hook **does not directly prevent re-rendering of child components**. Its main purpose is to memoi
+The `useMemo` hook **does not directly prevent re-rendering of child components**. Its main purpose is to memoize expensive computations. However, it can indirectly prevent child re-renders when memoizing a complex object or array passed as props to a child wrapped in `React.memo`, preserving referential equality between renders.
+
+---
 
 ### 304. What is useCallback and why is it used?
-The `useCallback` is a React Hook used to memoi
+The `useCallback` is a React Hook used to memoize callback functions across renders. It prevents unnecessary re-renders of optimized child components (`React.memo`) that rely on reference equality of function props:
+
+```jsx
+import React, { useState, useCallback } from 'react';
+
+function Parent() {
+  const [count, setCount] = useState(0);
+
+  // Function reference is preserved unless dependencies change
+  const handleClick = useCallback(() => {
+    console.log('Button clicked');
+  }, []);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(c => c + 1)}>Increment</button>
+      <MemoizedChild onClick={handleClick} />
+    </div>
+  );
+}
+```
+
+---
 
 ### 305. What are Custom React Hooks, and How Can You Develop One?
 **Custom Hooks** in React are JavaScript functions that allow you to **extract and reuse component logic** using React’s built-in Hooks like `useState`, `useEffect`, etc.
@@ -8485,7 +8632,25 @@ The primary use case for `isMounted()` is to avoid calling `setState()` after a 
 ---
 
 ### 350. What is the difference between constructor and getInitialState?
-You should initiali
+- **`constructor`**: Used in ES6 class components (`class MyComponent extends React.Component`) to initialize local component state by assigning an object to `this.state` and to bind event handler methods.
+- **`getInitialState`**: Used in legacy `React.createClass()` components to return the initial state object.
+
+In modern React functional components, both are superseded by the `useState()` Hook (`const [state, setState] = useState(initialValue)`).
+
+```jsx
+// Modern Functional Component (Standard):
+const [user, setUser] = useState({ name: 'Alex' });
+
+// ES6 Class Component:
+class UserProfile extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { name: 'Alex' };
+  }
+}
+```
+
+---
 
 ### 351. Can you force a component to re-render without calling setState?
 By default, when your component's state or props change, your component will re-render. If your `render()` method depends on some other data, you can tell React that the component needs re-rendering by calling `forceUpdate()`.

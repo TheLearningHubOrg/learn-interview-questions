@@ -490,3 +490,240 @@ export const cartTotal = computed(cartItems, (items) =>
 - **Choose Next.js when**: The team is deeply invested in the React ecosystem or requires React Native cross-platform code sharing.
 - **Avoid Gatsby**: Outdated architecture with slow build times and heavy client-side GraphQL runtime overhead.
 
+
+---
+
+### 36. Astro Client Directives: `client:load`, `client:idle`, `client:visible`, `client:media`, and `client:only`.
+
+**In Simple Words:**
+By default, Astro renders all UI components (React, Vue, Svelte) to pure, zero-JavaScript HTML at build/server time. **Client Directives** selectively tell Astro when to send JavaScript to hydrate an Island in the browser:
+- **`client:load`**: High-priority; hydrates immediately when page finishes loading (navigation bars, critical search inputs).
+- **`client:idle`**: Low-priority; hydrates once the browser's main thread is idle (`requestIdleCallback`).
+- **`client:visible`**: Hydrates only when the element scrolls into the user's viewport (`IntersectionObserver`), perfect for footers, comments, and below-the-fold carousels.
+- **`client:media="(max-width: 768px)"`**: Hydrates only if a CSS media query matches.
+- **`client:only="react"`**: Skips server rendering completely and renders solely on the client.
+
+```astro
+<!-- Hydration Directives in Astro -->
+<Header client:load />
+<ProductFilter client:idle />
+<CustomerReviews client:visible />
+<MobileNav client:media="(max-width: 640px)" />
+```
+
+---
+
+### 37. Astro Content Collections & Type-Safe Schemas with Zod.
+
+**In Simple Words:**
+Content Collections organize Markdown, MDX, or JSON files inside `src/content/`. By defining a schema in `src/content/config.ts` using **Zod**, Astro validates frontmatter properties at build time, preventing runtime bugs and generating auto-complete TypeScript types for posts.
+
+```typescript
+// src/content/config.ts
+import { defineCollection, z } from 'astro:content';
+
+const blog = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string().max(160),
+    pubDate: z.date(),
+    author: z.string().default('Editorial Team'),
+    tags: z.array(z.string()),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { blog };
+```
+
+---
+
+### 38. Astro Hybrid Rendering: `output: 'hybrid'` and `prerender = true/false`.
+
+**In Simple Words:**
+In Astro, you don't have to choose between a 100% static site or a 100% dynamic server:
+- **`output: 'static'`**: Pure Static Site Generation (SSG).
+- **`output: 'hybrid'`**: Everything is pre-rendered static by default. Individual dynamic routes opt out with `export const prerender = false;`.
+- **`output: 'server'`**: Everything is Server-Side Rendered (SSR) by default. Static pages opt into pre-rendering with `export const prerender = true;`.
+
+```astro
+---
+// src/routes/dashboard.astro (Inside hybrid mode)
+// Opts this specific page into real-time server rendering
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/login');
+---
+<h1>Welcome back, {user.name}</h1>
+```
+
+---
+
+### 39. Astro Actions (Astro 4.8+): Type-Safe Server Mutations with Zod.
+
+**In Simple Words:**
+Astro Actions (`src/actions/index.ts`) provide type-safe backend RPC calls directly from Astro components or client scripts. They automatically validate input using Zod, handle errors, and return type-safe results.
+
+```typescript
+// src/actions/index.ts
+import { defineAction } from 'astro:actions';
+import { z } from 'astro:schema';
+
+export const server = {
+  subscribeNewsletter: defineAction({
+    input: z.object({ email: z.string().email() }),
+    handler: async ({ email }) => {
+      await db.subscribers.insert({ email });
+      return { success: true };
+    }
+  })
+};
+```
+
+---
+
+### 40. View Transitions in Astro: Client Router and State Persistence.
+
+**In Simple Words:**
+By adding `<ViewTransitions />` from `astro:transitions` into your root layout `<head>`, Astro transforms multi-page navigation into a single-page app (SPA) experience:
+- It intercepts link clicks, fetches the next page HTML, and morphs the DOM using the browser's native View Transitions API.
+- **`transition:persist`**: Keeps an interactive Island component mounted across page navigations (e.g. an audio/video player that continues playing without pausing!).
+
+```astro
+---
+// src/layouts/BaseLayout.astro
+import { ViewTransitions } from 'astro:transitions';
+---
+<html>
+  <head>
+    <ViewTransitions />
+  </head>
+  <body>
+    <!-- Persistent audio player survives route changes without stopping playback -->
+    <AudioPlayer client:load transition:persist />
+    <slot />
+  </body>
+</html>
+```
+
+---
+
+### 41. Image Optimization with Astro's `<Image />` and `<Picture />`.
+
+**In Simple Words:**
+The `astro:assets` module automatically optimizes images:
+1. Resizes local images to required dimensions at build time.
+2. Converts formats to modern `.webp` or `.avif`.
+3. Auto-calculates `width`, `height`, and `aspect-ratio` to eliminate Cumulative Layout Shift (CLS).
+
+```astro
+---
+import { Image } from 'astro:assets';
+import heroImg from '../assets/hero.png';
+---
+<!-- Automatically generates srcset, webp conversion, and prevents layout shift -->
+<Image src={heroImg} alt="Interview Hub Banner" width={800} quality="high" />
+```
+
+---
+
+### 42. Astro Middleware: Request Interception and `Astro.locals`.
+
+**In Simple Words:**
+Middleware (`src/middleware.ts`) runs before every request on SSR pages. It intercepts the `APIContext`, mutates `context.locals` to pass authenticated user data down to components, or returns an early `Response` / redirect.
+
+```typescript
+// src/middleware.ts
+import { defineMiddleware } from 'astro:middleware';
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  const sessionToken = context.cookies.get('session')?.value;
+  if (sessionToken) {
+    context.locals.user = await verifyUserSession(sessionToken);
+  }
+  return next();
+});
+```
+
+---
+
+### 43. Multi-Framework Integration: Mixing React, Vue, Svelte, and Solid.
+
+**In Simple Words:**
+Astro allows using multiple UI frameworks in the exact same application. Astro treats each framework as an independent Island:
+- You can write a React complex data grid (`client:load`), a Vue checkout cart (`client:idle`), and a Svelte interactive slider on the same page!
+- Islands communicate with each other using standard browser events (`CustomEvent`) or lightweight reactive stores like **Nano Stores**.
+
+---
+
+### 44. Dynamic Routing & `getStaticPaths()` in Astro.
+
+**In Simple Words:**
+In static mode (`output: 'static'`), dynamic routes (`src/pages/posts/[slug].astro`) must export a `getStaticPaths()` function returning an array of all parameters and props to pre-render at build time.
+
+```astro
+---
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: { post }
+  }));
+}
+const { post } = Astro.props;
+---
+<h1>{post.data.title}</h1>
+```
+
+---
+
+### 45. Astro DB: Built-in Edge-Ready Relational Database.
+
+**In Simple Words:**
+Astro DB is a fully managed, embedded SQL database built on LibSQL (SQLite fork) configured directly inside Astro projects:
+- Schemas are declared in `db/config.ts`.
+- Supports type-safe ORM queries with zero configuration using `import { db, eq, User } from 'astro:db'`.
+
+---
+
+### 46. Astro SSR Adapters: Deploying to Edge and Node Runtimes.
+
+**In Simple Words:**
+To deploy an SSR or Hybrid Astro site, you install an official adapter in `astro.config.mjs`:
+- `@astrojs/node`: Generates a standalone Node.js server.
+- `@astrojs/vercel`: Deploys as Vercel Edge / Serverless Functions.
+- `@astrojs/cloudflare`: Compiles for Cloudflare Workers/Pages with Edge KV and D1 support.
+
+---
+
+### 47. Scoped CSS vs Global CSS in Astro.
+
+**In Simple Words:**
+Astro styles in `<style>` blocks are **scoped by default** using generated data-attribute hashes (`data-astro-cid-xxx`), preventing CSS leaks.
+- To style child elements or inject global classes, use `<style is:global>` or the `:global()` selector wrapper.
+
+---
+
+### 48. Automated RSS and Sitemap Generation in Astro.
+
+**In Simple Words:**
+- `@astrojs/sitemap`: Automatically crawls all generated routes at build time and outputs a standards-compliant `sitemap-index.xml` and `sitemap-0.xml`.
+- `@astrojs/rss`: Generates an RSS 2.0 feed endpoint from Content Collections for feed readers.
+
+---
+
+### 49. Security in Astro: Origin Checking and `astro:env`.
+
+**In Simple Words:**
+Astro provides enterprise security features:
+1. **CSRF Protection**: In SSR form submissions, Astro automatically checks the `Origin` header against the host domain to block cross-site request forgery attacks.
+2. **Type-Safe Environment Variables (`astro:env`)**: Declares environment schema in `astro.config.mjs` with strict client/server access rules.
+
+---
+
+### 50. Astro Build Pipeline: HTML Streaming and Vite Architecture.
+
+**In Simple Words:**
+Astro builds on top of Vite for bundling and Rollup for asset optimization. During SSR execution, Astro uses **HTML Streaming**: it streams the `<head>` and top HTML immediately to the browser before awaiting slow backend data fetches, optimizing Time-to-First-Byte (TTFB) and First Contentful Paint (FCP).

@@ -342,3 +342,157 @@ Columns whose values are calculated dynamically from an expression:
 - **Migrate to PostgreSQL**: Complex analytical queries, rich native JSON querying, PostGIS geospatial indexing, full outer joins, and advanced data types.
 - **Migrate to Distributed SQL (CockroachDB / TiDB / Spanner)**: When a single write-primary node exceeds physical hardware limits (CPU, disk I/O) and requires transparent horizontal multi-node sharding with ACID consistency.
 `;
+
+---
+
+### 36. InnoDB Storage Engine Architecture: Buffer Pool, Redo Log, and Undo Log.
+
+**In Simple Words:**
+InnoDB is MySQL's default ACID storage engine:
+1. **InnoDB Buffer Pool**: RAM cache holding data and index pages in memory. Modified pages are marked as "dirty" and flushed to disk asynchronously.
+2. **Redo Log (WAL)**: Circular disk buffer that records physical changes before modifying table files. If the server crashes, InnoDB replays the Redo Log during crash recovery to guarantee Durability (ACID).
+3. **Undo Log**: Stores historical copies of data rows before modification, enabling MVCC consistent non-blocking reads and transaction rollback.
+4. **Doublewrite Buffer**: Writes pages to a contiguous disk area before writing to final data files, preventing page corruption from partial OS writes during power failure.
+
+---
+
+### 37. Clustered Index vs Secondary Indexes in InnoDB.
+
+**In Simple Words:**
+In InnoDB, data storage is organized directly around the **Primary Key**:
+- **Clustered Index**: The table itself is physically ordered and stored as a B+ Tree keyed by the Primary Key. Leaf nodes contain the complete row data.
+- **Secondary Index**: Leaf nodes do **not** store full row data or physical disk pointers; they store the **Primary Key value**.
+- **Double Lookup**: Searching by a secondary index looks up the Primary Key in the secondary index tree, then traverses the Clustered Index tree to fetch the full row (unless using a Covering Index).
+
+---
+
+### 38. InnoDB Locking: Record Locks, Gap Locks, and Next-Key Locks.
+
+**In Simple Words:**
+To prevent **Phantom Reads** under the default `REPEATABLE READ` isolation level, InnoDB uses three locking mechanisms:
+1. **Record Lock**: Locks a specific existing index record (`WHERE id = 5 FOR UPDATE`).
+2. **Gap Lock**: Locks the empty gap between index records (or before the first / after the last record) to prevent other transactions from inserting new rows into the gap.
+3. **Next-Key Lock**: Combination of a Record Lock on the index record plus a Gap Lock on the gap preceding it.
+
+```sql
+-- Next-Key Lock example
+-- If rows exist with id=10 and id=20, this query locks the record 20 AND the gap (10, 20],
+-- blocking any concurrent INSERT of id=15!
+SELECT * FROM orders WHERE id = 20 FOR UPDATE;
+```
+
+---
+
+### 39. MySQL Replication: Asynchronous vs Semi-Synchronous vs Group Replication.
+
+**In Simple Words:**
+- **Asynchronous Replication (Default)**: Primary commits transactions and writes to binlog without waiting for replicas. High throughput, but risk of data loss if Primary fails before binlog ships.
+- **Semi-Synchronous Replication**: Primary commits only after at least one replica confirms receiving and persisting the event to its Relay Log. Zero data loss for committed transactions.
+- **Group Replication (MGR / InnoDB Cluster)**: Multi-master / Single-master synchronous replication using the Paxos consensus algorithm with automated failover and network split-brain protection.
+
+---
+
+### 40. Global Transaction Identifiers (GTID) in MySQL.
+
+**In Simple Words:**
+Older MySQL replication required specifying binary log file names and integer offsets (`binlog.000004:10423`). **GTID** assigns a unique cluster-wide identifier to every committed transaction (`UUID:Transaction_ID`):
+- Replicas auto-negotiate replication position using `CHANGE REPLICATION SOURCE TO SOURCE_AUTO_POSITION = 1;`.
+- Dramatically simplifies automated failover and promoting a replica to new Primary without calculating log byte offsets.
+
+---
+
+### 41. MySQL Binary Log (Binlog) Formats: `ROW` vs `STATEMENT` vs `MIXED`.
+
+**In Simple Words:**
+The binlog records database modifications for replication and Point-In-Time Recovery:
+- **`STATEMENT`**: Records raw SQL queries. Non-deterministic functions (`NOW()`, `UUID()`, `RAND()`) can produce different results on replicas!
+- **`ROW` (Modern Default)**: Records the exact before-and-after binary row images. Safe, deterministic, and recommended for all modern production systems.
+- **`MIXED`**: Uses statement format by default, switching to row format for non-deterministic queries.
+
+---
+
+### 42. Online DDL in MySQL 8.0: `ALGORITHM=INPLACE` vs `ALGORITHM=COPY`.
+
+**In Simple Words:**
+When running schema migrations (`ALTER TABLE`):
+- **`ALGORITHM=COPY`**: Creates a temporary table copy, copies all rows, locks writes, and swaps tables. High disk usage and long write locks.
+- **`ALGORITHM=INPLACE`**: Modifies the table directly without rebuilding the entire file or blocking concurrent `DML` (`SELECT`, `INSERT`, `UPDATE`), enabling zero-downtime index creation and column additions.
+
+```sql
+-- Online non-blocking index creation
+ALTER TABLE users ADD INDEX idx_status (status), ALGORITHM=INPLACE, LOCK=NONE;
+```
+
+---
+
+### 43. Invisible Indexes and Descending Indexes in MySQL 8.0.
+
+**In Simple Words:**
+- **Invisible Indexes**: You can toggle an index invisible to the query optimizer (`ALTER TABLE t ALTER INDEX idx INVISIBLE;`) to safely test if removing it degrades performance before executing an irreversible drop.
+- **Descending Indexes**: Prior to MySQL 8.0, indexes were stored in ascending order only. Descending indexes (`CREATE INDEX idx ON orders (created_at DESC);`) optimize queries sorting in reverse order without file-sort overhead.
+
+---
+
+### 44. Why the MySQL Query Cache Was Removed in MySQL 8.0.
+
+**In Simple Words:**
+The Query Cache stored verbatim SQL text queries and their raw result sets.
+- **Why it was deleted**: Any `INSERT` or `UPDATE` on a table immediately invalidated **all** cached queries associated with that table. On multi-core servers, the global Query Cache mutex lock became a severe concurrency bottleneck.
+- **Modern replacement**: Application-level caching (Redis, Memcached) with granular cache eviction.
+
+---
+
+### 45. Optimizing Deep Pagination: The Deferred Join Pattern.
+
+**In Simple Words:**
+`SELECT * FROM orders ORDER BY id LIMIT 1000000, 20` takes seconds because MySQL scans 1,000,020 rows and reads full table columns from disk before discarding the first 1,000,000!
+- **Deferred Join (Late Row Lookup)**: Use the covering index to scan the 1,000,020 integer IDs only, then join back to fetch full columns for only the final 20 rows!
+
+```sql
+-- Optimized: 100x faster than standard offset
+SELECT o.*
+FROM orders o
+JOIN (
+  SELECT id FROM orders ORDER BY id LIMIT 1000000, 20
+) AS subquery ON o.id = subquery.id;
+```
+
+---
+
+### 46. Multi-Source Replication in MySQL.
+
+**In Simple Words:**
+Multi-source replication allows a single MySQL replica to receive replication feeds from multiple distinct Primary servers simultaneously. Commonly used to aggregate data from multiple geographic shards into a centralized analytical data warehouse.
+
+---
+
+### 47. Sizing MySQL Memory: `innodb_buffer_pool_size`.
+
+**In Simple Words:**
+The **InnoDB Buffer Pool** is the single most critical performance parameter in MySQL:
+- **Rule of Thumb**: Set `innodb_buffer_pool_size` to **70% - 80%** of total system RAM on a dedicated database host.
+- Leaving 20-30% RAM for OS page cache, client connections (`max_connections * thread_stack`), and temporary query memory.
+
+---
+
+### 48. Zero-Downtime Schema Migrations: `gh-ost` and `pt-online-schema-change`.
+
+**In Simple Words:**
+Even with Online DDL, massive tables (500M+ rows) risk replication lag and metadata lock stalls.
+- **Ghost Table Pattern (`gh-ost`)**: Creates a shadow table, applies the DDL schema modification, reads changes from the MySQL binary log, backfills historical data in throttled chunks, and performs a microsecond atomic table rename (`RENAME TABLE original TO old, ghost TO original`).
+
+---
+
+### 49. Slow Query Log Analysis and `pt-query-digest`.
+
+**In Simple Words:**
+- Enable `slow_query_log = 1` and set `long_query_time = 0.5` (500ms).
+- Use Percona Toolkit's `pt-query-digest /var/log/mysql/slow.log` to aggregate queries into fingerprint classes and identify queries consuming the highest cumulative CPU execution time.
+
+---
+
+### 50. Scaling MySQL to Millions of QPS: Vitess vs ProxySQL.
+
+**In Simple Words:**
+- **ProxySQL**: High-performance MySQL-aware proxy that performs connection multiplexing, query caching, and automatic read/write splitting between Primary and Replicas.
+- **Vitess**: Distributed database clustering system developed by YouTube. It sits on top of thousands of MySQL instances, handling horizontal sharding, query routing, two-phase commits, and auto-scaling transparently to application code.

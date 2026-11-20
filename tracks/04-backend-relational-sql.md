@@ -330,3 +330,211 @@ Splitting a database across multiple independent physical servers:
 2. **Complex Entity Relationships**: Systems requiring multi-table joins and relational integrity enforcement (Users, Roles, Permissions, Orders).
 3. **Structured Schemas with Unknown Future Query Patterns**: Relational SQL allows running arbitrary ad-hoc queries, aggregations, and joins that were not planned when the schema was initially designed.
 `;
+
+---
+
+### 36. SQL Window Functions: `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()`, `LEAD()`, and `LAG()`.
+
+**In Simple Words:**
+Window functions perform calculations across a set of table rows related to the current row without collapsing the rows into a single group like `GROUP BY` does:
+- **`ROW_NUMBER()`**: Assigns a unique sequential integer (1, 2, 3, 4) to each row within a partition.
+- **`RANK()`**: Assigns ranks with gaps for ties (1, 2, 2, 4).
+- **`DENSE_RANK()`**: Assigns ranks without gaps for ties (1, 2, 2, 3).
+- **`LEAD(col, offset)` / `LAG(col, offset)`**: Accesses data from a subsequent or preceding row without performing a self-join.
+
+```sql
+-- Finding the top 2 highest-paid employees in each department
+WITH RankedSalaries AS (
+  SELECT
+    employee_id,
+    department_id,
+    salary,
+    DENSE_RANK() OVER (
+      PARTITION BY department_id
+      ORDER BY salary DESC
+    ) AS salary_rank
+  FROM employees
+)
+SELECT * FROM RankedSalaries WHERE salary_rank <= 2;
+```
+
+---
+
+### 37. Common Table Expressions (CTEs) vs Subqueries vs Temporary Tables.
+
+**In Simple Words:**
+- **Subquery**: Inline query inside `FROM` or `WHERE`. Often difficult to read and may be evaluated repeatedly depending on database query optimizer.
+- **CTE (`WITH ... AS (...)`)**: Improves readability and modularity. In PostgreSQL 12+, CTEs are automatically inlined unless marked `MATERIALIZED`.
+- **Temporary Tables (`CREATE TEMP TABLE ...`)**: Persists across multiple queries in a session. Best for complex batch ETL pipelines where intermediate results are indexed and queried multiple times.
+
+---
+
+### 38. Recursive CTEs: Querying Trees and Hierarchies in SQL.
+
+**In Simple Words:**
+A Recursive CTE references itself to traverse hierarchical data (organization charts, category trees, bill of materials) in pure SQL without procedural code loops:
+- **Anchor Member**: Initial query that selects the root nodes.
+- **Recursive Member**: Joins the CTE with the table to select child nodes until no rows remain.
+
+```sql
+-- Traversing an organization management hierarchy
+WITH RECURSIVE OrgChart AS (
+  -- 1. Anchor: Top-level CEO (manager_id is NULL)
+  SELECT employee_id, name, manager_id, 1 AS level
+  FROM employees
+  WHERE manager_id IS NULL
+
+  UNION ALL
+
+  -- 2. Recursive step: Join subordinate employees with their managers
+  SELECT e.employee_id, e.name, e.manager_id, o.level + 1
+  FROM employees e
+  INNER JOIN OrgChart o ON e.manager_id = o.employee_id
+)
+SELECT * FROM OrgChart ORDER BY level, name;
+```
+
+---
+
+### 39. Database Normalization: 1NF through BCNF and Intentional Denormalization.
+
+**In Simple Words:**
+Normalization eliminates data redundancy and prevents update/delete anomalies:
+- **1NF**: Atomic values; no repeating groups or comma-separated lists in a single cell.
+- **2NF**: In 1NF and all non-key columns depend on the entire primary key (eliminates partial key dependency).
+- **3NF**: In 2NF and no transitive dependencies (non-key column depending on another non-key column).
+- **BCNF**: Stricter 3NF where every determinant is a candidate key.
+- **Intentional Denormalization**: In high-read analytical databases, tables are denormalized (storing pre-joined customer names with orders) to avoid expensive multi-table joins.
+
+---
+
+### 40. SQL Joins Deep Dive: Anti-Joins (`NOT EXISTS` vs `NOT IN`).
+
+**In Simple Words:**
+- **Inner Join**: Returns rows with matching keys in both tables.
+- **Left Outer Join**: Returns all rows from left table, with `NULL`s for non-matching right rows.
+- **Anti-Join**: Finds records in Table A that have no matching record in Table B.
+- **Performance Rule**: Prefer `NOT EXISTS` over `NOT IN`! If the subquery in `NOT IN` contains even a single `NULL` value, `NOT IN` returns zero rows due to SQL three-valued logic (`TRUE`, `FALSE`, `UNKNOWN`), while `NOT EXISTS` handles `NULL`s safely and allows the optimizer to use an Anti-Hash Join.
+
+```sql
+-- Optimal Anti-Join pattern using NOT EXISTS
+SELECT u.id, u.email
+FROM users u
+WHERE NOT EXISTS (
+  SELECT 1 FROM orders o WHERE o.user_id = u.id
+);
+```
+
+---
+
+### 41. B-Tree Indexes and the Leftmost Prefix Rule.
+
+**In Simple Words:**
+A B-Tree (Balanced Tree) index keeps keys sorted in logarithmic time $O(\log N)$ for lookups, range scans, and sorting:
+- **Composite Index `(A, B, C)`**: Can accelerate queries filtering on:
+  - `WHERE A = 1`
+  - `WHERE A = 1 AND B = 2`
+  - `WHERE A = 1 AND B = 2 AND C = 3`
+- **Leftmost Prefix Rule**: The index **cannot** be used if query skips column `A` (e.g. `WHERE B = 2 AND C = 3`).
+
+---
+
+### 42. Covering Indexes & Index-Only Scans.
+
+**In Simple Words:**
+In normal index lookups, the database finds the matching row pointer in the B-Tree index, then performs a random disk read (Heap Fetch) to read remaining columns from the table.
+- **Covering Index**: An index that contains **every column** requested by the query (via composite keys or the `INCLUDE` clause).
+- **Index-Only Scan**: The database satisfies the query entirely from the B-Tree index pages without touching table storage, resulting in up to 10x faster query execution.
+
+```sql
+-- Creating a covering index with INCLUDE
+CREATE INDEX idx_orders_user_covering
+ON orders (user_id, status)
+INCLUDE (total_amount, created_at);
+```
+
+---
+
+### 43. ACID Transactions: Deep Dive into Write-Ahead Logging (WAL).
+
+**In Simple Words:**
+ACID guarantees transactional reliability:
+- **A (Atomicity)**: All operations succeed, or all are rolled back.
+- **C (Consistency)**: State transitions must satisfy all constraints and foreign keys.
+- **I (Isolation)**: Concurrent transactions do not interfere with each other.
+- **D (Durability)**: Once committed, data survives power loss and hardware crashes.
+- **Write-Ahead Logging (WAL)**: To guarantee durability without flushing random disk pages on every commit, changes are sequentially appended to a write-ahead log on disk **before** modifying table pages in memory.
+
+---
+
+### 44. Transaction Isolation Levels and Concurrency Anomalies.
+
+**In Simple Words:**
+SQL-92 defines four transaction isolation levels to balance consistency against concurrency:
+1. **Read Uncommitted**: Suffers from **Dirty Reads** (reading uncommitted changes from another transaction that might roll back).
+2. **Read Committed** (Default in PostgreSQL): Prevents dirty reads; suffers from **Non-Repeatable Reads** (rereading the same row yields different data because another transaction committed an update).
+3. **Repeatable Read** (Default in MySQL InnoDB): Guarantees reading the same row snapshot; can suffer from **Phantom Reads** (new rows inserted by another transaction).
+4. **Serializable**: Highest isolation; eliminates all anomalies by executing transactions as if run sequentially.
+
+---
+
+### 45. Concurrency Control: Optimistic vs Pessimistic Locking.
+
+**In Simple Words:**
+- **Pessimistic Locking (`SELECT ... FOR UPDATE`)**: Acquires an exclusive row lock immediately, blocking other transactions until commit. Best for high-contention, low-latency financial balances where conflicts are frequent.
+- **Optimistic Locking**: No locks acquired during reading. The row has a `version` or `updated_at` column. When updating:
+  `UPDATE accounts SET balance = balance - 100, version = version + 1 WHERE id = 1 AND version = 5;`
+  If `affected_rows == 0`, a concurrent update occurred, and the application retries. Best for low-contention web applications.
+
+---
+
+### 46. Database Deadlocks: Detection and Resolution.
+
+**In Simple Words:**
+A Deadlock occurs when Transaction 1 holds Lock A and waits for Lock B, while Transaction 2 holds Lock B and waits for Lock A:
+- **Detection**: The database engine runs background deadlock detection (evaluating a **Wait-For Graph** for cycles) and kills the transaction with lower cost, returning error code `40P01` (Postgres) or `1213` (MySQL).
+- **Prevention**: Always access and lock resources in a **consistent, uniform order** across all services (e.g. always lock user IDs in ascending order `WHERE id IN (1, 2) ORDER BY id ASC`).
+
+---
+
+### 47. Database Sharding: Horizontal Partitioning Strategies.
+
+**In Simple Words:**
+When a single database server exceeds CPU, RAM, or storage capacity, data is split across multiple independent database nodes:
+- **Range-Based Sharding**: Partitioning by ID or Date ranges (e.g. Shard 1: IDs 1-1M; Shard 2: IDs 1M-2M). Can cause write hotspots on the latest shard.
+- **Hash-Based Sharding**: Applying a hash function `hash(user_id) % num_shards`. Evenly distributes data, but adding new nodes requires reshuffling unless using **Consistent Hashing**.
+
+---
+
+### 48. Primary-Replica Topology and Replication Lag Mitigation.
+
+**In Simple Words:**
+- Primary handles all `WRITE` operations and streams changes to Read Replicas.
+- **Replication Lag**: Asynchronous replication introduces a delay ($\Delta t \approx 50\text{ms} - 5\text{s}$) where replicas lag behind the primary.
+- **Read-Your-Own-Writes Pattern**: If a user updates their profile, route that specific user's reads to the **Primary** database for the next 5 seconds (or until replica LSN reaches the commit LSN), while routing anonymous traffic to read replicas.
+
+---
+
+### 49. SQL Injection Prevention: Prepared Statements vs Dynamic SQL.
+
+**In Simple Words:**
+SQL Injection occurs when untrusted user input is concatenated into an SQL string, allowing attackers to manipulate query syntax.
+- **Prepared Statements**: Separate query structure from data values. The database compiles the query syntax first, then binds parameters strictly as literals, making it impossible for input strings like `' OR '1'='1` to be interpreted as SQL code.
+
+```typescript
+// ❌ Dangerous: SQL Injection vulnerability!
+const query = `SELECT * FROM users WHERE email = '${req.body.email}'`;
+
+// ✅ Secure: Parameterized prepared statement
+const query = `SELECT * FROM users WHERE email = $1`;
+await db.query(query, [req.body.email]);
+```
+
+---
+
+### 50. Database Connection Pooling: Sizing and Leak Prevention.
+
+**In Simple Words:**
+Creating a new database connection requires TCP handshakes, TLS negotiation, authentication, and allocating backend server processes (consuming ~5-10MB RAM per connection in Postgres).
+- **Connection Pools (HikariCP, PgBouncer)** maintain a warm pool of reusable connections.
+- **Formula for Optimal Pool Size**: $\text{Pool Size} = ((\text{Core Count} \times 2) + \text{Spindle Count})$. A smaller pool (e.g. 20-30 connections) prevents CPU context-switching thrashing and outperforms a bloated pool of 500 connections!

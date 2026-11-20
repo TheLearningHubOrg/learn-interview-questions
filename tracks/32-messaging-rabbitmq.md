@@ -490,3 +490,169 @@ Because RabbitMQ clustering requires low-latency LAN (<10ms) and does not tolera
   - Run independent RabbitMQ clusters in `us-east-1` (Primary) and `us-west-2` (DR).
   - Connect them via **Dynamic Shovel** or **Federated Exchanges**.
   - On primary region outage, failover DNS to `us-west-2` where messages replicated via Shovels are immediately available for consumption.
+
+
+---
+
+### 36. RabbitMQ Streams vs Quorum Queues: Key architectural differences, offset-based reads, and throughput benchmarks.
+
+**In Simple Words:**
+- **Quorum Queues**: Traditional message queues implemented over Raft. Messages are deleted once acknowledged. Ideal for task distribution, pub/sub, and enterprise transactional messaging.
+- **RabbitMQ Streams (v3.9+)**: Append-only, log-centric storage engine (similar to Apache Kafka) designed inside RabbitMQ. Messages persist after reading. Consumers track their own offsets and can replay historical data.
+- **Throughput**: Streams achieve 1,000,000+ msgs/sec because they use Zero-Copy OS disk reads and bypass Erlang actor mailbox overhead.
+
+---
+
+### 37. Consumer Prefetch (`basic.qos`): Setting global vs channel vs consumer prefetch to prevent worker starvation and memory blowups.
+
+**In Simple Words:**
+By default, RabbitMQ pushes messages to connected consumers as fast as possible (unbounded prefetch). If a consumer is slow, thousands of unacked messages accumulate in the consumer's RAM, causing out-of-memory crashes.
+- **`basic.qos(prefetch_count)`**: Caps the number of unacknowledged messages assigned to a consumer socket:
+  - `prefetch_count = 1`: Perfect fair dispatch for slow, uneven CPU-intensive tasks.
+  - `prefetch_count = 50 - 200`: Optimal sweet spot for high-throughput, low-latency consumers.
+  - `global = true`: Shares the prefetch limit across all channels on the AMQP connection.
+
+---
+
+### 38. Publisher Confirms vs AMQP Transactions: Performance comparison and implementation with batch confirmations.
+
+**In Simple Words:**
+- **AMQP Transactions (`tx_select`, `tx_commit`)**: Highly synchronous and blocking. The publisher waits for disk commit round-trips on every single message, cutting throughput by over 95% (~500 msgs/sec).
+- **Publisher Confirms (`confirm_select`)**: Asynchronous confirmation mechanism:
+  - The broker assigns a monotonically increasing sequence ID to published messages.
+  - Once persisted to disk or replicated to quorum replicas, RabbitMQ sends asynchronous `basic.ack` (or `basic.nack`) frames with batch flags (`multiple: true`), maintaining throughput at 50,000+ msgs/sec.
+
+---
+
+### 39. Consistent Hash Exchange plugin: Distributing sharded workloads across queues deterministically.
+
+**In Simple Words:**
+When you need to scale beyond a single queue's throughput while strictly preserving per-user message ordering:
+- The **Consistent Hash Exchange** hashes the routing key (e.g. `user_id`) and distributes messages evenly across $N$ bound queues based on hash ring intervals.
+- All messages for user `101` will deterministically land in Queue B, while user `102` lands in Queue A.
+- Each queue has a dedicated single consumer, ensuring parallel processing without cross-user race conditions.
+
+---
+
+### 40. Handling Poison Pill Messages: Max deliver count in Quorum Queues (`x-delivery-limit`) to prevent infinite crash loops.
+
+**In Simple Words:**
+A "Poison Pill" is a malformed message that triggers an unhandled exception or segment fault in the consumer:
+1. Consumer crashes or nacks with `requeue: true`.
+2. Broker immediately redelivers the message to another consumer.
+3. Second consumer crashes. The poison pill loops infinitely, crashing the entire worker pool!
+- **Quorum Queue Solution**: Set `"x-delivery-limit": 5`. RabbitMQ tracks delivery count in metadata. After 5 failed attempts, the broker automatically drops or dead-letters the message to quarantine.
+
+---
+
+### 41. Single Active Consumer (SAC): Enforcing strict FIFO message processing ordering with automatic failover.
+
+**In Simple Words:**
+When multiple consumers attach to a single standard queue, messages are processed concurrently, causing out-of-order execution (e.g., Order Cancelled completes before Order Created).
+- **Single Active Consumer (`"x-single-active-consumer": true`)**:
+  - Only one primary consumer is permitted to pull messages from the queue at any time.
+  - Additional attached consumers remain connected in a warm standby state.
+  - If the active consumer disconnects or crashes, RabbitMQ automatically promotes the next standby consumer seamlessly without dropping a single message.
+
+---
+
+### 42. RabbitMQ Clustering Network Partitions: `pause_minority` vs `autoheal` strategies and split-brain resolution.
+
+**In Simple Words:**
+When a network cable fails between nodes in a cluster (split-brain):
+- **`pause_minority` (Recommended for Quorum/CP Semantics)**: Nodes that discover they are in the minority (< 50% cluster nodes) automatically pause and close client connections. Prevents split-brain state divergence.
+- **`autoheal`**: Both partitions continue accepting writes. When network connectivity restores, the partition with the fewest clients is restarted, wiping any un-replicated messages written to it.
+- **`ignore`**: Never use in production; requires manual operator intervention to resolve split-brain.
+
+---
+
+### 43. RabbitMQ Memory Watermarks and Disk Free Limit: Flow control mechanism when brokers pause publishing sockets.
+
+**In Simple Words:**
+RabbitMQ protects itself from OS crashes by monitoring host RAM and disk space:
+- **Memory Watermark (`vm_memory_high_watermark.relative = 0.4`)**: When RabbitMQ consumes 40% of host RAM, the broker sounds an internal alarm.
+- **Action**: RabbitMQ blocks socket reads on all publishers! Publishers freeze and enter TCP flow control.
+- Consumers continue reading and acknowledging messages, draining queues until memory falls below the threshold, at which point publishing unblocks automatically.
+
+---
+
+### 44. RabbitMQ OAuth 2.0 / JWT Integration: Token-based authentication and claim-to-permission mapping.
+
+**In Simple Words:**
+Instead of hardcoding static credentials in client configuration files:
+- Clients obtain a signed JWT token from an OpenID Connect identity provider (Auth0, Keycloak, Okta).
+- Clients connect to RabbitMQ passing `user=""` and `password="<JWT_TOKEN>"`.
+- RabbitMQ validates the token's RSA/EC signature using the IdP's JWKS endpoint.
+- Permissions (read/write access to specific virtual hosts and queue regex patterns) are mapped directly from the JWT's `scope` or custom claims.
+
+---
+
+### 45. Priority Queues (`x-max-priority`): How binary heap indexing works and why priority levels should be kept low.
+
+**In Simple Words:**
+Priority queues allow urgent messages (e.g., password reset OTPs) to jump ahead of background bulk tasks (e.g., monthly newsletter emails):
+- Declared with `"x-max-priority": 10`.
+- **Erlang Heap Overhead**: Each priority level internally creates a separate sub-queue/binary heap within the Erlang process.
+- **Best Practice**: Never set `x-max-priority > 10` (preferably 3 to 5). Setting priority to 255 consumes massive memory and severely degrades message ingestion rates.
+
+---
+
+### 46. Dead Letter Exchange (DLX) Routing: `x-dead-letter-exchange` and `x-dead-letter-routing-key` headers preservation.
+
+**In Simple Words:**
+When a message is rejected (`basic.reject`), expires (`TTL`), or exceeds queue length limits:
+- RabbitMQ forwards the message to the exchange configured in `x-dead-letter-exchange`.
+- **`x-death` Header**: RabbitMQ automatically appends a diagnostic array to the message header containing:
+  - Reason for death (`rejected`, `expired`, `maxlen`).
+  - Queue where the death occurred.
+  - Original routing keys and precise epoch timestamp.
+  - Number of times dead-lettered.
+
+---
+
+### 47. RabbitMQ Message TTL and Queue Expiration (`x-message-ttl` vs `x-expires`).
+
+**In Simple Words:**
+- **`x-message-ttl`**: Lifespan of individual messages in milliseconds. If a message remains unconsumed past its TTL, it is dropped or forwarded to a Dead Letter Exchange.
+- **`x-expires`**: Lifespan of the **queue itself**. If a queue is unused (no active consumers and no messages published) for the specified duration (e.g. 2 hours), RabbitMQ automatically deletes the queue to prevent orphaned queue buildup in ephemeral client environments.
+
+---
+
+### 48. RabbitMQ Warm Standby with Federation Plugin: Bi-directional federated exchanges and queue federation.
+
+**In Simple Words:**
+The **Federation Plugin** connects distinct RabbitMQ brokers across WAN networks without requiring cluster membership:
+- **Federated Exchange**: Messages published to an upstream exchange in Frankfurt are forwarded across the public internet (over TLS) to a downstream exchange in Tokyo only if there are active consumers bound in Tokyo.
+- Provides eventual consistency and WAN resilience: network interruptions between regions do not impact local broker stability.
+
+---
+
+### 49. RabbitMQ Shovel Plugin: Static vs Dynamic shovel definitions and WAN cross-cluster migration.
+
+**In Simple Words:**
+A **Shovel** is an automated in-broker worker that continuously consumes messages from a source queue and publishes them to a destination exchange or queue (even across different clusters or clouds):
+- **Static Shovels**: Defined in `rabbitmq.conf` configuration file.
+- **Dynamic Shovels**: Configured at runtime via the HTTP Management API or `rabbitmqctl` without restarting the broker.
+- **Zero-Downtime Cluster Migration**: Deploy Shovels to drain lingering messages from an old RabbitMQ 3.8 cluster into a newly provisioned RabbitMQ 3.13 cluster while producers switch traffic.
+
+---
+
+### 50. Debugging RabbitMQ Bottlenecks: `rabbitmqctl`, `rabbitmq-diagnostics`, and identifying rogue consumers.
+
+**In Simple Words:**
+Essential CLI diagnostic commands for on-call engineers:
+
+```bash
+# 1. Check cluster health and active alarms
+rabbitmq-diagnostics check_alarms
+rabbitmq-diagnostics cluster_status
+
+# 2. List queues sorted by highest unacknowledged messages (stalled consumers)
+rabbitmqctl list_queues name messages_ready messages_unacknowledged consumers --sort messages_unacknowledged
+
+# 3. Identify top memory-consuming Erlang processes
+rabbitmqctl list_top_processes memory 10
+
+# 4. Inspect specific queue details and memory footprint
+rabbitmqctl list_queues name memory message_bytes_ram message_bytes_persistent
+```

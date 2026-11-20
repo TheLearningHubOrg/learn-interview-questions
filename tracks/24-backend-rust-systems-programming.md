@@ -389,3 +389,191 @@ Miri is an interpreter for Rust's intermediate representation (MIR):
   - Absolute memory safety guarantees where memory bugs represent multi-million dollar security exploits.
 - **Choose Go**: Microservices, web APIs, and DevOps tooling where fast compile times, developer onboarding, and simplicity take priority over maximum raw CPU throughput.
 `;
+
+---
+
+### 36. Rust Ownership, Borrowing, and Lifetimes: The Borrow Checker.
+
+**In Simple Words:**
+Rust achieves memory safety without a garbage collector through **Ownership and Borrowing**:
+1. **Ownership Rules**:
+   - Each value has an owner (a variable).
+   - There can only be one owner at a time.
+   - When the owner goes out of scope, the value is automatically dropped (`Drop` trait).
+2. **Borrowing Rules (Aliasing XOR Mutability)**:
+   - You can have any number of immutable references (`&T`).
+   - OR you can have exactly one mutable reference (`&mut T`).
+   - You can never have both simultaneously, preventing data races at compile time!
+3. **Lifetimes (`'a`)**: Named compiler annotations ensuring references never outlive the underlying data they point to, eliminating dangling pointer bugs.
+
+---
+
+### 37. Smart Pointers in Rust: `Box`, `Rc`, `Arc`, `RefCell`, and `Mutex`.
+
+**In Simple Words:**
+- **`Box<T>`**: Allocates data on the heap rather than the stack. Used for recursive data structures with dynamic size.
+- **`Rc<T>`**: Reference Counting pointer for single-threaded multiple ownership.
+- **`Arc<T>`**: Atomic Reference Counting pointer; thread-safe equivalent of `Rc` across threads.
+- **`RefCell<T>`**: Provides **Interior Mutability**; enforces borrowing rules at runtime instead of compile time.
+- **`Arc<Mutex<T>>`**: Standard pattern for thread-safe shared mutable state across threads.
+
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+let counter = Arc::new(Mutex::new(0));
+let mut handles = vec![];
+
+for _ in 0..5 {
+    let c = Arc::clone(&counter);
+    handles.push(thread::spawn(move || {
+        let mut num = c.lock().unwrap();
+        *num += 1;
+    }));
+}
+
+for h in handles { h.join().unwrap(); }
+println!("Final Count: {}", *counter.lock().unwrap());
+```
+
+---
+
+### 38. Concurrency in Rust: `Send` and `Sync` Marker Traits.
+
+**In Simple Words:**
+Rust guarantees "Fearless Concurrency" via two auto-implemented marker traits:
+- **`Send`**: Indicates ownership of the type can be safely transferred across thread boundaries (`T: Send`). Almost all Rust types are `Send`, except types with raw pointers or non-atomic reference counts (`Rc<T>`).
+- **`Sync`**: Indicates it is safe to share references to this type between multiple threads concurrently (`&T: Send`). A type `T` is `Sync` if and only if `&T` is `Send`.
+
+---
+
+### 39. Error Handling in Rust: `Result<T, E>`, `?` Operator, `thiserror`, and `anyhow`.
+
+**In Simple Words:**
+Rust does not have runtime exceptions. Errors are handled via algebraic types:
+- **`Result<T, E>`**: Enum with `Ok(T)` or `Err(E)`.
+- **`?` Operator**: Unwraps `Ok(val)` or returns early with `Err(e)` from the current function.
+- **`thiserror`**: Macro library for creating structured, typed domain errors in reusable libraries.
+- **`anyhow`**: Idiomatic error library for application binaries with dynamic backtraces.
+
+```rust
+use anyhow::{Context, Result};
+use std::fs;
+
+fn read_app_config(path: &str) -> Result<String> {
+  fs::read_to_string(path)
+    .with_context(|| format!("Failed to read configuration file at '{}'", path))
+}
+```
+
+---
+
+### 40. Static vs Dynamic Dispatch: `impl Trait` vs `dyn Trait`.
+
+**In Simple Words:**
+- **Static Dispatch (`impl Trait` / Generics)**: The compiler generates a concrete copy of the function for every specific type (Monomorphization). Zero runtime cost, allows function inlining, but increases binary size.
+- **Dynamic Dispatch (`&dyn Trait` / `Box<dyn Trait>`)**: Method lookups happen at runtime via a Virtual Method Table (vtable). Allows heterogeneous collections (e.g. `Vec<Box<dyn Widget>>`), but introduces vtable pointer dereferencing overhead.
+
+---
+
+### 41. Asynchronous Rust with Tokio: Futures and Pinning.
+
+**In Simple Words:**
+In Rust, an `async fn` does nothing until polled (`Future::poll`).
+- **Tokio**: Multi-threaded work-stealing async runtime executing non-blocking event loops.
+- **Pinning (`Pin<&mut T>`)**: Pinning guarantees that an async state machine's memory address will **never move** in memory once polled, ensuring self-referential generator pointers remain valid.
+
+---
+
+### 42. RAII and the `Drop` Trait: Deterministic Destruction.
+
+**In Simple Words:**
+Rust uses **RAII (Resource Acquisition Is Initialization)**. When a value goes out of scope, the compiler automatically inserts calls to its `Drop::drop()` implementation, immediately freeing heap memory, closing TCP sockets, and unlocking mutexes without relying on a non-deterministic garbage collector.
+
+---
+
+### 43. Unsafe Rust: When and Why is it Necessary?
+
+**In Simple Words:**
+`unsafe` disables compiler safety checks for 5 specific superpowers:
+1. Dereferencing raw pointers (`*const T`, `*mut T`).
+2. Calling unsafe functions or Foreign Function Interface (FFI) C libraries.
+3. Implementing unsafe traits (`unsafe impl Send for MyType`).
+4. Mutating mutable static variables.
+5. Accessing fields of a `union`.
+- **Rule**: `unsafe` is used to build safe abstractions (like `Vec` and `Mutex`) where humans verify invariants that the compiler borrow checker cannot prove.
+
+---
+
+### 44. Pattern Matching & Algebraic Data Types.
+
+**In Simple Words:**
+Rust enums can hold data variants (Algebraic Data Types / Tagged Unions). The `match` expression guarantees **exhaustiveness**: the compiler throws an error if even a single enum variant is unhandled, eliminating `null` pointer exceptions and unhandled state transitions.
+
+```rust
+enum PaymentStatus {
+    Pending,
+    Authorized { transaction_id: String },
+    Failed { reason: String, retry_allowed: bool },
+}
+
+match status {
+    PaymentStatus::Pending => log("Awaiting settlement"),
+    PaymentStatus::Authorized { transaction_id } => capture(transaction_id),
+    PaymentStatus::Failed { reason, retry_allowed: true } => retry(),
+    PaymentStatus::Failed { reason, .. } => abort(reason),
+}
+```
+
+---
+
+### 45. Rust Closures: `Fn`, `FnMut`, and `FnOnce`.
+
+**In Simple Words:**
+Rust closures automatically implement one or more closure traits based on how they capture variables from their environment:
+- **`FnOnce`**: Consumes captured variables by value (can only be called once).
+- **`FnMut`**: Mutates captured variables in-place (can be called multiple times).
+- **`Fn`**: Borrows captured variables immutably (can be called concurrently across threads).
+
+---
+
+### 46. Procedural Macros in Rust: Derive, Attribute, and Function-Like.
+
+**In Simple Words:**
+Procedural macros accept Rust token streams and return modified token streams at compile time:
+- **Custom Derive (`#[derive(Serialize)]`)**: Auto-generates serialization code.
+- **Attribute Macros (`#[tokio::main]`)**: Rewrites function definitions into async Tokio runtime bootstrap code.
+- **Function-like (`sqlx::query!("...")`)**: Verifies SQL syntax against a live database during `cargo build`!
+
+---
+
+### 47. Performance Benchmarking with Criterion.rs and Flamegraphs.
+
+**In Simple Words:**
+- **Criterion.rs**: Statistical micro-benchmarking framework with outlier analysis, measuring nanosecond-level function execution times.
+- **`cargo-flamegraph`**: Generates visual SVG flamegraphs showing which code paths consume CPU execution cycles using Linux `perf` or DTrace.
+
+---
+
+### 48. WebAssembly (Wasm) with Rust: `wasm-bindgen`.
+
+**In Simple Words:**
+Rust is the premier language for high-performance WebAssembly:
+- Compiles directly to compact `.wasm` binaries without a runtime garbage collector.
+- **`wasm-bindgen`**: Generates bidirectional zero-copy bridges between JavaScript DOM objects and Rust memory structures, enabling browser-native speeds for video encoders, CAD editors, and cryptography.
+
+---
+
+### 49. Zero-Copy Serialization with Serde.
+
+**In Simple Words:**
+**Zero-Copy Deserialization** (`&'a str` instead of `String`) points directly to the bytes in the original memory buffer rather than allocating new strings on the heap, allowing parsers to deserialize JSON, Protocol Buffers, or Bincode at multi-gigabyte per second memory bus throughput.
+
+---
+
+### 50. Production Microservices with Axum and Tower.
+
+**In Simple Words:**
+**Axum** is the premier Tokio-native web framework:
+- Uses **Tower** middleware architecture (`Service` trait) for rate limiting, tracing, and timeouts.
+- **Type-Safe Extractors**: Route parameters, JSON payloads, and database connection pools are validated at compile time through method parameter typing (`async fn handle(State(pool): State<PgPool>, Json(payload): Json<User>)`).

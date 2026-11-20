@@ -53,19 +53,7 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
 
   useEffect(() => {
     let isMounted = true;
-
-    const purgeErrorArtifacts = () => {
-      if (typeof document === 'undefined') return;
-      document
-        .querySelectorAll('body > svg.error-icon, body > [id^="dmermaid"]')
-        .forEach((el) => {
-          try {
-            el.remove();
-          } catch {
-            // ignore
-          }
-        });
-    };
+    let renderContainer: HTMLDivElement | null = null;
 
     getMermaid()
       .then(async (mermaid) => {
@@ -113,14 +101,29 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
             .replace(/\|'([^']+)'\|/g, '|$1|');
 
           const renderId = `mermaid-${Math.random().toString(36).substring(2, 9)}-${Date.now()}`;
-          const { svg: renderedSvg } = await mermaid.render(renderId, cleanChart);
+          
+          if (typeof document !== 'undefined') {
+            renderContainer = document.createElement('div');
+            renderContainer.id = `container-${renderId}`;
+            // IMPORTANT: Do NOT use display: none! display: none prevents SVG font metrics and bounding box computation.
+            // Using offscreen fixed positioning allows the browser to layout and measure elements accurately without flickering.
+            renderContainer.style.position = 'fixed';
+            renderContainer.style.left = '-99999px';
+            renderContainer.style.top = '-99999px';
+            renderContainer.style.width = '1200px';
+            renderContainer.style.height = '800px';
+            renderContainer.style.opacity = '0';
+            renderContainer.style.pointerEvents = 'none';
+            document.body.appendChild(renderContainer);
+          }
+
+          const { svg: renderedSvg } = await mermaid.render(renderId, cleanChart, renderContainer || undefined);
           
           if (isMounted) {
             setSvg(renderedSvg);
             setError(null);
           }
         } catch (renderErr: any) {
-          purgeErrorArtifacts();
           if (isMounted) {
             const rawMsg = renderErr?.message || '';
             const friendlyMsg = rawMsg.includes('firstChild') || rawMsg.includes('null')
@@ -128,10 +131,17 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
               : rawMsg || 'Diagram syntax parse error';
             setError(friendlyMsg);
           }
+        } finally {
+          if (renderContainer && renderContainer.parentNode) {
+            try {
+              renderContainer.parentNode.removeChild(renderContainer);
+            } catch {
+              // ignore
+            }
+          }
         }
       })
       .catch((loadErr) => {
-        purgeErrorArtifacts();
         if (isMounted) {
           setError('Unable to load diagram rendering engine (offline mode)');
         }
@@ -139,7 +149,13 @@ export function MermaidBlock({ chart }: MermaidBlockProps) {
 
     return () => {
       isMounted = false;
-      purgeErrorArtifacts();
+      if (renderContainer && renderContainer.parentNode) {
+        try {
+          renderContainer.parentNode.removeChild(renderContainer);
+        } catch {
+          // ignore
+        }
+      }
     };
   }, [chart]);
 

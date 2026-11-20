@@ -601,3 +601,253 @@ Managing CSS at scale across 200 developers without conflicts:
   7. **Utilities**: High-specificity overrides (`.text-center`).
 - Combined with Cascade Layers (`@layer`), prevents specificity conflicts permanently.
 
+
+---
+
+### 36. CSS Container Queries: `@container` and `container-type: inline-size`.
+
+**In Simple Words:**
+Media queries `@media` only evaluate the **viewport width** of the entire browser window. **Container Queries (`@container`)** evaluate the width of the component's direct parent container, allowing reusable components (like cards or widgets) to adapt their layout whether placed in a narrow sidebar or a wide hero banner.
+
+```css
+/* 1. Define container element */
+.card-container {
+  container-type: inline-size;
+  container-name: card;
+}
+
+/* 2. Responsive styling based on container's width, NOT viewport */
+@container card (min-width: 480px) {
+  .product-card {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+}
+```
+
+---
+
+### 37. CSS Cascade Layers (`@layer`): Solving Specificity Wars.
+
+**In Simple Words:**
+Cascade Layers give developers explicit control over which style sheets override each other, regardless of CSS specificity or file order. Styles in a higher layer always override styles in a lower layer:
+- Normal Layer Order: `reset` -> `base` -> `components` -> `utilities`.
+- A simple class selector in the `utilities` layer `.text-center` overrides a high-specificity selector `#sidebar .card .title` in the `components` layer!
+
+```css
+@layer reset, base, components, utilities;
+
+@layer reset {
+  * { box-sizing: border-box; margin: 0; }
+}
+
+@layer components {
+  .btn { background: #3b82f6; color: white; padding: 0.5rem 1rem; }
+}
+
+@layer utilities {
+  .bg-red { background: #ef4444; } /* Overrides .btn without !important */
+}
+```
+
+---
+
+### 38. CSS Subgrid: `grid-template-columns: subgrid`.
+
+**In Simple Words:**
+In standard CSS Grid, child grid elements define their own independent column/row sizing, making it difficult to align sibling card headers, descriptions, and footers across rows. **Subgrid** allows child grids to adopt and align directly with the parent grid's tracks.
+
+```css
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: subgrid; /* Inherits parent rows */
+  grid-row: span 3; /* Header, Body, Footer align across all cards */
+}
+```
+
+---
+
+### 39. Modern CSS Selectors: `:has()` (The Parent Selector), `:is()`, and `:where()`.
+
+**In Simple Words:**
+- **`:has()`**: The relational parent selector. Selects a parent based on its children or following siblings (e.g. `figure:has(figcaption)` or `form:has(:invalid)`).
+- **`:is()`**: Groups selectors together, taking the specificity of the most specific argument.
+- **`:where()`**: Identical grouping to `:is()`, but **always has zero (0) specificity**, making utility classes easily overridable.
+
+```css
+/* Style form border red if it contains an invalid input */
+form:has(input:invalid) {
+  border-color: #ef4444;
+}
+
+/* Zero-specificity styling with :where */
+:where(h1, h2, h3) {
+  font-family: 'Inter', sans-serif; /* Easy to override anywhere without specificity wars */
+}
+```
+
+---
+
+### 40. Native CSS Nesting without Preprocessors.
+
+**In Simple Words:**
+Modern browsers natively support nested CSS rules without requiring Sass, Less, or PostCSS:
+- Use the `&` nesting selector to reference parent selectors or pseudo-classes (`&:hover`).
+- Can nest element tags and media queries directly inside selectors.
+
+```css
+.card {
+  background: white;
+  padding: 1.5rem;
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  & .title {
+    font-size: 1.25rem;
+    color: #1e293b;
+  }
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
+}
+```
+
+---
+
+### 41. Next-Gen Color Spaces: `oklch()` and `color-mix()`.
+
+**In Simple Words:**
+- **`oklch()`**: Perceptually uniform color space designed for human vision. Unlike `hsl()`, changing hue in `oklch` preserves consistent lightness across all colors, eliminating "muddy" gradients. Supports Display P3 wide-gamut colors.
+- **`color-mix(in oklch, color1, color2 percentage)`**: Mixes two colors natively in CSS without JavaScript.
+
+```css
+:root {
+  /* Vibrant, wide-gamut primary brand color */
+  --brand: oklch(0.65 0.24 280);
+  /* Generate 20% transparent tint natively */
+  --brand-tint: color-mix(in oklch, var(--brand) 20%, transparent);
+}
+```
+
+---
+
+### 42. CSS Scroll-Driven Animations: `animation-timeline: scroll()`.
+
+**In Simple Words:**
+Scroll-driven animations link keyframe progress to a scroll container or element visibility rather than wall-clock time, running on the browser's compositor thread with zero JavaScript:
+- **`animation-timeline: scroll()`**: Tracks scroll position of the viewport or parent.
+- **`animation-timeline: view()`**: Tracks when an element enters and exits the viewport.
+
+```css
+/* Reading progress bar that fills as the user scrolls */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  transform-origin: 0 50%;
+  animation: scale-x linear;
+  animation-timeline: scroll();
+}
+
+@keyframes scale-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+```
+
+---
+
+### 43. Scoped CSS in Native HTML: `@scope`.
+
+**In Simple Words:**
+`@scope` establishes boundary limits for CSS selectors without relying on CSS Modules, Shadow DOM, or BEM class prefixes.
+- **`@scope (.card)`**: Selects elements only within `.card`.
+- **`to (.card-content)` (Donut Scope)**: Stops styling when reaching a boundary element.
+
+```css
+@scope (.feature-card) to (.card-footer) {
+  /* Styles only apply between .feature-card and .card-footer */
+  p { color: #64748b; font-size: 0.95rem; }
+}
+```
+
+---
+
+### 44. Hardware Acceleration & Composite Layers: `transform`, `opacity`, and `will-change`.
+
+**In Simple Words:**
+The browser rendering pipeline consists of: **JavaScript -> Style -> Layout (Reflow) -> Paint -> Composite**.
+- Modifying `width`, `height`, `margin`, or `top` triggers expensive **Reflow (Layout)** and **Repaint**.
+- Modifying `transform` and `opacity` skips Layout and Paint entirely; changes are handled on the **GPU Compositor Thread** at 60/120 FPS.
+- **`will-change: transform`**: Informs the GPU to promote an element to its own compositor layer in advance.
+
+---
+
+### 45. Modern Responsive Typography: `clamp()` and Fluid Viewport Units (`dvh`, `svh`).
+
+**In Simple Words:**
+- **`clamp(min, preferred, max)`**: Creates fluid typography and spacing that scales smoothly with viewport width without media query breakpoints:
+  `font-size: clamp(1rem, 2.5vw + 0.5rem, 2.5rem);`
+- **Dynamic Viewport Units**:
+  - `dvh` (Dynamic Viewport Height): Adapts dynamically as mobile URL bars expand or collapse.
+  - `svh` (Small Viewport Height): Height assuming URL bars are visible.
+  - `lvh` (Large Viewport Height): Height assuming URL bars are hidden.
+
+---
+
+### 46. Cumulative Layout Shift (CLS) Prevention: `aspect-ratio: 16 / 9`.
+
+**In Simple Words:**
+Cumulative Layout Shift occurs when images, iframes, or ads load and suddenly push down surrounding page content.
+- Setting `aspect-ratio: 16 / 9` allows the browser to reserve the exact layout box dimensions **before** the image or video payload downloads, completely eliminating layout jumps.
+
+---
+
+### 47. Stacking Contexts and Stacking Order: Why `z-index: 9999` Fails.
+
+**In Simple Words:**
+`z-index` only compares elements within the **same stacking context**. A child with `z-index: 99999` inside a parent with `z-index: 1` will always render behind a sibling parent with `z-index: 2`!
+- New stacking contexts are created by: `position: relative/absolute` with `z-index`, `opacity < 1`, `transform`, `filter`, `will-change`, and `isolation: isolate`.
+- **`isolation: isolate`**: Explicitly creates a localized stacking context so child elements do not interfere with external layers.
+
+---
+
+### 48. Flexbox vs CSS Grid: 1D vs 2D Layout Engines.
+
+**In Simple Words:**
+- **Flexbox (One-Dimensional)**: Arranges items along a single axis (row OR column). Content-driven: element sizes dictate the flow. Best for navbars, button groups, and auto-wrapping pills.
+- **CSS Grid (Two-Dimensional)**: Arranges items across columns AND rows simultaneously. Layout-driven: container defines rigid tracks and items snap into designated cells. Best for page layouts, galleries, and dashboards.
+
+---
+
+### 49. CSS Logical Properties: `inline` and `block` for Internationalization (RTL/LTR).
+
+**In Simple Words:**
+Physical directional properties (`left`, `right`, `top`, `bottom`) break when websites support Right-To-Left (RTL) languages like Arabic or Hebrew. **CSS Logical Properties** adapt automatically based on document writing mode:
+- `margin-left` -> `margin-inline-start`
+- `margin-right` -> `margin-inline-end`
+- `width` -> `inline-size`
+- `height` -> `block-size`
+
+---
+
+### 50. High-Fidelity Print Style Sheets: `@media print` and `@page`.
+
+**In Simple Words:**
+Print style sheets optimize web pages for printing and PDF generation:
+1. **Hide Navigation & Interactive UI**: `display: none` on headers, buttons, footers.
+2. **Prevent Breaking Across Pages**: `break-inside: avoid` (formerly `page-break-inside: avoid`) on cards, questions, and tables.
+3. **Expand URLs**: `a[href]::after { content: " (" attr(href) ")"; }` displays destination URLs on physical paper.
+4. **Margins**: `@page { margin: 1.5cm; }` sets physical printer margins.

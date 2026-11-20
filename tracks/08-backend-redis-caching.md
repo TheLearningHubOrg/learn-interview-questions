@@ -351,3 +351,148 @@ Standard Redis replication is strictly master-replica within a single datacenter
 2. **Complex relational joins and ad-hoc aggregations**: Redis lacks relational querying capabilities.
 3. **Strict ACID durability requirements without any data loss tolerance**: Even with AOF `everysec`, a power loss can lose the last 1 second of transactions.
 `;
+
+---
+
+### 36. Redis Single-Threaded Event Loop vs Multi-Threaded I/O (Redis 6.0+).
+
+**In Simple Words:**
+- **Core Engine is Single-Threaded**: All command execution (updating strings, sets, hashes) runs on a single main thread, using non-blocking I/O multiplexing (`epoll` on Linux). This completely eliminates lock contention, mutex overhead, and context switching!
+- **Multi-Threaded I/O (Redis 6.0+)**: Reading network requests and writing socket responses is offloaded to worker threads, while **command execution remains strictly single-threaded**, boosting throughput by up to 2.5x on multi-core servers.
+
+---
+
+### 37. Redis Data Structures: Use Cases for ZSET, HyperLogLog, and Bitmaps.
+
+**In Simple Words:**
+- **Sorted Set (ZSET)**: Stores unique members with an associated floating-point score (backed by a SkipList and Hash). Ideal for real-time leaderboards (`ZADD`, `ZRANK`, `ZREVRANGE`) and rate limiters.
+- **HyperLogLog (`PFADD`, `PFCOUNT`)**: Probabilistic data structure that estimates unique items (cardinality) with a standard error of $0.81\%$, using a fixed maximum of only **12 KB of RAM** to count billions of unique visitors!
+- **Bitmaps (`SETBIT`, `BITCOUNT`)**: Manipulates individual bits within strings. Ideal for daily user login tracking (1 bit per user; tracking 100M active users takes only 12 MB RAM!).
+
+---
+
+### 38. Caching Strategies: Cache-Aside vs Write-Through vs Write-Behind.
+
+**In Simple Words:**
+- **Cache-Aside (Lazy Loading)**: Application reads from Redis. On cache miss, it reads from DB, updates Redis, and returns. Simple and resilient.
+- **Write-Through**: Application writes data to Redis; the cache synchronous layer writes to the database immediately before confirming. Guarantees consistency, but adds write latency.
+- **Write-Behind (Write-Back)**: Application writes to Redis immediately; an asynchronous background worker flushes batched writes to the DB. Maximum write performance, but risk of data loss if Redis crashes before flushing.
+
+---
+
+### 39. Cache Stampede (Thundering Herd) Mitigation: Probabilistic Early Expiration.
+
+**In Simple Words:**
+A Cache Stampede occurs when a hot cache key expires (e.g. homepage top products), causing thousands of concurrent requests to hit the backend database simultaneously:
+- **Solution 1: Distributed Mutex Lock**: The first thread acquires a lock to recompute the cache while others wait or return stale data.
+- **Solution 2: Probabilistic Early Expiration (XFetch Algorithm)**: As the TTL approaches expiration, background worker threads probabilistically recalculate the value *before* it expires:
+  $\Delta t - \beta \times \ln(\text{random}()) > \text{expiry}$
+
+---
+
+### 40. Cache Penetration & Bloom Filters.
+
+**In Simple Words:**
+**Cache Penetration** occurs when queries request non-existent keys (e.g. `id = -9999` sent by an attacker). Since the key is neither in Redis nor the DB, every request bypasses the cache and hammers the database:
+- **Mitigation 1 (Null Caching)**: Cache the non-existent result with a short TTL (`SET user:-9999 "NULL" EX 60`).
+- **Mitigation 2 (Bloom Filter)**: A space-efficient probabilistic data structure placed in front of the cache. If the Bloom filter says the key does not exist, reject the request immediately without touching Redis or the DB!
+
+---
+
+### 41. Redis Memory Eviction Policies: LRU vs LFU.
+
+**In Simple Words:**
+When memory reaches `maxmemory`, Redis evicts keys according to its configured policy:
+- **`noeviction` (Default)**: Returns errors on write operations when memory is full.
+- **`allkeys-lru`**: Evicts the Least Recently Used keys across all keys (best for general caching).
+- **`allkeys-lfu`**: Evicts the Least Frequently Used keys based on access count counters (prevents a burst of temporary keys from evicting permanent hot keys).
+- **`volatile-ttl`**: Evicts keys with the shortest remaining TTL among keys set with expirations.
+
+---
+
+### 42. Redis Persistence: RDB vs AOF vs Hybrid.
+
+**In Simple Words:**
+- **RDB (Snapshotting)**: Point-in-time binary snapshot of memory dumped to disk via `BGSAVE` (`fork()` copy-on-write). Compact file, fast restart, but risk of losing minutes of data between snapshots.
+- **AOF (Append Only File)**: Logs every write command sequentially (`appendfsync everysec`). Highly durable (at most 1 second of data loss), but larger file sizes and slower restart.
+- **Hybrid Persistence (Default in Redis 5+)**: RDB snapshot preamble + AOF incremental log tail for fast restarts and high durability.
+
+---
+
+### 43. Distributed Locks in Redis: Single-Node vs Redlock.
+
+**In Simple Words:**
+- **Single-Node Lock**: `SET resource_key random_token NX PX 10000` (Acquires lock if Not eXists with 10s auto-expiry). Released using a Lua script that verifies the token matches before deleting.
+- **Redlock Algorithm**: For multi-node independent Redis clusters. Acquires the lock in parallel across $N$ independent masters. Lock is granted only if acquired on a majority ($\ge \frac{N}{2} + 1$) within a strict time budget.
+
+---
+
+### 44. Atomic Operations: Redis Transactions (`MULTI`/`EXEC`) vs Lua Scripts (`EVAL`).
+
+**In Simple Words:**
+- **`MULTI` / `EXEC`**: Queues commands and runs them sequentially. Does **not** support rollback if a command produces a runtime error, and cannot use the result of Command 1 inside Command 2 within the same transaction.
+- **Lua Scripts (`EVAL`)**: Executed **atomically** in the Redis main thread. Can read state, execute conditional logic, and update keys without any other command interleaving!
+
+```lua
+-- Atomic Rate Limiting Lua Script
+local current = redis.call('INCR', KEYS[1])
+if current == 1 then
+  redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+return current
+```
+
+---
+
+### 45. Redis Streams vs Kafka vs Pub/Sub.
+
+**In Simple Words:**
+- **Pub/Sub**: Fire-and-forget; messages are lost if the subscriber is disconnected. No persistence, no replay.
+- **Redis Streams (`XADD`, `XREADGROUP`)**: Persistent append-only log with consumer groups, message acknowledgments (`XACK`), and Pending Entries List (PEL) for reprocessing unacknowledged crashed consumer messages.
+- **vs Kafka**: Redis Streams runs purely in memory (microsecond latency), best for real-time messaging workloads that fit within RAM.
+
+---
+
+### 46. High Availability with Redis Sentinel.
+
+**In Simple Words:**
+**Redis Sentinel** is a distributed monitoring and failover system for Master-Replica topologies:
+1. **Monitoring**: Sentinels continuously ping Master and Replica nodes.
+2. **Quorum Election**: If Master is unreachable, Sentinels agree via quorum (`ODOWN`), promote a Replica to Master, and notify clients via Pub/Sub to connect to the new Master.
+
+---
+
+### 47. Redis Cluster: 16,384 Hash Slots and Hash Tags.
+
+**In Simple Words:**
+Redis Cluster shards data across multiple nodes without a centralized proxy:
+- **16,384 Hash Slots**: Keys are mapped to slots using `CRC16(key) % 16384`. Each master owns a subset of slots.
+- **Hash Tags (`{user_id}`)**: Only the string inside `{}` is hashed. Forces related keys (e.g. `{u:123}:profile` and `{u:123}:orders`) into the **exact same hash slot**, enabling multi-key transactions!
+
+---
+
+### 48. Rate Limiting with Sliding Window Log (ZSET).
+
+**In Simple Words:**
+Fixed-window rate limiters suffer from 2x traffic spikes at window boundaries. **Sliding Window Log** uses a Redis Sorted Set:
+1. Store timestamp as both member and score: `ZADD rate:user1 <now> <now>`.
+2. Remove timestamps older than window: `ZREMRANGEBYSCORE rate:user1 0 (<now> - 60)`.
+3. Count remaining requests: `ZCARD rate:user1`. If $< 100$, allow request!
+
+---
+
+### 49. Bigkey and Hotkey Detection in Production.
+
+**In Simple Words:**
+- **Bigkey**: A single key containing megabytes of data (e.g. a Set with 1M items). Reading it blocks the single-threaded event loop! Detect with `redis-cli --bigkeys`.
+- **Hotkey**: A single key receiving 50,000+ QPS, saturating a single CPU core. Detect with `redis-cli --hotkeys`.
+- **Mitigation**: Enable **Client-Side Caching (Tracking)** via RESP3 to cache hot keys in application RAM.
+
+---
+
+### 50. Enterprise Redis: Active-Active Multi-Region CRDTs.
+
+**In Simple Words:**
+Running Redis across globally distributed datacenters (US, EU, APAC) with sub-millisecond local reads and writes uses **Conflict-Free Replicated Data Types (CRDTs)**:
+- Nodes in different regions accept concurrent writes locally.
+- In the background, changes replicate asynchronously and mathematically converge without write conflicts or global locking.

@@ -411,4 +411,340 @@ echo "Execution time: ${elapsed}ms"
   - Heavy JSON/YAML parsing and API client integrations.
   - Multi-threaded network sockets and concurrency.
   - Scripts exceeding 300 lines where maintainability, unit testing, and type safety are required.
-`;
+`
+
+---
+
+### 36. Parameter Expansion Tricks: String replacement, default fallbacks (`$:-`, `$:=`, `$:?`), substring slicing, and length.
+
+**In Simple Words:**
+Bash parameter expansion performs fast string manipulation directly inside the shell process without spawning slow subshells (`sed` or `awk`):
+
+```bash
+VAR="production-api-server-01"
+
+# 1. Default value fallback if unset
+PORT="${APP_PORT:-8080}"
+
+# 2. Assign default value to variable if unset
+DB_HOST="${DB_HOST:=localhost}"
+
+# 3. Terminate script with error if variable is unset
+API_KEY="${API_KEY:?Error: API_KEY must be provided!}"
+
+# 4. String Length: ${#VAR}
+echo "${#VAR}" # 24
+
+# 5. Substring Slicing: ${VAR:offset:length}
+echo "${VAR:0:10}" # production
+
+# 6. Pattern Replacement: ${VAR/search/replace} (// for global)
+echo "${VAR//-/_}" # production_api_server_01
+
+# 7. Strip Prefix (# short, ## long) & Suffix (% short, %% long)
+FILE="archive.tar.gz"
+echo "${FILE%%.*}" # archive
+echo "${FILE#*.}"  # tar.gz
+```
+
+---
+
+### 37. Associative Arrays (Hash Maps) vs Indexed Arrays in Bash: Declaration, iteration, and pitfalls.
+
+**In Simple Words:**
+Bash 4.0+ supports key-value hash maps via `declare -A`:
+
+```bash
+# Declare Associative Array (must use -A!)
+declare -A HTTP_STATUS=(
+  [200]="OK"
+  [404]="Not Found"
+  [500]="Internal Server Error"
+)
+
+# Insert or update
+HTTP_STATUS[401]="Unauthorized"
+
+# Access value
+echo "${HTTP_STATUS[404]}" # Not Found
+
+# Iterate over keys (!) and values
+for code in "${!HTTP_STATUS[@]}"; do
+  echo "HTTP $code -> ${HTTP_STATUS[$code]}"
+done
+
+# Array length
+echo "Total codes: ${#HTTP_STATUS[@]}"
+```
+
+---
+
+### 38. File Locking in Bash with `flock`: Preventing multiple simultaneous cron executions.
+
+**In Simple Words:**
+When a cron job takes longer to run than its execution frequency (e.g., a 10-minute backup scheduled every 5 minutes), overlapping instances will thrash CPU and corrupt files.
+**`flock`** uses kernel-level advisory file locking to ensure strictly one instance runs at any given time:
+
+```bash
+#!/usr/bin/env bash
+exec 200>/var/lock/nightly-sync.lock
+flock -n 200 || { echo "Another sync instance is already running. Exiting."; exit 1; }
+
+# Critical section starts here
+echo "Performing exclusive backup..."
+sleep 10
+echo "Backup complete."
+```
+
+---
+
+### 39. Process Substitution (`<()`, `>()`) vs Named Pipes (`mkfifo`): Syntax and use cases.
+
+**In Simple Words:**
+Process substitution allows the standard output or input of a command to appear as a temporary file descriptor (`/dev/fd/63`), avoiding intermediate temporary files on disk:
+
+```bash
+# Compare the output of two remote APIs directly using diff
+diff -u <(curl -s https://api.v1.com/users) <(curl -s https://api.v2.com/users)
+
+# Split stdout stream to two different consumers simultaneously
+tar -cf - ./data | tee >(gzip > data.tar.gz) >(bzip2 > data.tar.bz2) > /dev/null
+```
+
+---
+
+### 40. Here Documents (`<<EOF`), Quoted Here Docs (`<<'EOF'`), and Here Strings (`<<<`).
+
+**In Simple Words:**
+- **Unquoted HereDoc (`<<EOF`)**: Evaluates variables (`$VAR`), command substitutions (`$(date)`), and arithmetic before feeding into stdin.
+- **Quoted HereDoc (`<<'EOF'`)**: Treats all content as raw literal text without variable expansion. Essential when generating shell scripts, nginx configs, or remote SSH commands!
+- **Here String (`<<<`)**: Feeds a single string variable directly into stdin without needing `echo ... |`:
+
+```bash
+# Parsing single variable with read
+read -r first last <<< "Linus Torvalds"
+echo "Creator: $last, $first"
+```
+
+---
+
+### 41. Signal Trapping (`trap`) for graceful cleanup of temporary files on `EXIT`, `INT`, and `TERM`.
+
+**In Simple Words:**
+Scripts frequently create temporary files in `/tmp`. If a user presses `Ctrl+C` (`SIGINT`) or the process is killed (`SIGTERM`), orphaned files clutter the disk.
+The `trap` command registers guaranteed cleanup handlers:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+TEMP_DIR=$(mktemp -d /tmp/myapp.XXXXXX)
+
+# Guaranteed cleanup whether script exits normally or crashes!
+cleanup() {
+  echo "Cleaning up temporary files..."
+  rm -rf "$TEMP_DIR"
+}
+trap cleanup EXIT INT TERM
+
+echo "Working inside $TEMP_DIR"
+```
+
+---
+
+### 42. Defensive Bash Boilerplate: `set -euo pipefail` and custom error trap handlers.
+
+**In Simple Words:**
+By default, Bash happily continues executing subsequent commands even if an earlier command threw a fatal error!
+Production scripts must start with the **Strict Mode** prelude:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# -e: Exit immediately if any command returns a non-zero exit status.
+# -u: Exit and treat unset variables as an error.
+# -o pipefail: Pipeline exit status reflects the rightmost failing command!
+
+# Print exact line number and command on error
+trap 'echo "Error occurred at line $LINENO: command `$BASH_COMMAND` returned $?"' ERR
+```
+
+---
+
+### 43. Working with JSON in Bash: Best practices using `jq` vs fragile regex parsing.
+
+**In Simple Words:**
+Never parse JSON with `grep`, `sed`, or `awk` — multiline strings, escaped quotes, and nested arrays break regex immediately. Always use **`jq`**:
+
+```bash
+JSON_DATA='{"user":{"id":101,"name":"Sarah","roles":["admin","editor"]}}'
+
+# Extract single field
+NAME=$(jq -r '.user.name' <<< "$JSON_DATA")
+
+# Filter and iterate over arrays
+for role in $(jq -r '.user.roles[]' <<< "$JSON_DATA"); do
+  echo "User Role: $role"
+done
+
+# Transform and produce new JSON
+NEW_PAYLOAD=$(jq --arg ip "192.168.1.1" '.user + {ip: $ip}' <<< "$JSON_DATA")
+```
+
+---
+
+### 44. Parsing Command-Line Options with `getopts`: Handling flags (`-f`), arguments (`-o value`), and help output.
+
+**In Simple Words:**
+`getopts` is Bash's built-in POSIX option parser for handling short flags:
+
+```bash
+#!/usr/bin/env bash
+
+usage() { echo "Usage: $0 [-e <env>] [-v] [-h]"; exit 1; }
+
+VERBOSE=0
+ENV="development"
+
+while getopts "e:vh" opt; do
+  case "$opt" in
+    e) ENV="$OPTARG" ;;
+    v) VERBOSE=1 ;;
+    h) usage ;;
+    *) usage ;;
+  esac
+done
+shift $((OPTIND - 1)) # Shift away parsed flags
+
+echo "Environment: $ENV, Verbose: $VERBOSE"
+```
+
+---
+
+### 45. Subshells `(...)` vs Command Grouping `{ ...; }`: Memory isolation and environment variable scope.
+
+**In Simple Words:**
+- **Subshell `( cd /tmp && ls )`**: Spawns a child process. Any variable modifications (`export VAR=1`) or directory changes (`cd`) **vanish** when the subshell terminates, keeping the parent shell clean.
+- **Command Grouping `{ cd /tmp; ls; }`**: Executes within the **current shell process**. Variable modifications and directory changes persist in the caller's environment. Requires trailing semicolon before `}`.
+
+---
+
+### 46. Concurrency and Parallel Job Processing in Bash: Background jobs (`&`), `wait`, and `xargs -P`.
+
+**In Simple Words:**
+Executing independent tasks in parallel accelerates batch processing:
+
+```bash
+# 1. Background Jobs and wait
+pids=()
+for file in data_*.csv; do
+  process_file "$file" &
+  pids+=($!)
+done
+
+# Wait for all background jobs to finish and capture errors
+for pid in "${pids[@]}"; do
+  wait "$pid" || echo "Process $pid failed"
+done
+
+# 2. Using xargs with parallel workers (e.g. 8 parallel cores)
+find ./images -name "*.png" | xargs -P 8 -I {} pngquant --ext -min.png {}
+```
+
+---
+
+### 47. TCP Sockets in Bash: Native network reads/writes using `/dev/tcp/host/port` without curl or netcat.
+
+**In Simple Words:**
+Bash includes built-in TCP/UDP socket abstraction via virtual paths:
+
+```bash
+# Check if a remote port is open without netcat
+if (echo > /dev/tcp/db.example.com/5432) 2>/dev/null; then
+  echo "Database port is reachable"
+else
+  echo "Database connection failed"
+fi
+
+# Send raw HTTP GET request
+exec 3<>/dev/tcp/httpbin.org/80
+echo -e "GET /ip HTTP/1.1
+Host: httpbin.org
+Connection: close
+" >&3
+cat <&3
+exec 3>&- # Close socket
+```
+
+---
+
+### 48. Security in Bash: Preventing command injection (`eval` risks) and safe variable quoting rules.
+
+**In Simple Words:**
+- **Never use `eval` with user input**: `eval "cmd $user_input"` allows an attacker to pass `; rm -rf /` or `$(malicious_command)`.
+- **Always Quote Variables**: Use `"$VAR"` instead of `$VAR`. Unquoted variables undergo word splitting and globbing, turning a file named `*.*` or `my file.txt` into multiple dangerous arguments.
+- **Use `printf %q`**: Sanitizes and safely escapes arbitrary strings for reuse in shell commands.
+
+---
+
+### 49. Testing Bash Scripts with BATS (Bash Automated Testing System): Assertions and mocks.
+
+**In Simple Words:**
+**BATS** is an automated testing framework for Bash scripts providing unit test structures:
+
+```bash
+# test_math.bats
+setup() {
+  load 'test_helper/bats-support/load'
+  load 'test_helper/bats-assert/load'
+  source ./calculator.sh
+}
+
+@test "add function correctly sums two positive integers" {
+  run add 5 10
+  assert_success
+  assert_output "15"
+}
+
+@test "divide function throws error on division by zero" {
+  run divide 10 0
+  assert_failure
+  assert_output --partial "Division by zero"
+}
+```
+
+---
+
+### 50. Building Interactive CLI Prompts: Colored terminal output, menus (`select`), and silent input (`read -s`).
+
+**In Simple Words:**
+Creating polished interactive developer tools:
+
+```bash
+#!/usr/bin/env bash
+
+# ANSI Color Palettes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+echo -e "${CYAN}=== Production Deployment CLI ===${NC}"
+
+# Silent Password Prompt (no echo on screen)
+read -rsp "Enter API Secret: " SECRET
+echo ""
+
+# Interactive Selection Menu
+PS3="Select Target Cluster: "
+options=("US-East (Primary)" "EU-West (Failover)" "Staging" "Cancel")
+select opt in "${options[@]}"; do
+  case $opt in
+    "US-East (Primary)") echo -e "${GREEN}Deploying to US-East...${NC}"; break ;;
+    "EU-West (Failover)") echo -e "${GREEN}Deploying to EU-West...${NC}"; break ;;
+    "Cancel") exit 0 ;;
+    *) echo -e "${RED}Invalid option${NC}" ;;
+  esac
+done
+```

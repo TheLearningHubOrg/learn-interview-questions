@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'InterviewHub PRO - 3,600+ Master Technical Interview Questions Across 64 Tracks';
+export const alt = 'InterviewHub PRO - 4,300+ Master Technical Interview Questions Across 64 Tracks';
 export const size = {
   width: 1200,
   height: 630,
@@ -69,7 +69,7 @@ export default async function Image() {
             margin: '0 0 40px 0',
           }}
         >
-          3,600+ Battle-Tested Questions Across 64 Tracks: TypeScript, Angular, React, Vue, Nuxt, Svelte, Astro, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Swift, iOS, Kotlin, Android, Mobile, Testing/SRE, Networking, Linux, SOLID, Design Patterns, Data Engineering, Cloud & System Design.
+          4,300+ Battle-Tested Questions Across 64 Tracks: TypeScript, Angular, React, Vue, Nuxt, Svelte, Astro, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Swift, iOS, Kotlin, Android, Mobile, Testing/SRE, Networking, Linux, SOLID, Design Patterns, Data Engineering, Cloud & System Design.
         </p>
 
         <div

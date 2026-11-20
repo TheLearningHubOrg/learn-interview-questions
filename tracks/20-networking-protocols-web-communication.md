@@ -360,4 +360,171 @@ After sending the final `ACK` during connection close, the client enters `TIME_W
   - Multi-language enterprise teams (Protobuf generates type-safe clients in Go, Java, Python, C++, TypeScript).
   - Workloads requiring full-duplex streaming.
 - **Choose REST/JSON**: Public external APIs consumed by third-party developers, browsers, and mobile clients where human readability, simplicity, and zero client generation tooling are required.
-`;
+`
+
+---
+
+### 36. HTTP/3 and QUIC Protocol: Replacing TCP with UDP, 0-RTT handshakes, and solving Head-of-Line blocking.
+
+**In Simple Words:**
+HTTP/2 multiplexed streams over a single TCP connection, but created **TCP Head-of-Line Blocking**: if a single network packet is dropped on flaky Wi-Fi, the OS kernel pauses *all* streams until that one lost TCP packet is retransmitted:
+- **QUIC / HTTP/3**: Replaces TCP with **UDP in user space**:
+  - **Independent Streams**: Streams are decoupled at the transport layer. Dropping a packet in Stream 2 does not pause Stream 1!
+  - **Connection Migration**: Connections are tracked by a 64-bit **Connection ID**, not by IP/Port. If a user walks out of Wi-Fi range and switches to 5G cellular, the connection continues uninterrupted with zero handshake reconnect!
+  - **0-RTT Resumption**: Clients that previously connected can send encrypted application payloads on the very first round trip.
+
+---
+
+### 37. TLS 1.3 Handshake vs TLS 1.2: 1-RTT connection setup and modern cryptographic security.
+
+**In Simple Words:**
+- **TLS 1.2 (Legacy)**: Required **2 full round-trips (2-RTT)** between client and server just to negotiate keys and certificates before sending HTTP data. Supported outdated, insecure ciphers (RSA static key exchange, CBC mode ciphers).
+- **TLS 1.3**:
+  - Slashes handshake latency to **1 round-trip (1-RTT)** by combining key exchange parameters with the initial `ClientHello`.
+  - **Strict Forward Secrecy**: Enforces ephemeral Diffie-Hellman (`ECDHE`). If a server's private key is stolen 5 years in the future, past recorded traffic can never be decrypted!
+
+---
+
+### 38. DNS Resolution Deep Dive: Recursive resolver, Root, TLD, and Authoritative nameservers.
+
+**In Simple Words:**
+What happens when you type `google.com` in a browser:
+1. **Local Caches**: Checks browser cache, OS cache (`/etc/hosts`), and router cache.
+2. **Recursive Resolver (e.g. 1.1.1.1 / 8.8.8.8)**: Acts on behalf of the client:
+   - Queries **Root Nameserver (`.`)** -> Returns IPs of `.com` TLD nameservers.
+   - Queries **TLD Nameserver (`.com`)** -> Returns Authoritative Nameservers for `google.com` (e.g. `ns1.google.com`).
+   - Queries **Authoritative Nameserver** -> Returns final IPv4/IPv6 address (`A` / `AAAA` record).
+3. Resolver caches the record based on **TTL (Time to Live)** and returns IP to browser.
+
+---
+
+### 39. TCP Flow Control vs Congestion Control: Sliding Window, BBR, and CUBIC.
+
+**In Simple Words:**
+- **Flow Control (End-to-End Receiver Protection)**: Prevents a fast sender from overwhelming a slow receiver's memory buffer. The receiver advertises its available buffer space in the TCP header via the **Receive Window (`rwnd`)**.
+- **Congestion Control (Network Protection)**: Prevents senders from overwhelming the shared routers across the global internet:
+  - **CUBIC (Packet-Loss Based)**: Increases sending rate until a packet drops, then cuts transmission window in half. Flawed on modern high-speed long-distance fiber networks.
+  - **BBR (Bottleneck Bandwidth and RTT by Google)**: Measures actual network throughput and round-trip time, pumping data at the exact bottleneck bandwidth without causing packet drops or bufferbloat.
+
+---
+
+### 40. BGP (Border Gateway Protocol) and Anycast: How the global internet routes traffic.
+
+**In Simple Words:**
+- **BGP**: The routing protocol of the global internet that exchanges routing tables between Autonomous Systems (ASNs like Comcast, Cloudflare, AWS, Google).
+- **Unicast**: An IP address belongs to exactly one physical server in one building.
+- **Anycast**: The **exact same IP address is announced from hundreds of data centers globally**:
+  - When a user in London pings `1.1.1.1`, BGP routes packets across the shortest hop to the London edge router.
+  - When a user in Tokyo pings `1.1.1.1`, BGP routes to the Tokyo edge router.
+  - Eliminates trans-oceanic latency and absorbs multi-terabit DDoS attacks across hundreds of edge locations.
+
+---
+
+### 41. WebSocket Handshake and Framing: HTTP 101 Switching Protocols and Masking.
+
+**In Simple Words:**
+1. **Handshake**: Initiates via standard HTTP GET with headers:
+   ```http
+   Upgrade: websocket
+   Connection: Upgrade
+   Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+   ```
+   Server replies with `101 Switching Protocols` and a SHA-1 hash of the key, converting the TCP socket into a bidirectional binary stream.
+2. **Framing & Masking**: Client-to-server frames **must be masked with a 4-byte random XOR key**. This prevents poisoned proxy caches from misidentifying WebSocket payloads as cached HTTP responses.
+
+---
+
+### 42. Cross-Origin Resource Sharing (CORS): Simple requests vs Preflight `OPTIONS`.
+
+**In Simple Words:**
+A browser security mechanism enforcing the Same-Origin Policy (Protocol, Domain, Port):
+- **Simple Requests (GET/POST with standard headers)**: Browser sends request directly, including `Origin` header. Server responds with `Access-Control-Allow-Origin`.
+- **Preflight Requests (`OPTIONS`)**: Triggered if the request uses custom headers (e.g. `Authorization`, `Content-Type: application/json`) or mutating methods (`PUT`, `DELETE`):
+  - Browser automatically fires a preflight `OPTIONS` request first: *"Are you willing to accept a PUT request with an Authorization header from example.com?"*
+  - The actual data request executes only after the server approves the preflight headers.
+
+---
+
+### 43. WebTransport Protocol: Bidirectional, multiplexed communication over QUIC.
+
+**In Simple Words:**
+Modern replacement for WebSockets designed for gaming, cloud gaming, and live streaming:
+- Runs natively over **HTTP/3 / QUIC**.
+- Supports both **Reliable Streams** (ordered delivery like WebSockets) and **Unreliable Datagrams** (unordered, drop-tolerant packet delivery like UDP).
+- In online gaming, position updates can be sent via datagrams: if packet 42 drops, the client doesn't care because packet 43 has newer coordinates!
+
+---
+
+### 44. Content Delivery Networks (CDN) Architecture: Edge PoPs, Origin Shields, and Caching.
+
+**In Simple Words:**
+- **Edge PoPs (Points of Presence)**: Distributed servers close to users that serve cached static assets (images, CSS, JS) in $< 10	ext{ms}$.
+- **Origin Shield**: A centralized intermediate caching layer between edge PoPs and the primary origin data center, protecting origin servers from thundering herd cache misses.
+- **`Cache-Control: stale-while-revalidate=60`**: Tells the browser to serve stale cached content instantly while asynchronously fetching a fresh version in the background, delivering instant zero-latency UI loads.
+
+---
+
+### 45. IP Addressing and Subnetting: IPv4 vs IPv6, CIDR notation, and RFC 1918.
+
+**In Simple Words:**
+- **CIDR Notation (`/24`)**: Number of fixed network prefix bits. `192.168.1.0/24` has 24 network bits, leaving $32 - 24 = 8$ bits for hosts ($2^8 - 2 = 254$ usable host IPs).
+- **RFC 1918 Private Ranges**: Reserved for local networks, unroutable on the public internet:
+  - `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`.
+- **IPv6**: 128-bit hexadecimal addresses ($3.4 	imes 10^{38}$ addresses), eliminating the need for NAT and providing native end-to-end device connectivity.
+
+---
+
+### 46. TCP Keep-Alive vs HTTP Persistent Connections (`Keep-Alive` header).
+
+**In Simple Words:**
+Two completely different concepts operating at different OSI layers:
+- **HTTP `Connection: keep-alive` (Layer 7)**: Reuses the same underlying TCP connection to send multiple sequential HTTP requests and responses, avoiding the 3-way handshake overhead for every image or CSS file.
+- **TCP Keep-Alive (Layer 4)**: Operates at the OS socket level. Sends empty probe packets with duplicate sequence numbers every 2 hours (or configured interval) to verify that an idle connection's peer has not crashed or lost power.
+
+---
+
+### 47. Zero-Trust Network Architecture: mTLS and Software-Defined Perimeters (SDP).
+
+**In Simple Words:**
+Traditional security relied on the "Castle and Moat" perimeter model (firewalls protecting the corporate intranet). Once inside, everything was trusted:
+- **Zero-Trust**: *"Never trust, always verify"*.
+- Every request must be authenticated, authorized, and encrypted, regardless of whether it originates inside the corporate LAN or across the public internet.
+- Microservices authenticate using short-lived X.509 certificates (**mTLS**) managed by service meshes (Istio) or SPIFFE/SPIRE.
+
+---
+
+### 48. Network MTU (Maximum Transmission Unit) and Path MTU Discovery (PMTUD).
+
+**In Simple Words:**
+- **MTU**: Maximum packet size in bytes that can be transmitted over a physical link without fragmentation (standard Ethernet MTU = **1500 bytes**; AWS Jumbo Frames = 9001 bytes).
+- **Path MTU Discovery (PMTUD)**: Senders set the `DF` (Don't Fragment) bit in the IP header. If a router along the route has a smaller MTU (e.g. 1420 bytes for a VPN tunnel), it drops the packet and sends back an ICMP `Fragmentation Needed` message.
+- **Black Hole Routers**: If a broken firewall blocks ICMP messages, the sender never knows its packets are too large, causing mysterious TCP connections that hang during large file transfers!
+
+---
+
+### 49. HTTP Caching Headers Matrix: `ETag`, `no-cache`, `no-store`, and `immutable`.
+
+**In Simple Words:**
+| Header | Meaning |
+| :--- | :--- |
+| **`Cache-Control: no-store`** | Never cache! Browser and CDNs must not save any copy (used for bank statements, sensitive PII). |
+| **`Cache-Control: no-cache`** | Cache the file, but **must revalidate** with origin server before every single use via `ETag`! |
+| **`ETag` / `If-None-Match`** | Hash fingerprint of file content. Server returns `304 Not Modified` (0 body bytes) if unchanged. |
+| **`immutable`** | Used with hashed bundles (`app.a8f9b2.js`). Informs the browser that this URL will *never* change, eliminating 304 revalidation checks on page reload. |
+
+---
+
+### 50. Debugging Network Bottlenecks: `tcpdump`, Wireshark, `curl` timing metrics, and `ss`.
+
+**In Simple Words:**
+Essential CLI diagnostic tools for network engineers:
+```bash
+# 1. Inspect exact HTTP connection timings (DNS, TCP Handshake, TLS, TTFB)
+curl -w "DNS: %{time_namelookup}s | TCP: %{time_connect}s | TLS: %{time_appconnect}s | TTFB: %{time_starttransfer}s | Total: %{time_total}s\n" -so /dev/null https://api.example.com
+
+# 2. Capture raw TCP packets on port 443 into a file for Wireshark analysis
+tcpdump -i eth0 -nn -s0 -w trace.pcap port 443
+
+# 3. Inspect socket states and listen backlogs
+ss -tulpn
+```

@@ -331,3 +331,183 @@ Attackers inject malicious instructions into external documents (e.g. "IGNORE AL
 - **Milvus**: Distributed, Kubernetes-native, built for massive enterprise scale (hundreds of millions to billions of vectors).
 - **Qdrant**: Written in Rust, exceptional performance, memory-efficient vector payload filtering, single binary self-hosting or cloud.
 - **Weaviate**: Built-in vectorizer modules, hybrid search, and GraphQL API support.
+
+
+---
+
+### 36. Approximate Nearest Neighbor (ANN) Algorithms: HNSW vs IVF-Flat vs IVF-PQ benchmarks and recall-vs-latency tradeoffs.
+
+**In Simple Words:**
+Exact nearest neighbor search (kNN) requires calculating distance against every vector in the database ($O(N)$), which is unacceptably slow for millions of vectors. **ANN algorithms** trade a tiny fraction of accuracy (< 1%) for orders-of-magnitude faster queries:
+- **HNSW (Hierarchical Navigable Small World)**:
+  - Multi-layer graph structure where upper layers have long-range skip edges and lower layers have dense local connections (like an express train subway network).
+  - Highest recall (> 98%) and lowest search latency (< 5ms).
+  - **Tradeoff**: Consumes significant RAM to store graph edge lists.
+- **IVF-Flat (Inverted File Flat)**:
+  - Partitions vector space into Voronoi cells using k-means clustering. At query time, only vectors inside the nearest $n$ centroids (`nprobe`) are checked.
+  - Low memory overhead, fast index build time; slightly lower recall than HNSW under high dimensionality.
+- **IVF-PQ**: Combines IVF partitioning with Product Quantization to compress vectors, fitting billions of vectors into limited RAM.
+
+---
+
+### 37. Product Quantization (PQ) and Scalar Quantization (SQ): Mathematical principles and RAM reduction up to 95%.
+
+**In Simple Words:**
+High-dimensional vectors are stored as 32-bit floating point numbers (FP32). 1 million 1536-dim vectors consume **6 GB** of raw memory:
+- **Scalar Quantization (SQ8)**: Compresses 32-bit floats into 8-bit integers (`int8`) using linear scaling:
+  $$	ext{int8} = 	ext{round}left(255 	imes rac{x - min}{max - min}ight)$$
+  - Yields an immediate **4x reduction in RAM** (from 6 GB down to 1.5 GB) with virtually zero loss in search accuracy (< 0.5% drop in recall).
+- **Product Quantization (PQ)**: Decomposes a 1536-dim vector into 192 sub-vectors of 8 dimensions each, clusters sub-vectors into codebooks, and replaces them with 1-byte centroid IDs.
+  - Yields up to **95% memory reduction**, allowing massive datasets to reside in memory at the cost of slightly lower recall.
+
+---
+
+### 38. Distance Metrics in Vector Space: Cosine Similarity, Dot Product, Euclidean Distance (L2), and Manhattan Distance (L1).
+
+**In Simple Words:**
+Choosing the right metric depends on how the embedding model was trained:
+- **Cosine Similarity**: Measures the cosine of the angle between two vectors:
+  $$cos(	heta) = rac{A cdot B}{|A| |B|}$$
+  - Range from -1 to 1. Completely invariant to vector magnitude (length). Ideal for text documents of varying length.
+- **Dot Product (Inner Product)**:
+  $$A cdot B = sum A_i B_i$$
+  - Fastest to compute. If vectors are **normalized to unit length ($|A|=1$)**, Dot Product is mathematically identical to Cosine Similarity!
+- **Euclidean Distance (L2)**: Measures straight-line geometric distance:
+  $$sqrt{sum (A_i - B_i)^2}$$
+  - Sensitive to vector magnitude. Common in image feature embeddings and clustering algorithms.
+
+---
+
+### 39. Chunking Strategies: Fixed-size, Recursive Character Splitting, Semantic Chunking, and Document-aware chunking.
+
+**In Simple Words:**
+How you chop source documents directly dictates RAG quality:
+- **Fixed-Size Chunking (e.g. 500 tokens with 50 token overlap)**: Fast and simple, but often splits mid-sentence or cuts a crucial paragraph in half.
+- **Recursive Character Splitting**: Attempts to split by double newlines (`\n\n`), then single newlines (`\n`), then spaces, preserving natural paragraph and sentence boundaries.
+- **Semantic Chunking**: Computes embeddings for individual consecutive sentences. When the cosine distance between sentence $N$ and $N+1$ exceeds a statistical threshold (e.g. 95th percentile delta), a new chunk is started because the topic has shifted!
+- **Document-Aware Chunking**: Parses Markdown headings (`#`, `##`), HTML tags, or PDF sections so headers are prepended to every chunk as contextual metadata.
+
+---
+
+### 40. Advanced RAG Query Transformations: Query Rewriting, HyDE, and Multi-Query Generation.
+
+**In Simple Words:**
+Raw user queries are often vague, keyword-sparse, or poorly worded for semantic matching:
+- **Query Rewriting**: An LLM reformulates the user prompt into a clear, standalone search query resolving pronouns and past conversational context.
+- **HyDE (Hypothetical Document Embeddings)**:
+  1. Feed the user prompt to an LLM: *"Write a hypothetical passage that answers this question"*.
+  2. Embed the **generated hypothetical answer**, not the user question!
+  3. The hypothetical answer lives in "document space" rather than "query space", dramatically improving cosine similarity matches with real source documents.
+- **Multi-Query Expansion**: Generates 3-5 distinct keyword and semantic variations of the query, executes them in parallel, and merges candidate chunks via reciprocal rank fusion.
+
+---
+
+### 41. GraphRAG: Combining Knowledge Graphs with Vector Embeddings for multi-hop reasoning.
+
+**In Simple Words:**
+Standard Vector RAG is great for finding specific facts ("What is the refund policy?"), but fails on global holistic questions ("What are the main themes across all customer complaints in 2024?").
+- **GraphRAG (Microsoft)**:
+  1. Uses an LLM to extract Entities (People, Places, Concepts) and Relationships into a **Knowledge Graph** (Neo4j / NetworkX).
+  2. Clusters the graph into communities using the Leiden algorithm and generates pre-computed summaries for each community.
+  3. Combines vector semantic search with graph graph traversal: when a node matches, the retriever hops across relationships to gather connected entities, answering complex multi-hop queries.
+
+---
+
+### 42. Cross-Encoder Re-Ranking: Architecture, latency overhead, and recall improvements.
+
+**In Simple Words:**
+- **Bi-Encoder (Vector Search)**: Encodes Query and Document separately into two vectors, computing similarity via fast dot product ($< 5	ext{ms}$). High speed, but lacks fine token-to-token attention.
+- **Cross-Encoder (Re-Ranker like Cohere Rerank or BGE-Reranker)**: Passes Query and Document together through a transformer cross-attention layer:
+  - Every query token attends to every document token simultaneously.
+  - Produces an exact relevance score (0.0 to 1.0).
+- **Two-Stage Retrieval Pattern**:
+  1. Vector search fetches the top 50 coarse candidates (5ms).
+  2. Cross-Encoder re-ranks the 50 candidates, picking the top 5 highest-quality chunks (30ms).
+  3. Eliminates irrelevant chunks before stuffing into the LLM context.
+
+---
+
+### 43. Corrective RAG (CRAG) and Self-RAG: Evaluating retrieval relevance and dynamic fallback to web search.
+
+**In Simple Words:**
+What happens if the internal vector database does not contain the answer? Blindly passing irrelevant chunks causes LLM hallucination:
+- **Self-RAG / CRAG Pipeline**:
+  1. Retrieve top $K$ documents from vector storage.
+  2. A lightweight evaluator model scores the retrieval confidence:
+     - **CORRECT**: Pass chunks to LLM generator.
+     - **INCORRECT**: Discard internal chunks; dynamically trigger an external Web Search API (Tavily, Google, Bing) to fetch fresh ground-truth documents.
+     - **AMBIGUOUS**: Combine filtered internal chunks with web search results.
+
+---
+
+### 44. Measuring RAG System Quality: The RAG Triad using Ragas and TruLens.
+
+**In Simple Words:**
+Evaluating generative AI systems without manual human grading:
+1. **Context Relevance**: Does the retrieved context contain *only* information needed to answer the question, or is it contaminated with noise?
+2. **Groundedness / Faithfulness**: Is the LLM's generated response strictly derived from the retrieved context, or did the model invent external facts (hallucination)?
+3. **Answer Relevance**: Did the generated answer directly address the user's original query?
+
+---
+
+### 45. Vector Database Disaster Recovery, Backup, and Snapshotting.
+
+**In Simple Words:**
+Re-generating millions of vector embeddings during a disaster takes days and thousands of dollars in LLM API fees:
+- **Write-Ahead Logging (WAL)**: All vector insertions, updates, and deletes are committed to an immutable append-only disk log before updating in-memory HNSW graphs.
+- **Automated S3/GCS Snapshots**: Periodic point-in-time snapshots of index files and WAL segments uploaded to cloud object storage.
+- **Recovery SLA**: On catastrophic node failure, the database loads the latest snapshot from S3 and replays remaining WAL delta records, restoring full cluster read/write capability in minutes without re-embedding.
+
+---
+
+### 46. Real-Time Vector Ingestion: Handling continuous document updates, deletes, and the "Stale Embeddings" problem.
+
+**In Simple Words:**
+When source documents (Notion docs, Jira tickets, SQL tables) update frequently:
+- **Hash-Based Change Detection**: Compute SHA-256 hash of each chunk text. Store `{ chunk_id: sha256_hash }`. If the hash is identical, skip re-embedding.
+- **Soft Deletes & HNSW Graph Compaction**: In graph indexes (HNSW), deleting a vector immediately leaves orphaned edges. Vector databases mark nodes as deleted (tombstone) and trigger background vacuum compaction during idle windows.
+- **Model Drift / Stale Embeddings**: If you upgrade the embedding model (e.g. from OpenAI `ada-002` to `text-embedding-3-small`), you **cannot mix old and new vectors in the same index**. You must re-embed all documents in a parallel index before cutting over.
+
+---
+
+### 47. Local / In-Process Vector Engines: FAISS, ChromaDB, and SQLite-vss for edge and desktop AI applications.
+
+**In Simple Words:**
+When cloud vector databases are overkill or offline privacy is required:
+- **FAISS (Meta)**: Low-level C++ library with GPU acceleration for massive similarity searches. Unrivaled raw matrix compute performance, but lacks persistence and metadata filtering out of the box.
+- **ChromaDB**: Lightweight, Python-first vector store with DuckDB/ClickHouse backend. Ideal for local prototypes, LangChain agents, and notebook experimentation.
+- **SQLite-vss**: Extends standard SQLite with vector search capabilities. Ideal for embedded mobile apps (iOS/Android) and desktop apps (Electron) running local embeddings with zero network latency.
+
+---
+
+### 48. Filtering Strategies: Pre-Filtering vs Post-Filtering vs Single-Stage Filtered Vector Search.
+
+**In Simple Words:**
+Query: *"Find matching vectors where category == 'medical' and year >= 2023"*:
+- **Post-Filtering**: Runs ANN vector search first, retrieves top 100 results, then filters out non-medical documents. **Major Flaw**: If only 2% of the database is medical, all 100 results might get filtered out, returning 0 matches!
+- **Pre-Filtering**: Filters documents first, then runs brute-force vector search over the filtered set. Slow if the filtered set contains millions of records.
+- **Single-Stage Filtered Search (Qdrant / Milvus)**: Traverses the HNSW graph while checking a bitset/payload index during every graph traversal hop. Guarantees top $K$ results matching all metadata filters with zero missing matches.
+
+---
+
+### 49. Embedding Model Selection and Dimensionality Tradeoffs.
+
+**In Simple Words:**
+| Model | Dimensions | MTEB Benchmark | Cost / Latency | Best Use Case |
+| :--- | :--- | :--- | :--- | :--- |
+| **OpenAI `text-embedding-3-small`** | 1536 (or 512 via MRL) | High (62.3) | Ultra-cheap API, low latency | General-purpose SaaS RAG applications |
+| **OpenAI `text-embedding-3-large`** | 3072 | Highest (64.6) | Moderate API cost | High-precision legal, medical, and financial search |
+| **BAAI `bge-large-en-v1.5`** | 1024 | Very High (64.1) | Open-source (self-hosted GPU) | Air-gapped on-premise enterprise environments |
+| **`nomic-embed-text`** | 768 | High (62.4) | Open-source, 8K context window | Long-document ingestion with fully auditable weights |
+
+---
+
+### 50. Scaling RAG to Enterprise Long-Context Documents: Parent-Child Document Retrievers and Hierarchical Summarization Indexes.
+
+**In Simple Words:**
+The **Small-to-Big Retrieval Dilemma**: Small chunks (100 tokens) produce accurate vector similarity matches, but lack surrounding context. Large chunks (2,000 tokens) provide rich context to the LLM, but their embeddings get diluted and yield poor search accuracy.
+- **Parent-Child Document Retriever**:
+  1. Chunk source documents into small child chunks (200 tokens) and link each to a larger parent chunk (1,000 tokens) or the full document.
+  2. Index only the **child chunks** in the vector database.
+  3. When a child chunk matches the user query, retrieve and inject the **parent chunk** into the LLM prompt.
+  4. Delivers surgical search precision with complete, un-truncated context for the generative model.

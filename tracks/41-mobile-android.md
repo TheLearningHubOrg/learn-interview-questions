@@ -388,8 +388,7 @@ Allows breaking an app into dynamic feature modules that are downloaded **on dem
   - High-performance 3D graphics, real-time audio DSP, or complex background services (WorkManager, VPNs).
   - High-consequence enterprise applications where zero bridge latency, immediate access to Day-0 Android OS APIs, and absolute smallest APK size are paramount.
 - **Choose Cross-Platform (RN/Flutter)**: Standard e-commerce, content, or SaaS applications where developer velocity and unified iOS/Android codebase cut time-to-market in half.
-`;
-
+`
 ---
 
 ### 33. What is Baseline Profiles and how does it eliminate Android App Startup Jank?
@@ -407,3 +406,189 @@ Generate an asymmetric cryptographic key inside the hardware-backed **Android Ke
 ### 35. What are Foreground Services vs Background Execution limits in modern Android (Android 14+)?
 **In Simple Words:**
 Android strictly restricts background work to preserve battery. Foreground Services display an ongoing persistent notification and require declaring explicit `foregroundServiceType` (e.g., location, mediaPlayback, dataSync) in Android 14+.
+
+
+---
+
+### 36. Jetpack Compose Internals: The Slot Table, Composer, and Smart Recomposition.
+
+**In Simple Words:**
+Unlike traditional Android XML Views that exist as a heavy mutable hierarchy of View objects on the heap, Jetpack Compose represents UI as an in-memory flat data array called the **Slot Table**:
+- **Slot Table**: A contiguous array (gap buffer) that stores the state and values emitted by `@Composable` functions during execution.
+- **Position Keys & Object Identity**: As composables run, the **Composer** reads and writes to the Slot Table.
+- **Smart Recomposition**: When a state value mutates, the runtime jumps directly to the specific slot in the table, evaluates if the new inputs equal the old inputs (`equals`), and skips executing the composable function entirely if inputs have not changed!
+
+---
+
+### 37. Jetpack Compose State Stability: `@Stable`, `@Immutable`, and Collections stability.
+
+**In Simple Words:**
+In Compose, a function can only be skipped during recomposition if all its parameters are proven to be **Stable**:
+- **Primitives & Strings**: Automatically stable.
+- **The List Problem**: Standard Kotlin `List<T>` is an interface. Because a mutable `ArrayList` can be passed as a `List`, the Compose compiler treats standard collections as **Unstable**, causing views to needlessly recompose on every frame!
+- **Fixes**:
+  1. Use Kotlinx Immutable Collections (`ImmutableList<T>`).
+  2. Annotate custom UI data models with `@Immutable` or `@Stable`.
+  3. Pass lambdas as method references or wrap in `remember`.
+
+---
+
+### 38. Dependency Injection with Hilt / Dagger: Scopes, Component Lifecycles, and `@HiltViewModel`.
+
+**In Simple Words:**
+Hilt simplifies Dagger on Android by providing standard, pre-defined dependency scopes tied directly to Android OS component lifecycles:
+- **`@Singleton`**: Survives the entire application lifetime (`SingletonComponent`).
+- **`@ActivityRetainedScoped`**: Survives configuration changes (screen rotations) alongside ViewModels.
+- **`@ActivityScoped`**: Destroyed when the Activity is destroyed.
+- **`@HiltViewModel`**: Injects repositories, use-cases, and `SavedStateHandle` directly into ViewModels with zero factory boilerplate.
+
+---
+
+### 39. Android Architecture Components: Room Persistence Library and Flow integration.
+
+**In Simple Words:**
+Room is an object-mapping abstraction over SQLite:
+- **Compile-Time SQL Verification**: Validates SQL queries at compile time; if you mistype a column name, the build fails immediately instead of crashing in production!
+- **Reactive Flow Integration**:
+  ```kotlin
+  @Query("SELECT * FROM items WHERE status = :status")
+  fun observeItems(status: String): Flow<List<ItemEntity>>
+  ```
+  When a row in the `items` table is inserted, updated, or deleted anywhere in the app, Room automatically re-queries SQLite on a background thread and emits the fresh list to UI collectors.
+
+---
+
+### 40. Android ART vs Dalvik: AOT, JIT with Profile-Guided Optimization (PGO), and Cloud Profiles.
+
+**In Simple Words:**
+How Android executes compiled DEX bytecode:
+1. **Dalvik (Legacy)**: Interpreted bytecode with basic Just-In-Time (JIT) compilation; high CPU overhead and slow app launch.
+2. **ART AOT (Android 5.0)**: Compiled all bytecode into native machine code at install time. Caused massive 20-minute app install delays and huge storage bloat.
+3. **ART Modern Hybrid (PGO + Cloud Profiles)**:
+   - Apps install quickly with JIT.
+   - While the user interacts with the app, ART records a profile of hot methods and classes.
+   - When the phone is idle and charging, ART compiles only the hot profile methods into native machine code.
+   - **Cloud Profiles**: Google Play aggregates profiles across thousands of users and ships pre-compiled profiles inside the APK, delivering instant AOT speed on day one!
+
+---
+
+### 41. Navigation in Jetpack Compose: Type-safe navigation routes and shared element transitions.
+
+**In Simple Words:**
+Modern Compose Navigation (Navigation 2.8+) replaces fragile string URLs (`"profile/{id}"`) with strongly typed Kotlin Serializable classes:
+```kotlin
+@Serializable
+data class ProfileRoute(val userId: String, val referralSource: String? = null)
+
+// Navigate type-safely:
+navController.navigate(ProfileRoute(userId = "1042"))
+
+// Define destination:
+composable<ProfileRoute> { backStackEntry ->
+  val profile: ProfileRoute = backStackEntry.toRoute()
+  ProfileScreen(userId = profile.userId)
+}
+```
+- Provides compile-time route verification, automatic argument parceling, and native support for predictive back gestures and shared element animations.
+
+---
+
+### 42. Coroutine Lifecycle in Android: `repeatOnLifecycle` vs `launchWhenStarted`.
+
+**In Simple Words:**
+Collecting flows naively on Android can cause catastrophic background leaks:
+- **`launchWhenStarted` (Deprecated & Dangerous)**: Pauses coroutine execution when the app enters the background, but **keeps the active upstream Flow subscription open**! The server or location manager continues streaming data, burning battery in the background.
+- **`repeatOnLifecycle(Lifecycle.State.STARTED)`**: Completely **cancels and restarts** the collection block when the Activity stops and restarts, ensuring zero background battery drain or resource leaks.
+
+---
+
+### 43. Network Layer with Retrofit, OkHttp, and Interceptors: Connection pooling and certificate pinning.
+
+**In Simple Words:**
+The gold standard Android networking stack:
+- **Connection Pooling**: OkHttp keeps persistent HTTP/2 and HTTP/3 TCP sockets open, eliminating handshake latency for subsequent requests.
+- **Interceptors**: Chain of middleware for logging, adding auth headers (`Authorization: Bearer <token>`), and handling token refresh automatically via `Authenticator`.
+- **Certificate Pinning**: Hardcodes SHA-256 public key hashes to reject rogue certificate authority MITM attacks.
+
+---
+
+### 44. WorkManager Deep Dive: Constraints, `PeriodicWorkRequest`, and Expedited Work.
+
+**In Simple Words:**
+WorkManager is Android's guaranteed background processing engine:
+- **Guaranteed Execution**: Jobs persist in an internal SQLite database; if the device reboots or runs out of battery, WorkManager resumes the job when conditions are restored.
+- **Constraints**: Enforces battery-friendly rules (e.g. `setRequiredNetworkType(NetworkType.UNMETERED)`, `setRequiresCharging(true)`).
+- **Expedited Work**: Executes high-priority tasks (e.g. uploading a user's sent chat message) immediately without waiting for OS doze mode windows.
+
+---
+
+### 45. Android IPC (Inter-Process Communication): Binder, AIDL, and Parcelable serialization.
+
+**In Simple Words:**
+In Android, each application runs in its own isolated Linux process:
+- **Binder**: A Linux kernel driver (`/dev/binder`) optimized for fast inter-process communication using shared memory pages.
+- **Parcelable**: High-performance, reflection-free Android binary serialization format designed specifically for Binder transaction buffers (capped at 1 MB per transaction).
+- **AIDL (Android Interface Definition Language)**: Defines type-safe IPC service contracts allowing cross-application remote procedure calls (RPC).
+
+---
+
+### 46. Memory Leak Profiling: LeakCanary architecture and common Activity retain leaks.
+
+**In Simple Words:**
+A memory leak occurs when an object is no longer needed (e.g. an Activity destroyed after back press) but remains referenced by a GC Root, preventing garbage collection:
+- **Common Causes**: Static variables holding Context references, non-static inner classes, un-cancelled RxJava/Coroutine subscriptions, or singleton listeners.
+- **LeakCanary**: Automatically watches destroyed Activities and Fragments using `WeakReference`. If the object is not collected after 5 seconds, it forces a garbage collection and dumps the HPROF heap file, analyzing and displaying the exact reference chain causing the leak in a notification!
+
+---
+
+### 47. Security & Encryption: Android Keystore, EncryptedSharedPreferences, and Play Integrity API.
+
+**In Simple Words:**
+Securing Android enterprise apps:
+- **Android Keystore**: Cryptographic keys are generated and stored inside hardware security modules (TEE - Trusted Execution Environment / StrongBox), making key extraction impossible even on rooted devices.
+- **EncryptedSharedPreferences**: Automatically encrypts key-value preferences using AES-256 GCM.
+- **Play Integrity API**: Cryptographically verifies that the app binary was installed legitimately from Google Play and is running on a genuine, un-compromised, un-rooted Android device.
+
+---
+
+### 48. Jetpack Glance: Building modern App Widgets with declarative Compose-like syntax.
+
+**In Simple Words:**
+Historically, Android Home Screen Widgets required complex, clunky XML `RemoteViews`:
+- **Jetpack Glance**: Brings declarative Jetpack Compose paradigms to Android Widgets.
+- Translates composable functions into `RemoteViews` hierarchies underneath, providing reactive state management and seamless Material You dynamic theming.
+
+---
+
+### 49. Custom Views and Custom Modifiers in Compose: Layout phase and MeasurePolicy.
+
+**In Simple Words:**
+Building custom layout algorithms in Compose:
+- **Three Phases of Compose**: Composition (What to show), Layout (Where to place), and Drawing (How to render).
+- **Custom `Layout` Composable**:
+  ```kotlin
+  Layout(content = content) { measurables, constraints ->
+    val placeables = measurables.map { it.measure(constraints) }
+    layout(width, height) {
+      placeables.forEach { it.placeRelative(x, y) }
+    }
+  }
+  ```
+- Allows building custom staggered grids, circular layouts, and responsive flow rows.
+
+---
+
+### 50. Edge-to-Edge and Insets Handling in Modern Android (Android 15+).
+
+**In Simple Words:**
+In Android 15, apps are drawn **Edge-to-Edge by default**, displaying content directly behind the transparent system status bar and gesture navigation bar:
+- **WindowInsets Handling**: Use Compose modifiers to prevent text from colliding with system navigation bars or camera punch-holes:
+  ```kotlin
+  Scaffold(
+    modifier = Modifier.fillMaxSize(),
+    contentWindowInsets = WindowInsets.safeDrawing
+  ) { innerPadding ->
+    Box(modifier = Modifier.padding(innerPadding)) { ... }
+  }
+  ```
+- Supports dynamic keyboard animation insets (`imePadding`) where views glide smoothly above the soft keyboard as it slides up.

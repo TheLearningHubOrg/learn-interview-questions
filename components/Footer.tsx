@@ -30,7 +30,7 @@ export function Footer() {
                 </span>
               </p>
               <p className="text-xs text-muted-foreground text-center sm:text-left">
-                Free & open-source engineering interview platform • 3,600+ Questions • 64 Specialized Tracks
+                Free & open-source engineering interview platform • 4,300+ Questions • 64 Specialized Tracks
               </p>
             </div>
           </div>

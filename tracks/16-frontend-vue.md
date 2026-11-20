@@ -518,3 +518,378 @@ Host applications (React, Angular, or plain HTML) can consume the widget without
 9. **Enforce TypeScript strict mode across all props and emits**.
 10. **Use `<Teleport>` for modals to preserve semantic layering**.
 
+
+---
+
+### 36. Vue 3 `toRef` vs `toRefs` vs `toValue`: Deep Dive into Reactivity Utilities.
+
+**In Simple Words:**
+- **`toRef`**: Creates a ref tracking a single property from a reactive object or converts a getter/value into a ref.
+- **`toRefs`**: Converts all properties of a reactive object into individual refs, preserving reactivity when destructuring.
+- **`toValue`** (Vue 3.3+): Normalizes values, refs, or getter functions to raw values, simplifying composable parameter handling.
+
+```typescript
+import { reactive, toRef, toRefs, toValue, MaybeRefOrGetter } from 'vue';
+
+const state = reactive({ count: 0, title: 'Vue 3' });
+
+// 1. toRef for a single property
+const countRef = toRef(state, 'count');
+countRef.value++; // state.count is now 1
+
+// 2. toRefs for safe destructuring
+const { count, title } = toRefs(state);
+
+// 3. toValue in composables (Vue 3.3+)
+function useDoubler(input: MaybeRefOrGetter<number>) {
+  // toValue unwraps refs OR executes getter functions transparently
+  return computed(() => toValue(input) * 2);
+}
+```
+
+---
+
+### 37. Custom Directives in Vue 3: Lifecycle Hooks and Practical Implementations.
+
+**In Simple Words:**
+Custom Directives allow direct low-level DOM manipulations on elements. In Vue 3, directive hooks mirror component lifecycles (`created`, `beforeMount`, `mounted`, `beforeUpdate`, `updated`, `beforeUnmount`, `unmounted`).
+
+```typescript
+// v-click-outside directive implementation
+import { Directive } from 'vue';
+
+export const vClickOutside: Directive = {
+  mounted(el, binding) {
+    el._clickOutsideHandler = (event: MouseEvent) => {
+      if (!(el === event.target || el.contains(event.target as Node))) {
+        binding.value(event); // Invoke passed callback
+      }
+    };
+    document.addEventListener('click', el._clickOutsideHandler);
+  },
+  unmounted(el) {
+    document.removeEventListener('click', el._clickOutsideHandler);
+  }
+};
+
+// Usage in template:
+// <div v-click-outside="closeDropdown">...</div>
+```
+
+---
+
+### 38. Vue 3 Reactivity Caveats: Loss of Reactivity During Destructuring and How to Preserve It.
+
+**In Simple Words:**
+Destructuring properties from a `reactive()` object strips their reactive link because JavaScript passes primitive values (`number`, `string`, `boolean`) by value, not by reference.
+
+- **The Problem**: Destructuring `const { count } = reactive({ count: 0 })` creates an isolated primitive local variable that never updates when the store changes.
+- **The Solution**: Use `toRefs()` to wrap each key in a getter/setter ref object before destructuring.
+
+```typescript
+import { reactive, toRefs } from 'vue';
+
+const userStore = reactive({ username: 'Alex', karma: 120 });
+
+// ❌ Anti-pattern: Reactivity lost!
+const { username } = userStore;
+
+// ✅ Optimal Pattern: Reactivity preserved!
+const { username: liveUsername, karma } = toRefs(userStore);
+```
+
+---
+
+### 39. `v-model` Modifiers in Vue 3: Built-in vs Custom Modifier Implementation.
+
+**In Simple Words:**
+`v-model` modifiers adjust how user input is bound to component state.
+- **Built-in Modifiers**: `.lazy` (syncs on `change` event instead of `input`), `.number` (typecasts input string to number via `parseFloat`), `.trim` (strips leading/trailing whitespace).
+- **Custom Modifiers**: Accessed via `defineProps<{ modelModifiers?: { capitalize?: boolean } }>()` in child components.
+
+```vue
+<!-- ChildComponent.vue with custom .capitalize modifier -->
+<script setup lang="ts">
+const [model, modifiers] = defineModel({
+  set(val: string) {
+    if (modifiers.capitalize) {
+      return val.charAt(0).toUpperCase() + val.slice(1);
+    }
+    return val;
+  }
+});
+</script>
+
+<template>
+  <input v-model="model" />
+</template>
+```
+
+---
+
+### 40. Vue 3 `defineModel` Macro (Vue 3.4+): Two-Way State Binding.
+
+**In Simple Words:**
+`defineModel` eliminates boilerplate prop/emit pairings for `v-model`. Previously, two-way binding required declaring `defineProps(['modelValue'])` and `defineEmits(['update:modelValue'])`. With `defineModel`, the compiler automatically handles the prop declaration and event emission as a synchronous ref.
+
+```vue
+<!-- Child.vue with defineModel (Vue 3.4+) -->
+<script setup lang="ts">
+// Declares 'modelValue' prop and 'update:modelValue' emit automatically
+const count = defineModel<number>({ default: 0 });
+
+// Multiple models are supported with custom names:
+const title = defineModel<string>('title', { required: true });
+</script>
+
+<template>
+  <button @click="count++">Count is {{ count }}</button>
+  <input v-model="title" />
+</template>
+```
+
+---
+
+### 41. Vue 3 Slots Deep Dive: Default, Named, Scoped Slots, and Dynamic Slot Names.
+
+**In Simple Words:**
+- **Default Slot**: Injects content without a name (`<slot />`).
+- **Named Slots**: Target specific outlets (`<slot name="header" />`) using `<template #header>`.
+- **Scoped Slots**: Pass data from child up to parent template (`<slot :item="item" />`), allowing parents to customize render logic while children control data loops.
+
+```vue
+<!-- Child: VirtualList.vue with Scoped Slot -->
+<template>
+  <ul>
+    <li v-for="item in items" :key="item.id">
+      <slot name="row" :item="item" :index="item.id">
+        <!-- Default fallback content -->
+        {{ item.name }}
+      </slot>
+    </li>
+  </ul>
+</template>
+
+<!-- Parent Component Usage -->
+<VirtualList :items="products">
+  <template #row="{ item, index }">
+    <span class="font-bold">#{{ index }}</span>: {{ item.name }} (${{ item.price }})
+  </template>
+</VirtualList>
+```
+
+---
+
+### 42. `provide` / `inject` vs Pinia: Patterns for Hierarchical Component Trees.
+
+**In Simple Words:**
+- **`provide` / `inject`**: Dependency injection across parent-to-deep-child ancestor trees. Best for reusable component libraries (e.g. `Tabs` providing state to `TabPanel`) without coupling to global state.
+- **Pinia**: Global application state with devtools time-travel, plugins, actions, and cross-route persistence.
+
+```typescript
+// InjectionKey pattern for type-safe DI in TypeScript
+import { provide, inject, InjectionKey, Ref, ref } from 'vue';
+
+interface ThemeContext {
+  isDark: Ref<boolean>;
+  toggleTheme: () => void;
+}
+
+export const ThemeKey: InjectionKey<ThemeContext> = Symbol('ThemeContext');
+
+// In Parent / Provider:
+const isDark = ref(true);
+provide(ThemeKey, {
+  isDark,
+  toggleTheme: () => { isDark.value = !isDark.value; }
+});
+
+// In Deep Child:
+const theme = inject(ThemeKey); // Type is inferred as ThemeContext | undefined
+```
+
+---
+
+### 43. Vue 3 Error Handling Architecture: `onErrorCaptured` vs `app.config.errorHandler`.
+
+**In Simple Words:**
+- **`onErrorCaptured`**: Component-level hook that intercepts errors bubbling up from descendant components. Returning `false` stops error propagation to the global handler, functioning like a React Error Boundary.
+- **`app.config.errorHandler`**: Global catch-all handler for reporting unhandled errors to observability systems (Sentry, Datadog).
+
+```typescript
+// main.ts: Global Sentry integration
+app.config.errorHandler = (err, instance, info) => {
+  console.error('[Vue Global Error]', { err, info });
+  Sentry.captureException(err, { extra: { lifecycleHook: info } });
+};
+
+// ErrorBoundary.vue: Reusable Component Error Boundary
+import { onErrorCaptured, ref } from 'vue';
+
+const error = ref<Error | null>(null);
+
+onErrorCaptured((err, instance, info) => {
+  error.value = err as Error;
+  return false; // Stop error from bubbling to global handler
+});
+```
+
+---
+
+### 44. Dynamic and Async Components in Vue 3: `<component :is="...">` and `defineAsyncComponent`.
+
+**In Simple Words:**
+- **Dynamic Components (`<component :is="view">`)**: Dynamically swaps active components based on reactive state or tabs.
+- **Async Components (`defineAsyncComponent`)**: Splits large components into separate lazy bundles loaded on demand, with built-in loading and error fallback states.
+
+```typescript
+import { defineAsyncComponent, shallowRef } from 'vue';
+
+const AsyncChart = defineAsyncComponent({
+  loader: () => import('./HeavyAnalyticsChart.vue'),
+  loadingComponent: LoadingSpinner,
+  errorComponent: ErrorFallback,
+  delay: 200,      // Display loading component after 200ms delay
+  timeout: 10000,  // Timeout error triggered after 10s
+});
+
+// Using shallowRef to store component definitions prevents unnecessary deep reactivity
+const currentTab = shallowRef(AsyncChart);
+```
+
+---
+
+### 45. Vue 3 `<Teleport>`: Escaping Stacking Contexts for Modals and Popovers.
+
+**In Simple Words:**
+`<Teleport>` renders a component's template DOM node into a different part of the document body (e.g. `to="body"` or `to="#modal-target"`) while preserving Vue component reactivity, props, and emit hierarchies.
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const isOpen = ref(false);
+</script>
+
+<template>
+  <button @click="isOpen = true">Open Dialog</button>
+
+  <!-- Content escapes overflow:hidden and z-index traps of parent container -->
+  <Teleport to="body" :disabled="!isOpen">
+    <div v-if="isOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-2xl">
+        <h3>Portal Modal</h3>
+        <button @click="isOpen = false">Close</button>
+      </div>
+    </div>
+  </Teleport>
+</template>
+```
+
+---
+
+### 46. Vue 3 `<Transition>` and `<TransitionGroup>`: Classes, Hooks, and FLIP Animations.
+
+**In Simple Words:**
+- **`<Transition>`**: Applies CSS enter/leave transition classes (`v-enter-from`, `v-enter-active`, `v-enter-to`, `v-leave-from`, `v-leave-active`, `v-leave-to`) to single elements or dynamic components.
+- **`<TransitionGroup>`**: Animates lists of items when elements are inserted, removed, or reordered using FLIP (First, Last, Invert, Play) algorithms with the `.v-move` class.
+
+```vue
+<template>
+  <!-- List animation using TransitionGroup -->
+  <TransitionGroup name="list" tag="ul">
+    <li v-for="item in items" :key="item.id">
+      {{ item.text }}
+    </li>
+  </TransitionGroup>
+</template>
+
+<style scoped>
+.list-move, /* Applied to moving elements during reorder */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.list-leave-active {
+  position: absolute; /* Ensures smooth reordering of remaining elements */
+}
+</style>
+```
+
+---
+
+### 47. Vue 3 Compiler Internals: Block Trees, Patch Flags, Static Hoisting, and Cache Handlers.
+
+**In Simple Words:**
+Vue 3's compiler optimizes virtual DOM reconciliation through ahead-of-time (AOT) template analysis:
+1. **Patch Flags**: Numbers embedded in VNodes telling the runtime exactly what needs updating (e.g. `1` for text, `2` for class, `8` for dynamic props), skipping unchanging properties.
+2. **Static Hoisting**: Unchanging VNodes and props are created once outside render functions and reused across renders without garbage collection churn.
+3. **Cache Handlers**: Inline event handlers (`@click="count++"`) are cached as constant functions, preventing unnecessary child re-renders.
+4. **Block Trees**: Dynamic nodes are organized into flat block arrays (`dynamicChildren`), enabling diffing in $O(\text{dynamic nodes})$ instead of $O(\text{all template nodes})$.
+
+---
+
+### 48. Vue 3 Render Functions & JSX: When to Drop Down from Templates.
+
+**In Simple Words:**
+Render functions use the `h()` function to programmatically create Virtual DOM nodes (VNodes). While templates are declarative and optimized, render functions provide full JavaScript flexibility for highly dynamic scenarios (e.g. dynamic heading tags `h(props.tag, slots.default())` or building form schema renderers).
+
+```typescript
+import { h, defineComponent } from 'vue';
+
+export const DynamicHeading = defineComponent({
+  props: {
+    level: { type: Number, required: true },
+    title: { type: String, required: true }
+  },
+  setup(props, { slots }) {
+    // Generates <h1>, <h2>, etc. dynamically without 6 v-if branches in template
+    return () => h(`h${props.level}`, { class: 'heading-style' }, slots.default ? slots.default() : props.title);
+  }
+});
+```
+
+---
+
+### 49. State Persistence and Plugins in Pinia.
+
+**In Simple Words:**
+Pinia plugins extend stores with cross-cutting concerns like persistence, logging, and error tracking. The `$subscribe` API listens for mutations and saves state to `localStorage` or `sessionStorage`.
+
+```typescript
+import { PiniaPluginContext } from 'pinia';
+
+export function piniaLocalStoragePlugin({ store }: PiniaPluginContext) {
+  const storageKey = `pinia_${store.$id}`;
+  const savedState = localStorage.getItem(storageKey);
+  if (savedState) {
+    store.$patch(JSON.parse(savedState));
+  }
+
+  // Subscribe to changes and persist automatically
+  store.$subscribe((mutation, state) => {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  });
+}
+
+// In main.ts:
+// const pinia = createPinia();
+// pinia.use(piniaLocalStoragePlugin);
+```
+
+---
+
+### 50. Vue 3 Memory Leaks: Common Pitfalls and Profiling Techniques.
+
+**In Simple Words:**
+Vue 3 automates most memory management, but common developer oversights cause detached DOM trees and memory bloat:
+1. **Uncleaned Window / Document Listeners**: Adding `window.addEventListener('resize', fn)` without removing it in `onUnmounted`.
+2. **Lingering Timers**: `setInterval` continuing to run after component teardown.
+3. **Global Event Buses / External Subscriptions**: Subscribing to an RxJS Subject or WebSocket without unsubscribing on component unmount.
+4. **Reactive Map / Set Retention**: Adding objects to global `reactive(new Map())` without pruning deleted records.
+5. **Detection**: Use Chrome DevTools Memory tab -> "Heap snapshot" and filter by "Detached HTMLDivElement" to identify leaks.

@@ -536,3 +536,285 @@ Use packages like **`dbt-artifacts`**:
 2. **AI & Agentic Modeling**: Autonomous agents reading business requirements and generating validated dbt models with unit tests and contracts.
 3. **Open Table Formats**: dbt compiling models directly into Apache Iceberg and Delta Lake formats across multi-engine lakehouses.
 
+
+
+---
+
+### 36. Model Contracts and Model Governance (`contract: { enforced: true }`): Enforcing schemas and non-breaking changes.
+
+**In Simple Words:**
+Without contracts, upstream engineers can change a column from integer to string or drop a column, silently breaking downstream analytics models:
+- **Model Contracts**: Guarantees that the model's compiled SQL strictly conforms to the exact column names and data types defined in YAML:
+  ```yaml
+  models:
+    - name: dim_customers
+      config:
+        contract:
+          enforced: true
+      columns:
+        - name: customer_id
+          data_type: integer
+          constraints:
+            - type: not_null
+            - type: primary_key
+        - name: email
+          data_type: string
+  ```
+- If the SQL query produces an unexpected schema or violates constraints, dbt **aborts before creating or altering the warehouse table**, preventing data corruption.
+
+---
+
+### 37. Model Versions (`latest_version` / `v1`, `v2`): Managing deprecation cycles and non-breaking migrations.
+
+**In Simple Words:**
+When making breaking changes to a core public dimension table used by 50 downstream dashboards:
+```yaml
+models:
+  - name: dim_users
+    latest_version: 2
+    versions:
+      - v: 1
+      - v: 2
+        config:
+          contract: { enforced: true }
+```
+- Creates physical tables `dim_users_v1` and `dim_users_v2`.
+- `{{ ref('dim_users') }}` defaults to `latest_version` (v2), but legacy dashboards can continue referencing `{{ ref('dim_users', v=1) }}`.
+- Allows graceful multi-month migration windows before deprecating v1.
+
+---
+
+### 38. dbt Semantic Layer and MetricFlow: Defining metrics once for consistent enterprise BI queries.
+
+**In Simple Words:**
+Different departments often calculate "Monthly Active Users" or "Gross Revenue" differently in their own SQL queries, causing conflicting board meeting metrics:
+- **Semantic Layer**: Define the single source of truth for business metrics in YAML:
+  ```yaml
+  semantic_models:
+    - name: orders
+      model: ref('fct_orders')
+      measures:
+        - name: revenue
+          agg: sum
+          expr: order_amount_usd
+      dimensions:
+        - name: order_date
+          type: time
+          type_params:
+            time_granularity: day
+  metrics:
+    - name: monthly_revenue
+      type: simple
+      type_params:
+        measure: revenue
+  ```
+- BI tools (Looker, Tableau, Hex) query MetricFlow directly via JDBC/GraphQL, guaranteeing that every dashboard reports identical numbers.
+
+---
+
+### 39. dbt Python Models: When and how to run Python scripts in Snowflake, Databricks, and BigQuery.
+
+**In Simple Words:**
+SQL is ideal for set-based data transformations; Python is ideal for complex statistical analysis, NLP parsing, and machine learning scoring:
+```python
+# models/customer_churn_prediction.py
+import statsmodels.api as sm
+
+def model(dbt, session):
+    dbt.config(materialized="table", packages=["statsmodels", "scikit-learn"])
+    
+    # Read upstream dbt SQL model as a DataFrame!
+    df = dbt.ref("fct_customer_activity").to_pandas()
+    
+    # Perform Python ML transformations
+    df["predicted_churn"] = (df["inactive_days"] > 30).astype(int)
+    
+    return session.create_dataframe(df)
+```
+- Executes serverlessly inside the data warehouse's secure Python runtime without moving data over the public internet.
+
+---
+
+### 40. dbt Unit Testing (`unit_tests:`): Testing SQL logic with mocked inputs and expected outputs.
+
+**In Simple Words:**
+Traditional dbt tests (`not_null`, `unique`) test the *quality of live data*. **Unit Tests** test the *correctness of your SQL logic* using static mocked data without querying real warehouse tables:
+```yaml
+unit_tests:
+  - name: test_discount_calculation
+    model: fct_orders
+    given:
+      - input: ref('stg_orders')
+        rows:
+          - { order_id: 1, base_price: 100, discount_pct: 0.10 }
+          - { order_id: 2, base_price: 200, discount_pct: 0.00 }
+    expect:
+      rows:
+        - { order_id: 1, final_price: 90.0 }
+        - { order_id: 2, final_price: 200.0 }
+```
+- Runs in seconds during pull request CI checks to catch SQL math bugs before code merges.
+
+---
+
+### 41. Advanced Node Selection Syntax: Graph operators, state comparisons, and tagging strategies.
+
+**In Simple Words:**
+Mastering dbt CLI selection syntax saves hours of developer time:
+```bash
+# 1. Run model and all its downstream descendants
+dbt run --select dim_customers+
+
+# 2. Run model and all its upstream ancestors
+dbt run --select +dim_customers
+
+# 3. Run model, its children, and its parents
+dbt run --select +dim_customers+
+
+# 4. Run models matching tag OR folder
+dbt run --select "tag:finance path:models/marts"
+
+# 5. State comparison: Run ONLY models modified in this Git branch
+dbt run --select state:modified --state path/to/prod/manifest
+```
+
+---
+
+### 42. Slim CI Workflows: Running and testing only modified models using production `manifest.json`.
+
+**In Simple Words:**
+Running 1,000 dbt models on every pull request commit costs $500 and takes 45 minutes:
+- **Slim CI Architecture**:
+  1. Download the production `manifest.json` artifact generated during the last successful nightly run.
+  2. Execute:
+     ```bash
+     dbt build --select state:modified+ --defer --state ./prod-manifest
+     ```
+  3. **`--defer` Magic**: Any upstream unmodified model is not rebuilt in staging; dbt dynamically points references to the existing production table instead!
+  4. Reduces CI runtime from 45 minutes down to 2 minutes.
+
+---
+
+### 43. Exposures and Data Lineage: Connecting dashboards, ML models, and reverse-ETL tools.
+
+**In Simple Words:**
+**Exposures** document downstream consumers of your data models directly inside dbt documentation:
+```yaml
+# models/exposures.yml
+exposures:
+  - name: executive_revenue_dashboard
+    type: dashboard
+    maturity: high
+    url: https://app.tableau.com/views/revenue
+    depends_on:
+      - ref('fct_monthly_revenue')
+      - ref('dim_customers')
+    owner:
+      name: Finance Team
+      email: finance@corp.com
+```
+- If a data engineer alters a column in `fct_monthly_revenue`, the dbt DAG displays an immediate warning that the Executive Revenue Dashboard will be impacted!
+
+---
+
+### 44. Custom Materializations: Writing custom Jinja materialization blocks.
+
+**In Simple Words:**
+When standard materializations (`view`, `table`, `incremental`) don't fit (e.g. exporting data directly to cloud object storage or updating a specialized vector index):
+- Define custom materialization logic in `macros/materializations/`:
+  ```sql
+  {% materialization export_to_s3, default %}
+    {%- set target_relation = api.Relation.create(identifier=target.identifier) -%}
+    {% call statement('main') -%}
+      UNLOAD ({{ sql }})
+      TO 's3://my-bucket/exports/{{ model.name }}/'
+      FORMAT = PARQUET;
+    {%- endcall %}
+    {{ return({'relations': [target_relation]}) }}
+  {% endmaterialization %}
+  ```
+
+---
+
+### 45. Ephemeral vs View vs Table vs Incremental: Memory, performance, and storage tradeoffs.
+
+**In Simple Words:**
+| Materialization | Stored in Warehouse? | Query Performance | Build Duration | Best Use Case |
+| :--- | :--- | :--- | :--- | :--- |
+| **`ephemeral`** | No (interpolated as CTE) | Dependent on final query | Zero build time | Lightweight transformations used in only 1 downstream model |
+| **`view`** | Yes (metadata query definition) | Slower for complex queries | Instantaneous (< 1s) | Staging layers, clean renames, lightweight filters |
+| **`table`** | Yes (physical disk storage) | Fast (columnar optimized) | Moderate | Intermediate marts, aggregations under 10M rows |
+| **`incremental`** | Yes (physical disk storage) | Fast | Very fast after initial load | Multi-billion row fact tables, append-only event streams |
+
+---
+
+### 46. dbt Seeds vs External Dictionaries: Limitations and best practices.
+
+**In Simple Words:**
+**`dbt seed`** loads small, static CSV files stored in `seeds/` directly into data warehouse tables:
+- **Ideal Use Cases**: Country code mappings (ISO 3166), employee department lookups, currency codes.
+- **Critical Limitations**:
+  - Seeds are committed directly into Git. Never store PII, customer records, or files exceeding **5 MB / 100,000 rows**.
+  - For large or frequently updating lookup datasets, use automated ingestion tools (Fivetran, Airbyte) instead of seeds.
+
+---
+
+### 47. Hooks in dbt: `on-run-start`, `on-run-end`, `pre-hook`, and `post-hook`.
+
+**In Simple Words:**
+Executing arbitrary SQL before and after model or run execution:
+```yaml
+# dbt_project.yml
+on-run-start:
+  - "CREATE TABLE IF NOT EXISTS audit_log (event STRING, timestamp TIMESTAMP);"
+on-run-end:
+  - "INSERT INTO audit_log VALUES ('dbt_run_completed', CURRENT_TIMESTAMP());"
+
+# In a specific model config:
+{{ config(
+    post_hook = [
+      "GRANT SELECT ON {{ this }} TO ROLE bi_analyst;",
+      "OPTIMIZE {{ this }} ZORDER BY (customer_id);"
+    ]
+) }}
+```
+
+---
+
+### 48. Working with Complex JSON Payloads in dbt: Macro patterns for cross-warehouse unnesting.
+
+**In Simple Words:**
+Unnesting JSON arrays differs drastically across warehouses (Snowflake uses `FLATTEN()`, BigQuery uses `CROSS JOIN UNNEST()`, Postgres uses `json_array_elements()`).
+- **Cross-Database Macros**: Write adapter-aware macros using `adapter.dispatch` so your model code remains clean and portable:
+  ```sql
+  SELECT
+    order_id,
+    {{ unnest_json_array('items', 'item_id') }}
+  FROM {{ ref('stg_orders') }}
+  ```
+
+---
+
+### 49. Performance Profiling in dbt: Diagnosing long compile times, circular references, and slow models.
+
+**In Simple Words:**
+Optimizing slow enterprise dbt projects:
+1. **Compilation Delays**: Excessively nested Jinja macros and thousands of model references slow down `dbt compile`. Use `--threads 16` to parallelize compilation.
+2. **Circular References**: Occurs when Model A refs Model B and Model B refs Model A. dbt's DAG compiler detects and flags circular loops during parsing.
+3. **Audit Execution Timings**: Inspect `target/run_results.json` to sort models by execution duration and target the slowest 5% for incremental refactoring.
+
+---
+
+### 50. Building a Production Enterprise dbt Repository: Medallion Architecture best practices.
+
+**In Simple Words:**
+Organizing thousands of models into a maintainable, structured directory layout:
+1. **Staging / Bronze (`models/staging/`)**:
+   - 1-to-1 mapping with source tables (`stg_stripe__payments.sql`).
+   - Clean column names, cast data types, handle timezone normalization. Zero business logic joins!
+2. **Intermediate / Silver (`models/intermediate/`)**:
+   - Ephemeral or table materialization (`int_orders_pivoted_by_payment_method.sql`).
+   - Complex joins, window functions, and multi-source unifications.
+3. **Marts / Gold (`models/marts/`)**:
+   - Partitioned and clustered dimension and fact tables organized by business domain (`marts/finance/fct_orders.sql`, `marts/marketing/dim_campaigns.sql`).
+   - Ready for direct consumption by BI dashboards and machine learning pipelines.

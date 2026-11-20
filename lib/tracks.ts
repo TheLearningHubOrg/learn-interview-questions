@@ -89,36 +89,140 @@ export function cleanMarkdownText(text: string): string {
     .trim();
 }
 
-export function formatOneSentence(text: string): string {
+function formatBulletsToInline(text: string): string {
+  const lines = text.split('\n');
+  const introParts: string[] = [];
+  const bulletParts: string[] = [];
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    if (line.startsWith('---') || line.startsWith('#') || line.startsWith('|') || line.startsWith('```')) {
+      break;
+    }
+
+    const isBullet = line.startsWith('- ') || line.startsWith('* ') || /^\d+\.\s+/.test(line);
+    if (isBullet) {
+      const cleanBullet = cleanMarkdownText(line.replace(/^[-*]\s+|\d+\.\s+/, ''));
+      if (cleanBullet.length > 3) {
+        // Protect dots in versions, numbers, and identifiers (e.g. 5.0, Node.js, fs.readFile)
+        const safeBullet = cleanBullet
+          .replace(/\b(e\.g\.|i\.e\.|etc\.|vs\.|v[0-9]+\.)/gi, (m) => m.replace(/\./g, '___DOT___'))
+          .replace(/([a-zA-Z0-9_$])\.([a-zA-Z0-9_$])/g, '$1___DOT___$2');
+
+        const match = safeBullet.match(/^(.*?[.!?])(?:\s+|$)/);
+        let itemText = (match ? match[1] : safeBullet).replace(/___DOT___/g, '.');
+
+        if (itemText.length > 150) {
+          const cut = itemText.slice(0, 145);
+          const space = cut.lastIndexOf(' ');
+          itemText = (space > 50 ? cut.slice(0, space) : cut);
+        }
+        itemText = itemText.replace(/[:,\-–—.]\s*$/, '').trim();
+        bulletParts.push(itemText);
+      }
+    } else if (bulletParts.length === 0) {
+      const cleanIntro = cleanMarkdownText(line);
+      if (cleanIntro.length > 5) {
+        introParts.push(cleanIntro);
+      }
+    }
+  }
+
+  const intro = introParts.join(' ').replace(/[:,\-–—]\s*$/, '').trim();
+  const uselessLeadIns = [
+    /(below are|the following are|here are|there are|consists of the following|consists of|has the following|key components below|components below|below classes|as follows|list of|these include|following is the list|are shown below)/i
+  ];
+  const isUselessIntro = uselessLeadIns.some(rgx => rgx.test(intro));
+
+  if (bulletParts.length > 0) {
+    const topBullets = bulletParts.slice(0, 4).join(' • ');
+    if (intro && !isUselessIntro) {
+      return `${intro}: ${topBullets}.`;
+    }
+    return `${topBullets}.`;
+  }
+
+  return intro;
+}
+
+export function formatOneSentence(text: string, maxChars = 340): string {
   if (!text) return '';
-  const match = text.match(/^(.+?[.!?])(?:\s+[A-Z]|\s*$)/);
-  let sentence = match ? match[1].trim() : text.trim();
+  const cleaned = cleanMarkdownText(text);
 
-  sentence = sentence.replace(/[:\-–—]\s*$/, '.');
-  sentence = sentence.replace(/,\s*$/, '.');
-  sentence = sentence.replace(/\.+$/, '.');
+  // Protect common abbreviations, initials, and identifier dots
+  const protectedText = cleaned
+    .replace(/\b(e\.g\.|i\.e\.|etc\.|vs\.|al\.|approx\.|min\.|max\.|Mr\.|Dr\.|v[0-9]+\.)/gi, (m) => m.replace(/\./g, '___DOT___'))
+    .replace(/\b([A-Z])\.\s+([A-Z])/g, '$1___DOT___ $2')
+    .replace(/([a-zA-Z0-9_$])\.([a-zA-Z0-9_$])/g, '$1___DOT___$2');
 
-  if (!/[.!?]$/.test(sentence)) {
-    sentence += '.';
+  if (protectedText.length <= maxChars) {
+    let result = protectedText.replace(/___DOT___/g, '.').replace(/[:,\-–—]\s*$/, '').trim();
+    result = result.replace(/\.+$/, '.');
+    if (!/[.!?]$/.test(result)) result += '.';
+    return result;
   }
 
-  if (sentence.length > 220) {
-    const cut = sentence.slice(0, 217);
-    const lastSpace = cut.lastIndexOf(' ');
-    sentence = (lastSpace > 120 ? cut.slice(0, lastSpace) : cut) + '...';
+  if (protectedText.includes(' • ')) {
+    const bullets = protectedText.split(' • ');
+    let bulletAcc = '';
+    for (const b of bullets) {
+      const candidate = bulletAcc ? `${bulletAcc} • ${b}` : b;
+      if (candidate.length <= maxChars) {
+        bulletAcc = candidate;
+      } else {
+        break;
+      }
+    }
+    if (bulletAcc.length >= 80) {
+      let result = bulletAcc.replace(/___DOT___/g, '.').replace(/[:,\-–—]\s*$/, '').trim();
+      result = result.replace(/\.+$/, '.');
+      if (!/[.!?]$/.test(result)) result += '.';
+      return result;
+    }
   }
-  return sentence;
+
+  const sentences = protectedText.split(/(?<=[.!?])\s+/);
+  let accumulated = '';
+  for (const s of sentences) {
+    if ((accumulated + ' ' + s).trim().length <= maxChars) {
+      accumulated = (accumulated + ' ' + s).trim();
+    } else {
+      break;
+    }
+  }
+
+  if (accumulated.length >= 100) {
+    let result = accumulated.replace(/___DOT___/g, '.').trim();
+    result = result.replace(/\.+$/, '.');
+    if (!/[.!?]$/.test(result)) result += '.';
+    return result;
+  }
+
+  const cut = protectedText.slice(0, maxChars - 3);
+  const lastSpace = cut.lastIndexOf(' ');
+  const safeCut = (lastSpace > 140 ? cut.slice(0, lastSpace) : cut);
+  let result = safeCut.replace(/___DOT___/g, '.').replace(/[,:;\-–—]\s*$/, '').trim() + '...';
+  return result;
 }
 
 export function extractOneLineSummary(content: string, title?: string): string {
   if (!content) return '';
 
   // 1. Explicit **In Simple Words:** block
-  const simpleMatch = content.match(/\*{0,2}In Simple Words:?\*{0,2}\s*([\s\S]*?)(?=\n\s*\n|####|###|\n-|\n\d+\.|$)/i);
+  const simpleMatch = content.match(/\*{0,2}In Simple Words:?\*{0,2}\s*([\s\S]*?)(?=\n\s*---|####|###|\n\s*```|\n\s*\||$)/i);
   if (simpleMatch && simpleMatch[1]) {
-    const cleaned = cleanMarkdownText(simpleMatch[1]);
-    if (cleaned.length >= 15) {
-      return formatOneSentence(cleaned);
+    const rawBlock = simpleMatch[1].trim();
+    if (/^\s*[-*]\s|\n\s*[-*]\s|^\s*\d+\.\s|\n\s*\d+\.\s/m.test(rawBlock)) {
+      const bulletSummary = formatBulletsToInline(rawBlock);
+      if (bulletSummary && bulletSummary.length >= 15) {
+        return formatOneSentence(bulletSummary);
+      }
+    } else {
+      const cleaned = cleanMarkdownText(rawBlock);
+      if (cleaned.length >= 15) {
+        return formatOneSentence(cleaned);
+      }
     }
   }
 
@@ -132,12 +236,14 @@ export function extractOneLineSummary(content: string, title?: string): string {
     }
   }
 
-  // 3. Scan lines for the first explanatory narrative paragraph
+  // 3. Scan first explanatory narrative paragraph / list
   const lines = content.split('\n');
-  const paragraph: string[] = [];
+  const collectedLines: string[] = [];
   let inCodeBlock = false;
+  let isLeadIn = false;
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmed = line.trim();
     if (trimmed.startsWith('```')) {
       inCodeBlock = !inCodeBlock;
@@ -145,7 +251,6 @@ export function extractOneLineSummary(content: string, title?: string): string {
     }
     if (inCodeBlock) continue;
 
-    // Skip headers, horizontal rules, tables, images, details/summary, diagrams
     if (
       trimmed.startsWith('#') ||
       trimmed.startsWith('---') ||
@@ -155,38 +260,51 @@ export function extractOneLineSummary(content: string, title?: string): string {
       trimmed.startsWith('+--') ||
       trimmed.startsWith('┌--')
     ) {
-      if (paragraph.length > 0) break;
+      if (collectedLines.length > 0) break;
       continue;
     }
 
     if (trimmed.startsWith('>')) {
       const quoteText = trimmed.replace(/^>\s*/, '');
       if (quoteText.length > 15 && !quoteText.includes('|')) {
-        paragraph.push(quoteText);
+        collectedLines.push(quoteText);
         break;
       }
       continue;
     }
 
     if (trimmed.length > 0) {
-      if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || /^\d+\.\s/.test(trimmed)) {
-        if (paragraph.length === 0) {
-          paragraph.push(trimmed.replace(/^[-*]|\d+\.\s*/, ''));
-          break;
-        }
-      } else {
-        paragraph.push(trimmed);
-        if (trimmed.endsWith('.') || trimmed.endsWith(':') || paragraph.join(' ').length > 150) {
+      collectedLines.push(trimmed);
+      isLeadIn = /(:|,|below|following|are|include|consists of)$/i.test(trimmed) || collectedLines.join(' ').length < 60;
+      if (collectedLines.join('\n').length > 500) break;
+    } else if (collectedLines.length > 0) {
+      let nextIsList = false;
+      for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
+        const nextTrimmed = lines[j].trim();
+        if (nextTrimmed.length > 0) {
+          if (nextTrimmed.startsWith('- ') || nextTrimmed.startsWith('* ') || /^\d+\.\s+/.test(nextTrimmed)) {
+            nextIsList = true;
+          }
           break;
         }
       }
-    } else if (paragraph.length > 0) {
-      break;
+      if (isLeadIn && nextIsList) {
+        continue;
+      } else {
+        break;
+      }
     }
   }
 
-  const rawText = paragraph.join(' ');
-  const cleaned = cleanMarkdownText(rawText);
+  const rawSection = collectedLines.join('\n');
+  if (/^\s*[-*]\s|\n\s*[-*]\s|^\s*\d+\.\s|\n\s*\d+\.\s/m.test(rawSection)) {
+    const bulletSummary = formatBulletsToInline(rawSection);
+    if (bulletSummary && bulletSummary.length >= 15) {
+      return formatOneSentence(bulletSummary);
+    }
+  }
+
+  const cleaned = cleanMarkdownText(rawSection);
   if (cleaned.length >= 12) {
     return formatOneSentence(cleaned);
   }

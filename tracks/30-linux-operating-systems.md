@@ -329,4 +329,201 @@ When CPU usage is pinned at 100% and you need to know which exact code functions
   - Horizontal axis: Shows the proportion of CPU time spent in each function.
   - Vertical axis: Shows call stack depth.
   - The widest plateaus highlight the exact code bottleneck consuming CPU!
-`;
+`
+
+---
+
+### 36. Linux Boot Sequence: From UEFI/BIOS, GRUB2, Kernel Initialization, to systemd PID 1.
+
+**In Simple Words:**
+1. **Power-On & POST / UEFI**: Hardware self-test. UEFI loads the EFI boot manager and executes the bootloader from the ESP partition.
+2. **GRUB2 Bootloader**: Presents the OS menu, loads the selected kernel image (`vmlinuz`) and the temporary initial RAM filesystem (`initramfs`) into memory.
+3. **Kernel Initialization**: Decompresses itself, initializes CPU registers, page tables, interrupts, and drivers from `initramfs`, then mounts the real root filesystem (`/`).
+4. **PID 1 (systemd)**: The kernel executes `/sbin/init` (systemd), which launches system target units (`multi-user.target`, `graphical.target`), initializes Daemons, mounts fstab entries, and presents the login shell.
+
+---
+
+### 37. HugePages and Transparent HugePages (THP): How they optimize database performance and why Redis advises disabling THP.
+
+**In Simple Words:**
+Standard x86-64 page size is **4 KB**. For applications managing 64 GB+ RAM (databases), navigating billions of 4 KB pages overloads the CPU **TLB (Translation Lookaside Buffer)** cache:
+- **HugePages (2 MB / 1 GB)**: Reduces the number of page table entries by 500x, boosting database memory lookup throughput.
+- **Transparent HugePages (THP)**: Automated kernel allocation of 2 MB pages.
+  - **Why Redis disables THP**: Redis uses background `fork()` for RDB snapshots relying on Copy-on-Write (CoW). With standard 4 KB pages, writing a 10-byte key only clones 4 KB. With THP enabled, writing 10 bytes forces the kernel to copy an entire **2 MB** page, causing severe latency spikes and memory bloat!
+
+---
+
+### 38. Linux Cgroups v1 vs Cgroups v2: Architecture differences and modern unified hierarchy.
+
+**In Simple Words:**
+- **Cgroups v1 (Legacy)**: Orthogonal multi-hierarchy design where each resource (CPU, Memory, BlkIO) had its own independent tree structure. Controllers could not communicate, causing resource leaks and priority inversion where memory limits could not correlate with block I/O throttling.
+- **Cgroups v2 (Unified Hierarchy)**: Single unified tree structure rooted at `/sys/fs/cgroup`.
+  - **Single Root of Control**: A process belongs to exactly one cgroup node.
+  - **Pressure Stall Information (PSI)**: Provides kernel metrics on CPU, Memory, and I/O starvation.
+  - **Memory Controller Integration**: Seamlessly accounts for socket buffers, swap, and page caches together.
+
+---
+
+### 39. Linux Epoll vs Select/Poll: How Event-Driven I/O enables the C10K and C10M problem solutions (Nginx, Node.js).
+
+**In Simple Words:**
+Handling 10,000+ concurrent network connections:
+- **`select()` / `poll()` (O(N) Complexity)**: The application passes an array of 10,000 file descriptors to the kernel on every loop. The kernel must iterate through all 10,000 items to check which one is ready, wasting CPU cycles.
+- **`epoll()` (O(1) Complexity)**: The application registers sockets once in kernel memory (`epoll_create`, `epoll_ctl`). Sockets register hardware interrupt callbacks. When a packet arrives, the kernel places only the active socket onto a ready list. `epoll_wait` returns immediately with active descriptors only, enabling scalable event-driven architectures.
+
+---
+
+### 40. Linux Swap Space, Swappiness (`vm.swappiness`), and ZRAM: When and how to configure swapping.
+
+**In Simple Words:**
+- **Swap**: Disk space used when physical RAM is exhausted, paging inactive anonymous memory to disk.
+- **`vm.swappiness` (0 - 100)**: Controls the kernel's balance between reclaiming page cache (file buffers) vs swapping anonymous memory.
+  - `swappiness = 60`: Default desktop behavior.
+  - `swappiness = 1 - 10`: Ideal for latency-sensitive databases (PostgreSQL, Kafka, Elasticsearch) to avoid blocking disk thrashing.
+- **ZRAM**: Creates a compressed block device directly inside RAM. Instead of writing slow pages to HDD/SSD, the kernel compresses idle pages by 3:1 in RAM with zero disk I/O.
+
+---
+
+### 41. Linux IPC (Inter-Process Communication): Pipes, Unix Domain Sockets, Shared Memory, and Message Queues.
+
+**In Simple Words:**
+| IPC Mechanism | Speed / Latency | Persistence | Use Case |
+| :--- | :--- | :--- | :--- |
+| **Pipes (`|` / `mkfifo`)** | Fast unidirectional stream | Process lifetime | Command-line pipelines, parent-child processes |
+| **Unix Domain Sockets (`AF_UNIX`)** | Very fast (bypasses TCP/IP stack) | Filesystem socket file | Nginx to PHP-FPM, Docker daemon to CLI |
+| **Shared Memory (`shm_open`, `mmap`)** | **Fastest (Zero-Copy memory read/write)** | Kernel / System restart | High-frequency trading, real-time audio/video streaming |
+| **POSIX Message Queues** | Fast structured message passing | Kernel lifetime | Asynchronous inter-process priority tasks |
+
+---
+
+### 42. Linux Kernel Capabilities: Least privilege without full root access.
+
+**In Simple Words:**
+Traditionally, a process was either unprivileged (UID != 0) or all-powerful root (UID == 0). **Linux Capabilities** divide root privileges into over 40 distinct permissions:
+- `CAP_NET_BIND_SERVICE`: Allows binding to privileged network ports (< 1024) without running as root (e.g. `setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx`).
+- `CAP_SYS_ADMIN`: Overly broad "almost root" capability (mount filesystems, load drivers). Should be avoided in production containers.
+- `CAP_NET_ADMIN`: Configure network interfaces, firewall rules, and routing tables.
+
+---
+
+### 43. Linux Network Tuning for High-Concurrency Web Servers (`sysctl.conf`).
+
+**In Simple Words:**
+Production web servers handling high QPS require kernel network stack tuning:
+
+```ini
+# /etc/sysctl.conf
+# Maximum listen queue backlog for incoming TCP connections
+net.core.somaxconn = 65535
+
+# Maximum pending connection requests before 3-way handshake completes
+net.ipv4.tcp_max_syn_backlog = 65535
+
+# Reuse sockets in TIME_WAIT state for new connections safely
+net.ipv4.tcp_tw_reuse = 1
+
+# Expand local port range for outbound connections (reverse proxies)
+net.ipv4.ip_local_port_range = 1024 65535
+
+# Increase TCP read and write memory buffers (min, default, max)
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+```
+
+---
+
+### 44. Understanding Linux I/O Schedulers: `mq-deadline`, `bfq`, `kyber`, and `none` (NVMe bypass).
+
+**In Simple Words:**
+I/O schedulers reorder and batch block storage read/write requests to optimize disk throughput:
+- **`none`**: Bypasses the scheduler entirely. Best for high-speed **NVMe SSDs** that handle parallel hardware submission queues internally.
+- **`mq-deadline`**: Guarantees a deadline for every I/O request, preventing starvation. Default choice for enterprise cloud virtual disks (AWS EBS, GCP Persistent Disks).
+- **`bfq` (Budget Fair Queueing)**: Allocates bandwidth fractions to processes. Best for interactive desktop environments and audio processing to prevent stutter during background file downloads.
+
+---
+
+### 45. Systemd Units and Service Management: Anatomy of a `.service` file, restart policies, and watchdog integration.
+
+**In Simple Words:**
+A robust production systemd service definition:
+
+```ini
+[Unit]
+Description=Core API Microservice
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/api-server --port=8080
+Restart=on-failure
+RestartSec=5s
+User=appuser
+Group=appuser
+LimitNOFILE=65536
+WatchdogSec=30s
+
+# Security Sandboxing
+ProtectSystem=strict
+ProtectHome=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+```
+- **Watchdog Integration**: The process must send periodic `sd_notify("WATCHDOG=1")` signals. If deadlocked, systemd automatically restarts the service after 30 seconds.
+
+---
+
+### 46. Linux Inodes, Hard Links vs Symbolic Links, and recovering from Inode Exhaustion.
+
+**In Simple Words:**
+- **Inode (Index Node)**: A data structure storing metadata about a file (permissions, owner, size, timestamp, pointers to disk data blocks), but **not** the file name or file content.
+- **Hard Link**: A new directory entry pointing to the **same inode number**. Modifying either modifies the underlying data. Deleting one hard link does not delete data until all links are removed. Cannot span across different filesystems.
+- **Symbolic Link (Symlink)**: A pointer file containing the string path to another file.
+- **Inode Exhaustion ("No space left on device" with 50% disk space free)**: Happens when millions of tiny 0-byte cache or session files exhaust the filesystem inode table:
+  ```bash
+  df -i # Inspect inode usage percentage
+  find /var/spool/clientmqueue -type f -delete # Clean up millions of small files
+  ```
+
+---
+
+### 47. Linux Kernel Panic: Causes, debugging via `kdump` / `crash` utility, and reading kernel stack traces.
+
+**In Simple Words:**
+A Kernel Panic is an unrecoverable fatal error where the kernel cannot safely continue executing without risking data corruption (e.g. memory hardware fault, null pointer in kernel driver, corrupted root filesystem).
+- **`kdump` Mechanism**: Upon panic, the kernel uses `kexec` to boot into a minimal secondary recovery kernel residing in reserved memory.
+- The recovery kernel saves the crashed kernel's memory space into `/var/crash/vmcore`.
+- Engineers inspect the crash dump using the `crash` tool or `gdb vmlinux vmcore` to inspect CPU registers, stack traces, and module state at the exact moment of failure.
+
+---
+
+### 48. Linux Memory Allocators: Glibc `malloc`, `jemalloc`, and `tcmalloc` in high-concurrency applications.
+
+**In Simple Words:**
+Standard glibc `malloc` uses global mutex locks or a limited number of memory arenas. In applications with 64+ concurrent threads (e.g. MySQL, Redis, Java apps), threads spend excessive CPU time waiting on lock contention during memory allocations.
+- **`jemalloc` (FreeBSD / Meta)**: Partitions memory into thread-specific arenas and size-classes. Dramatically reduces memory fragmentation and eliminates lock contention.
+- **`tcmalloc` (Google Thread-Caching Malloc)**: Thread-local memory caches for small allocations (< 32 KB), making multi-threaded allocation near zero-overhead.
+
+---
+
+### 49. Understanding `strace`, `ltrace`, and `ftrace`: Tracing system calls, dynamic library calls, and kernel events.
+
+**In Simple Words:**
+- **`strace -p <PID> -e trace=network,file -tt -T`**: Intercepts and records **system calls** made between user-space processes and the Linux kernel, printing argument values, return codes, and elapsed execution time. Essential for diagnosing hung processes ("why is this app stuck?").
+- **`ltrace`**: Intercepts dynamic library calls (e.g. calls to `libc.so`, `libssl.so`).
+- **`ftrace`**: Internal Linux kernel tracer that tracks function calls inside the kernel itself, measuring interrupt latencies and scheduling delays.
+
+---
+
+### 50. Linux PAM (Pluggable Authentication Modules): How SSH, Sudo, and system authentication pipelines work.
+
+**In Simple Words:**
+**PAM** decouples system applications (`sshd`, `sudo`, `login`) from specific authentication technologies (local `/etc/shadow`, LDAP, Kerberos, Duo MFA, YubiKey FIDO2).
+- Configuration files reside in `/etc/pam.d/` (`/etc/pam.d/sshd`, `/etc/pam.d/sudo`).
+- **Four Management Modules**:
+  1. `auth`: Verifies user identity (password, MFA token).
+  2. `account`: Verifies account validity (expiration, allowed login hours).
+  3. `password`: Handles password updates and complexity enforcement (`pam_pwquality`).
+  4. `session`: Configures environment prior to login (mount home directory, set resource limits via `pam_limits`).

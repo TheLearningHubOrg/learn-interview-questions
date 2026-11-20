@@ -547,3 +547,304 @@ Slow CI pipelines cost developer productivity.
 | **Plugin Ecosystem** | Massive plugin jar files installed on controller (maintenance nightmare) | Composable marketplace actions (`uses: org/action@v1`) |
 | **State & Maintenance** | Requires server backups, OS patches, Jenkins version upgrades | Zero infrastructure maintenance for SaaS; minimal for ARC runners |
 
+
+---
+
+### 36. GitHub Actions Reusable Workflows vs Composite Actions: Key differences and selection criteria.
+
+**In Simple Words:**
+- **Reusable Workflows (`workflow_call`)**: Entire parameterized pipeline workflows defined in `.github/workflows/`. They run on their own separate runners, support secret inheritance, environment protection gates, and multi-job execution.
+- **Composite Actions (`action.yml`)**: Bundles multiple shell steps into a single reusable action within the same job/runner. Best for packaging frequently repeated tasks (e.g., setup toolchain + authenticate + cache).
+
+| Feature | Reusable Workflows (`workflow_call`) | Composite Actions (`action.yml`) |
+| :--- | :--- | :--- |
+| **Scope** | Cross-job orchestration (contains multiple jobs) | Step-level (runs within an existing job) |
+| **Runner** | Can define new and independent `runs-on` targets | Executes inside the caller job's runner |
+| **Secrets Access** | Explicit input or `secrets: inherit` | Inputs passed as standard arguments |
+| **File Location** | `.github/workflows/*.yml` | Root or subfolder containing `action.yml` |
+
+```yaml
+# Reusable Workflow Caller
+jobs:
+  call-deploy:
+    uses: my-org/shared-workflows/.github/workflows/deploy.yml@v2
+    with:
+      environment: production
+    secrets: inherit
+```
+
+---
+
+### 37. How do you manage Concurrency and prevent race conditions or duplicate runs in CI/CD pipelines?
+
+**In Simple Words:**
+When developers push multiple commits to the same pull request in rapid succession, running multiple pipelines simultaneously wastes runner minutes and can cause deploy race conditions.
+The `concurrency` block groups runs by branch or PR number and cancels obsolete in-flight runs using `cancel-in-progress: true`.
+
+```yaml
+name: Deploy Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+```
+- For production deployments, omit `cancel-in-progress` or set it to `false` to guarantee that deployment jobs execute sequentially in FIFO order without interrupting an active deployment.
+
+---
+
+### 38. Secrets Masking and Redaction: How GitHub Actions protects sensitive data in logs and how to avoid accidental leaks.
+
+**In Simple Words:**
+GitHub Actions automatically masks any value registered as a secret in repository settings or set via `::add-mask::` by replacing occurrences with `***` in execution logs.
+
+```bash
+# Registering a dynamic secret generated in a step
+echo "::add-mask::$TEMP_TOKEN"
+echo "TEMP_TOKEN=$TEMP_TOKEN" >> "$GITHUB_ENV"
+```
+
+**Common Leak Vectors & Mitigations:**
+1. **Encoded Secrets**: Base64 or URL-encoded secrets are not masked by default. Always register both raw and encoded representations if logs might print them.
+2. **Command Tracing**: Avoid `set -x` in bash scripts when secrets are exported as environment variables.
+3. **Structured Formats**: Dumping complete JSON payloads with `jq` or `print_r` can reveal secret subkeys. Use explicit parsing instead of object dumps.
+
+---
+
+### 39. Automated Release Management with Semantic Release and Conventional Commits.
+
+**In Simple Words:**
+Automated release pipelines inspect commit messages to determine the next Semantic Version (`MAJOR.MINOR.PATCH`), generate changelogs, tag Git repositories, and publish packages without human intervention.
+
+```yaml
+name: Semantic Release
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SEMANTIC_RELEASE_PAT }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+- `fix:` bumps the **PATCH** version (e.g. 1.2.0 -> 1.2.1).
+- `feat:` bumps the **MINOR** version (e.g. 1.2.0 -> 1.3.0).
+- `BREAKING CHANGE:` or `feat!:` bumps the **MAJOR** version (e.g. 1.2.0 -> 2.0.0).
+
+---
+
+### 40. Dynamic Matrix Strategies: How to generate matrix jobs dynamically from JSON outputs using expressions.
+
+**In Simple Words:**
+Instead of hardcoding matrix arrays in YAML, dynamic matrices compute the job list at runtime (e.g., finding all microservices modified in a pull request) and feed the JSON array into downstream parallel jobs.
+
+```yaml
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.filter.outputs.matrix }}
+    steps:
+      - id: filter
+        run: |
+          # Compute modified services as JSON array
+          echo 'matrix=["auth-service", "billing-service", "notification-service"]' >> "$GITHUB_OUTPUT"
+
+  build-services:
+    needs: detect-changes
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Building ${{ matrix.service }} in parallel"
+```
+
+---
+
+### 41. Containerized CI Jobs: Running workflow jobs directly inside Docker containers (`jobs.<job_id>.container`).
+
+**In Simple Words:**
+Instead of installing language runtimes, libraries, and native C-bindings on the VM host runner, `container:` executes all steps inside a dedicated Docker image, guaranteeing absolute environment reproducibility.
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.22-alpine
+      env:
+        CGO_ENABLED: '0'
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: root
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - run: go test -v ./...
+```
+
+---
+
+### 42. Ephemeral Test Environments (Preview Environments / PR Environments) orchestration in CI/CD.
+
+**In Simple Words:**
+Ephemeral environments spin up an isolated, production-like copy of the frontend and microservices for each pull request. When the PR is closed or merged, the pipeline automatically destroys the infrastructure to eliminate cloud waste.
+
+**Workflow Stages:**
+1. **PR Opened/Updated**:
+   - Build container image tagged with PR commit SHA.
+   - Deploy Kubernetes Namespace (`pr-${{ github.event.number }}`) or Cloudflare Pages preview.
+   - Comment URL on the PR discussion thread via GitHub API.
+2. **PR Closed**:
+   - Trigger cleanup workflow listening to `pull_request: types: [closed]`.
+   - Delete Kubernetes namespace, Helm release, or AWS ECS service.
+
+---
+
+### 43. Monorepo CI Optimization: Path filtering (`paths` / `paths-ignore`) vs tooling like Nx and Turborepo.
+
+**In Simple Words:**
+In repositories containing multiple frontend apps and backend microservices, running all tests on every commit causes multi-hour pipeline queues.
+- **GitHub Actions Native `paths` Filter**: Skips entire workflows if commits only touch unrelated directories.
+- **Affected Graph Tooling (Nx / Turborepo)**: Calculates git difference against base branch (`git diff --name-only main`), computes dependency graphs, and executes tasks only on affected packages while reusing remote computation cache.
+
+```bash
+# Run tests only on projects affected by current PR
+npx turbo run test --filter=...[origin/main]
+```
+
+---
+
+### 44. Step Outputs vs Environment Files (`GITHUB_OUTPUT`, `GITHUB_ENV`, `GITHUB_STEP_SUMMARY`).
+
+**In Simple Words:**
+GitHub Actions transitioned from older stdout commands (`::set-output`, `::set-env`) to secure file-based environment state passing.
+
+```bash
+# 1. Setting output for downstream steps in the same job
+echo "build_sha=a1b2c3d" >> "$GITHUB_OUTPUT"
+
+# 2. Setting persistent environment variables for all subsequent steps
+echo "NODE_ENV=production" >> "$GITHUB_ENV"
+
+# 3. Adding rich markdown report to GitHub Action summary page
+cat << EOF >> "$GITHUB_STEP_SUMMARY"
+### 🚀 Deployment Report
+- **Status**: Complete
+- **Artifact**: \`app-v2.1.0.tar.gz\`
+EOF
+```
+
+---
+
+### 45. Supply Chain Security with Cosign and Sigstore: Keyless signing and container provenance verification.
+
+**In Simple Words:**
+Supply chain attacks inject malware into dependencies or registries. **Sigstore Cosign** allows pipelines to sign container images using GitHub OIDC tokens (keyless signing). Downstream clusters verify signatures before permitting container deployment.
+
+```yaml
+- name: Install Cosign
+  uses: sigstore/cosign-installer@v3
+
+- name: Sign container image
+  run: |
+    cosign sign --yes "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}"
+```
+- Uses ephemeral short-lived certificates issued by Fulcio, logged into the immutable transparency log (Rekor).
+
+---
+
+### 46. Handling Long-Running Tests: Test splitting, parallel test shards, and Flaky Test quarantine strategies.
+
+**In Simple Words:**
+When integration test suites exceed 30 minutes, developers stop running tests.
+1. **Parallel Sharding**: Split the test suite across multiple identical parallel runners using GitHub matrix sharding:
+   ```yaml
+   strategy:
+     matrix:
+       shard: [1/4, 2/4, 3/4, 4/4]
+   steps:
+     - run: npx playwright test --shard=${{ matrix.shard }}
+   ```
+2. **Flaky Test Quarantine**: Automatically flag non-deterministic tests and execute them in a quarantined non-blocking job to keep main deployment paths green while reporting reliability metrics.
+
+---
+
+### 47. GitHub Actions Self-Hosted Runners on Kubernetes with Actions Runner Controller (ARC): Architecture and Autoscaling.
+
+**In Simple Words:**
+**Actions Runner Controller (ARC)** is a Kubernetes operator that dynamically provisions ephemeral, isolated runner pods inside private cloud VPCs.
+- **Security**: Pods are destroyed immediately after job completion, preventing cross-build state contamination or secret theft.
+- **Autoscaling**: Scales from 0 to hundreds of runner pods using Kubernetes Horizontal Pod Autoscaler (HPA) or KEDA based on GitHub webhook queue metrics.
+- **VPC Access**: Allows builds to communicate directly with private databases, staging VPCs, and internal package registries without internet ingress.
+
+---
+
+### 48. Zero-Trust Access with HashiCorp Vault Integration in GitHub Actions pipelines.
+
+**In Simple Words:**
+Instead of storing static long-lived credentials in GitHub Secrets, GitHub Actions exchanges its ephemeral JWT token (`id-token: write`) with HashiCorp Vault via OIDC to retrieve dynamic, short-lived credentials (e.g. database passwords valid for 1 hour).
+
+```yaml
+- name: Retrieve Secrets from Vault
+  uses: hashicorp/vault-action@v3
+  with:
+    url: https://vault.corp.internal:8200
+    role: github-actions-deployer
+    method: jwt
+    secrets: |
+      secret/data/production/db password | DB_PASSWORD ;
+      secret/data/production/stripe api_key | STRIPE_KEY
+```
+
+---
+
+### 49. Deployment Protection Rules and Environment Approvals for multi-stage enterprise deployments.
+
+**In Simple Words:**
+GitHub Environments provide production safeguards:
+1. **Required Reviewers**: Deployments pause and trigger email/Slack notifications until specified senior engineers or team leads approve.
+2. **Wait Timers**: Delays deployment execution (e.g., wait 30 minutes in canary stage before proceeding to production).
+3. **Deployment Branches**: Enforce that the `production` environment can strictly be triggered only from the `main` branch.
+
+```yaml
+jobs:
+  deploy-prod:
+    environment:
+      name: production
+      url: https://prod.example.com
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./deploy.sh
+```
+
+---
+
+### 50. Designing a Disaster-Resilient Multi-Region CI/CD Deployment Architecture.
+
+**In Simple Words:**
+Enterprise production pipelines must safely roll out updates across globally distributed cloud regions (e.g. US-East, EU-Central, AP-Southeast) without risking global downtime.
+
+**Architectural Stages:**
+1. **Stage 1 (Canary Region)**: Deploy to the lowest-traffic region (`us-west-1`). Run synthetic latency and error rate monitors for 30 minutes.
+2. **Stage 2 (Primary Staggered Rollout)**: Deploy to primary regions (`us-east-1` and `eu-west-1`) in serial sequence with automated health-check validation.
+3. **Stage 3 (Automated Circuit Breaker)**: If HTTP 5xx error percentage exceeds 0.5% or latency increases by >20% at any stage, the workflow immediately triggers automated rollback to the previous immutable container tag and alerts on-call engineers.

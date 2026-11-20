@@ -343,3 +343,175 @@ Searchable snapshots allow searching read-only index snapshots stored directly i
 1. **Primary transactional system of record with ACID multi-table updates**: Elasticsearch does not support ACID multi-document transactions or foreign key constraints (use PostgreSQL/MySQL).
 2. **Deep relational data modeling**: Joining multiple tables requires denormalization or slow application-side joins.
 3. **Pure key-value caching with microsecond SLA**: Redis or Memcached provides 10x lower latency for simple key lookups.
+
+
+---
+
+### 36. Lucene Inverted Index Deep Dive: Term dictionary, Term index (FST), and Postings lists with Skip lists.
+
+**In Simple Words:**
+An inverted index maps terms to the list of document IDs that contain them:
+1. **Term Index (FST - Finite State Transducer)**: Stored in RAM. A compressed prefix automaton that points to offsets in the Term Dictionary, avoiding disk lookups for every term.
+2. **Term Dictionary**: Alphabetically sorted list of all unique terms stored on disk.
+3. **Postings Lists**: Linked lists of Document IDs containing the term, along with term frequencies and byte offsets for phrase searches.
+4. **Skip Lists**: Allows Lucene to skip large blocks of irrelevant document IDs during boolean AND/OR intersections, achieving sub-millisecond query evaluation.
+
+---
+
+### 37. Doc Values vs Fielddata: Memory tradeoffs, column-oriented storage, and sorting/aggregations architecture.
+
+**In Simple Words:**
+The inverted index is optimized for search ("find documents matching 'kubernetes'"), but terrible for sorting or aggregations ("group by category and calculate average price"):
+- **Doc Values**: On-disk, column-oriented data structure built at index time for non-analyzed fields (`keyword`, `numeric`, `date`). Uses the OS Page Cache, preventing JVM Heap bloat and OOM crashes.
+- **Fielddata**: In-memory data structure built dynamically on first query for analyzed `text` fields. High memory usage; dangerous in production without strict circuit breakers.
+
+---
+
+### 38. Reindexing Patterns and Zero-Downtime Index Migrations: Index Aliases and the `_reindex` API.
+
+**In Simple Words:**
+Because Lucene inverted indexes are immutable, changing field data types or analyzers requires creating a new index and reindexing documents:
+- **Index Aliases**: Never point applications directly to a raw index name (`orders_v1`). Always query through a logical alias (`orders`).
+- **Zero-Downtime Reindex Workflow**:
+  1. Create new index `orders_v2` with updated mapping.
+  2. Run asynchronous reindexing: `POST _reindex?wait_for_completion=false`.
+  3. Atomically swap alias from v1 to v2:
+     ```json
+     POST /_aliases
+     {
+       "actions": [
+         { "remove": { "index": "orders_v1", "alias": "orders" } },
+         { "add":    { "index": "orders_v2", "alias": "orders" } }
+       ]
+     }
+     ```
+  4. Delete legacy index `orders_v1` once validated.
+
+---
+
+### 39. Aggregations Deep Dive: Bucket aggregations, Metric aggregations, and Precision Threshold in `cardinality`.
+
+**In Simple Words:**
+- **Bucket Aggregations**: Group documents into sets/buckets (e.g. `terms`, `date_histogram`, `range`).
+- **Metric Aggregations**: Compute mathematical metrics over document sets (e.g. `avg`, `sum`, `min`, `percentiles`).
+- **Cardinality Aggregation (HyperLogLog++)**: Counting unique visitors over billions of records. Instead of keeping a set of billions of strings in memory, Elasticsearch uses the probabilistic **HyperLogLog++** algorithm:
+  - Controlled by `precision_threshold` (default 3,000). Guarantees < 5% error with negligible memory usage.
+
+---
+
+### 40. Deep Pagination at Scale: `from`/`size` limit vs `search_after` vs Scroll API.
+
+**In Simple Words:**
+- **`from` / `size` (The 10,000 Limit)**: Requesting `from: 100000, size: 10` forces every shard to fetch 100,010 documents into memory and ship them to the coordinating node for sorting, crashing the node. Capped at `index.max_result_window = 10000`.
+- **`search_after` (Recommended for Live Pagination)**: Uses the sort values of the last retrieved document as an index cursor. $O(1)$ memory consumption and blazing fast.
+- **Scroll API**: Designed exclusively for batch data exports (ETL). Deprecated for user-facing interactive searches because it keeps open search contexts in memory.
+
+---
+
+### 41. Shard Sizing and Allocation: Why 20GB-50GB per shard is the golden rule and diagnosing "Too many shards".
+
+**In Simple Words:**
+Every Elasticsearch shard is a full Apache Lucene index requiring its own file descriptors, term indices, and memory buffers:
+- **The Golden Rule**: Aim for primary shard sizes between **20 GB and 50 GB** for logs/time-series data, and **10 GB to 30 GB** for search catalogs.
+- **Too Many Shards Anti-Pattern**: Having 5,000 100MB shards wastes massive heap memory on segment headers and overloads the master node cluster state.
+- **Rule of Thumb**: Keep total shards under **20 shards per GB of allocated JVM heap memory**.
+
+---
+
+### 42. Index Lifecycle Management (ILM): Hot, Warm, Cold, Frozen, and Delete tiers automation.
+
+**In Simple Words:**
+ILM automates storage tiering as data ages, slashing infrastructure costs by 70%:
+1. **Hot Tier**: High-speed NVMe SSDs. Handles all incoming write ingestion and frequent queries.
+2. **Warm Tier (after 7 days)**: Rolled over, read-only index. Shrink shard count and run force-merge to 1 segment.
+3. **Cold Tier (after 30 days)**: Read-only searchable snapshots stored directly on AWS S3 / GCS.
+4. **Frozen Tier (after 90 days)**: Fully decoupled object storage cache.
+5. **Delete Phase (after 365 days)**: Automatically delete index to maintain compliance.
+
+---
+
+### 43. Query Context vs Filter Context: Why filters use bitsets and avoid scoring, boosting search performance.
+
+**In Simple Words:**
+- **Query Context (`"query": { "match": ... }`)**: Asks *"How well does this document match the query?"*. Lucene calculates TF-IDF / BM25 relevance score for every matching document. Non-cacheable and CPU intensive.
+- **Filter Context (`"filter": { "term": ... }`)**: Asks a binary *"Does this document match? Yes or No"*.
+  - Bypasses scoring entirely.
+  - Generates compact in-memory **Bitsets** (`Roaring bitmaps`) that are cached automatically in the Node Query Cache. Subsequent identical filters execute in microseconds!
+
+---
+
+### 44. Parent-Child (`join` field) vs Nested Objects (`nested` type): Architectural tradeoffs.
+
+**In Simple Words:**
+- **`nested` Objects**: Flat arrays of objects are indexed as separate hidden Lucene documents stored in contiguous disk blocks.
+  - Fast read/query performance.
+  - **Downside**: Updating a single child item requires re-indexing the entire root parent document and all siblings!
+- **Parent-Child (`join` field)**: Decoupled parent and child documents stored independently in the same shard:
+  - Children can be added, updated, or deleted without touching the parent document.
+  - Slower query join performance (`has_child` / `has_parent`). Ideal for 1-to-many relationships where children update rapidly (e.g. comments, bids).
+
+---
+
+### 45. Elasticsearch Node Roles: Master-eligible, Data, Ingest, Coordinating-only, and Machine Learning.
+
+**In Simple Words:**
+In large clusters, separating node responsibilities guarantees stability:
+- **`master` (Dedicated Master Nodes)**: 3 lightweight nodes that manage cluster state, shard routing, and index mappings. Do not store data or process search queries.
+- **`data`**: Store Lucene shards and execute data queries/indexing.
+- **`ingest`**: Pre-process documents through Ingest Pipelines (grok parsing, IP geolocation, user-agent parsing) before writing to shards.
+- **`coordinating`**: Smart load balancers that scatter search requests across data nodes and gather/reduce the results.
+- **`ml`**: Run anomaly detection and trained deep learning NLP models.
+
+---
+
+### 46. Circuit Breakers in Elasticsearch: Fielddata circuit breaker, Parent circuit breaker, and preventing OOM heap crashes.
+
+**In Simple Words:**
+Circuit breakers protect nodes from running out of JVM heap memory and crashing during aggressive queries:
+- **Parent Circuit Breaker (`indices.breaker.total.use_real_memory: true`)**: Trips if total allocated JVM memory exceeds 95% of heap, rejecting incoming queries with a `CircuitBreakingException`.
+- **Fielddata Circuit Breaker (`indices.breaker.fielddata.limit: 40%`)**: Trips if an aggregation on text fields attempts to load more than 40% of heap.
+- Ensures one rogue developer running an unbounded aggregation will not crash the entire cluster for other services.
+
+---
+
+### 47. Custom Analyzers: Character filters, Tokenizers, and Token filters (synonyms, stemming).
+
+**In Simple Words:**
+An Analyzer processes raw text into inverted index tokens through 3 sequential stages:
+1. **Character Filters**: Strips HTML tags (`html_strip`) or normalizes characters (`mapping`).
+2. **Tokenizer**: Splits text stream into individual tokens (e.g. `standard` breaks on punctuation/whitespace; `edge_ngram` creates autocomplete character prefixes `["k", "ku", "kub", "kube"]`).
+3. **Token Filters**: Operates on tokens:
+   - `lowercase`: Converts tokens to lowercase.
+   - `stemmer`: Reduces words to root forms (`"running" -> "run"`).
+   - `synonym`: Expands synonyms (`"k8s" -> "kubernetes"`).
+
+---
+
+### 48. Elasticsearch Cluster Recovery and Peer Recovery: Translog retention, shard sync, and fast cluster restarts.
+
+**In Simple Words:**
+When a node restarts or a shard moves between nodes:
+- **Translog (Transaction Log)**: Lucene commits data to disk periodically (every 30 minutes or 512MB). Incoming writes are appended immediately to an fsynced Translog.
+- **Peer Recovery**: The primary shard transfers missing operations from its Translog to the replica shard over the network.
+- **Synced Flush / Translog Retention**: Allows the cluster to perform peer recovery without copying entire multi-gigabyte shard files, restoring cluster green state in seconds.
+
+---
+
+### 49. Security and RBAC: TLS encryption, Document-Level Security (DLS), and Field-Level Security (FLS).
+
+**In Simple Words:**
+Enterprise security enforcement inside the Elasticsearch engine:
+- **Transport TLS (Port 9300)** & **HTTP TLS (Port 9200)**.
+- **Document-Level Security (DLS)**: Evaluates a query template against the user's role. A sales rep with role `region_emea` can only view documents matching `"region": "EMEA"`.
+- **Field-Level Security (FLS)**: Masks sensitive fields. Engineers can query the `users` index, but `ssn` and `credit_card_hash` fields are omitted from results.
+
+---
+
+### 50. Hybrid Search with Reciprocal Rank Fusion (RRF): Combining BM25 keyword matching with kNN vector search scores.
+
+**In Simple Words:**
+Keyword search (BM25) is great for exact identifiers and domain terminology; semantic vector search is great for conceptual meaning and typo tolerance:
+- **Reciprocal Rank Fusion (RRF)**: A state-of-the-art rank aggregation algorithm that merges the ranked lists of lexical search and dense vector kNN search without needing score normalization:
+  $$	ext{RRF Score}(d) = sum_{m in M} rac{1}{k + r_m(d)}$$
+- Where $k$ is a constant (typically 60) and $r_m(d)$ is document rank in system $m$.
+- Guarantees top results feature items that scored strongly in both exact term matching and semantic relevance.

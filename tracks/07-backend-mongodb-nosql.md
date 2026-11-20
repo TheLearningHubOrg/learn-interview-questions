@@ -363,3 +363,163 @@ Occurs when write throughput or heavy reads cause dirty pages in the WiredTiger 
 2. **Strict column-store OLAP data warehousing**: Analyzing billions of rows across a few columns is 100x faster in Snowflake or BigQuery.
 3. **Pure key-value microsecond caching**: Redis provides 10x lower latency for simple session caching.
 `;
+
+---
+
+### 36. WiredTiger Storage Engine: Checkpointing, Cache, and Concurrency.
+
+**In Simple Words:**
+**WiredTiger** is MongoDB's default storage engine:
+1. **Document-Level Concurrency**: Uses optimistic concurrency control; multiple concurrent write operations can update different documents in the same collection simultaneously without table/collection locking.
+2. **WiredTiger RAM Cache**: Holds uncompressed documents in memory (defaults to $50\% \text{ RAM} - 1\text{GB}$).
+3. **Checkpoints**: Every 60 seconds (or 2GB of data), WiredTiger writes a consistent snapshot checkpoint to disk, ensuring recovery consistency in case of power failure.
+
+---
+
+### 37. Data Modeling: Embedding vs Referencing & The 16MB Document Limit.
+
+**In Simple Words:**
+- **Embedding (Denormalized)**: Stores sub-documents inside the parent document. Provides single-operation reads (no joins). Best for 1:1 and bounded 1:N relationships (e.g. user address, line items in an order).
+- **Referencing (Normalized)**: Stores `ObjectId` foreign keys and joins using `$lookup`. Mandatory for unbounded 1:N relationships (e.g. millions of sensor logs) to prevent breaching MongoDB's hard **16MB BSON document size limit**.
+
+---
+
+### 38. Advanced Aggregation Pipeline: `$lookup`, `$unwind`, and `$facet`.
+
+**In Simple Words:**
+MongoDB Aggregation pipelines process documents through multi-stage data transforms:
+- **`$lookup`**: Performs a left outer join to another collection.
+- **`$unwind`**: Deconstructs an array field from input documents to output a document for each element.
+- **`$facet`**: Executes multiple parallel aggregation pipelines within a single stage (e.g. calculating price distribution buckets AND total item count in one query).
+
+```javascript
+db.orders.aggregate([
+  { $match: { status: 'completed' } },
+  { $lookup: { from: 'users', localField: 'userId', foreignField: '_id', as: 'customer' } },
+  { $unwind: '$customer' },
+  { $group: { _id: '$customer.country', totalRevenue: { $sum: '$totalAmount' } } },
+  { $sort: { totalRevenue: -1 } }
+]);
+```
+
+---
+
+### 39. Replica Set Architecture and Oplog Internals.
+
+**In Simple Words:**
+A MongoDB Replica Set consists of a **Primary** node and multiple **Secondary** nodes:
+- **Oplog (Operations Log)**: A capped collection on the Primary storing an idempotent sequence of all write operations. Secondaries asynchronously tail the Oplog to replicate data.
+- **Automated Failover**: If the Primary stops sending heartbeats for 10 seconds, Secondaries hold an election using Raft consensus and elect the Secondary with the most up-to-date Oplog as new Primary within seconds.
+
+---
+
+### 40. Write Concern vs Read Concern: Distributed Guarantees.
+
+**In Simple Words:**
+- **Write Concern (`w`)**:
+  - `w: 1`: Primary confirms write in RAM (fastest, risk of data loss on failover).
+  - `w: 'majority'`: Write confirmed by a majority of replica set nodes.
+  - `j: true`: Confirmed written to on-disk journal file.
+- **Read Concern**:
+  - `'local'` / `'available'`: Reads node's current local state without consensus.
+  - `'majority'`: Reads data committed by a majority of nodes, preventing reading data rolled back during a primary failover.
+  - `'snapshot'`: Multi-document transactional read isolation.
+
+---
+
+### 41. MongoDB Sharding Architecture: `mongos`, Config Servers, and Chunks.
+
+**In Simple Words:**
+Sharding distributes data horizontally across a cluster of Replica Sets:
+1. **`mongos` (Query Router)**: Lightweight stateless proxy that routes client requests to the correct shard.
+2. **Config Database**: Replicated cluster storing cluster metadata and shard key routing ranges.
+3. **Chunks**: Data ranges of a collection (default 64MB). When chunks grow too large, the balancer automatically splits and migrates them across shards.
+
+---
+
+### 42. Shard Key Selection: Avoiding Hotspots.
+
+**In Simple Words:**
+The **Shard Key** determines which shard stores a document:
+- **Monotonically Increasing Keys (e.g. `_id` or `timestamp`) (Anti-pattern)**: All new writes go exclusively to the highest shard chunk, creating a massive single-shard bottleneck!
+- **Hashed Shard Key (`{ _id: 'hashed' }`)**: Distributes writes randomly and evenly across all shards, though range queries must fan-out to all shards.
+- **Compound Shard Key (`{ tenant_id: 1, created_at: 1 }`)**: Optimal pattern for multi-tenant SaaS applications.
+
+---
+
+### 43. Change Streams: Real-time Event-Driven Architectures.
+
+**In Simple Words:**
+Change Streams allow applications to subscribe to real-time data modifications at the collection, database, or deployment level without polling:
+- Powered by tailing the replication **Oplog**.
+- Emits insert, update, replace, and delete events directly into WebSockets, microservices, or Kafka topics.
+
+```javascript
+const collection = db.collection('orders');
+const changeStream = collection.watch([{ $match: { 'fullDocument.status': 'paid' } }]);
+
+changeStream.on('change', (next) => {
+  console.log('New paid order received:', next.fullDocument);
+  triggerNotificationService(next.fullDocument);
+});
+```
+
+---
+
+### 44. Time-Series Collections in MongoDB 5.0+.
+
+**In Simple Words:**
+Designed for IoT telemetry, financial quotes, and system monitoring metrics:
+- Declare with `timeseries: { timeField: 'timestamp', metaField: 'metadata', granularity: 'minutes' }`.
+- Automatically organizes data into optimized columnar-like compressed disk buckets, reducing storage footprint by up to 70% compared to standard collections.
+
+---
+
+### 45. Multi-Document ACID Transactions in MongoDB.
+
+**In Simple Words:**
+MongoDB 4.0+ supports multi-document ACID transactions across collections and replica sets (and across shards in 4.2+):
+- Uses sessions (`client.startSession()`).
+- Commits via two-phase commit protocol (`session.commitTransaction()`).
+- Best reserved for complex financial ledger operations; document embedding should remain the primary design pattern for high-scale performance.
+
+---
+
+### 46. TTL (Time-To-Live) and Partial Indexes in MongoDB.
+
+**In Simple Words:**
+- **TTL Index**: Automatically deletes documents after a specified number of seconds (`expireAfterSeconds: 3600`). Ideal for temporary OTP verification codes, shopping cart sessions, and log retention.
+- **Partial Index**: Indexes only documents matching a filter expression (`partialFilterExpression: { active: true }`), reducing index memory size.
+
+---
+
+### 47. MongoDB Atlas Search & Vector Search (`knnVector`).
+
+**In Simple Words:**
+- **Atlas Search**: Integrates Apache Lucene directly alongside MongoDB data, providing full-text search, fuzzy matching, and autocomplete with zero external sync pipeline.
+- **Vector Search**: Indexes high-dimensional vector embeddings with HNSW graphs for semantic AI searches, executing alongside standard MongoDB queries in a single `$vectorSearch` aggregation stage.
+
+---
+
+### 48. Schema Validation with JSON Schema (`$jsonSchema`).
+
+**In Simple Words:**
+Although MongoDB is schemaless, enterprise applications enforce data consistency using **JSON Schema validation rules** on collections:
+- Enforces data types (`bsonType: 'string'`), required fields, minimum/maximum values, and regular expression patterns on `INSERT` and `UPDATE` operations.
+
+---
+
+### 49. Query Performance Tuning: `explain("executionStats")`.
+
+**In Simple Words:**
+- **`COLLSCAN`**: Full collection scan (reading all documents). Immediate red flag indicating a missing index!
+- **`IXSCAN`**: Index scan; only matching index keys are read.
+- **`totalDocsExamined` vs `nReturned`**: In an optimal query, the ratio is $1:1$. If `totalDocsExamined` is 100,000 and `nReturned` is 10, the index is poorly suited for the query.
+
+---
+
+### 50. Enterprise Backup: `mongodump` vs Continuous Cloud Snapshots.
+
+**In Simple Words:**
+- **`mongodump` / `mongorestore`**: Exports BSON data files. Suitable for development databases, but locks resources and causes memory pressure on large multi-terabyte production clusters.
+- **Continuous Cloud Snapshots (Atlas / EBS)**: Storage-level copy-on-write disk snapshots combined with continuous Oplog archiving, providing Point-In-Time Recovery (PITR) to any exact second without impacting database query latency.

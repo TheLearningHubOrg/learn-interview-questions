@@ -341,4 +341,186 @@ class UserService with LoggerMixin {
   - Startups and enterprise teams aiming for maximum velocity with a single unified engineering team.
   - Multi-platform targets: deploying simultaneously to Mobile (iOS/Android), Desktop (macOS/Windows), and Web.
 - **Choose Native**: When building complex hardware accessories (Bluetooth peripherals), lock screen widgets, or deep OS integrations where platform-specific UI conventions must be strictly preserved.
-`;
+`
+
+---
+
+### 36. Flutter Rendering Architecture: The Three Trees (Widget Tree, Element Tree, RenderObject Tree).
+
+**In Simple Words:**
+Flutter's high performance is driven by its three distinct internal trees:
+1. **Widget Tree**: Lightweight, immutable blueprints of UI configuration. Instantiated and destroyed rapidly at negligible cost.
+2. **Element Tree**: The persistent bone structure managing the lifecycle. Elements hold references to widgets and their corresponding RenderObjects, coordinating diffing and widget updates.
+3. **RenderObject Tree**: Heavy, mutable objects that handle layout sizing (`layout()`), constraint propagation, hit-testing, and actual pixel drawing (`paint()`) to the screen.
+
+---
+
+### 37. Impeller Rendering Engine: Eliminating Shader Compilation Jank on iOS and Android.
+
+**In Simple Words:**
+In Flutter's legacy Skia renderer, when a user opened an animation or new screen for the first time, Skia had to compile GLSL graphics shaders on the fly on the device GPU, causing noticeable dropped frames (**Shader Compilation Jank**):
+- **Impeller**: Flutter's next-generation rendering engine written from scratch in C++:
+  - Pre-compiles a finite set of shaders ahead of time (AOT) at build time.
+  - Leverages modern GPU APIs natively (**Metal on iOS**, **Vulkan on Android**).
+  - Guarantees zero runtime shader compilation jank and rock-solid 120 FPS frame stability.
+
+---
+
+### 38. State Management Comparison: BLoC vs Riverpod vs Provider vs Signals.
+
+**In Simple Words:**
+| Paradigm | Core Concept | Reactivity Model | Best For |
+| :--- | :--- | :--- | :--- |
+| **BLoC / Cubit** | Event-Driven Reactive Streams | Streams & Sinks | Strict enterprise teams, financial apps with audit trails |
+| **Riverpod** | Compile-Safe Global Providers | `ConsumerWidget` & `ref.watch` | Scalable apps requiring compile-time safety without `BuildContext` |
+| **Provider** | Scoped `InheritedWidget` wrapper | `ChangeNotifier` | Small to medium projects, classic Flutter applications |
+| **Signals** | Fine-grained reactive values | Signal graph propagation | High-performance atomic UI updates without rebuilding parent trees |
+
+---
+
+### 39. Dart Concurrency: Event Loop, Microtask Queue, Futures, Streams, and Isolates.
+
+**In Simple Words:**
+Dart is single-threaded by default, operating on an **Event Loop**:
+1. **Microtask Queue**: Short internal tasks executed before the next event loop iteration.
+2. **Event Queue**: User inputs, network socket I/O, timers, and filesystem events.
+3. **Isolates**: To run heavy computational tasks (e.g. image filtering, parsing a 50MB JSON file) without stuttering the 60 FPS UI thread, Dart spawns **Isolates**:
+   - Isolates have completely separate memory heaps (no shared state, zero thread locks).
+   - Communicate strictly via message passing (`SendPort` / `ReceivePort` or `Isolate.run()`).
+
+---
+
+### 40. Platform Channels & FFI: `MethodChannel` vs `EventChannel` vs `dart:ffi`.
+
+**In Simple Words:**
+Communicating with platform native capabilities:
+- **`MethodChannel`**: Asynchronous request-response bridge for calling native Swift/Kotlin methods.
+- **`EventChannel`**: Continuous asynchronous stream from native to Flutter (e.g. accelerometer, battery level stream).
+- **`dart:ffi` (Foreign Function Interface)**: **Zero-overhead direct synchronous C/C++/Rust binding**:
+  - Bypasses serialization and platform channels entirely.
+  - Invokes C functions directly from Dart memory in nanoseconds (ideal for OpenCV, SQLite, crypto libraries).
+
+---
+
+### 41. Navigation 2.0 (Router API) and `go_router`: Declarative routing and deep linking.
+
+**In Simple Words:**
+- **Imperative Navigator 1.0 (`Navigator.push()`)**: Simple stack manipulation, but brittle for browser history, nested bottom navigation bars, and deep linking.
+- **Declarative Navigation 2.0 / `go_router`**:
+  - Treats navigation state as a pure function of application state.
+  - Declarative route definitions with URL pattern matching (`/users/:id`).
+  - Supports nested `ShellRoute` (keeps bottom navigation tab bar visible while navigating child sub-routes).
+
+---
+
+### 42. CustomPainter and Canvas API: Drawing custom vector graphics and animations.
+
+**In Simple Words:**
+When standard composable widgets cannot achieve bespoke visual designs (e.g. radial progress meters, audio waveforms, interactive graphs):
+```dart
+class WavePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.purple..strokeWidth = 3..style = PaintingStyle.stroke;
+    final path = Path()..moveTo(0, size.height / 2)..quadraticBezierTo(size.width / 2, 0, size.width, size.height / 2);
+    canvas.drawPath(path, paint);
+  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+```
+
+---
+
+### 43. Flutter Web: HTML/CSS renderer vs CanvasKit vs WebAssembly (WasmGC) in Flutter 3.22+.
+
+**In Simple Words:**
+- **HTML Renderer (Legacy)**: Uses standard HTML DOM, SVG, and CSS. Lower download size, but inconsistent visual rendering and animations compared to mobile.
+- **CanvasKit**: Ships Skia compiled to WebAssembly. Pixel-perfect identical rendering to mobile, but adds a ~2MB initial download payload.
+- **WasmGC (Flutter 3.22+)**: Dart compiles directly to native browser WebAssembly with Garbage Collection:
+  - 2x to 3x faster execution speeds.
+  - Eliminates JavaScript bridge overhead, unlocking desktop-class 60/120 FPS performance in web browsers.
+
+---
+
+### 44. Dependency Injection in Flutter: GetIt and injectable service locators.
+
+**In Simple Words:**
+Decoupling widget UI from API services and database repositories:
+- **`GetIt`**: A lightweight, fast Service Locator for Dart:
+  ```dart
+  final sl = GetIt.instance;
+  void setupLocator() {
+    sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
+    sl.registerFactory<LoginBloc>(() => LoginBloc(sl()));
+  }
+  ```
+- Simplifies unit testing: replace `AuthRepositoryImpl` with a mock implementation in test setups without passing parameters down through 20 widget layers.
+
+---
+
+### 45. Optimizing List Performance: `ListView.builder`, `RepaintBoundary`, and `AutomaticKeepAliveClientMixin`.
+
+**In Simple Words:**
+Keeping infinite feeds silky smooth:
+1. **`ListView.builder`**: Only instantiates widgets that are currently visible in the viewport.
+2. **`RepaintBoundary`**: Isolates complex or animated widgets onto their own independent graphics display layer. When an animated spinner ticks, Flutter repaints *only* that subtree, without repainting the entire static parent screen.
+3. **`AutomaticKeepAliveClientMixin`**: Prevents tab views or list items from disposing their state (e.g. scroll position or form input) when scrolled offscreen.
+
+---
+
+### 46. Internationalization (i18n) and Localization (l10n): ARB files and pluralization.
+
+**In Simple Words:**
+Localizing Flutter apps for global audiences:
+- Define strings in Application Resource Bundle (`.arb`) JSON files (`app_en.arb`, `app_es.arb`).
+- Supports pluralization rules natively:
+  ```json
+  "itemCount": "{count, plural, =0{No items} =1{1 item} other{{count} items}}"
+  ```
+- Flutter's code generator creates type-safe `AppLocalizations.of(context)!.itemCount(5)` calls.
+
+---
+
+### 47. Secure Storage & Encryption in Flutter: `flutter_secure_storage` and Hive AES.
+
+**In Simple Words:**
+- **`flutter_secure_storage`**: Uses platform-native hardware enclaves (**iOS Keychain** and **Android KeyStore / EncryptedSharedPreferences**). Essential for storing JWT refresh tokens, API keys, and user credentials.
+- **Hive with AES-256**: For high-volume offline local databases requiring encryption at rest:
+  ```dart
+  final secureKey = await Hive.generateSecureKey();
+  final box = await Hive.openBox('encryptedBox', encryptionCipher: HiveAesCipher(secureKey));
+  ```
+
+---
+
+### 48. Background Processing in Flutter: `workmanager` and background services.
+
+**In Simple Words:**
+Executing tasks when the user has minimized or closed the app:
+- **`workmanager`**: Wraps Android `WorkManager` and iOS `BGTaskScheduler`.
+- **How it works**: Spawns an isolated background Dart Isolate to execute periodic tasks (e.g. syncing data every 24 hours, uploading queued offline receipts) while respecting OS battery optimization policies.
+
+---
+
+### 49. App Size Reduction Strategies: Splitting debug info and font subsetting.
+
+**In Simple Words:**
+Reducing production release bundle size:
+1. **Strip Debug Info**:
+   ```bash
+   flutter build appbundle --obfuscate --split-debug-info=./symbols
+   ```
+   Separates debug symbols from the compiled binary, reducing app download size by up to 40%.
+2. **Font Subsetting**: Flutter automatically tree-shakes and bundles only the specific icon glyphs used in your code, discarding unused font megabytes.
+3. **Optimize Asset Images**: Use WebP or SVG format instead of uncompressed PNGs.
+
+---
+
+### 50. Debugging Memory Leaks and Frame Drops with Flutter DevTools.
+
+**In Simple Words:**
+Using Flutter DevTools to resolve performance bottlenecks:
+1. **CPU Profiler**: Inspects flame charts to identify which Dart functions consume excessive CPU time.
+2. **Memory Timeline & Snapshot**: Take heap snapshots before and after navigating to a screen. If the screen's State or Controller remains in memory after popping, you have an un-disposed StreamController or orphaned listener leak.
+3. **Widget Rebuild Tracker**: Highlights widgets that rebuild excessively, allowing you to wrap static children with `const` or memoize them to preserve 120 FPS performance.

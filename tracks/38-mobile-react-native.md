@@ -339,4 +339,183 @@ During the multi-year migration to the New Architecture, many legacy third-party
   - Preference for platform-native UI widgets rather than custom canvas painting.
   - Massive, mature npm ecosystem and first-class Expo tooling.
 - **Choose Flutter**: When complex, pixel-perfect identical 2D rendering and animations across all platforms with zero reliance on native platform UI widgets is the top priority.
-`;
+`
+
+---
+
+### 36. New Architecture Deep Dive: JSI (JavaScript Interface), Fabric, and TurboModules.
+
+**In Simple Words:**
+The legacy React Native architecture relied on an asynchronous JSON bridge across three threads (JS, Native, Shadow), causing serialization lag during fast scrolling:
+- **JSI (JavaScript Interface)**: Replaces the JSON bridge with direct C++ host objects. JavaScript holds direct references to native C++/Java/Objective-C objects and invokes methods synchronously without string serialization.
+- **Fabric (New Renderer)**: Uses JSI to construct the C++ shadow tree directly, unifying rendering across platforms and supporting React 18 concurrent features.
+- **TurboModules**: Native modules are loaded lazily on demand instead of initializing all native code at app launch, dramatically slashing cold startup times.
+
+---
+
+### 37. Hermes JavaScript Engine: Ahead-of-Time (AOT) bytecode compilation and low memory footprint.
+
+**In Simple Words:**
+Standard V8 or JavaScriptCore compiles JS text to bytecode on the user's mobile device at app launch, consuming CPU and causing launch lag:
+- **Hermes**: Built by Meta specifically for mobile devices.
+- **AOT Compilation**: Compiles JavaScript into optimized binary bytecode (`.hbc`) during the build process on your developer machine or CI server.
+- **Benefits**:
+  - Near-instantaneous cold startup time (Time to Interactive - TTI).
+  - 50% smaller memory footprint on budget Android devices.
+  - Generational garbage collection tuned for mobile memory limits.
+
+---
+
+### 38. Reanimated 3 and Gesture Handler: Running 60/120fps animations on the native UI thread via worklets.
+
+**In Simple Words:**
+Standard React Native animations run on the JavaScript thread. If the JS thread is busy parsing JSON, animations drop frames and feel sluggish:
+- **Worklets**: Tiny JavaScript functions compiled to bytecode that execute directly on the **Native UI Thread**.
+- **Reanimated 3 & Gesture Handler**:
+  - Touch gestures and physics-based animations (springs, friction) execute synchronously on the display refresh loop (60Hz / 120Hz ProMotion).
+  - JavaScript thread can be 100% blocked on heavy calculations, while the bottom sheet or swipe animation glides at butter-smooth 120 FPS.
+
+---
+
+### 39. Offline-First State Synchronization: WatermelonDB vs MMKV vs SQLite with background syncing.
+
+**In Simple Words:**
+Mobile apps frequently operate in subways or poor cell reception:
+- **MMKV (Tencent)**: In-memory mapped key-value store using C++ `mmap`. 30x faster than `AsyncStorage`; ideal for user preferences, auth tokens, and session flags.
+- **WatermelonDB**: High-performance SQLite-backed reactive database:
+  - Lazy loading: loads only visible rows into memory.
+  - Observable queries: UI automatically re-renders when local database rows mutate.
+  - Built-in sync engine: Tracks `created_at` and `updated_at` columns to exchange compact JSON deltas with backend endpoints during network recovery.
+
+---
+
+### 40. Fastlane Automation: Automating App Store and Google Play signing, metadata, and deployment.
+
+**In Simple Words:**
+Manually uploading IPAs and APKs through Xcode and web consoles is error-prone:
+- **Fastlane**: Open-source automation toolchain driven by Ruby `Fastfile`:
+  ```ruby
+  lane :beta do
+    match(type: "appstore") # Automated iOS code signing certificates via Git
+    increment_build_number
+    build_app(workspace: "MyApp.xcworkspace", scheme: "MyApp")
+    upload_to_testflight
+    upload_to_play_store(track: "internal")
+  end
+  ```
+- Handles code signing, provisioning profiles, asset generation, and automated App Store submission in one terminal command.
+
+---
+
+### 41. Over-the-Air (OTA) Updates: Expo Updates vs CodePush and App Store compliance rules.
+
+**In Simple Words:**
+Pushing a hotfix through the App Store review process takes 24-48 hours. **OTA Updates** download new JavaScript bundles and assets directly to users' phones in seconds:
+- **How it works**: On app launch, the native shell checks an update server. If a new hash exists, it downloads the `index.android.bundle` in the background and applies it on next restart.
+- **Apple Guideline 3.3.2 Compliance**: Permitted strictly for JavaScript/asset updates that do not alter the fundamental primary purpose of the application. Native code modifications (C++/Swift/Java) still require full App Store review.
+
+---
+
+### 42. Expo Application Services (EAS): EAS Build, EAS Submit, and Prebuild architecture.
+
+**In Simple Words:**
+- **Prebuild (`npx expo prebuild`)**: Generates transient `android/` and `ios/` native directories dynamically from `app.json` config plugins without committing thousands of fragile native files into Git.
+- **EAS Build**: Cloud-hosted CI/CD infrastructure with dedicated macOS M-series and Linux build runners that compile native binaries with managed certificates.
+- **EAS Submit**: Automatically pushes completed binaries directly to Apple App Store Connect and Google Play Console.
+
+---
+
+### 43. FlatList vs FlashList (Shopify): Recycling strategies and fixing list scroll stuttering.
+
+**In Simple Words:**
+- **`FlatList`**: Unmounts components offscreen, creating and destroying hundreds of native view elements during fast scrolling, leading to blank white spaces and memory spikes.
+- **`FlashList` (Shopify)**: Implements **View Recycling**:
+  - Keeps a small pool of native views alive.
+  - As rows scroll offscreen, their views are instantly recycled and re-bound with new row data without destroying or allocating new native memory.
+  - Delivers consistent 60 FPS scrolling even across lists of 100,000+ complex items.
+
+---
+
+### 44. Memory Leak Detection in Mobile Apps: Native retain cycles, orphaned listeners, and profiling tools.
+
+**In Simple Words:**
+Detecting why an app crashes after 30 minutes of usage:
+1. **JavaScript Retain Cycles**: Forgotten global event listeners (`AppState.addEventListener`, `setInterval`) that are never cleaned up on component unmount.
+2. **Native Retain Cycles (Swift/Kotlin)**: Strong reference cycles between closures and ViewControllers (resolve with `[weak self]`).
+3. **Profiling**: Use **Xcode Instruments (Allocations & Leaks)** on iOS and **Android Studio Memory Profiler** to inspect native heap memory graphs and identify un-garbage-collected objects.
+
+---
+
+### 45. Push Notifications Architecture: APNs, FCM, and background silent push handling.
+
+**In Simple Words:**
+- **APNs (iOS)** & **FCM (Android)**: Device registers with the OS and obtains an ephemeral push token sent to the backend database.
+- **Visual Notifications**: Displayed in the OS notification shade with title, body, sound, and action buttons.
+- **Silent Background Push (`content-available: 1`)**: Wakes up the app in the background for up to 30 seconds to fetch fresh data (e.g. download new chat messages) so content is ready the instant the user taps the app icon.
+
+---
+
+### 46. Biometric Authentication & Secure Storage: Keychain and KeyStore.
+
+**In Simple Words:**
+Never store JWT refresh tokens or passwords in unencrypted `AsyncStorage` or `MMKV`:
+- **iOS Keychain** & **Android KeyStore**: Hardware-encrypted security enclaves.
+- **Biometric Binding**: Use `react-native-keychain` with biometric flags:
+  ```typescript
+  await Keychain.setGenericPassword('auth_token', token, {
+    accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY,
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+  });
+  ```
+- Hardware automatically prompts for FaceID / TouchID / Fingerprint before returning the secret token to JavaScript.
+
+---
+
+### 47. Native Module Authoring with Codegen specs in the New Architecture.
+
+**In Simple Words:**
+In the New Architecture, native modules are strictly type-safe across JavaScript and C++/Swift/Kotlin:
+1. Define the interface in TypeScript using Flow or TypeScript Spec:
+   ```typescript
+   // NativeBattery.ts
+   import type { TurboModule } from 'react-native';
+   import { TurboModuleRegistry } from 'react-native';
+
+   export interface Spec extends TurboModule {
+     getBatteryLevel(): Promise<number>;
+   }
+   export default TurboModuleRegistry.getEnforcing<Spec>('NativeBattery');
+   ```
+2. Run **Codegen**: Generates C++ glue headers enforcing that your native Swift/Kotlin methods match the exact parameter types at compile time.
+
+---
+
+### 48. App Startup Time Optimization (Time to Interactive - TTI).
+
+**In Simple Words:**
+Slashing cold launch time from 4 seconds down to sub-1 second:
+1. **Enable Hermes Engine**: Eliminates runtime JS parsing overhead.
+2. **Inline Requires**: Defer importing heavy modules until they are actually rendered (`require('moment')` inside the function).
+3. **Optimize Splash Screen**: Keep native splash screen visible until initial critical layout renders to avoid layout jank.
+4. **Reduce Native Module Overhead**: Convert legacy synchronous native modules to lazy TurboModules.
+
+---
+
+### 49. Microfrontends in Mobile: Super Apps architecture using Re.Pack.
+
+**In Simple Words:**
+In massive enterprise apps (e.g. Uber, WeChat, Amazon), multiple independent teams cannot deploy inside a single monolithic Git repository:
+- **Re.Pack (Webpack / Rspack for React Native)**: Enables **Module Federation** for mobile.
+- **Super App Architecture**:
+  - The "Shell" app downloads dynamic JavaScript feature mini-bundles over the network (e.g., Food Delivery bundle, Ride Sharing bundle).
+  - Teams develop, test, and release mini-apps independently without waiting for other teams' release schedules.
+
+---
+
+### 50. Battery and Network Consumption Tuning: Background tasks and throttling.
+
+**In Simple Words:**
+Preventing your app from draining user battery in the background:
+- **iOS `BGTaskScheduler` & Android `WorkManager`**: Schedule background jobs with battery-friendly constraints (e.g. execute sync strictly when connected to Wi-Fi and device is charging).
+- **Batching Network Requests**: Group periodic analytics telemetry pings into single batches every 5 minutes rather than firing cellular radio chips on every click.
+- **Adaptive Geolocation**: Switch GPS from continuous high-accuracy tracking to coarse cell-tower geofencing when the user is stationary.

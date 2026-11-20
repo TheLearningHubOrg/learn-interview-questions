@@ -750,3 +750,177 @@ public class StringBenchmark {
 1. **No Dynamic ClassLoading**: All reachable classes must be known at build time.
 2. **Reflection & Dynamic Proxies Configuration**: Requires explicit JSON reflection configuration metadata.
 3. **Peak Throughput**: Long-running JIT compilation with PGO can theoretically achieve higher peak throughput than static AOT compilation because it optimizes against live runtime CPU profile traces.
+
+---
+
+### 36. Java Virtual Threads (Project Loom): Architecture and Best Practices.
+
+**In Simple Words:**
+Prior to Java 21, every `java.lang.Thread` was a heavyweight operating system (OS) kernel thread consuming $\approx 1\text{MB}$ of stack memory, limiting concurrency to a few thousand threads.
+- **Virtual Threads (`Thread.ofVirtual()`)**: Lightweight user-mode threads managed entirely by the JVM:
+  - Consumes only a few hundred bytes of heap memory; you can spawn **1,000,000+ virtual threads** concurrently!
+  - Mounts onto a small pool of OS "carrier threads" (typically equal to CPU cores). When a virtual thread performs blocking I/O (database, socket, sleep), the JVM unmounts it from the carrier thread and parks it in heap memory, keeping the carrier thread 100% busy.
+  - **Thread-per-request model**: Eliminates reactive programming complexity (`WebFlux`, `Mono`/`Flux`) while achieving identical non-blocking throughput.
+
+```java
+// Spawning 100,000 Virtual Threads in Java 21+
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    IntStream.range(0, 100_000).forEach(i -> {
+        executor.submit(() -> {
+            Thread.sleep(Duration.ofSeconds(1)); // Unmounts from carrier thread; 0ms OS stall!
+            return i;
+        });
+    });
+} // Blocks cleanly until all virtual threads finish
+```
+
+---
+
+### 37. Modern Garbage Collectors: ZGC vs Shenandoah vs G1GC.
+
+**In Simple Words:**
+- **G1GC (Default)**: Divides heap into regional blocks. Target pause time $\le 200\text{ms}$. Balances throughput against pause times for moderate heaps (4GB - 32GB).
+- **ZGC (Generational ZGC in Java 21+)**: Low-latency collector using colored pointers and load barriers. Guarantees **sub-millisecond pause times ($< 1\text{ms}$)** regardless of heap size (from 16MB to 16 Terabytes!).
+- **Shenandoah**: Ultra-low-latency collector performing concurrent compaction alongside running Java application threads.
+
+---
+
+### 38. Java Memory Model (JMM): `volatile` and Happens-Before Guarantees.
+
+**In Simple Words:**
+Modern CPUs have independent L1/L2 caches and reorder instructions for performance. The JMM defines rules for variable visibility across threads:
+- **`volatile`**:
+  1. **Visibility**: Guarantees that any write to a volatile variable is immediately flushed to main memory and visible to all other threads.
+  2. **Instruction Ordering**: Prohibits compiler and CPU instruction reordering across the volatile variable read/write via memory barriers.
+- **Happens-Before**: A formal guarantee that memory writes by one thread are guaranteed to be visible to another thread (e.g. unlocking a monitor happens-before any subsequent lock acquisition).
+
+---
+
+### 39. JVM Memory Architecture: Heap, Metaspace, and Stack.
+
+**In Simple Words:**
+1. **JVM Stack**: Thread-private. Stores stack frames containing primitive local variables, method call parameters, and object references.
+2. **Heap Memory**: Shared across all threads. Stores all class instances and arrays.
+   - **Young Generation (Eden + Survivor S0/S1)**: Where new objects are allocated.
+   - **Old (Tenured) Generation**: Stores long-lived surviving objects.
+3. **Metaspace**: Stores class metadata, bytecode, and method tables in native off-heap memory (replaces PermGen since Java 8).
+
+---
+
+### 40. `CompletableFuture` and Async Orchestration in Java.
+
+**In Simple Words:**
+`CompletableFuture<T>` represents an asynchronous computation supporting monadic chaining, error handling, and fan-out/fan-in combinations without blocking threads:
+
+```java
+CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(() -> userService.getUser(id));
+CompletableFuture<List<Order>> ordersFuture = CompletableFuture.supplyAsync(() -> orderService.getOrders(id));
+
+// Combine both futures asynchronously
+CompletableFuture<DashboardDTO> dashboard = userFuture.thenCombine(ordersFuture, (user, orders) -> {
+    return new DashboardDTO(user, orders);
+}).exceptionally(ex -> {
+    log.error("Failed to fetch dashboard", ex);
+    return DashboardDTO.empty();
+});
+```
+
+---
+
+### 41. `ConcurrentHashMap` Concurrency Architecture.
+
+**In Simple Words:**
+- `Hashtable` and `Collections.synchronizedMap` lock the entire table with a single synchronized lock, killing throughput.
+- **`ConcurrentHashMap`**:
+  - In Java 7: Used 16 independent lock segments (Lock Striping).
+  - In Java 8+: Uses lock-free **CAS (Compare-And-Swap)** for inserting the first node in empty bucket bins, and synchronized locks on individual bucket head nodes for hash collisions. Reads (`get()`) are completely lock-free via `volatile` nodes!
+
+---
+
+### 42. Java Dynamic Proxies vs Bytecode Manipulation (ByteBuddy / CGLIB).
+
+**In Simple Words:**
+Dynamic proxies create proxy classes at runtime:
+- **JDK Dynamic Proxy (`Proxy.newProxyInstance`)**: Built into the JDK. Requires target classes to implement an **interface**. Intercepts calls via `InvocationHandler`.
+- **CGLIB / ByteBuddy**: Subclasses concrete classes directly at runtime by generating raw JVM bytecode. Used by Spring Boot for `@Transactional` and AOP aspect interception on non-interface service classes.
+
+---
+
+### 43. Modern Java Pattern Matching: Records, Sealed Classes, and Switch.
+
+**In Simple Words:**
+Java 17-21+ introduced algebraic data types:
+- **Records (`record Point(int x, int y) {}`)**: Immutable data carriers with auto-generated constructor, getters, `equals()`, and `hashCode()`.
+- **Sealed Classes (`sealed interface Shape permits Circle, Square`)**: Restricts which classes can extend or implement an interface.
+- **Pattern Matching for Switch**: Type-safe exhaustive pattern matching with zero cast boilerplate.
+
+```java
+public String formatShape(Shape shape) {
+    return switch (shape) {
+        case Circle c -> "Circle with radius " + c.radius();
+        case Square(int side) -> "Square with area " + (side * side); // Record pattern deconstruction
+    };
+}
+```
+
+---
+
+### 44. Foreign Function & Memory API (Project Panama).
+
+**In Simple Words:**
+Project Panama (Java 22+) replaces legacy Java Native Interface (JNI):
+- **Foreign Memory Access (`Arena`, `MemorySegment`)**: Safely allocates and accesses off-heap memory with deterministic allocation lifetimes, eliminating JVM garbage collection pauses.
+- **Foreign Linker**: Calls native C/C++ libraries and system calls with near-native performance and type-safe signatures without writing any C wrapper code.
+
+---
+
+### 45. Java Streams: Spliterators and Parallel Stream Traps.
+
+**In Simple Words:**
+- A **Spliterator** partitions elements of a source for parallel execution.
+- **The Parallel Streams Trap**: `list.parallelStream()` uses the shared common `ForkJoinPool.commonPool()`. If a parallel stream performs blocking I/O (HTTP calls, DB queries), it starves the entire JVM of thread workers, freezing other parallel streams across the application!
+
+---
+
+### 46. Just-In-Time (JIT) Compilation: Tiered Compilation and Escape Analysis.
+
+**In Simple Words:**
+The HotSpot JVM interprets bytecode initially, while profiling execution:
+1. **C1 Compiler (Client)**: Quickly compiles hot methods with basic optimizations.
+2. **C2 Compiler (Server / Graal)**: Heavily optimizes hot methods (loop unrolling, method inlining, branch prediction).
+3. **Escape Analysis**: If an object does not escape the allocating method, the JIT compiler eliminates the heap allocation entirely and **allocates the object on the stack** (Scalar Replacement), eliminating garbage collection overhead!
+
+---
+
+### 47. Low-Overhead Profiling: JDK Flight Recorder (JFR).
+
+**In Simple Words:**
+**JDK Flight Recorder (JFR)** is a kernel-integrated, low-overhead ($< 1\%$ CPU impact) diagnostic engine built directly into the JVM. It records CPU usage, thread locks, memory allocations, garbage collection pauses, and socket I/O, allowing developers to safely diagnose live production incidents without degrading user latency.
+
+---
+
+### 48. Scoped Values (JEP 446): Replacing `ThreadLocal` for Virtual Threads.
+
+**In Simple Words:**
+`ThreadLocal` stores mutable state per thread. With 1,000,000 virtual threads, millions of `ThreadLocal` maps consume massive heap memory and risk leaks if not manually cleaned up.
+- **Scoped Values (`ScopedValue.where(...)`)**: Immutable, stack-bounded values shared safely across virtual threads and child tasks with guaranteed automatic cleanup when exiting the execution scope.
+
+---
+
+### 49. The Java Module System (JPMS / Project Jigsaw).
+
+**In Simple Words:**
+Introduced in Java 9 (`module-info.java`):
+- Provides **Strong Encapsulation**: Internal implementation packages cannot be accessed by external consumers, even via reflection!
+- Explicit dependency graphs via `requires` and `exports`.
+
+---
+
+### 50. High-Performance Java Networking: Java NIO vs Netty.
+
+**In Simple Words:**
+- **Java NIO (Non-blocking I/O)**: Uses `SocketChannel` and `Selector` to manage thousands of active network sockets with a handful of threads.
+- **Netty**: Production-grade async event-driven framework built on top of NIO:
+  - Custom memory buffer (`ByteBuf`) with reference counting and thread-local pooling.
+  - Fixes complex low-level epoll CPU spin bugs present in raw Java NIO.
+  - Powers Kafka, Cassandra, gRPC Java, and Spring WebFlux.

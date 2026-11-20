@@ -254,3 +254,218 @@ Query system views in `SNOWFLAKE.ACCOUNT_USAGE` (e.g., `QUERY_HISTORY`, `LOGIN_H
 ### 35. When should you choose Snowflake over Google BigQuery or Databricks?
 **In Simple Words:**
 Choose Snowflake when requiring multi-cloud flexibility (AWS/Azure/GCP), instantaneous zero-copy cloning, seamless secure data sharing, and zero-management ANSI SQL performance.
+
+
+---
+
+### 36. Snowflake Micro-Partitions and Automated Clustering: Physical layout and clustering depth.
+
+**In Simple Words:**
+Unlike traditional databases where DBAs manually create disk partitions (e.g. by year or month), Snowflake automatically divides all table data into contiguous **Micro-Partitions**:
+- Each micro-partition contains **50 MB to 500 MB** of uncompressed data stored in proprietary columnar compressed format.
+- **Immutable & Stateless**: Micro-partitions are write-once; updates write new micro-partitions.
+- **Clustering Depth**: Measures how well data is aligned along query filter keys. For multi-terabyte tables with high clustering depth, you can define an explicit **Clustering Key** (`CLUSTER BY (order_date, customer_id)`), enabling the background Automated Clustering service to reorganize micro-partitions for optimal pruning.
+
+---
+
+### 37. Snowflake Virtual Warehouses Sizing: Scale-Up vs Scale-Out (Multi-Cluster Warehouses).
+
+**In Simple Words:**
+- **Scale-Up (Warehouse Sizing: X-Small to 6X-Large)**:
+  - Doubles compute power and memory with each step ($XS=1, S=2, M=4, L=8, XL=16 dots$ credits/hr).
+  - Use Scale-Up to speed up **individual large, complex queries** (heavy joins, massive aggregations, ETL transformations).
+- **Scale-Out (Multi-Cluster Warehouses)**:
+  - Adds identical warehouse clusters horizontally (e.g. min 1, max 10 clusters).
+  - Use Scale-Out to resolve **query queuing and high user concurrency** (e.g., Monday morning when 500 business analysts open dashboards simultaneously).
+- **Auto-Suspend (e.g. 60 seconds)**: Automatically shuts down warehouse billing when idle.
+
+---
+
+### 38. Time Travel vs Fail-Safe: Retention limits, querying past versions, and disaster recovery.
+
+**In Simple Words:**
+| Feature | Time Travel | Fail-Safe |
+| :--- | :--- | :--- |
+| **Duration** | 0 to 90 days (Enterprise Edition; Standard is 1 day) | Strictly 7 days (non-configurable) |
+| **User Accessible?** | Yes, via standard SQL (`AT` / `BEFORE`) | No, strictly accessed via Snowflake Support |
+| **Use Case** | Accidental `DROP TABLE`, bug rollback, audit historical states | Catastrophic cloud hardware/disaster recovery |
+| **Storage Cost** | Billed as active storage | Billed as active storage |
+
+```sql
+-- Query table exactly as it existed 2 hours ago
+SELECT * FROM orders AT(OFFSET => -60*120);
+
+-- Restore accidentally dropped table instantly
+UNDROP TABLE customers;
+```
+
+---
+
+### 39. Zero-Copy Cloning (`CLONE`): How pointer-based cloning works with zero initial storage cost.
+
+**In Simple Words:**
+Creating a full copy of a 50-terabyte production database for staging or testing takes seconds and costs $0 in new storage:
+```sql
+CREATE DATABASE staging_db CLONE production_db;
+```
+- **How it works**: Snowflake simply duplicates the metadata pointers in the Cloud Services layer pointing to the existing immutable micro-partitions.
+- **Copy-on-Write (CoW)**: When staging engineers modify or delete rows in `staging_db`, only the newly generated delta micro-partitions incur storage billing. Production remains completely untouched.
+
+---
+
+### 40. Snowpipe vs Bulk `COPY INTO`: Serverless continuous ingestion vs scheduled batch loading.
+
+**In Simple Words:**
+- **Bulk `COPY INTO`**: Requires an active Virtual Warehouse. Best for scheduled, periodic batch loading (e.g. hourly or nightly ingestion of gigabytes of Parquet/CSV files).
+- **Snowpipe**: Serverless continuous event-driven ingestion:
+  1. Cloud storage (AWS S3 / GCS) emits an event notification (SNS/SQS) when a new file lands.
+  2. Snowpipe consumes the event and loads data into Snowflake micro-partitions within seconds.
+  3. Billed per file and second using serverless compute without needing a running virtual warehouse.
+
+---
+
+### 41. Streams and Tasks: Change Data Capture (CDC) and automated DAG orchestration.
+
+**In Simple Words:**
+Building automated ELT pipelines natively inside Snowflake without external Airflow:
+- **Stream**: Tracks CDC changes (inserts, updates, deletes) on a source table using an offset pointer without locking or duplicating data:
+  ```sql
+  CREATE STREAM orders_stream ON TABLE raw_orders;
+  ```
+- **Task**: Scheduled SQL runner executing at cron intervals or triggered when stream has data (`WHEN SYSTEM$STREAM_HAS_DATA('orders_stream')`):
+  ```sql
+  CREATE TASK process_orders_task
+    WAREHOUSE = transform_wh
+    SCHEDULE = '5 MINUTE'
+    WHEN SYSTEM$STREAM_HAS_DATA('orders_stream')
+  AS
+    MERGE INTO analytics_orders a USING orders_stream s ...;
+  ```
+
+---
+
+### 42. Semi-Structured Data Processing: `VARIANT`, `OBJECT`, and `ARRAY` types.
+
+**In Simple Words:**
+Snowflake treats JSON, Avro, ORC, and XML as first-class citizens using the **`VARIANT`** data type:
+- Ingest raw JSON directly without defining upfront schemas:
+  ```sql
+  SELECT 
+    payload:user.id::INT AS user_id,
+    payload:user.email::STRING AS email,
+    f.value:item_id::STRING AS item
+  FROM raw_events,
+  LATERAL FLATTEN(input => payload:cart_items) f;
+  ```
+- **Under the Hood**: Snowflake parses JSON during write, analyzes paths, and stores frequent sub-keys into separate compressed columnar physical structures, delivering SQL speeds on unstructured JSON.
+
+---
+
+### 43. Secure Data Sharing and Clean Rooms: Direct data sharing across Snowflake accounts without ETL.
+
+**In Simple Words:**
+Traditional data sharing requires dumping CSVs to SFTP or S3, creating stale copies and security compliance leaks:
+- **Secure Data Sharing**: The provider shares access to a database or view directly via metadata permissions:
+  ```sql
+  CREATE SHARE partner_sales_share;
+  GRANT USAGE ON DATABASE sales_db TO SHARE partner_sales_share;
+  GRANT SELECT ON VIEW sales_db.public.regional_sales TO SHARE partner_sales_share;
+  ALTER SHARE partner_sales_share ADD ACCOUNTS = 'xy12345';
+  ```
+- The consumer queries live data in real time using their own virtual warehouse with zero data copying or storage duplication.
+
+---
+
+### 44. Dynamic Tables vs Materialized Views: Declarative pipeline transformations.
+
+**In Simple Words:**
+- **Materialized Views**: Single-table query acceleration. Best for pre-computing aggregations or filters on single base tables. Cannot handle multi-table joins.
+- **Dynamic Tables**: Declarative pipeline transformation engine:
+  - Define the desired end-state using SQL containing complex multi-table joins and window functions.
+  - Specify the target lag (`TARGET_LAG = '10 minutes'`).
+  - Snowflake's automated engine continuously computes the incremental deltas and refreshes downstream tables, completely replacing manual Streams and Tasks.
+
+---
+
+### 45. Search Optimization Service (SOS): Point lookup acceleration and substring search.
+
+**In Simple Words:**
+Micro-partition pruning is excellent for range scans (`date BETWEEN ...`), but slow for finding a single needle in a 10-billion row haystack (`WHERE transaction_id = 'a8f9-1234'`):
+- **Search Optimization Service**: An automated background service that builds an optimized search access path (persistent indexes) over high-cardinality columns.
+- Accelerates point lookups, equality checks, and substring searches (`LIKE '%term%'`) from minutes down to milliseconds.
+
+---
+
+### 46. Snowpark Deep Dive: Python, Java, and Scala APIs with pushdown execution.
+
+**In Simple Words:**
+**Snowpark** allows data scientists and engineers to write idiomatic Python/Scala DataFrame code instead of raw SQL:
+```python
+import snowflake.snowpark.functions as F
+
+df = session.table("sales")
+filtered = df.filter(F.col("amount") > 1000).group_by("region").agg(F.sum("amount"))
+filtered.show()
+```
+- **Pushdown Execution**: Snowpark code does **not** pull data to the local client. The Snowpark compiler translates Python DataFrame operations into deeply optimized Snowflake ANSI SQL executed entirely inside Snowflake's distributed engine.
+- Supports running custom Python machine learning packages (scikit-learn, PyTorch) inside secure Anaconda sandboxes on warehouse nodes.
+
+---
+
+### 47. Row-Level Security (Row Access Policies) and Column-Level Security (Dynamic Data Masking).
+
+**In Simple Words:**
+- **Dynamic Data Masking**: Anonymizes column values at query runtime based on the caller's role:
+  ```sql
+  CREATE MASKING POLICY ssn_mask AS (val STRING) RETURNS STRING ->
+    CASE WHEN CURRENT_ROLE() = 'HR_ADMIN' THEN val
+         ELSE '***-**-' || RIGHT(val, 4)
+    END;
+  ALTER TABLE employees MODIFY COLUMN ssn SET MASKING POLICY ssn_mask;
+  ```
+- **Row Access Policy**: Restricts which specific rows are returned:
+  ```sql
+  CREATE ROW ACCESS POLICY region_policy AS (reg STRING) RETURNS BOOLEAN ->
+    CURRENT_ROLE() = 'GLOBAL_ADMIN' OR CURRENT_ROLE() = reg || '_SALES';
+  ```
+
+---
+
+### 48. Resource Monitors: Credit quota enforcement, threshold alerting, and automatic warehouse suspension.
+
+**In Simple Words:**
+Prevent runaway cloud bills from forgotten warehouse instances:
+- Set up **Resource Monitors** attached to virtual warehouses or account-level credits:
+  ```sql
+  CREATE RESOURCE MONITOR monthly_limit
+    WITH CREDIT_QUOTA = 5000
+    FREQUENCY = MONTHLY
+    START_TIMESTAMP = IMMEDIATELY
+    TRIGGERS
+      ON 80 PERCENT DO NOTIFY
+      ON 100 PERCENT DO SUSPEND
+      ON 110 PERCENT DO SUSPEND_IMMEDIATELY;
+  ```
+
+---
+
+### 49. Query Profiler and Bottleneck Diagnosis: Spilling to local/remote storage and pruning efficiency.
+
+**In Simple Words:**
+Using the Snowflake UI Query Profiler to fix slow queries:
+1. **Spilling to Local Storage**: Occurs when intermediate query data exceeds Virtual Warehouse RAM. Indicates warehouse size is too small; scale up from M to L.
+2. **Spilling to Remote Storage**: Occurs when data exceeds both RAM and local SSD, spilling to slow S3/GCS. Drastic performance collapse. Immediate indicator to resize warehouse or rewrite query.
+3. **Partitions Scanned vs Total**: If a query scans 10,000 out of 10,000 partitions, clustering is broken or query lacks partition pruning filters.
+
+---
+
+### 50. Cross-Cloud & Cross-Region Database Replication and Failover Groups.
+
+**In Simple Words:**
+Enterprise business continuity across AWS, Azure, and Google Cloud:
+- **Replication Groups / Failover Groups**: Automatically replicate databases, roles, users, and resource monitors from a primary account (e.g. AWS `us-east-1`) to a secondary account (e.g. Azure `westeurope`).
+- **One-Command Failover**:
+  ```sql
+  ALTER FAILOVER GROUP business_critical_group FAILOVER;
+  ```
+- Instantly promotes the secondary region to primary with zero data loss, routing client connection strings seamlessly via Snowflake Global Client Redirect URLs.

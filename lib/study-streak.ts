@@ -22,13 +22,16 @@ export function getLocalDateString(date: Date = new Date()): string {
 
 /**
  * Calculate difference in days between two YYYY-MM-DD strings (date2 - date1)
+ * Using UTC midnight guarantees exactly 86,400,000 ms per day without DST or timezone skew
  */
-function getDayDifference(dateStr1: string, dateStr2: string): number {
+export function getDayDifference(dateStr1: string, dateStr2: string): number {
   try {
-    const d1 = new Date(`${dateStr1}T00:00:00`);
-    const d2 = new Date(`${dateStr2}T00:00:00`);
-    const diffTime = d2.getTime() - d1.getTime();
-    return Math.round(diffTime / (1000 * 60 * 60 * 24));
+    const [y1, m1, d1] = dateStr1.split('-').map(Number);
+    const [y2, m2, d2] = dateStr2.split('-').map(Number);
+    if (!y1 || !m1 || !d1 || !y2 || !m2 || !d2) return 0;
+    const utc1 = Date.UTC(y1, m1 - 1, d1);
+    const utc2 = Date.UTC(y2, m2 - 1, d2);
+    return Math.round((utc2 - utc1) / (1000 * 60 * 60 * 24));
   } catch {
     return 0;
   }
@@ -74,9 +77,9 @@ export function getStudyStreak(): StudyStreakData {
 
     const lastDate = data.lastStudiedDate;
     const activeDates = Array.isArray(data.activeDates) ? data.activeDates : [];
-    const totalActiveDays = data.totalActiveDays || activeDates.length;
+    const totalActiveDays = Math.max(data.totalActiveDays || 0, activeDates.length);
     let currentStreak = data.currentStreak || 0;
-    const longestStreak = data.longestStreak || currentStreak;
+    let longestStreak = data.longestStreak || currentStreak;
 
     if (!lastDate) {
       return {
@@ -90,11 +93,17 @@ export function getStudyStreak(): StudyStreakData {
     }
 
     const diff = getDayDifference(lastDate, today);
-    const studiedToday = diff === 0;
+    const studiedToday = diff === 0 || activeDates.includes(today);
 
     // If more than 1 day has elapsed since last study date, streak is broken
     if (diff > 1) {
       currentStreak = 0;
+    } else if (studiedToday && currentStreak < 1) {
+      currentStreak = 1;
+    }
+
+    if (currentStreak > longestStreak) {
+      longestStreak = currentStreak;
     }
 
     return {
@@ -129,8 +138,8 @@ export function recordStudyActivity(): StudyStreakData {
     const today = getLocalDateString();
     const streak = getStudyStreak();
 
-    // Already studied today
-    if (streak.lastStudiedDate === today) {
+    // Already recorded study activity today
+    if (streak.studiedToday && streak.currentStreak > 0) {
       return streak;
     }
 
@@ -143,7 +152,10 @@ export function recordStudyActivity(): StudyStreakData {
       const diff = getDayDifference(streak.lastStudiedDate, today);
       if (diff === 1) {
         // Consecutive day
-        nextCurrentStreak = streak.currentStreak + 1;
+        nextCurrentStreak = (streak.currentStreak || 0) + 1;
+      } else if (diff === 0) {
+        // Same day
+        nextCurrentStreak = Math.max(1, streak.currentStreak);
       } else {
         // Streak broken
         nextCurrentStreak = 1;
@@ -156,7 +168,9 @@ export function recordStudyActivity(): StudyStreakData {
       nextLongestStreak = nextCurrentStreak;
     }
 
-    totalActiveDays += 1;
+    if (!streak.activeDates.includes(today)) {
+      totalActiveDays += 1;
+    }
 
     const payload = {
       currentStreak: nextCurrentStreak,

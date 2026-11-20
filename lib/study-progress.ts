@@ -86,6 +86,9 @@ export function toggleBookmark(item: BookmarkItem): boolean {
     localStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(next));
     window.dispatchEvent(new Event(BOOKMARKS_UPDATE_EVENT));
     window.dispatchEvent(new Event(STUDY_PROGRESS_UPDATE_EVENT));
+    if (isNowBookmarked) {
+      recordStudyActivity();
+    }
     return isNowBookmarked;
   } catch {
     return false;

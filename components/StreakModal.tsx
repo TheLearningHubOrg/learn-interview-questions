@@ -11,7 +11,7 @@ import {
   ArrowRight,
   Zap
 } from 'lucide-react';
-import { StudyStreakData, getCurrentWeekDays } from '@/lib/study-streak';
+import { StudyStreakData, getCurrentWeekDays, recordStudyActivity } from '@/lib/study-streak';
 
 interface StreakModalProps {
   isOpen: boolean;
@@ -183,14 +183,25 @@ export function StreakModal({ isOpen, onClose, streakData }: StreakModalProps) {
             Zero login • Saved locally
           </span>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-700 text-white shadow-md shadow-orange-600/20 transition-all active:scale-95 cursor-pointer w-full sm:w-auto"
-          >
-            <span>Continue Studying</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          {!streakData.studiedToday ? (
+            <button
+              type="button"
+              onClick={() => recordStudyActivity()}
+              className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/25 transition-all active:scale-95 cursor-pointer w-full sm:w-auto"
+            >
+              <Flame className="w-4 h-4 fill-current animate-pulse" />
+              <span>Check In & Ignite Streak Today</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-700 text-white shadow-md shadow-orange-600/20 transition-all active:scale-95 cursor-pointer w-full sm:w-auto"
+            >
+              <span>Continue Studying</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
     </div>

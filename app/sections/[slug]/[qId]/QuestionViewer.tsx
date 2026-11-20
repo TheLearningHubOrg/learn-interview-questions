@@ -236,7 +236,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
     };
   }, [storageKey, track.slug, question.number]);
 
-  // Save current question to reading history
+  // Save current question to reading history & record daily study activity
   useEffect(() => {
     saveLastRead({
       trackSlug: track.slug,
@@ -246,6 +246,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
       questionTitle: question.title,
       timestamp: Date.now(),
     });
+    recordStudyActivity();
   }, [track.slug, track.shortTitle, track.sectionNumber, question.number, question.title]);
 
   // Toggle studied status

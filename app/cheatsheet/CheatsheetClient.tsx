@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { QuestionIndexItem, TrackMeta } from '@/lib/tracks-meta';
 import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
+import { recordStudyActivity } from '@/lib/study-streak';
 import { TechStackSelector } from '@/components/TechStackSelector';
 import { getSelectedTechSlugs, setSelectedTechSlugs, TECH_STACK_UPDATE_EVENT, isQuestionInSelectedTech } from '@/lib/tech-stack';
 
@@ -65,6 +66,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
 
     refreshBookmarks();
     refreshTechStack();
+    recordStudyActivity();
 
     window.addEventListener(BOOKMARKS_UPDATE_EVENT, refreshBookmarks);
     window.addEventListener(TECH_STACK_UPDATE_EVENT, refreshTechStack);

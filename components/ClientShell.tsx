@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer';
 import { SearchModal } from '@/components/SearchModal';
 import { BookmarksModal } from '@/components/BookmarksModal';
 import { QuestionIndexItem } from '@/lib/tracks-meta';
+import { recordStudyActivity } from '@/lib/study-streak';
 
 interface ClientShellProps {
   children: React.ReactNode;
@@ -17,6 +18,9 @@ export function ClientShell({ children, searchIndex }: ClientShellProps) {
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
 
   useEffect(() => {
+    // Record daily study activity on session start
+    recordStudyActivity();
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();

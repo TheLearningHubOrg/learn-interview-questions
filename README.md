@@ -18,8 +18,8 @@
 | Track | Focus Tech Stack | Questions | Link |
 | :--- | :--- | :---: | :--- |
 | **Track 1: Complete Angular Master** | Enterprise Bank: 283 Qs: Angular 2-19, Signals, Control Flow, Directives, DI, RxJS, NgRx | **283** | [Open Track 1](tracks/01-frontend-angular-ts.md) |
-| **Track 2: Complete React Master** | Full Stack Bank: 445 Qs: React 18/19, JSX, Fiber, Hooks, Redux, Router v6, SSR, Legacy Internals | **445** | [Open Track 2](tracks/02-frontend-react-nextjs.md) |
-| **Track 3: Databases & System Design** | PostgreSQL, MySQL, ACID, Indexing, MongoDB, DynamoDB, Redis, Scalability | **60** | [Open Track 3](tracks/03-backend-databases-system-design.md) |
+| **Track 2: Complete React Master** | Full Stack Bank: 445 Qs: React 18/19, JSX, Fiber, Hooks, Redux, Router v6, SSR, Legacy Internals | **445** | [Open Track 2](tracks/02-frontend-react.md) |
+| **Track 3: Databases & System Design** | PostgreSQL, MySQL, ACID, Indexing, MongoDB, DynamoDB, Redis, Scalability | **60** | [Open Track 3](tracks/04-backend-relational-sql.md) |
 | **Track 4: Backend Python** | Python 3.12+, CPython Internals, AsyncIO, FastAPI, SQLAlchemy 2.0, Celery | **65** | [Open Track 4](tracks/04-backend-python.md) |
 | **Track 5: Backend Node.js** | Node.js Runtime, V8, Libuv Event Loop, Streams, Buffers, Express, Fastify | **60** | [Open Track 5](tracks/05-backend-nodejs.md) |
 | **Track 6: AWS Cloud Architecture** | AWS Well-Architected, VPC, Fargate, Lambda, S3, Aurora, IAM, KMS, SQS | **65** | [Open Track 6](tracks/06-cloud-aws-architecture.md) |
@@ -27,7 +27,7 @@
 | **Track 8: Core JavaScript Internals** | Core Language Bank: 528 Qs: Prototypes, Closures, Event Loop, ES6+, Web APIs, V8 | **528** | [Open Track 8](tracks/08-frontend-javascript.md) |
 | **Track 9: Behavioral, HR & Leadership** | General Intro, STAR Method (S-T-A-R), Incident Post-Mortems, Culture, Negotiation | **50** | [Open Track 9](tracks/09-general-behavioral-hr.md) |
 | **Track 10: System Design & Distributed Systems** | Distributed Trade-offs, TinyURL, Rate Limiter, WhatsApp, Twitter, Raft, Back-of-the-Envelope | **50** | [Open Track 10](tracks/10-system-design-distributed-systems.md) |
-| **Track 11: DevOps, Containers & Kubernetes** | Docker Internals, Kubernetes Control Plane, CNI/CSI, HPA/Karpenter, GitOps, CI/CD, Terraform, SRE | **50** | [Open Track 11](tracks/11-devops-containers-kubernetes.md) |
+| **Track 11: DevOps, Containers & Kubernetes** | Docker Internals, Kubernetes Control Plane, CNI/CSI, HPA/Karpenter, GitOps, CI/CD, Terraform, SRE | **50** | [Open Track 11](tracks/27-devops-kubernetes-cloud-native.md) |
 | **Track 12: Web Security & OWASP Top 10** | OWASP Top 10, BOLA/IDOR, XSS, CSRF, SSRF, CSP Nonces, JWT, OAuth2 PKCE, Cryptography | **50** | [Open Track 12](tracks/12-web-security-owasp.md) |
 | **Track 13: AI Engineering & LLM Architecture** | RAG, Vector Search, PagedAttention/vLLM, KV Cache, Autonomous Agents, MCP, LoRA & DPO | **50** | [Open Track 13](tracks/13-ai-engineering-llm.md) |
 | **TOTAL** | **Full-Stack, Cloud, AI Systems, Security, DevOps & System Design Mastery** | **1,856** | — |
@@ -50,7 +50,7 @@
 
 ---
 
-### ⚛️ [Track 2: Complete React Master (1 - 445)](tracks/02-frontend-react-nextjs.md)
+### ⚛️ [Track 2: Complete React Master (1 - 445)](tracks/02-frontend-react.md)
 1. **Core React, JSX & Component Architecture (Q1 - Q77)**: React evolution from XHP/FaxJS, JSX transpilation, Virtual DOM, React Fiber scheduling, controlled vs uncontrolled components, reconciliation, fragments, portals, static type checking, synthetic events, prop validation, inline styles, error boundaries.
 2. **React Router & Navigation (Q78 - Q88)**: React Router v6 architecture, `<BrowserRouter>`, `<Routes>`, programmatic navigation with `useNavigate`, `push` vs `replace`, query parameters, 404 fallback routing.
 3. **React Internationalization (Q89 - Q94)**: React Intl (`IntlProvider`, `FormattedMessage`, `FormattedNumber`), pluralization, currency formatting, locale switching.
@@ -65,7 +65,7 @@
 
 ---
 
-### 🗄️ [Track 3: Databases, SQL, NoSQL & System Design (1 - 60)](tracks/03-backend-databases-system-design.md)
+### 🗄️ [Track 3: Databases, SQL, NoSQL & System Design (1 - 60)](tracks/04-backend-relational-sql.md)
 1. **Candid Experience & Production Scenarios (Q1 - Q5)**: Production database selection, zero-downtime schema migrations (Expand/Contract pattern), debugging connection pool exhaustion and slow queries with `pg_stat_statements`.
 2. **Relational Databases (PostgreSQL / MySQL) (Q6 - Q25)**: ACID enforcement mechanisms, Normalization (1NF - BCNF) vs Denormalization, SQL Transaction Isolation levels (Read Committed, Repeatable Read, Serializable), B-Tree & B+Tree internal structures, Clustered vs Secondary indexes, Leftmost prefix rule, `EXPLAIN ANALYZE` (Seq Scan vs Index Scan vs Bitmap Scan), Join algorithms (Nested Loop, Hash Join, Merge Join), PostgreSQL JSONB with GIN indexes, PgBouncer transaction pooling, MVCC & autovacuum, WAL & Point-In-Time Recovery (PITR), N+1 query elimination.
 3. **NoSQL & Document Stores (MongoDB, DynamoDB) (Q26 - Q40)**: CAP Theorem positioning, Embedding vs Referencing, Aggregation Pipeline (`$match`, `$group`, `$lookup`), Replica Sets vs Sharding, Oplog & Change Streams, DynamoDB Partition (HASH) and Sort (RANGE) keys, Hot Partitions, Single-Table Design, GSI vs LSI, Optimistic vs Pessimistic concurrency control.
@@ -146,7 +146,7 @@
 
 ---
 
-### ☸️ [Track 11: DevOps, Containers, Kubernetes & Cloud Infrastructure Master (1 - 50)](tracks/11-devops-containers-kubernetes.md)
+### ☸️ [Track 11: DevOps, Containers, Kubernetes & Cloud Infrastructure Master (1 - 50)](tracks/27-devops-kubernetes-cloud-native.md)
 1. **Candid Experience, Container Internals & Docker (Q1 - Q10)**: DevOps philosophy, VM vs container Linux kernel namespaces (PID, NET, MNT) and cgroups (v1/v2), Overlay2 storage driver and Copy-on-Write (CoW), Dockerfile multi-stage builds and layer caching, non-root security context hardening, Docker network drivers (Bridge, Host, Overlay, iptables NAT port mapping), PID 1 zombie process reaping and tini, Docker Compose v2 healthcheck dependencies, multi-architecture buildx and Cosign image signing, systematic container crash debugging (Exit codes 137, 139, 1).
 2. **Kubernetes Architecture & Core Workloads (Q11 - Q25)**: Control Plane components (API Server, Controller Manager, Scheduler, etcd) vs Worker Node agents (Kubelet, Kube-proxy, CRI containerd), etcd Raft consensus and snapshot disaster recovery, Kube-API Server request lifecycle (AuthN, AuthZ, Mutating/Validating Admission Webhooks), Kube-Scheduler filtering and scoring (Affinity, Taints, Tolerations, Topology Spread), Kubelet syncLoop and systemd cgroup driver alignment, Pod lifecycle phases and zero-downtime graceful shutdown with preStop hooks, Liveness vs Readiness vs Startup probes, Deployments vs StatefulSets (headless services), DaemonSets and Job concurrency policies (Allow, Forbid, Replace), ConfigMaps and Secrets encryption at rest with External Secrets Operator, PersistentVolumes (PV/PVC/CSI/StorageClass), CNI plugins (Cilium eBPF vs Calico vs AWS VPC CNI), Kubernetes Services and Kube-proxy IPVS/iptables, Gateway API vs Ingress, NetworkPolicies microsegmentation.
 3. **Production K8s Scaling, Reliability & SRE (Q26 - Q35)**: HPA scaling algorithm and KEDA event-driven autoscaling, Cluster Autoscaler vs Karpenter just-in-time direct EC2 provisioning and bin-packing consolidation, Resource Requests/Limits and QoS classes (Guaranteed, Burstable, BestEffort), PodDisruptionBudgets (PDB) protecting voluntary disruptions, Zero-downtime rolling upgrades (maxSurge, maxUnavailable, preStop sleep 10), Service mesh evaluation (Istio Ambient Mesh vs Linkerd mTLS), Kubernetes RBAC and ServiceAccount token security, Custom Resource Definitions (CRDs) and the Go Operator Pattern reconcile loop, Systematic CrashLoopBackOff and Pending Pod troubleshooting, Multi-tenant cluster isolation (ResourceQuotas, LimitRanges, vcluster).

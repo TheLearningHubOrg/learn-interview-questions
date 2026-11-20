@@ -1,4 +1,4 @@
-# Kotlin 2.0, Coroutines & Functional Programming Master Interview Bank (1 - 35)
+# Kotlin Language, Coroutines & Functional Architecture Master Interview Bank (1 - 35)
 
 > Comprehensive, production-grade technical interview questions covering Kotlin 2.0 Language, Null Safety, Coroutines Architecture, Kotlin Flow, StateFlow vs SharedFlow, Structured Concurrency, K2 Compiler, KSP, and Functional Programming.
 

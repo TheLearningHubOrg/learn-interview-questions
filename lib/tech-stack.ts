@@ -8,13 +8,13 @@ export interface GranularTech {
 
 export const GRANULAR_TECHS: GranularTech[] = [
   // 1. Frontend Frameworks & Languages
-  { slug: 'typescript', name: 'TypeScript 5.x & Typings', category: 'Frontend', icon: '🔷', approxQuestionCount: 50 },
-  { slug: 'angular', name: 'Angular 19 & Signals', category: 'Frontend', icon: '🅰️', approxQuestionCount: 283 },
+  { slug: 'typescript', name: 'TypeScript & Type Systems', category: 'Frontend', icon: '🔷', approxQuestionCount: 50 },
+  { slug: 'angular', name: 'Angular Architecture & Signals', category: 'Frontend', icon: '🅰️', approxQuestionCount: 283 },
   { slug: 'react', name: 'React Core & Hooks', category: 'Frontend', icon: '⚛️', approxQuestionCount: 407 },
-  { slug: 'nextjs', name: 'Next.js & Server Actions', category: 'Frontend', icon: '▲', approxQuestionCount: 50 },
-  { slug: 'vue', name: 'Vue 3 & Composition API', category: 'Frontend', icon: '💚', approxQuestionCount: 35 },
-  { slug: 'nuxt', name: 'Nuxt 3 & Nitro SSR', category: 'Frontend', icon: '🟩', approxQuestionCount: 35 },
-  { slug: 'svelte', name: 'Svelte 5 & Runes', category: 'Frontend', icon: '🧡', approxQuestionCount: 35 },
+  { slug: 'nextjs', name: 'Next.js App Router & SSR', category: 'Frontend', icon: '▲', approxQuestionCount: 50 },
+  { slug: 'vue', name: 'Vue.js & Composition API', category: 'Frontend', icon: '💚', approxQuestionCount: 35 },
+  { slug: 'nuxt', name: 'Nuxt & Universal SSR', category: 'Frontend', icon: '🟩', approxQuestionCount: 35 },
+  { slug: 'svelte', name: 'Svelte & SvelteKit', category: 'Frontend', icon: '🧡', approxQuestionCount: 35 },
   { slug: 'astro', name: 'Astro & Islands Architecture', category: 'Frontend', icon: '🚀', approxQuestionCount: 35 },
   { slug: 'javascript', name: 'Core JavaScript Internals', category: 'Frontend', icon: '🟨', approxQuestionCount: 536 },
   { slug: 'html', name: 'Modern HTML5 & Web APIs', category: 'Frontend', icon: '🌐', approxQuestionCount: 35 },
@@ -25,12 +25,12 @@ export const GRANULAR_TECHS: GranularTech[] = [
   // 2. Backend & Microservices
   { slug: 'golang', name: 'Go (Golang) & Concurrency', category: 'Backend', icon: '🐹', approxQuestionCount: 50 },
   { slug: 'rust', name: 'Rust & Systems Programming', category: 'Backend', icon: '🦀', approxQuestionCount: 35 },
-  { slug: 'java', name: 'Java 21 Core & JVM', category: 'Backend', icon: '☕', approxQuestionCount: 35 },
-  { slug: 'spring-boot', name: 'Spring Boot 3 & Cloud', category: 'Backend', icon: '🍃', approxQuestionCount: 35 },
-  { slug: 'csharp', name: 'C# 12 & CLR Internals', category: 'Backend', icon: '🔷', approxQuestionCount: 35 },
-  { slug: 'aspnet-core', name: 'ASP.NET Core 8/9 & Web API', category: 'Backend', icon: '🌐', approxQuestionCount: 35 },
-  { slug: 'php', name: 'PHP 8.3+ & Zend Engine', category: 'Backend', icon: '🐘', approxQuestionCount: 35 },
-  { slug: 'laravel', name: 'Laravel 11 & Ecosystem', category: 'Backend', icon: '🔴', approxQuestionCount: 35 },
+  { slug: 'java', name: 'Java Core & JVM Internals', category: 'Backend', icon: '☕', approxQuestionCount: 35 },
+  { slug: 'spring-boot', name: 'Spring Boot & Microservices', category: 'Backend', icon: '🍃', approxQuestionCount: 35 },
+  { slug: 'csharp', name: 'C# & CLR Internals', category: 'Backend', icon: '🔷', approxQuestionCount: 35 },
+  { slug: 'aspnet-core', name: 'ASP.NET Core & Web API', category: 'Backend', icon: '🌐', approxQuestionCount: 35 },
+  { slug: 'php', name: 'PHP & Zend Engine Internals', category: 'Backend', icon: '🐘', approxQuestionCount: 35 },
+  { slug: 'laravel', name: 'Laravel & Ecosystem', category: 'Backend', icon: '🔴', approxQuestionCount: 35 },
   { slug: 'nodejs', name: 'Node.js & Event Loop', category: 'Backend', icon: '🟩', approxQuestionCount: 60 },
   { slug: 'python', name: 'Python & FastAPI', category: 'Backend', icon: '🐍', approxQuestionCount: 65 },
   { slug: 'rest-api', name: 'REST APIs & HTTP', category: 'Backend', icon: '🌐', approxQuestionCount: 25 },
@@ -40,9 +40,9 @@ export const GRANULAR_TECHS: GranularTech[] = [
   // 3. Mobile Engineering (Completely Separated!)
   { slug: 'react-native', name: 'React Native & Expo', category: 'Mobile', icon: '📱', approxQuestionCount: 35 },
   { slug: 'flutter', name: 'Flutter & Dart Engine', category: 'Mobile', icon: '💙', approxQuestionCount: 35 },
-  { slug: 'swift', name: 'Modern Swift 6 & Concurrency', category: 'Mobile', icon: '🦅', approxQuestionCount: 35 },
+  { slug: 'swift', name: 'Swift & Concurrency', category: 'Mobile', icon: '🦅', approxQuestionCount: 35 },
   { slug: 'ios', name: 'Native iOS & SwiftUI', category: 'Mobile', icon: '🍎', approxQuestionCount: 35 },
-  { slug: 'kotlin', name: 'Kotlin 2.0 & Coroutines', category: 'Mobile', icon: '🟣', approxQuestionCount: 35 },
+  { slug: 'kotlin', name: 'Kotlin & Coroutines', category: 'Mobile', icon: '🟣', approxQuestionCount: 35 },
   { slug: 'android', name: 'Native Android & Jetpack Compose', category: 'Mobile', icon: '🤖', approxQuestionCount: 35 },
 
   // 4. Databases & In-Memory Caching (Completely Separated!)

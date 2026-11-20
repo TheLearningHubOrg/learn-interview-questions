@@ -1,4 +1,4 @@
-# Modern PHP 8.3+, Zend Engine Internals & Architecture Master Interview Bank (1 - 35)
+# Modern PHP, Zend Engine Internals & Scalable Web Architecture Master Interview Bank (1 - 35)
 
 > Comprehensive, production-grade technical interview questions covering Modern PHP 8.3+, Zend Engine Architecture, zval Memory Layout, Reference Counting & GC, OPcache, JIT Compiler, Fibers, SPL, and Production Tuning.
 

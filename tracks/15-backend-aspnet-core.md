@@ -1,4 +1,4 @@
-# ASP.NET Core 8/9, Web API & Enterprise Architecture Master Interview Bank (1 - 35)
+# ASP.NET Core, Web API & Enterprise Cloud Architecture Master Interview Bank (1 - 35)
 
 > Comprehensive, production-grade technical interview questions covering ASP.NET Core 8/9 Middleware Pipeline, Dependency Injection Lifetimes, Minimal APIs, Entity Framework Core 8, JWT & Policy Authorization, Health Checks, Kestrel Tuning, and Microservices Architecture.
 

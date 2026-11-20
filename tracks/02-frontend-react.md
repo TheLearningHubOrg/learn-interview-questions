@@ -1,4 +1,4 @@
-# React 18/19, Hooks, Redux & Fiber Architecture Master Interview Bank (1 - 407)
+# React Core Architecture, Hooks, Redux & Fiber Performance Master Interview Bank (1 - 407)
 
 > The definitive React interview questions covering Core React, JSX, Virtual DOM, Fiber architecture, Hooks, Context API, Redux Toolkit, React Router v6, Concurrent Features, and Action hooks.
 

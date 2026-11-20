@@ -415,6 +415,15 @@ code, pre, kbd {
   background: rgba(255, 255, 255, 0.02);
 }
 
+/* Responsive cheatsheet card word wrap for smaller devices */
+.cheatsheet-item,
+.cheatsheet-title,
+.cheatsheet-summary-box,
+.cheatsheet-summary-text {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 /* Print Optimization for Cheatsheet & Documentation */
 @media print {
   @page {

@@ -253,7 +253,23 @@ The dependency graph of packages must contain **no cycles** (no mutual A -> B ->
 
 ### 29. How do you enforce SOLID and Architectural Rules in CI/CD using ArchUnit or NetArchTest?
 **In Simple Words:**
-Write unit tests that fail if developers break architectural rules (e.g. `noClasses().thatResideIn('..domain..').should().dependOnClassesThatResideIn('..infrastructure..')`).
+Write automated architectural fitness tests that fail in CI/CD if developers violate SOLID rules (e.g. domain layer depending on infrastructure, or circular package dependencies).
+
+```java
+// ArchUnit test enforcing Clean Architecture & DIP in CI/CD
+@AnalyzeClasses(packages = "com.company.app")
+public class ArchitectureTest {
+    @ArchTest
+    public static final ArchRule domain_must_not_depend_on_infrastructure =
+        noClasses().thatResideInAPackage("..domain..")
+            .should().dependOnClassesThatResideInAPackage("..infrastructure..");
+
+    @ArchTest
+    public static final ArchRule controllers_must_not_call_repositories_directly =
+        noClasses().thatResideInAPackage("..controller..")
+            .should().dependOnClassesThatResideInAPackage("..repository..");
+}
+```
 
 ---
 

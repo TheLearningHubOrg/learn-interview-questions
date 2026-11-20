@@ -525,13 +525,13 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
                       </div>
 
                       {/* Question Title */}
-                      <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2 leading-snug">
+                      <p className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2 leading-snug break-words [overflow-wrap:anywhere]">
                         {item.title}
                       </p>
 
                       {/* 1-Line Explanation Preview */}
                       {item.summary && (
-                        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed break-words [overflow-wrap:anywhere]">
                           {item.summary}
                         </p>
                       )}

@@ -472,9 +472,9 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
                           isBookmarked
                             ? 'border-amber-300 dark:border-amber-500/40 shadow-xs'
                             : 'border-border'
-                        } hover:border-purple-400/80 transition-all group cheatsheet-item print:border-slate-300 print:p-2 print:bg-white print:text-black print-page-break-avoid`}
+                        } hover:border-purple-400/80 transition-all group cheatsheet-item min-w-0 overflow-hidden print:border-slate-300 print:p-2 print:bg-white print:text-black print-page-break-avoid`}
                       >
-                        <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start justify-between gap-3 min-w-0">
                           <div className="flex items-start gap-2.5 min-w-0 flex-1">
                             {/* Question Number Badge */}
                             <Link
@@ -527,19 +527,19 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
                               {/* Question Title */}
                               <Link
                                 href={`/sections/${item.trackSlug}/${item.questionNumber}`}
-                                className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug block cheatsheet-title print:text-black print:text-[10pt]"
+                                className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug block cheatsheet-title break-words [overflow-wrap:anywhere] print:text-black print:text-[10pt]"
                               >
                                 {item.title}
                               </Link>
 
                               {/* 1-Line Explanation Box */}
                               {item.summary && (
-                                <div className="mt-2 p-2.5 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20 cheatsheet-summary-box print:bg-slate-50 print:border-slate-200 print:mt-1 print:p-1.5">
-                                  <div className="flex items-start gap-1.5">
+                                <div className="mt-2 p-2.5 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20 cheatsheet-summary-box min-w-0 overflow-hidden print:bg-slate-50 print:border-slate-200 print:mt-1 print:p-1.5">
+                                  <div className="flex items-start gap-1.5 min-w-0">
                                     <span className="text-purple-600 dark:text-purple-400 font-bold shrink-0 text-xs print:text-slate-700">
                                       💡
                                     </span>
-                                    <p className="text-xs font-medium text-foreground/90 leading-relaxed cheatsheet-summary-text print:text-slate-900 print:text-[9pt] print:leading-normal">
+                                    <p className="text-xs font-medium text-foreground/90 leading-relaxed cheatsheet-summary-text break-words [overflow-wrap:anywhere] print:text-slate-900 print:text-[9pt] print:leading-normal">
                                       {item.summary}
                                     </p>
                                   </div>

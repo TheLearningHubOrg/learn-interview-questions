@@ -2606,7 +2606,7 @@ And then add the following section to your `package.json`:
 
 Finally, run `yarn test` or `npm test` and Jest will print a result:
 
-```console
+```bash
 $ yarn test
 PASS ./sum.test.js
 ✓ adds 1 + 2 to equal 3 (2ms)
@@ -3031,7 +3031,7 @@ Most of the applications has several top-level directories as below:
 
 It is available in NPM:
 
-```console
+```bash
 $ npm install --save redux-saga
 ```
 
@@ -3376,7 +3376,7 @@ The below steps followed to include Font Awesome in React:
 
 1. Install `font-awesome`:
 
-```console
+```bash
  $ npm install --save font-awesome
 ```
 
@@ -8743,7 +8743,7 @@ You can _decorate_ your _class_ components, which is the same as passing the com
 
     Let's create Todo App using _CRA_:
 
-```console
+```bash
 # Installation
     $ npm install -g create-react-app
 
@@ -8771,7 +8771,7 @@ You can _decorate_ your _class_ components, which is the same as passing the com
     **Modern Alternatives (Recommended 2026):**
 
     **1. Vite (Best for SPAs):**
-```console
+```bash
     npm create vite@latest my-app -- --template react
     cd my-app
     npm install

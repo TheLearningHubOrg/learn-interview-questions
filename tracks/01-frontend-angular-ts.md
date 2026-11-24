@@ -61,7 +61,7 @@ export class GreetingComponent {
 
 TypeScript is a strongly typed superset of JavaScript created by Microsoft that adds optional types, classes, async/await and many other features, and compiles to plain JavaScript. Angular is written entirely in TypeScript as a primary language.
 You can install TypeScript globally as
-```cmd
+```bash
 npm install -g typescript
 ```
 Let's see a simple example of TypeScript usage:-
@@ -1805,7 +1805,7 @@ Just-in-Time (JIT) is a type of compilation that compiles your app in the browse
 
 Ahead-of-Time (AOT) is a type of compilation that compiles your app at build time. This is the default starting in Angular 9. When you run the ng build (build only) or ng serve (build and serve locally) CLI commands, the type of compilation (JIT or AOT) depends on the value of the aot property in your build configuration specified in angular.json. By default, aot is set to true.
 
-```cmd
+```bash
 ng build
 ng serve
 ```
@@ -3973,7 +3973,7 @@ ng generate @angular-devkit/schematics-cli:schematic --name=custom-schematic
 You can use jquery in Angular using 3 simple steps,
 
 1. **Install the dependency:** At first, install the jquery dependency using npm
-```cmd
+```bash
      npm install --save jquery
 ```
 
@@ -5644,7 +5644,7 @@ The usage would be different based on form types,
 
 In Angular, placing both `*ngFor` and `*ngIf` on the same HTML element is invalid and throws a compile-time template error:
 
-```cmd
+```bash
 Template parse errors: Can't have multiple template bindings on one element. Use only one attribute prefixed with *
 ```
 

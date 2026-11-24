@@ -7968,7 +7968,7 @@ Both browser and NodeJS javascript environments throttles with a minimum delay t
 
  and the output would be in
 
-```cmd
+```bash
  Script loaded
  My script is initialized
 ```
@@ -7985,7 +7985,7 @@ Both browser and NodeJS javascript environments throttles with a minimum delay t
 
  and the output is,
 
-```cmd
+```bash
  My script is initialized
  Script loaded
 ```

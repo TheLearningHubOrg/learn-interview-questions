@@ -1029,29 +1029,21 @@ Every page should be **actionable, urgent, and customer-impacting**. If an alert
 3. **Alert Hygiene & Pager Tuning**: Review all pages weekly during team standups; any alert that fired without requiring immediate action must be tuned or deleted.
 4. **Comprehensive Runbooks**: Every alert in PagerDuty must link directly to an up-to-date Markdown runbook with explicit remediation steps.
 
-#### Practical Script & Summary Template
+#### Practical Production Runbook Template: `HighDatabaseConnectionPoolSaturation`
 
-````markdown
-# Runbook: HighDatabaseConnectionPoolSaturation
-
-## Alert Description
-Fires when active connections to primary PostgreSQL exceed 85% of `max_connections` for >3 minutes.
-
-## Severity
-P1 - Critical (Risk of service-wide 504 gateway timeouts)
-
-## Step-by-Step Remediation:
-1. Open Datadog Database Dashboard: `https://app.datadoghq.com/db/postgres-prod`
-2. Identify top connection-consuming services:
-```sql
-   SELECT client_addr, usename, count(*) FROM pg_stat_activity GROUP BY 1, 2 ORDER BY 3 DESC;
-```
-3. If PgBouncer pool is saturated, restart PgBouncer pods in Kubernetes:
-```bash
-   kubectl rollout restart deployment/pgbouncer -n production
-```
-4. If problem persists, escalate to Database Administrator (DBA) on-call.
-````
+- **Severity**: P1 - Critical (Risk of service-wide 504 gateway timeouts)
+- **Trigger**: Active PostgreSQL connections exceed 85% of `max_connections` for >3 minutes.
+- **Step-by-Step Remediation**:
+  1. Open Datadog Database Dashboard: `https://app.datadoghq.com/db/postgres-prod`
+  2. Identify top connection-consuming services:
+  ```sql
+  SELECT client_addr, usename, count(*) FROM pg_stat_activity GROUP BY 1, 2 ORDER BY 3 DESC;
+  ```
+  3. If PgBouncer pool is saturated, restart PgBouncer pods in Kubernetes:
+  ```bash
+  kubectl rollout restart deployment/pgbouncer -n production
+  ```
+  4. If problem persists, escalate to Database Administrator (DBA) on-call.
 
 ---
 

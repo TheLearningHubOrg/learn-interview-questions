@@ -5298,7 +5298,7 @@ For example, you can create register form easily by following the below simple s
     [(ngModel)]="model.name" name="name">
 ```
 
-3.  Attach NgForm directive to the <form> tag in order to create FormControl instances and register them
+3.  Attach NgForm directive to the `<form>` tag in order to create FormControl instances and register them
 ```js
   <form #registerForm="ngForm">
 ```

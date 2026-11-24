@@ -104,6 +104,19 @@ export const TRACK_ROADMAP_META: Record<string, Record<number, RoadmapStageMeta>
   },
 
   // Track 02: React Architecture & Modern Internals
+  'react': {
+    1: { shortTitle: 'Core React & JSX', subtitle: 'Virtual DOM, Elements vs Components, Reconciliation' },
+    2: { shortTitle: 'Hooks & Modern State', subtitle: 'useState, useEffect, useMemo, useCallback' },
+    3: { shortTitle: 'Fiber & Concurrent Mode', subtitle: 'Lanes, Time Slicing, Transitions, Suspense' },
+    4: { shortTitle: 'Context & State Trees', subtitle: 'Prop Drilling, Context API, Redux Toolkit' },
+    5: { shortTitle: 'Component Patterns', subtitle: 'Render Props, Compound Components, HOCs' },
+    6: { shortTitle: 'Forms & User Input', subtitle: 'Controlled vs Uncontrolled, React Hook Form' },
+    7: { shortTitle: 'Performance Profiling', subtitle: 'React.memo, Re-render Optimization, Profiler' },
+    8: { shortTitle: 'State Architecture', subtitle: 'Zustand, Recoil, Redux Toolkit, Cache Stores' },
+    9: { shortTitle: 'React 19 Actions', subtitle: 'useActionState, useOptimistic, Server Actions' },
+    10: { shortTitle: 'Security & Sanitization', subtitle: 'XSS Prevention, dangerouslySetInnerHTML' },
+    11: { shortTitle: 'Testing & Architecture', subtitle: 'React Testing Library, Mocking, Vitest' },
+  },
   'react-nextjs': {
     1: { shortTitle: 'Core React & JSX', subtitle: 'Virtual DOM, Elements vs Components, Reconciliation' },
     2: { shortTitle: 'Hooks & Modern State', subtitle: 'useState, useEffect, useMemo, useCallback' },

@@ -102,7 +102,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'Virtual DOM, Fiber Architecture, Concurrent Mode & Custom Hooks',
         questions: [
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 1,
             day: 2,
@@ -111,7 +111,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 16,
             day: 2,
@@ -120,7 +120,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 19,
             day: 2,
@@ -129,7 +129,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'STAFF_LEVEL',
           },
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 228,
             day: 2,
@@ -138,7 +138,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'HIGH_YIELD',
           },
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 312,
             day: 2,
@@ -206,7 +206,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'B-Trees, ACID Isolations, MVCC & Distributed Caching',
         questions: [
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 1,
             day: 4,
@@ -215,7 +215,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 11,
             day: 4,
@@ -224,7 +224,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 9,
             day: 4,
@@ -233,7 +233,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 24,
             day: 4,
@@ -242,7 +242,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'HIGH_YIELD',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 43,
             day: 4,
@@ -310,7 +310,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'Linux Namespaces, Pod Lifecycles, RAG Architecture & Vector Search',
         questions: [
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 2,
             day: 6,
@@ -319,7 +319,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 16,
             day: 6,
@@ -328,7 +328,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 30,
             day: 6,
@@ -496,7 +496,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'JSX Compilation, Virtual DOM, Fiber Reconciliation',
         questions: [
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 16,
             day: 3,
@@ -505,7 +505,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 19,
             day: 3,
@@ -514,7 +514,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'STAFF_LEVEL',
           },
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 28,
             day: 3,
@@ -530,7 +530,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'Concurrent Mode, Server Components, Custom Hooks',
         questions: [
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 228,
             day: 4,
@@ -539,7 +539,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'HIGH_YIELD',
           },
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 236,
             day: 4,
@@ -548,7 +548,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'react-nextjs',
+            trackSlug: 'react',
             trackName: 'React & Next.js',
             questionNumber: 312,
             day: 4,
@@ -666,7 +666,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'B-Trees, Indexing & Query Optimizers',
         questions: [
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 6,
             day: 8,
@@ -675,7 +675,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 11,
             day: 8,
@@ -684,7 +684,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 14,
             day: 8,
@@ -700,7 +700,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'ACID, MVCC, Sharding, DynamoDB Single Table',
         questions: [
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 9,
             day: 9,
@@ -709,7 +709,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 10,
             day: 9,
@@ -718,7 +718,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 24,
             day: 9,
@@ -734,7 +734,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'Redis Data Structures, Eviction Policies, Kafka',
         questions: [
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 41,
             day: 10,
@@ -743,7 +743,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'databases',
+            trackSlug: 'sql-databases',
             trackName: 'Databases',
             questionNumber: 43,
             day: 10,
@@ -938,7 +938,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'Dockerfile Optimization, Multi-Stage Builds, Rootless Containers',
         questions: [
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 2,
             day: 16,
@@ -947,7 +947,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 3,
             day: 16,
@@ -956,7 +956,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'HIGH_YIELD',
           },
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 4,
             day: 16,
@@ -972,7 +972,7 @@ export const STUDY_PLANS: StudyPlan[] = [
         focus: 'Control Plane, etcd, Scheduling, CNI / CoreDNS',
         questions: [
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 11,
             day: 17,
@@ -981,7 +981,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'MUST_KNOW',
           },
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 12,
             day: 17,
@@ -990,7 +990,7 @@ export const STUDY_PLANS: StudyPlan[] = [
             importance: 'STAFF_LEVEL',
           },
           {
-            trackSlug: 'devops-kubernetes',
+            trackSlug: 'kubernetes',
             trackName: 'DevOps & K8s',
             questionNumber: 16,
             day: 17,

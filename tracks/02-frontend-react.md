@@ -1181,6 +1181,18 @@ Apart from the advantages, there are few limitations of React too,
 ```jsx
 // Limitation: React is a UI library, NOT a full-battery framework (requires external routing & state libs)
 // npm install react-router-dom
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<h1>Home</h1>} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
 
 ### 39. What are the recommended ways for static type checking?
 **Modern Recommendation (2026):** **TypeScript** is the industry standard for type checking in React applications.
@@ -1406,7 +1418,21 @@ Both render props and higher-order components render only a single child but in 
 
 ```jsx
 // Custom Hooks replace verbose Render Props and HOCs:
-// Before (HOC): withWindowSi
+// Modern Custom Hook approach:
+import { useState, useEffect } from 'react';
+
+export function useWindowSize() {
+  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  useEffect(() => {
+    const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return size;
+}
+```
 
 ### 52. What is a switching component?
 A _switching component_ is a component that renders one of many components. We need to use object to map prop values to components.
@@ -1459,7 +1485,16 @@ The following event types are now available in _React DOM_:
 #### Practical Code Example
 
 ```jsx
-// Pointer Events normali
+// Pointer Events normalize mouse, touch, and pen inputs:
+export function DrawingSurface() {
+  const handlePointerDown = (e) => {
+    e.target.setPointerCapture(e.pointerId);
+    console.log(`Captured ${e.pointerType} at coords: (${e.clientX}, ${e.clientY})`);
+  };
+
+  return <div onPointerDown={handlePointerDown} className="canvas-surface" />;
+}
+```
 
 ### 54. Why should component names start with capital letter?
 If you are rendering your component using JSX, the name of that component has to begin with a capital letter otherwise React will throw an error as an unrecogni
@@ -1521,11 +1556,17 @@ Using _template strings_ will also work:
 If you want to pass an array of objects to a component with a particular shape then use `React.PropTypes.shape()` as an argument to `React.PropTypes.arrayOf()`.
 
 ```javascript
+import PropTypes from 'prop-types';
+
 ReactComponent.propTypes = {
-arrayWithShape: React.PropTypes.arrayOf(
- React.PropTypes.shape({
-   color: React.PropTypes.string.isRequired,
-   fontSi
+  arrayWithShape: PropTypes.arrayOf(
+    PropTypes.shape({
+      color: PropTypes.string.isRequired,
+      fontSize: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+};
+```
 
 ### 59. How to conditionally apply class attributes?
 You shouldn't use curly braces inside quotes because it is going to be evaluated as a string.
@@ -2500,7 +2541,16 @@ There are couple of advantages compared to Jasmine:
 #### Practical Code Example
 
 ```javascript
-// Advantages of Jest: Zero config, paralleli
+// Advantages of Jest: Zero config, parallelized workers, built-in mocking & assertions
+describe('UserService', () => {
+  it('mocks asynchronous network requests natively', async () => {
+    const mockFetch = jest.fn().mockResolvedValue({ id: 101, name: 'Alice' });
+    const user = await mockFetch();
+    expect(user.name).toBe('Alice');
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+});
+```
 
 ### 100. Give a simple example of Jest test case
 Let's write a test for a function that adds two numbers in `sum.js` file:
@@ -2596,7 +2646,9 @@ While Redux offers a powerful and predictable state management solution, it come
 ```javascript
 // Downsides of Redux vs Flux:
 // 1. Boilerplate (Actions, Types, Reducers, Dispatchers)
-// 2. Steep learning curve (Normali
+// 2. Steep learning curve (Normalized relational state, strict immutability)
+// Note: Modern Redux Toolkit (createSlice, configureStore) eliminates 70% of this boilerplate.
+```
 
 ### 105. What is the difference between mapStateToProps() and mapDispatchToProps()?
 `mapStateToProps()` is a utility which helps your component get updated state (which is updated by some other components):
@@ -3030,8 +3082,17 @@ Both _Redux Thunk_ and _Redux Saga_ take care of dealing with side effects. In m
 #### Practical Code Example
 
 ```javascript
-// Redux Thunk vs Redux Saga:
-// Thunk: Simple async/await functions,
+// Redux Thunk: Simple async/await functions dispatched as actions
+export const fetchUserThunk = (id) => async (dispatch) => {
+  dispatch({ type: 'USER_PENDING' });
+  try {
+    const res = await api.getUser(id);
+    dispatch({ type: 'USER_SUCCESS', payload: res });
+  } catch (err) {
+    dispatch({ type: 'USER_ERROR', error: err.message });
+  }
+};
+```
 
 ### 126. What is Redux DevTools?
 _Redux DevTools_ is a live-editing time travel environment for Redux with hot reloading, action replay, and customi
@@ -3224,7 +3285,29 @@ Follow the below steps to debug React Native app:
 ## Part 7: Supported Libraries, Styling & Integrations (139 - 151)
 
 ### 139. What is reselect and how it works?
-_Reselect_ is a **selector library** (for Redux) which uses _memoi
+_Reselect_ is a **memoized selector library** for Redux (built into Redux Toolkit) that prevents expensive recalculations and unnecessary component re-renders.
+
+#### Core Benefits
+1. **Memoization**: Selectors compute derived state and cache results based on input selectors.
+2. **Referential Stability**: Returns the cached object reference if inputs haven't changed, preventing re-renders.
+3. **Composability**: Selectors can be chained together into modular data retrieval pipelines.
+
+#### Code Example
+```javascript
+import { createSelector } from '@reduxjs/toolkit';
+
+const selectCartItems = (state) => state.cart.items;
+const selectTaxRate = (state) => state.cart.taxRate;
+
+// Memoized selector: only runs when selectCartItems or selectTaxRate changes
+export const selectCartTotal = createSelector(
+  [selectCartItems, selectTaxRate],
+  (items, taxRate) => {
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    return subtotal * (1 + taxRate);
+  }
+);
+```
 
 ### 140. What is Flow?
 _Flow_ is a _static type checker_ designed to find type errors in JavaScript. Flow types can express much more fine-grained distinctions than traditional type systems. For example, Flow helps you catch errors involving `null`, unlike most type systems.
@@ -3249,8 +3332,21 @@ PropTypes is a _basic type checker_ (runtime checker) which has been patched ont
 #### Practical Code Example
 
 ```javascript
-// Flow vs PropTypes:
-// Flow: Static compile-time checking before code runs (
+// Flow: Static compile-time checking before code runs (zero runtime bundle overhead)
+// @flow
+function calculateDiscount(price: number, discountRate: number): number {
+  return price * (1 - discountRate);
+}
+
+// PropTypes: Runtime prop validation in development mode
+import PropTypes from 'prop-types';
+function PriceTag({ price }) {
+  return <span>${price}</span>;
+}
+PriceTag.propTypes = {
+  price: PropTypes.number.isRequired,
+};
+```
 
 ### 142. How to use Font Awesome icons in React?
 The below steps followed to include Font Awesome in React:
@@ -3396,7 +3492,17 @@ When the page loads, _React DevTools_ sets a global named `__REACT_DEVTOOLS_GLOB
 #### Practical Code Example
 
 ```jsx
-// Styled Components: CSS-in-JS library utili
+// Styled Components: CSS-in-JS library utilizing ES6 Tagged Template Literals
+import styled from 'styled-components';
+
+export const StyledCard = styled.div`
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+`;
+```
 
 ### 150. Give an example of Styled Components?
 Lets create `<Title>` and `<Wrapper>` components with specific styles for each.
@@ -3405,7 +3511,28 @@ Lets create `<Title>` and `<Wrapper>` components with specific styles for each.
 import React from "react";
 import styled from "styled-components";
 
-// Create a <Title> component that renders an <h1> which is centered, red and si
+// Create a <Title> component that renders an <h1> which is centered, purple, and responsive
+const Title = styled.h1`
+  font-size: 1.5rem;
+  text-align: center;
+  color: #7c3aed;
+`;
+
+// Create a <Wrapper> component that renders a section with background and padding
+const Wrapper = styled.section`
+  padding: 2rem;
+  background: #f8fafc;
+  border-radius: 12px;
+`;
+
+export default function StyledApp() {
+  return (
+    <Wrapper>
+      <Title>Hello Styled Components!</Title>
+    </Wrapper>
+  );
+}
+```
 
 ### 151. What is Relay?
 Relay is a JavaScript framework for providing a data layer and client-server communication to web applications using the React view layer.
@@ -5030,8 +5157,21 @@ Below are the main differences between Redux and MobX,
 #### Practical Code Example
 
 ```javascript
-// Redux vs MobX:
-// Redux: Explicit, immutable, centrali
+// Redux: Explicit, immutable, centralized single source of truth (Flux architecture)
+// MobX: Transparent functional reactive programming (TFRP) with observables
+import { makeAutoObservable } from 'mobx';
+
+class CounterStore {
+  count = 0;
+  constructor() {
+    makeAutoObservable(this);
+  }
+  increment() {
+    this.count++;
+  }
+}
+export const counterStore = new CounterStore();
+```
 
 ### 227. Should I learn ES6 before learning ReactJS?
 No, you don’t have to learn es2015/es6 to learn react. But you may find many resources or React ecosystem uses ES6 extensively. Let's see some of the frequently used ES6 features,
@@ -5332,7 +5472,20 @@ React Server Component is a way to write React component that gets rendered in t
 #### Practical Code Example
 
 ```jsx
-// React Server Components (RSC): Execute ONLY on the server,
+// React Server Components (RSC): Execute ONLY on the server, sending zero JS bundle to the client
+import db from '@/lib/db';
+
+export default async function UserListPage() {
+  const users = await db.user.findMany(); // Direct server database access
+  return (
+    <ul>
+      {users.map((u) => (
+        <li key={u.id}>{u.name} ({u.email})</li>
+      ))}
+    </ul>
+  );
+}
+```
 
 ### 237. What is prop drilling?
 Prop Drilling is the process by which you pass data from one component of the React Component tree to another by going through other components that do not need the data but only help in passing it around.
@@ -5424,7 +5577,34 @@ This way, the wrapper component can add additional functionality, styling, or la
 ---
 
 ### 240. What are the differences between useEffect and useLayoutEffect hooks?
-useEffect and useLayoutEffect are both React hooks that can be used to synchroni
+Both `useEffect` and `useLayoutEffect` share identical signatures, but differ in **when they execute** relative to DOM mutation and browser painting.
+
+| Feature | `useEffect` | `useLayoutEffect` |
+| :--- | :--- | :--- |
+| **Execution Timing** | Asynchronous (after browser paint) | Synchronous (after DOM mutation, before paint) |
+| **Blocks Visual Render?** | No | Yes (blocks visual paint until callback finishes) |
+| **Primary Use Cases** | API calls, subscriptions, timers, logging | DOM measurements (scroll position, tooltip placement) |
+| **Performance Impact** | Smooth 60fps renders without jank | Can cause screen freezing if computations are heavy |
+
+#### Code Example
+```jsx
+import { useState, useLayoutEffect, useRef } from 'react';
+
+export function TooltipTarget({ targetRect }) {
+  const tooltipRef = useRef(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  // useLayoutEffect runs BEFORE the browser paints, avoiding visual flicker
+  useLayoutEffect(() => {
+    if (tooltipRef.current && targetRect) {
+      const height = tooltipRef.current.offsetHeight;
+      setPosition({ top: targetRect.top - height - 8, left: targetRect.left });
+    }
+  }, [targetRect]);
+
+  return <div ref={tooltipRef} style={{ position: 'fixed', top: position.top, left: position.left }}>Tooltip</div>;
+}
+```
 
 ### 241. What are the differences between Functional and Class Components?
 There are two different ways to create components in ReactJS. The main differences are listed down as below,
@@ -6391,7 +6571,31 @@ setName('Alex');
 ---
 
 ### 271. Can useState take a function as an initial value?
-Yes, `useState` can take a function as an initial value, and this is a useful feature in React called **la
+Yes, `useState` accepts an initialization function (called **Lazy Initial State**).
+
+#### Why Use Lazy Initialization?
+When the initial state requires an expensive computation (e.g., parsing a large `localStorage` item, filtering an array, or computing cryptographic hashes), passing a value directly runs on **every re-render**:
+- `useState(expensiveCalculation())`: `expensiveCalculation()` executes on **every single render**, but React discards the result after mount!
+- `useState(() => expensiveCalculation())`: The function is executed **only once on initial mount**, saving valuable CPU cycles.
+
+#### Code Example
+```jsx
+import { useState } from 'react';
+
+export function UserPreferences() {
+  // ✅ Lazy state initialization: runs ONLY on mount
+  const [theme, setTheme] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem('app_theme');
+      return saved ? JSON.parse(saved) : 'system';
+    } catch {
+      return 'system';
+    }
+  });
+
+  return <button onClick={() => setTheme('dark')}>Current Theme: {theme}</button>;
+}
+```
 
 ### 272. What types of values can useState hold?
 The `useState` hook accepts different types of values.
@@ -6517,7 +6721,28 @@ The pseudocode for internal implementation of `useState` looks like below,
      const currentIndex = hookIndex;
  
      if (!hooks[currentIndex]) {
-         // First render: initiali
+         // First render: initialize slot with state and update queue
+         hooks[currentIndex] = {
+             state: typeof initialValue === 'function' ? initialValue() : initialValue,
+             queue: [],
+         };
+     }
+ 
+     const hook = hooks[currentIndex];
+     while (hook.queue.length > 0) {
+         const action = hook.queue.shift();
+         hook.state = typeof action === 'function' ? action(hook.state) : action;
+     }
+ 
+     const setState = (action) => {
+         hook.queue.push(action);
+         renderComponent(); // Trigger re-render
+     };
+ 
+     hookIndex++;
+     return [hook.state, setState];
+ }
+```
 
 ### 276. What is useReducer? Why do you use useReducer?
 The `useReducer` hook is a React hook used to manage **complex state logic** inside **functional components**. It is conceptually similar to **Redux**. i.e, Instead of directly updating state like with `useState`, you **dispatch an action** to a **reducer function**, and the reducer returns the new state.
@@ -7234,7 +7459,22 @@ The useImperativeHandler hook will be used in below cases:
 
 ```jsx
 // When to use useImperativeHandle:
-// Exposing speciali
+// Exposing specialized imperatively triggered methods (e.g. focus, clear, scroll)
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+
+export const CustomInput = forwardRef((props, ref) => {
+  const inputRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    clear: () => {
+      if (inputRef.current) inputRef.current.value = '';
+    },
+  }));
+
+  return <input ref={inputRef} {...props} />;
+});
+```
 
 ### 301. Is that possible to use useImperativeHandle without forwardRef?
 **No.** `useImperativeHandle` only works when the component is wrapped in `forwardRef`. It's the combination that allows parent components to use a `ref` on a function component.
@@ -7366,7 +7606,41 @@ Some of the benefits of custom hooks are:
 ---
 
 ### 306. How does React Fiber works? Explain in detail.
-React Fiber is the **core engine** that enables advanced features like **concurrent rendering**, **prioriti
+**React Fiber** is the complete rewrite of React's core reconciliation algorithm (introduced in React 16). Its primary purpose is to enable **incremental rendering**—the ability to split rendering work into chunks and spread it out over multiple frames.
+
+#### 1. Core Motivation: Replacing the Stack Reconciler
+The legacy Stack Reconciler was synchronous and recursive. Once a tree update started, it could not be paused or aborted until the entire component tree finished rendering. In complex UIs, this caused dropped animation frames (jank) and frozen inputs.
+
+#### 2. The Fiber Node: Unit of Work
+A **Fiber** is a plain JavaScript object representing a unit of work. Each React element has a corresponding Fiber node containing:
+- `tag` & `type`: Component type (Function, Class, HostComponent like `div`)
+- `child`: Pointer to the first direct child
+- `sibling`: Pointer to the next sibling
+- `return`: Pointer back to the parent Fiber
+- `memoizedState`: Linked list of Hooks state
+- `pendingProps` & `memoizedProps`: Input vs current props
+- `lanes`: Bitmask representing priority levels (Sync, InputContinuous, Default, Idle)
+
+#### 3. Two-Phase Work Loop
+1. **Render Phase (Reconciliation - Asynchronous & Interruptible)**:
+   - React processes the Fiber tree via `workLoopConcurrent`.
+   - Before processing each Fiber node, React checks `shouldYield()`. If higher-priority work (like user typing or animations) arrives, React yields control to the browser.
+   - Computes diffs and constructs an "Effect List" or work-in-progress tree without touching the DOM.
+2. **Commit Phase (Synchronous & Non-Interruptible)**:
+   - React applies the calculated mutations to the actual DOM in a single rapid pass.
+   - Executes lifecycle methods (`componentDidMount`, `componentDidUpdate`) and `useLayoutEffect` hooks synchronously.
+   - Swaps the current tree with the work-in-progress tree (**Double Buffering**).
+
+#### Fiber Double Buffering Diagram
+```mermaid
+flowchart TD
+  subgraph WorkLoop ["Concurrent Work Loop"]
+    C[Current Fiber Tree] -.->|Cloned to| W[Work-In-Progress Tree]
+    W -->|Interruptible Diffing| Diff[Compute Effect List]
+  end
+  Diff -->|Commit Phase| DOM[(Real DOM Update)]
+  DOM -->|Swap Pointers| C
+```
 
 ### 307. What is the useId hook and when should you use it?
 The `useId` hook is a React hook introduced in React 18 that generates **unique IDs** that are stable across server and client renders. It's primarily used for **accessibility attributes** like linking form labels to inputs.
@@ -7591,7 +7865,17 @@ return (
 );
 }
 
-function FontSi
+function FontSizeController() {
+  const [size, setSize] = useLocalStorage('preferred_font_size', 16);
+  return (
+    <div>
+      <span>Font Size: {size}px</span>
+      <button onClick={() => setSize((s) => s + 2)}>+</button>
+      <button onClick={() => setSize((s) => Math.max(12, s - 2))}>-</button>
+    </div>
+  );
+}
+```
 
 ### 313. What is the useDebugValue hook?
 The `useDebugValue` hook is used to **display a label** for custom hooks in **React DevTools**. It helps developers debug custom hooks by showing meaningful information.
@@ -7664,7 +7948,17 @@ return () => {
 **1. Event Listeners**
 ```jsx
 useEffect(() => {
-const handleResi
+  const handleResize = () => {
+    console.log(`Window dimensions: ${window.innerWidth} x ${window.innerHeight}`);
+  };
+  window.addEventListener('resize', handleResize);
+
+  // Cleanup: remove event listener before re-running effect or on unmount
+  return () => {
+    window.removeEventListener('resize', handleResize);
+  };
+}, []);
+```
 
 ### 315. What are the differences between useEffect and useEvent (experimental)?
 `useEvent` is an **experimental hook** (not yet stable in React) designed to solve the problem of creating **stable event handlers** that always access the latest props and state without causing re-renders or needing to be in dependency arrays.
@@ -7780,7 +8074,12 @@ useEffect(() => {
 doSomething(options);
 }, [{ page: 1, limit: 10 }]); // Always different reference
 
-// ✅ Good: Memoi
+// ✅ Good: Memoize object/array dependencies with useMemo
+const options = useMemo(() => ({ page: 1, limit: 10 }), []);
+useEffect(() => {
+  doSomething(options);
+}, [options]);
+```
 
 ### 317. What is Concurrent Rendering? (Legacy)
 The Concurrent rendering makes React apps to be more responsive by rendering component trees without blocking the main UI thread. It allows React to interrupt a long-running render to handle a high-priority event. i.e, When you enabled concurrent Mode, React will keep an eye on other tasks that need to be done, and if there's something with a higher priority it will pause what it is currently rendering and let the other task finish first. You can enable this in two ways,
@@ -8466,7 +8765,31 @@ The lifecycle methods are called in the following order when an instance of a co
 import React, { Component } from 'react';
 
 class MountingOrderTracker extends Component {
-  // Step 1: constructor initiali
+  // Step 1: constructor initializes state and binds handlers
+  constructor(props: {}) {
+    super(props);
+    this.state = { initialized: true };
+    console.log('1. constructor()');
+  }
+
+  // Step 2: static getDerivedStateFromProps syncs state with props
+  static getDerivedStateFromProps(props: {}, state: { initialized: boolean }) {
+    console.log('2. static getDerivedStateFromProps()');
+    return null;
+  }
+
+  // Step 4: componentDidMount triggers after DOM is painted
+  componentDidMount() {
+    console.log('4. componentDidMount() - safe for DOM lookups & API calls');
+  }
+
+  // Step 3: render returns JSX
+  render() {
+    console.log('3. render()');
+    return <div>Mounting Phase Complete</div>;
+  }
+}
+```
 
 ### 343. What are the lifecycle methods going to be deprecated in React v16?
 **⚠️ FULLY DEPRECATED:** These lifecycle methods have been deprecated and removed from React 17+.
@@ -9466,12 +9789,59 @@ class RenderReturnTypesDemo extends Component<{ type: string }> {
 ---
 
 ### 379. What is the main purpose of constructor?
-The constructor is mainly used for two purposes,
+In React class components, the constructor is mainly used for two purposes:
 
-    1.  To initiali
+1. **Initializing Local State**: Assigning an object directly to `this.state` (without calling `setState`).
+2. **Binding Event Handler Methods**: Binding instance methods to `this` (e.g. `this.handleClick = this.handleClick.bind(this)`) so `this` is preserved when passed as callbacks.
+
+#### Code Example
+```jsx
+import React, { Component } from 'react';
+
+class UserCard extends Component {
+  constructor(props) {
+    super(props); // Required to access this.props inside constructor
+    // 1. Initializing local state
+    this.state = { isOnline: false };
+    // 2. Binding event handler method
+    this.toggleStatus = this.toggleStatus.bind(this);
+  }
+
+  toggleStatus() {
+    this.setState((prev) => ({ isOnline: !prev.isOnline }));
+  }
+
+  render() {
+    return <button onClick={this.toggleStatus}>{this.state.isOnline ? 'Online' : 'Offline'}</button>;
+  }
+}
+```
 
 ### 380. Is it mandatory to define constructor for React component?
-No, it is not mandatory. i.e, If you don’t initiali
+**No, it is not mandatory.** If your component does not initialize state and does not bind methods, you do not need to implement a constructor.
+
+Furthermore, in modern React using Class Field Declarations (ES2022+), state can be declared directly as a class field and methods can use arrow functions, eliminating the need for a constructor entirely:
+
+#### Code Example
+```jsx
+import React, { Component } from 'react';
+
+class ModernComponent extends Component {
+  // Class field state initialization (no constructor needed!)
+  state = {
+    count: 0,
+  };
+
+  // Arrow function auto-binds 'this'
+  handleClick = () => {
+    this.setState((prev) => ({ count: prev.count + 1 }));
+  };
+
+  render() {
+    return <button onClick={this.handleClick}>Count: {this.state.count}</button>;
+  }
+}
+```
 
 ### 381. Why should not call setState in componentWillUnmount?
 You should not call `setState()` in `componentWillUnmount()` because once a component instance is unmounted, it will never be mounted again.

@@ -261,6 +261,66 @@ DynamoDB returns at most **1 MB of data** or the configured `Limit` in a single 
 - Pass `ExclusiveStartKey: LastEvaluatedKey` in the subsequent query to fetch the next page.
 - Once `LastEvaluatedKey` is undefined/null, the last page has been reached.
 
+#### Code Example (AWS SDK v3)
+```typescript
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
+
+const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({ region: 'us-east-1' }));
+
+export async function fetchAllOrders(userId: string) {
+  let lastEvaluatedKey: Record<string, any> | undefined = undefined;
+  const allOrders: any[] = [];
+
+  do {
+    const response = await docClient.send(
+      new QueryCommand({
+        TableName: 'OrdersTable',
+        KeyConditionExpression: 'PK = :pk',
+        ExpressionAttributeValues: { ':pk': `USER#${userId}` },
+        Limit: 50,
+        ExclusiveStartKey: lastEvaluatedKey,
+      })
+    );
+
+    if (response.Items) allOrders.push(...response.Items);
+    lastEvaluatedKey = response.LastEvaluatedKey;
+  } while (lastEvaluatedKey);
+
+  return allOrders;
+}
+```
+
+#### Code Example (AWS SDK v3)
+```typescript
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
+
+const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({ region: 'us-east-1' }));
+
+export async function fetchAllOrders(userId: string) {
+  let lastEvaluatedKey: Record<string, any> | undefined = undefined;
+  const allOrders: any[] = [];
+
+  do {
+    const response = await docClient.send(
+      new QueryCommand({
+        TableName: 'OrdersTable',
+        KeyConditionExpression: 'PK = :pk',
+        ExpressionAttributeValues: { ':pk': `USER#${userId}` },
+        Limit: 50,
+        ExclusiveStartKey: lastEvaluatedKey,
+      })
+    );
+
+    if (response.Items) allOrders.push(...response.Items);
+    lastEvaluatedKey = response.LastEvaluatedKey;
+  } while (lastEvaluatedKey);
+
+  return allOrders;
+}
+```
+
 ---
 
 ## Part 3: Advanced Architecture, Scale & Internals (Senior / Lead)
@@ -301,6 +361,36 @@ Use structured composite string patterns in sort keys:
   - Fetch entire state: `SK begins_with("STATE#CA#")`
   - Fetch specific county: `SK begins_with("STATE#CA#COUNTY#Orange#")`
 
+#### Code Example (Single-Table Sort Key Prefix Query)
+```typescript
+import { QueryCommand } from '@aws-sdk/lib-dynamodb';
+
+// Fetch all cities within California using sort key prefix
+export const queryStateHierarchy = new QueryCommand({
+  TableName: 'GlobalLocations',
+  KeyConditionExpression: 'PK = :pk AND begins_with(SK, :prefix)',
+  ExpressionAttributeValues: {
+    ':pk': 'COUNTRY#USA',
+    ':prefix': 'STATE#CA#COUNTY#Orange#',
+  },
+});
+```
+
+#### Code Example (Single-Table Sort Key Prefix Query)
+```typescript
+import { QueryCommand } from '@aws-sdk/lib-dynamodb';
+
+// Fetch all cities within California using sort key prefix
+export const queryStateHierarchy = new QueryCommand({
+  TableName: 'GlobalLocations',
+  KeyConditionExpression: 'PK = :pk AND begins_with(SK, :prefix)',
+  ExpressionAttributeValues: {
+    ':pk': 'COUNTRY#USA',
+    ':prefix': 'STATE#CA#COUNTY#Orange#',
+  },
+});
+```
+
 ### 26. What are the best practices for Primary Key design to prevent write throttling?
 **In Simple Words:**
 1. Use high-cardinality values for Partition Keys (UUIDs, User IDs, Device IDs).
@@ -320,6 +410,66 @@ Use conditional writes with TTL:
 - Acquire lock: `PutItem` with `ConditionExpression: attribute_not_exists(lockName) OR lockExpiresAt < :now` and set `lockExpiresAt` to `now + leaseSeconds`.
 - Heartbeat: Extend `lockExpiresAt` conditionally matching lease owner ID.
 - Release lock: Delete item conditionally matching lease owner ID.
+
+#### Code Example (Distributed Mutex with TTL Lease)
+```typescript
+import { PutCommand } from '@aws-sdk/lib-dynamodb';
+
+export async function acquireLock(docClient: any, lockKey: string, ownerId: string, ttlSeconds = 30) {
+  const now = Math.floor(Date.now() / 1000);
+  const leaseExpiresAt = now + ttlSeconds;
+
+  try {
+    await docClient.send(
+      new PutCommand({
+        TableName: 'DistributedLocks',
+        Item: {
+          LockKey: lockKey,
+          OwnerId: ownerId,
+          ExpiresAt: leaseExpiresAt,
+        },
+        // Only acquire if no lock exists OR current lock lease has expired
+        ConditionExpression: 'attribute_not_exists(LockKey) OR ExpiresAt < :now',
+        ExpressionAttributeValues: { ':now': now },
+      })
+    );
+    return true; // Lock acquired successfully
+  } catch (err: any) {
+    if (err.name === 'ConditionalCheckFailedException') return false; // Lock occupied
+    throw err;
+  }
+}
+```
+
+#### Code Example (Distributed Mutex with TTL Lease)
+```typescript
+import { PutCommand } from '@aws-sdk/lib-dynamodb';
+
+export async function acquireLock(docClient: any, lockKey: string, ownerId: string, ttlSeconds = 30) {
+  const now = Math.floor(Date.now() / 1000);
+  const leaseExpiresAt = now + ttlSeconds;
+
+  try {
+    await docClient.send(
+      new PutCommand({
+        TableName: 'DistributedLocks',
+        Item: {
+          LockKey: lockKey,
+          OwnerId: ownerId,
+          ExpiresAt: leaseExpiresAt,
+        },
+        // Only acquire if no lock exists OR current lock lease has expired
+        ConditionExpression: 'attribute_not_exists(LockKey) OR ExpiresAt < :now',
+        ExpressionAttributeValues: { ':now': now },
+      })
+    );
+    return true; // Lock acquired successfully
+  } catch (err: any) {
+    if (err.name === 'ConditionalCheckFailedException') return false; // Lock occupied
+    throw err;
+  }
+}
+```
 
 ### 29. How does DynamoDB handle Point-In-Time Recovery (PITR)?
 **In Simple Words:**

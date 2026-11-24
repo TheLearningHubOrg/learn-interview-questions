@@ -332,6 +332,42 @@ Advisory Locks are application-defined locks created using PostgreSQL functions:
   - `pg_advisory_unlock(key)`: Releases the lock.
 - Ideal for orchestrating background workers, preventing duplicate cron job runs, and distributed mutexes with zero table overhead.
 
+#### Code Example (PostgreSQL Advisory Locks)
+```sql
+-- 1. Try to acquire lock non-blockingly (key: 42109); returns true (1) if locked, false (0) if busy
+SELECT pg_try_advisory_lock(42109);
+
+-- 2. Execute critical background job
+UPDATE orders SET status = 'PROCESSING' WHERE status = 'PENDING';
+
+-- 3. Release advisory lock when done
+SELECT pg_advisory_unlock(42109);
+
+-- Transaction-scoped advisory lock (automatically releases on COMMIT / ROLLBACK)
+BEGIN;
+SELECT pg_advisory_xact_lock(42109);
+-- ... work ...
+COMMIT; -- Lock automatically released!
+```
+
+#### Code Example (PostgreSQL Advisory Locks)
+```sql
+-- 1. Try to acquire lock non-blockingly (key: 42109); returns true (1) if locked, false (0) if busy
+SELECT pg_try_advisory_lock(42109);
+
+-- 2. Execute critical background job
+UPDATE orders SET status = 'PROCESSING' WHERE status = 'PENDING';
+
+-- 3. Release advisory lock when done
+SELECT pg_advisory_unlock(42109);
+
+-- Transaction-scoped advisory lock (automatically releases on COMMIT / ROLLBACK)
+BEGIN;
+SELECT pg_advisory_xact_lock(42109);
+-- ... work ...
+COMMIT; -- Lock automatically released!
+```
+
 ### 29. How do you prevent and resolve Connection Pooler Session State issues in Transaction Pooling?
 **In Simple Words:**
 When using PgBouncer in **Transaction Pooling** mode, a client gets a different backend connection on every transaction:

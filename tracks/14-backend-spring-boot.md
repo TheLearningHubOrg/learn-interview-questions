@@ -240,6 +240,36 @@ Spring Events allow components to communicate asynchronously without direct depe
 2. Consumer listens via `@EventListener` or `@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)`.
 3. `AFTER_COMMIT` guarantees emails/Kafka events are only fired if the database transaction committed successfully.
 
+#### Code Example
+```java
+// 1. Immutable Domain Event
+public record OrderCreatedEvent(Long orderId, String customerEmail, java.math.BigDecimal total) {}
+
+// 2. Transaction-bound Listener (Executes ONLY after DB commit succeeds)
+@Component
+public class NotificationEventListener {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onOrderCreated(OrderCreatedEvent event) {
+        emailService.sendOrderReceipt(event.customerEmail(), event.orderId());
+    }
+}
+```
+
+#### Code Example
+```java
+// 1. Immutable Domain Event
+public record OrderCreatedEvent(Long orderId, String customerEmail, java.math.BigDecimal total) {}
+
+// 2. Transaction-bound Listener (Executes ONLY after DB commit succeeds)
+@Component
+public class NotificationEventListener {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onOrderCreated(OrderCreatedEvent event) {
+        emailService.sendOrderReceipt(event.customerEmail(), event.orderId());
+    }
+}
+```
+
 ---
 
 ---
@@ -262,6 +292,26 @@ When Kubernetes terminates a pod, it sends a `SIGTERM` signal:
 1. Configure `server.shutdown: graceful`.
 2. Set timeout `spring.lifecycle.timeout-per-shutdown-phase: 30s`.
 3. Spring stops accepting new HTTP traffic and allows in-flight requests and background jobs up to 30 seconds to finish before terminating.
+
+#### Configuration (`application.yml`)
+```yaml
+server:
+  shutdown: graceful # Stops accepting new connections, allows in-flight requests to complete
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s # Maximum grace period before SIGKILL
+```
+
+#### Configuration (`application.yml`)
+```yaml
+server:
+  shutdown: graceful # Stops accepting new connections, allows in-flight requests to complete
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s # Maximum grace period before SIGKILL
+```
 
 ---
 
@@ -443,6 +493,82 @@ public class SecurityConfig {
 2. Server validates credentials and signs a JWT (containing user ID, roles, expiration) using HMAC-SHA256 or RSA.
 3. Client stores token and sends it in `Authorization: Bearer <token>` on subsequent requests.
 4. A custom `OncePerRequestFilter` parses the token, verifies the signature, and sets the user's `UsernamePasswordAuthenticationToken` in `SecurityContextHolder.getContext()`.
+
+#### Code Example (`JwtAuthenticationFilter.java`)
+```java
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private final JwtTokenService jwtService;
+    private final UserDetailsService userDetailsService;
+
+    public JwtAuthenticationFilter(JwtTokenService jwtService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtService.isTokenValid(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+        chain.doFilter(request, response);
+    }
+}
+```
+
+#### Code Example (`JwtAuthenticationFilter.java`)
+```java
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private final JwtTokenService jwtService;
+    private final UserDetailsService userDetailsService;
+
+    public JwtAuthenticationFilter(JwtTokenService jwtService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String token = authHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtService.isTokenValid(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+        chain.doFilter(request, response);
+    }
+}
+```
 
 ---
 

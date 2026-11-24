@@ -1123,7 +1123,7 @@ class ReActAgent:
 #### 1. The Challenge of Unconstrained Generation
 
 When integrating LLMs into software pipelines (e.g., triggering a database write or calling a payment gateway), the model's output must adhere strictly to a deterministic schema (JSON, Protocol Buffers, SQL).
-- **Prompt Engineering ("Output valid JSON")**: Fragile. Models frequently add markdown backticks (```` ```json ````), trailing commas, or explanatory preamble text.
+- **Prompt Engineering ("Output valid JSON")**: Fragile. Models frequently add markdown code fences (`json`), trailing commas, or explanatory preamble text.
 - **Retry Loops**: Incurs latency and cost penalties when regenerating failing payloads.
 
 ---

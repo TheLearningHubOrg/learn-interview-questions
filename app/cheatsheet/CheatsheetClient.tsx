@@ -481,6 +481,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
                             {/* Question Number Badge */}
                             <Link
                               href={`/sections/${item.trackSlug}/${item.questionNumber}`}
+                              prefetch={false}
                               className="px-2 py-0.5 rounded font-mono font-bold text-xs bg-muted text-foreground border border-border group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-colors shrink-0 mt-0.5 print:bg-slate-100 print:text-black print:border-slate-300"
                               title="Open full question and deep-dive answer"
                             >
@@ -529,6 +530,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
                               {/* Question Title */}
                               <Link
                                 href={`/sections/${item.trackSlug}/${item.questionNumber}`}
+                                prefetch={false}
                                 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug block cheatsheet-title break-words [overflow-wrap:anywhere] print:text-black print:text-[10pt]"
                               >
                                 {item.title}
@@ -553,6 +555,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
                           {/* Quick Arrow Link (Hidden in Print) */}
                           <Link
                             href={`/sections/${item.trackSlug}/${item.questionNumber}`}
+                            prefetch={false}
                             className="text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 shrink-0 mt-1 print:hidden"
                             title="View full answer"
                           >

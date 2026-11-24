@@ -502,6 +502,7 @@ export function SectionClient({ track, questions, allTracks }: SectionClientProp
                     <Link
                       key={q.number}
                       href={`/sections/${track.slug}/${q.number}`}
+                      prefetch={false}
                       className={`p-4 rounded-xl bg-card border ${
                         isLastRead 
                           ? 'border-purple-500 dark:border-purple-400 ring-1 ring-purple-500/30' 

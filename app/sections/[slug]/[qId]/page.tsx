@@ -10,6 +10,8 @@ interface QuestionPageProps {
   };
 }
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const tracks = await getAllTracks();
   const params: { slug: string; qId: string }[] = [];

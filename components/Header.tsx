@@ -10,6 +10,7 @@ import { getAllBookmarks, BOOKMARKS_UPDATE_EVENT } from '@/lib/study-progress';
 import { getStudyStreak, StudyStreakData, STREAK_UPDATE_EVENT } from '@/lib/study-streak';
 import { getSelectedTechSlugs, TECH_STACK_UPDATE_EVENT } from '@/lib/tech-stack';
 import { StreakModal } from './StreakModal';
+import { preloadSearchIndex } from './SearchModal';
 
 interface HeaderProps {
   onOpenSearch?: () => void;
@@ -101,6 +102,8 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
             <button
               type="button"
               onClick={onOpenSearch}
+              onMouseEnter={() => preloadSearchIndex()}
+              onFocus={() => preloadSearchIndex()}
               className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-purple-400/50 hover:bg-card-hover transition-all text-sm group shadow-sm dark:shadow-none"
             >
               <div className="flex items-center gap-2 min-w-0">
@@ -119,6 +122,8 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
             <button
               type="button"
               onClick={onOpenSearch}
+              onTouchStart={() => preloadSearchIndex()}
+              onMouseEnter={() => preloadSearchIndex()}
               className="md:hidden p-1.5 sm:p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-colors shrink-0"
               aria-label="Search questions"
             >

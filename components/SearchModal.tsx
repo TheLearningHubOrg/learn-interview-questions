@@ -15,10 +15,14 @@ interface SearchModalProps {
 let globalSearchCache: QuestionIndexItem[] | null = null;
 let fetchPromise: Promise<QuestionIndexItem[]> | null = null;
 
+export function preloadSearchIndex(): Promise<QuestionIndexItem[]> {
+  return fetchSearchIndex();
+}
+
 function fetchSearchIndex(): Promise<QuestionIndexItem[]> {
   if (globalSearchCache) return Promise.resolve(globalSearchCache);
   if (!fetchPromise) {
-    fetchPromise = fetch('/api/search-index')
+    fetchPromise = fetch('/search-index.json')
       .then((res) => {
         if (!res.ok) throw new Error('Search index fetch failed');
         return res.json();
@@ -42,18 +46,6 @@ export function SearchModal({ isOpen, onClose, indexItems }: SearchModalProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [items, setItems] = useState<QuestionIndexItem[]>(() => indexItems || globalSearchCache || []);
   const [loading, setLoading] = useState<boolean>(!indexItems && !globalSearchCache);
-
-  // Pre-fetch search index during idle time after 1.5 seconds
-  useEffect(() => {
-    if (globalSearchCache || indexItems) return;
-    const timer = setTimeout(() => {
-      fetchSearchIndex().then((data) => {
-        setItems(data);
-        setLoading(false);
-      });
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [indexItems]);
 
   // When modal opens, make sure search items are loaded
   useEffect(() => {

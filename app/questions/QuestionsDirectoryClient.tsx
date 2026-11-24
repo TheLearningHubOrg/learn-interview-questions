@@ -437,6 +437,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
                 <Link
                   key={key}
                   href={`/sections/${item.trackSlug}/${item.questionNumber}`}
+                  prefetch={false}
                   className={`p-4 rounded-xl bg-card border ${
                     isBookmarked
                       ? 'border-amber-300 dark:border-amber-500/40'

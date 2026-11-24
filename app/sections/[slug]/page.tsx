@@ -9,6 +9,8 @@ interface SectionPageProps {
   };
 }
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const tracks = await getAllTracks();
   const legacySlugs = [

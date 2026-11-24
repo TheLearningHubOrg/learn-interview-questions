@@ -230,7 +230,7 @@ The usage of Error boundaries from the above library is quite straight forward.
 > **_Note when using react-error-boundary:_** ErrorBoundary is a client component. You can only pass props to it that are seriali
 
 ### 8. What are Pure Components?
-Pure components are the components which render the same output for the same state and props. In function components, you can achieve these pure components through memoi
+Pure components are the components which render the same output for the same state and props. In function components, you can achieve these pure components through memoization using React.memo().
 
 ### 9. What is state in React?
 _State_ of a component is an object that holds some information that may change over the lifetime of the component. The important point is whenever the state object changes, the component re-renders. It is always recommended to make our state as simple as possible and minimi
@@ -367,7 +367,7 @@ Think of props as arguments to a function, whereas state is like variables decla
 | Managed by| The component itself                | Parent component                  |
 | Mutable   | Yes                                 | No (read-only)                    |
 | Scope     | Local to the component              | Passed from parent to child       |
-| Usage     | Manage dynamic data and UI changes  | Configure and customi
+| Usage     | Manage dynamic data and UI changes  | Configure and customize component behavior
 
 ### 12. What is the difference between HTML and React event handling?
 Below are some of the main differences between HTML and React event handling,
@@ -486,7 +486,7 @@ const todoItems = todos.map((todo, index) => (
 ---
 
 ### 16. What is Virtual DOM?
-The _Virtual DOM_ (VDOM) is a lightweight, in-memory representation of _Real DOM_ used by libraries like React to optimi
+The _Virtual DOM_ (VDOM) is a lightweight, in-memory representation of _Real DOM_ used by libraries like React to optimize rendering performance.
 
 ### 17. How Virtual DOM works?
 The _Virtual DOM_ works in five simple steps.
@@ -553,7 +553,7 @@ shadowRoot.innerHTML = '<style>p { color: red; }</style><p>Shadow DOM</p>';
 ---
 
 ### 19. What is React Fiber?
-**React Fiber** is the **new reconciliation engine** in React, introduced in React 16. It’s a complete rewrite of React’s core algorithm(old stack-based algorithm) for rendering and updating the UI. Fiber enhances React’s ability to handle **asynchronous rendering**, **prioriti
+**React Fiber** is the **new reconciliation engine** in React, introduced in React 16. It’s a complete rewrite of React’s core algorithm(old stack-based algorithm) for rendering and updating the UI. Fiber enhances React's ability to handle **asynchronous rendering**, **prioritization of updates**, and **concurrency**.
 
 ### 20. What is the main goal of React Fiber?
 The goal of _React Fiber_ is to increase its suitability for areas like animation, layout, and gestures. Its headline feature is **incremental rendering**: the ability to split rendering work into chunks and spread it out over multiple frames.
@@ -562,14 +562,14 @@ Its main goals are:
 
 *   **Incremental Rendering** – Breaks work into chunks for smoother updates.
 *   **Interruptible Rendering** – Pauses and resumes rendering to keep the UI responsive.
-*   **Prioriti
+*   **Prioritization** – Assigns higher priority to immediate user interactions (typing, clicking) and lower priority to background updates.
 
 ### 21. What are controlled components?
 A **controlled component** is a React component that **fully manages the form element's state**(e.g, elements like `<input>`, `<textarea>`, or `<select>`))  using React's internal state mechanism. i.e, The component does not manage its own internal state — instead, React acts as the single source of truth for form data.
 
 The controlled components will be implemented using the below steps,
 
-1. Initiali
+1. **Initialize State**: Set up state in the component using `useState()` or class state to hold the input's current value.
 
 ### 22. What are uncontrolled components?
 The **Uncontrolled components** are form elements (like `<input>`, `<textarea>`, or `<select>`) that **manage their own state internally** via the **DOM**, rather than through React state.
@@ -1055,7 +1055,7 @@ return (
 
 <details><summary><b>See Class</b></summary>
 <p>
-The equivalent class stateful component with a state that gets initiali
+The equivalent class stateful component with a state that gets initialized in the constructor:
 
 ### 36. How to apply validation on props in React?
 When the application is running in _development mode_, React will automatically check all props that we set on components to make sure they have _correct type_. If the type is incorrect, React will generate warning messages in the console. It's disabled in _production mode_ due to performance impact. The mandatory props are defined with `isRequired`.
@@ -1335,7 +1335,7 @@ function Button() {
 ### 45. What is the impact of indexes as keys?
 Keys should be stable, predictable, and unique so that React can keep track of elements.
 
-In the below code snippet each element's key will be based on ordering, rather than tied to the data that is being represented. This limits the optimi
+In the below code snippet each element's key will be based on ordering, rather than tied to the data that is being represented. This limits the optimization capabilities of React's reconciliation engine.
 
 ### 46. How do you conditionally render components?
 In some cases you want to render different components depending on some state. JSX does not render `false` or `undefined`, so you can use conditional _short-circuiting_ to render a given part of your component only if a certain condition is true.
@@ -2871,7 +2871,7 @@ const FilterLink = connect(mapStateToProps, mapDispatchToProps)(Link);
 export default FilterLink;
 ```
 
-Due to it having quite a few performance optimi
+Due to it having quite a few performance optimizations.
 
 ### 116. What is the difference between component and container in React Redux?
 **Component** is a class or function component that describes the presentational part of your application.
@@ -3001,7 +3001,7 @@ Most of the applications has several top-level directories as below:
 2. **Containers**: Used for _smart_ components connected to Redux.
 3. **Actions**: Used for all action creators, where file names correspond to part of the app.
 4. **Reducers**: Used for all reducers, where files name correspond to state key.
-5. **Store**: Used for store initiali
+5. **Store**: Used for store initialization and configuration.
 
 ### 121. What is redux-saga?
 `redux-saga` is a library that aims to make side effects (asynchronous things like data fetching and impure things like accessing the browser cache) in React/Redux applications easier and better.
@@ -3095,7 +3095,7 @@ export const fetchUserThunk = (id) => async (dispatch) => {
 ```
 
 ### 126. What is Redux DevTools?
-_Redux DevTools_ is a live-editing time travel environment for Redux with hot reloading, action replay, and customi
+_Redux DevTools_ is a live-editing time-travel debugging environment for Redux with hot reloading, action replay, state diff inspection, and custom action dispatching.
 
 ### 127. What are the features of Redux DevTools?
 Some of the main features of Redux DevTools are below,
@@ -3186,7 +3186,7 @@ const store = createStore(rootReducer, initialState);
 ---
 
 ### 133. How Relay is different from Redux?
-Relay is similar to Redux in that they both use a single store. The main difference is that relay only manages state originated from the server, and all access to the state is used via _GraphQL_ queries (for reading data) and mutations (for changing data). Relay caches the data for you and optimi
+Relay is similar to Redux in that they both use a single store. The main difference is that relay only manages state originated from the server, and all access to the state is used via _GraphQL_ queries (for reading data) and mutations (for changing data). Relay caches the data for you and optimizes network payloads by batching and deduplicating queries.
 
 ### 134. What is an action in Redux?
 _Actions_ are plain JavaScript objects or payloads of information that send data from your application to your store. They are the only source of information for the store. Actions must have a type property that indicates the type of action being performed.
@@ -3484,7 +3484,7 @@ Let's see the difference between React and Angular in a table format.
 ---
 
 ### 148. Why React tab is not showing up in DevTools?
-When the page loads, _React DevTools_ sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initiali
+When the page loads, _React DevTools_ sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization.
 
 ### 149. What are Styled Components?
 `styled-components` is a JavaScript library for styling React applications. It removes the mapping between styles and components, and lets you write actual CSS augmented with JavaScript.
@@ -4357,7 +4357,7 @@ Next.js is a popular and lightweight framework for static and server‑rendered 
 3. Simple client-side routing (page based)
 4. Webpack-based dev environment which supports (HMR)
 5. Able to implement with Express or any other Node.js HTTP server
-6. Customi
+6. Customization
 
 ### 184. How do you pass an event handler to a component?
 You can pass event handlers and other functions as props to child components. The functions can be passed to child component as below,
@@ -4520,7 +4520,7 @@ Below are the main reasons to recommend formik over redux form library,
 3. Redux-Form is 22.5 kB minified g
 
 ### 193. Why are you not required to use inheritance?
-In React, it is recommended to use composition over inheritance to reuse code between components. Both Props and composition give you all the flexibility you need to customi
+In React, it is recommended to use composition over inheritance to reuse code between components. Both Props and composition give you all the flexibility you need to customize component behavior and appearance.
 
 ### 194. Can I use web components in react application?
 Yes, you can use web components in a react application. Even though many developers won't use this combination, it may require especially if you are using third-party UI components that are written using Web Components.
@@ -5253,7 +5253,7 @@ return (
 }
 ```
 
-In this example, typing remains smooth because React prioriti
+In this example, typing remains smooth because React prioritizes input events ahead of heavy background list updates.
 
 ### 229. What is the difference between async mode and concurrent mode?
 Both refers the same thing. Previously concurrent Mode being referred to as "Async Mode" by React team. The name has been changed to highlight React’s ability to perform work on different priority levels. So it avoids the confusion from other approaches to Async Rendering.
@@ -6351,7 +6351,7 @@ With Hooks (like `useState`, `useEffect`):
 
 #### 6. **React Scheduler**
 
-React uses an internal **Scheduler** to control how updates are prioriti
+React uses an internal **Scheduler** to control how updates are prioritized.
 
 ### 263. How is useReducer Different from useState?
 There are notable differences between `useState` and `useReducer` hooks.
@@ -6427,7 +6427,7 @@ You typically export this so other components can import it.
 ### 265. What are the use cases of useContext hook?
 The `useContext` hook in React is used to share data across components without having to pass props manually through each level. Here are some common and effective use cases:
 
- 1.  **Theme Customi
+ 1.  **Theme Customization**
 
 ### 266. When to use client and server components?
 You can efficiently build nextjs application if you are aware about which part of the application needs to use client components and which other parts needs to use server components. The common cases of both client and server components are listed below:
@@ -6867,7 +6867,7 @@ dispatch({ type: 'increment_twice' });
 ### 280. Is dispatch from useReducer asynchronous and does it update state immediately?
 The `dispatch` function returned by `useReducer` is **not asynchronous** — it is a **synchronous** function call. When you call `dispatch(action)`, React **synchronously** invokes your reducer with the current state and the action, computes the new state, and **schedules a re-render**. However, the **state variable does not update immediately** within the same render cycle. The updated state is only available in the **next render**.
 
-This behavior is similar to `useState`'s `setState` — React **batches** state updates for performance optimi
+This behavior is similar to `useState`'s `setState` — React **batches** state updates for performance optimization.
 
 ### 281. How does useContext works? Explain with an example
 The `useContext` hook can be used for authentication state management across multiple components and pages in a React application.
@@ -7060,7 +7060,7 @@ const UserContext = React.createContext();
 const ThemeContext = React.createContext();
 ```
 
-**2. Memoi
+**2. Memoization**
 
 ### 284. What would the context value be for no matching provider?
 When a component calls `useContext(SomeContext)` but **no matching** `<SomeContext.Provider>` **is present higher up in the component tree**, the **default value** passed to `React.createContext(defaultValue)` is returned.
@@ -7131,7 +7131,7 @@ useEffect(() => {
 
 React uses shallow comparison of the dependencies. If any value has changed (!==), the effect will re-run.
 
-**Note:** This hook works well when dependencies are primitives or memoi
+**Note:** This hook works well when dependencies are primitives or memoized values.
 
 ### 286. When and how often does React invoke the setup and cleanup functions inside a useEffect hook?
 1. **Setup Function Execution (`useEffect`)**
@@ -7681,7 +7681,7 @@ return (
 ---
 
 ### 308. What is the useDeferredValue hook?
-The `useDeferredValue` hook is used to **defer updating a part of the UI** to keep other parts responsive. It accepts a value and returns a "deferred" version of that value that may lag behind. This is useful for optimi
+The `useDeferredValue` hook is used to **defer updating a part of the UI** to keep other parts responsive. It accepts a value and returns a "deferred" version of that value that may lag behind. This is useful for optimizing search inputs and heavy list filtering.
 
 ### 309. What is the useTransition hook and how does it differ from useDeferredValue?
 The `useTransition` hook allows you to mark certain state updates as **non-urgent transitions**, keeping the UI responsive during expensive re-renders. It returns a `isPending` flag and a `startTransition` function.
@@ -8372,7 +8372,7 @@ If you worked with React before, you might be familiar with an older API where t
 ### 327. What are the different phases of component lifecycle?
 The component lifecycle has three distinct lifecycle phases:
 
-    1. **Mounting:** The component is ready to mount in the browser DOM. This phase covers initiali
+    1. **Mounting:** The component is ready to mount in the browser DOM. This phase covers initialization of props and state.
 
 ### 328. What are the lifecycle methods of React?
 Before React 16.3
@@ -8651,7 +8651,7 @@ This method is used to render a React element into the DOM in the supplied conta
 ---
 
 ### 337. What will happen if you use setState() in constructor?
-When you use `setState()`, then apart from assigning to the object state React also re-renders the component and all its children. You would get error like this: _Can only update a mounted or mounting component._ So we need to use `this.state` to initiali
+When you use `setState()`, then apart from assigning to the object state React also re-renders the component and all its children. You would get error like this: _Can only update a mounted or mounting component._ So we need to use `this.state` to initialize state directly in the constructor.
 
 ### 338. Is it good to use setState() in componentWillMount() method?
 **⚠️ DEPRECATED:** `componentWillMount()` has been removed in React 17+. This question is only relevant for legacy React applications.
@@ -8663,10 +8663,10 @@ When you use `setState()`, then apart from assigning to the object state React a
     - Was problematic with React's concurrent rendering features
 
     **Modern Alternative:**
-    Use `componentDidMount()` for side effects and async initiali
+    Use `componentDidMount()` for side effects and async initialization.
 
 ### 339. What will happen if you use props in initial state?
-If the props on the component are changed without the component being refreshed, the new prop value will never be displayed because the constructor function will never update the current state of the component. The initiali
+If the props on the component are changed without the component being refreshed, the new prop value will never be displayed because the constructor function will never update the current state of the component. The initialization only occurs once during mounting.
 
 ### 340. How you use decorators in React?
 You can _decorate_ your _class_ components, which is the same as passing the component into a function. **Decorators** are flexible and readable way of modifying component functionality.
@@ -8748,7 +8748,7 @@ You can _decorate_ your _class_ components, which is the same as passing the com
 ```
     - Lightning-fast HMR (Hot Module Replacement)
     - Modern ESM-based development
-    - Optimi
+    - Optimization
 
 ### 342. What is the lifecycle methods order in mounting?
 The lifecycle methods are called in the following order when an instance of a component is being created and inserted into the DOM.
@@ -8816,7 +8816,7 @@ class MountingOrderTracker extends Component {
     **Best Practice:** Use functional components with hooks instead:
     - `useEffect()` for side effects
     - `useState()` for state management
-    - `useMemo()`/`useCallback()` for optimi
+    - `useMemo()`/`useCallback()` for performance optimization.
 
 ### 344. What is the purpose of getDerivedStateFromProps() lifecycle method?
 The new static `getDerivedStateFromProps()` lifecycle method is invoked after a component is instantiated as well as before it is re-rendered. It can return an object to update state, or `null` to indicate that the new props do not require any state updates.
@@ -9656,7 +9656,7 @@ There are two main ways of implementing HOCs in React.
 ---
 
 ### 374. How to use class field declarations syntax in React classes?
-React Class Components can be made much more concise using the class field declarations. You can initiali
+React Class Components can be made much more concise using class field declarations. You can initialize state and class properties directly as class fields without a constructor:
 
 ### 375. Why do you not need error boundaries for event handlers?
 Error boundaries do not catch errors inside event handlers.
@@ -10112,7 +10112,7 @@ Higher-order components come with a few caveats apart from its benefits. Below a
 ---
 
 ### 388. Is it good to use arrow functions in render methods?
-Yes, You can use. It is often the easiest way to pass parameters to callback functions. But you need to optimi
+Yes, you can use arrow functions in render methods. It is often the easiest way to pass parameters to callback functions. However, each render creates a new function instance, so if passed to memoized child components, optimize using `useCallback` or instance methods to prevent unnecessary child re-renders.
 
 ### 389. How do you say that state updates are merged?
 When you call setState() in the component, React merges the object you provide into the current state.
@@ -10268,7 +10268,7 @@ ContextType is used to consume the context object. The contextType property can 
 ```
 
     2.  **Static field**
-        You can use a static class field to initiali
+        You can use a static class field to initialize default props.
 
 ### 394. What is a consumer?
 A Consumer is a React component that subscribes to context changes. It requires a function as a child which receives current context value as argument and returns a react node. The value argument passed to the function will be equal to the value prop of the closest Provider for this context above in the tree.

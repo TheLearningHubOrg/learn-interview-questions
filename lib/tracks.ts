@@ -210,9 +210,10 @@ export function extractOneLineSummary(content: string, title?: string): string {
   if (!content) return '';
 
   // 1. Explicit **In Simple Words:** block
-  const simpleMatch = content.match(/\*{0,2}In Simple Words:?\*{0,2}\s*([\s\S]*?)(?=\n\s*---|####|###|\n\s*```|\n\s*\||$)/i);
+  const simpleMatch = content.match(/\*{0,2}In Simple Words:?\*{0,2}\s*([\s\S]*?)(?=\n\s*---|(?:\n\s*###\s+\d+)|\n\s*```|\n\s*\||$)/i);
   if (simpleMatch && simpleMatch[1]) {
-    const rawBlock = simpleMatch[1].trim();
+    // Strip internal subheaders like #### Top Causes:
+    const rawBlock = simpleMatch[1].replace(/####[^\n]*\n/g, '').trim();
     if (/^\s*[-*]\s|\n\s*[-*]\s|^\s*\d+\.\s|\n\s*\d+\.\s/m.test(rawBlock)) {
       const bulletSummary = formatBulletsToInline(rawBlock);
       if (bulletSummary && bulletSummary.length >= 15) {
@@ -258,7 +259,8 @@ export function extractOneLineSummary(content: string, title?: string): string {
       trimmed.startsWith('<') ||
       trimmed.startsWith('![') ||
       trimmed.startsWith('+--') ||
-      trimmed.startsWith('┌--')
+      trimmed.startsWith('┌--') ||
+      /^\*{0,2}In Simple Words:?\*{0,2}$/i.test(trimmed)
     ) {
       if (collectedLines.length > 0) break;
       continue;

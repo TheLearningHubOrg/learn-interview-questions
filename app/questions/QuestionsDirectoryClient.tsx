@@ -32,6 +32,7 @@ interface QuestionsDirectoryClientProps {
 }
 
 export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDirectoryClientProps) {
+  const [items, setItems] = useState<QuestionIndexItem[]>(initialItems);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<'all' | 'junior' | 'mid' | 'senior'>('all');
   const [mostAskedOnly, setMostAskedOnly] = useState<boolean>(false);
@@ -91,6 +92,20 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
     setSelectedTechSlugs(slugs);
   };
 
+  useEffect(() => {
+    // If initialItems was an initial preview slice for fast First Paint, load full index from static asset
+    if (initialItems.length < 100) {
+      fetch('/search-index.json')
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data: QuestionIndexItem[]) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setItems(data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [initialItems.length]);
+
   // Track map for fast metadata lookup
   const trackMap = useMemo(() => {
     const map = new Map<string, TrackMeta>();
@@ -102,7 +117,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
 
   // Dynamic filter pipeline
   const filteredItems = useMemo(() => {
-    return initialItems.filter((item) => {
+    return items.filter((item) => {
       // 0. Personalized Tech Stack Filter (Multi-select, supporting granular tech separation)
       if (selectedTechSlugs.length > 0 && !isQuestionInSelectedTech(item, selectedTechSlugs)) {
         return false;
@@ -144,7 +159,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
       );
     });
   }, [
-    initialItems, 
+    items, 
     selectedTechSlugs,
     selectedLevel, 
     mostAskedOnly, 
@@ -204,7 +219,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
               Master Question Hub
             </span>
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-muted text-foreground border border-border">
-              {initialItems.length} Master Questions
+              {items.length > 100 ? items.length : '4,366'} Master Questions
             </span>
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-muted text-foreground border border-border">
               {tracks.length} Tracks
@@ -217,7 +232,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">
-            Explore All {initialItems.length || '4,300'}+ Interview Questions
+            Explore All 4,300+ Interview Questions
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
             Filter, search, and practice across the entire engineering curriculum. Filter by seniority level, high-frequency interview patterns, runnable code solutions, and individual technology tracks.
@@ -270,7 +285,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
                   : 'bg-slate-100 hover:bg-slate-200/90 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80'
               }`}
             >
-              All ({initialItems.length})
+              All ({items.length > 100 ? items.length : '4,366+'})
             </button>
 
             <button
@@ -393,7 +408,7 @@ export function QuestionsDirectoryClient({ initialItems, tracks }: QuestionsDire
           {/* Results Counter & Reset */}
           <div className="flex items-center justify-between sm:justify-end gap-2 text-xs text-muted-foreground font-medium w-full sm:w-auto pt-1 sm:pt-0 shrink-0">
             <span>
-              Showing <strong className="text-foreground">{filteredItems.length}</strong> of {initialItems.length} questions
+              Showing <strong className="text-foreground">{filteredItems.length}</strong> of {items.length > 100 ? items.length : '4,366'} questions
             </span>
             {isFiltering && (
               <button

@@ -35,6 +35,7 @@ interface CheatsheetClientProps {
 type StudyFocus = 'all' | 'most-asked' | 'bookmarked';
 
 export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps) {
+  const [items, setItems] = useState<QuestionIndexItem[]>(initialItems);
   const [searchQuery, setSearchQuery] = useState('');
   const [studyFocus, setStudyFocus] = useState<StudyFocus>('most-asked');
   const [selectedLevel, setSelectedLevel] = useState<'all' | 'junior' | 'mid' | 'senior'>('all');
@@ -94,9 +95,23 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
     return map;
   }, [tracks]);
 
+  useEffect(() => {
+    // If initialItems was an initial preview slice for fast First Paint, load full index from static asset
+    if (initialItems.length < 100) {
+      fetch('/search-index.json')
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data: QuestionIndexItem[]) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setItems(data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [initialItems.length]);
+
   // Filter pipeline
   const filteredItems = useMemo(() => {
-    return initialItems.filter((item) => {
+    return items.filter((item) => {
       const key = `${item.trackSlug}:${item.questionNumber}`;
 
       // Personalized Tech Stack Filter (Multi-select, supporting granular tech separation)
@@ -130,7 +145,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
       );
     });
   }, [
-    initialItems,
+    items,
     selectedTechSlugs,
     studyFocus,
     selectedLevel,

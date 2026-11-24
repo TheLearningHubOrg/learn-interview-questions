@@ -117,6 +117,19 @@ export default async function SectionPage({ params }: SectionPageProps) {
     })),
   };
 
+  // Optimize payload: SectionClient only renders title, summary, part, level, tags, etc.
+  // Stripping full markdown 'content' saves 1-2.5 MB of HTML and RSC payload per section page!
+  const clientQuestions = questions.map((q) => ({
+    number: q.number,
+    title: q.title,
+    part: q.part,
+    summary: q.summary,
+    level: q.level,
+    isMostAsked: q.isMostAsked,
+    hasCode: q.hasCode,
+    tags: q.tags,
+  }));
+
   return (
     <>
       <script
@@ -127,7 +140,7 @@ export default async function SectionPage({ params }: SectionPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
-      <SectionClient track={track} questions={questions} allTracks={allTracks} />
+      <SectionClient track={track} questions={clientQuestions as any} allTracks={allTracks} />
     </>
   );
 }

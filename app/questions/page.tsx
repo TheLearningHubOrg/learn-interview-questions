@@ -14,11 +14,20 @@ export const metadata: Metadata = {
     url: 'https://learn-interview-questions.vercel.app/questions',
     type: 'website',
     siteName: 'InterviewHub PRO',
+    images: [
+      {
+        url: 'https://learn-interview-questions.vercel.app/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'InterviewHub PRO Question Explorer',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Explore All 4,300+ Master Interview Questions (64 Separated Tracks)',
     description: 'Search, filter, and practice across 4,300+ technical interview questions across 64 specialized tracks.',
+    images: ['https://learn-interview-questions.vercel.app/opengraph-image'],
   },
 };
 

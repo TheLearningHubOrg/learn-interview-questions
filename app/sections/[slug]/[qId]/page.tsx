@@ -59,11 +59,20 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
       url: pageUrl,
       type: 'article',
       siteName: 'InterviewHub PRO',
+      images: [
+        {
+          url: 'https://learn-interview-questions.vercel.app/opengraph-image',
+          width: 1200,
+          height: 630,
+          alt: `${title} - InterviewHub PRO`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: ['https://learn-interview-questions.vercel.app/opengraph-image'],
     },
   };
 }
@@ -88,10 +97,20 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
       name: data.question.title,
       text: data.question.title,
       answerCount: 1,
+      upvoteCount: 1,
+      author: {
+        '@type': 'Organization',
+        name: 'The Learning Hub Org',
+      },
       acceptedAnswer: {
         '@type': 'Answer',
         text: data.question.summary || (data.question.content.slice(0, 300).replace(/[#*`]/g, '') + '...'),
         url: `https://learn-interview-questions.vercel.app/sections/${params.slug}/${qNum}`,
+        upvoteCount: 1,
+        author: {
+          '@type': 'Organization',
+          name: 'The Learning Hub Org',
+        },
       },
     },
   };

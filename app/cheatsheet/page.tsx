@@ -14,11 +14,20 @@ export const metadata: Metadata = {
     url: 'https://learn-interview-questions.vercel.app/cheatsheet',
     type: 'website',
     siteName: 'InterviewHub PRO',
+    images: [
+      {
+        url: 'https://learn-interview-questions.vercel.app/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'InterviewHub PRO Cheatsheet',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Last-Minute Interview Revision Cheatsheet & Printable PDF',
     description: 'Instant 1-line technical interview takeaways across JavaScript, React, System Design, Angular, Databases, and AI Engineering.',
+    images: ['https://learn-interview-questions.vercel.app/opengraph-image'],
   },
 };
 

@@ -245,6 +245,9 @@ Moving heavy JSON parsing, cryptography, audio processing, or search filtering o
 
 ### 19. How do Resource Hints optimize the Critical Rendering Path?
 **In Simple Words:**
+Resource hints (`preconnect`, `dns-prefetch`, `preload`) inform browser networking engines of critical domain handshakes and asset downloads before standard HTML parsing discovers them.
+
+#### Code Example
 ```html
 <!-- Early DNS + TLS handshake to payment gateway / CDN -->
 <link rel="preconnect" href="https://assets.store.com" crossorigin />
@@ -292,6 +295,9 @@ Instructs the rendering engine to skip layout and painting for elements that are
 
 ### 22. Measuring and Reporting RUM Web Vitals with the `web-vitals` Library.
 **In Simple Words:**
+The official Google `web-vitals` library hooks into PerformanceObserver APIs to calculate Core Web Vitals (LCP, INP, CLS) in production and dispatch telemetry to analytics backends.
+
+#### Code Example
 ```javascript
 import { onLCP, onINP, onCLS } from 'web-vitals';
 

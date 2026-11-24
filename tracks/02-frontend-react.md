@@ -62,7 +62,11 @@ But there was a different problem with XHP in which dynamic web applications req
 - React 16.3 introduced the Context API for easier state management
 
 **2019-Present: Modern React**
-- React Hooks were introduced in React 16.8 (February 2019), revolutioni
+- React Hooks were introduced in React 16.8 (February 2019), revolutionizing component architecture by allowing function components to use state and side effects.
+
+</details>
+
+---
 
 ### 3. What are the major features of React?
 React offers a powerful set of features that have made it one of the most popular JavaScript libraries for building user interfaces:
@@ -1053,9 +1057,28 @@ return (
 }
 ```
 
-<details><summary><b>See Class</b></summary>
-<p>
+<details><summary><b>See Class Component</b></summary>
+
 The equivalent class stateful component with a state that gets initialized in the constructor:
+
+```jsx
+import React, { Component } from 'react';
+
+class StatefulCounter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { count: 0 };
+  }
+
+  render() {
+    return <span>Counter: {this.state.count}</span>;
+  }
+}
+```
+
+</details>
+
+---
 
 ### 36. How to apply validation on props in React?
 When the application is running in _development mode_, React will automatically check all props that we set on components to make sure they have _correct type_. If the type is incorrect, React will generate warning messages in the console. It's disabled in _production mode_ due to performance impact. The mandatory props are defined with `isRequired`.
@@ -6204,6 +6227,14 @@ The preceding code enables you to update nested objects with a conceise mutation
 ---
 
 ### 257. What are the benefits of preventing the direct state mutations?
+
+Preventing direct state mutations is a core principle in React because React relies on **shallow reference equality checks** (`prevProps !== nextProps` or `prevState !== nextState`) to determine whether a component should re-render.
+
+#### Core Benefits
+1. **Predictable Re-renders**: Mutating state directly keeps the same memory reference, causing React's shallow comparison to assume nothing changed and skip rendering.
+2. **Time-Travel Debugging & Undo/Redo**: Immutability preserves past state snapshots, allowing Redux DevTools and React DevTools to inspect state history.
+3. **Pure Components & Memoization**: `React.memo` and `useMemo` depend on reference changes; immutability guarantees memoized components update when data updates.
+
 #### Practical Code Example
 
 ```javascript

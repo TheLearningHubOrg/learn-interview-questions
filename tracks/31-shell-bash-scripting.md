@@ -346,6 +346,9 @@ temp_dir=$(mktemp -d /tmp/build.XXXXXX)
 
 ### 30. How do you implement Exponential Backoff and Retries in Bash?
 **In Simple Words:**
+Exponential backoff in Bash retries failing operations in a loop, doubling the sleep interval between attempts to avoid overwhelming downstream services.
+
+#### Code Example
 ```bash
 retry_command() {
     local max_attempts=5

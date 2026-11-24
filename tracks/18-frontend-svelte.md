@@ -580,6 +580,9 @@ Edge CDNs serve cached pages instantly while revalidating in the background.
 
 ### 32. Testing Svelte 5 Components with Vitest and `@testing-library/svelte`.
 **In Simple Words:**
+Testing Svelte 5 components with Vitest and `@testing-library/svelte` renders runes and components into a simulated browser DOM to query accessibility roles, fire events, and assert state updates.
+
+#### Code Example
 ```typescript
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import Counter from './Counter.svelte';

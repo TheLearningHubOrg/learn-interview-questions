@@ -464,6 +464,9 @@ Vue 3 separates the core runtime from the browser DOM:
 
 ### 32. Testing Vue 3 Components with Vitest and `@vue/test-utils`.
 **In Simple Words:**
+Testing Vue 3 components with Vitest and `@vue/test-utils` mounts the component in a virtual DOM, provides mock props, dispatches user interaction events, and asserts reactive DOM mutations.
+
+#### Code Example
 ```typescript
 import { mount } from '@vue/test-utils';
 import Counter from './Counter.vue';

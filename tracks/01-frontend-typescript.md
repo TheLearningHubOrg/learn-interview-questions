@@ -656,6 +656,9 @@ emitter.emit("login", { userId: "123", timestamp: Date.now() }); // Valid
 
 ### 37. How do you implement Deep Tuple Reverse using Recursive Conditional Types?
 **In Simple Words:**
+Deep tuple reversal uses recursive conditional types with variadic tuple unpacking and the `infer` keyword to peel off the first element and append it to the recursively reversed tail.
+
+#### Code Example
 ```typescript
 type Reverse<T extends readonly any[]> = 
   T extends readonly [infer First, ...infer Rest]

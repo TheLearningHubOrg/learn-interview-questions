@@ -87,6 +87,7 @@ Wide (Shuffle Required): [Part 1] ───┬───► [Part 1']
 
 ### 9. How do you write a basic PySpark DataFrame application?
 **In Simple Words:**
+A standard PySpark application initializes a `SparkSession`, ingests structured data from distributed storage (such as S3, GCS, or HDFS), chains lazy transformations (filtering, grouping, and aggregations), and writes the computed output back to disk via an action:
 ```python
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, avg

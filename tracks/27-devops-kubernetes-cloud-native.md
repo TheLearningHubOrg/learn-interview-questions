@@ -79,6 +79,9 @@ A **Namespace** is a logical partition or virtual cluster within a single physic
 
 ### 5. Essential `kubectl` Commands for Daily Operations.
 **In Simple Words:**
+Essential daily `kubectl` commands allow engineers to inspect cluster topology, tail container logs, troubleshoot pod scheduling events, and apply declarative YAML configurations.
+
+#### Code Example
 ```bash
 # 1. Listing resources with wide output (IPs, Nodes)
 kubectl get pods -n production -o wide

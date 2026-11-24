@@ -7334,6 +7334,8 @@ new User('Alex').sayHi(); // 'Hi Alex'
 
 ### 356. Mixin Example using Object composition
 
+Mixins in JavaScript allow objects to borrow methods from multiple source objects without using rigid class inheritance hierarchies. By utilizing `Object.assign()` or object composition, behaviors can be mixed into target prototypes dynamically.
+
 ```javascript
   // Define a mixin
   const canEat = {

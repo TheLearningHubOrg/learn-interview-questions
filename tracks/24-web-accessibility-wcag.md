@@ -327,6 +327,9 @@ Toggling `aria-expanded="true"` immediately informs screen reader users that con
 
 ### 23. Automating Accessibility Testing in CI/CD with `axe-core` and Playwright.
 **In Simple Words:**
+Automating accessibility in CI/CD combines Playwright with `@axe-core/playwright` to audit live DOM pages against WCAG 2.1 AA rules and fail automated pull requests on violations.
+
+#### Code Example
 ```typescript
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';

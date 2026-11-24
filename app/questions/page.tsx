@@ -5,10 +5,20 @@ import { QuestionsDirectoryClient } from './QuestionsDirectoryClient';
 export const metadata: Metadata = {
   title: 'All Questions Explorer — 4,300+ Master Technical Interview Bank Across 64 Tracks',
   description: 'Search, filter, and practice across all 4,300+ technical interview questions. Filter by Track, Seniority Level (Junior, Mid, Senior), Most Asked Frequency, and Code Implementations.',
+  alternates: {
+    canonical: 'https://learn-interview-questions.vercel.app/questions',
+  },
   openGraph: {
     title: 'Explore All 4,300+ Master Interview Questions (64 Separated Tracks)',
     description: 'Filter across 64 Individual Tracks: React, Next.js, Angular, Vue, Svelte, Astro, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Python, Node.js, PostgreSQL, MySQL, SQL, MongoDB, Redis, Docker, Kubernetes, Terraform, AWS, GCP, Azure, Snowflake, BigQuery, Swift, iOS, Kotlin, Android, SOLID Principles, Design Patterns, and more.',
     url: 'https://learn-interview-questions.vercel.app/questions',
+    type: 'website',
+    siteName: 'InterviewHub PRO',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Explore All 4,300+ Master Interview Questions (64 Separated Tracks)',
+    description: 'Search, filter, and practice across 4,300+ technical interview questions across 64 specialized tracks.',
   },
 };
 

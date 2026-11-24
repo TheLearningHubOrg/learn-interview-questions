@@ -75,5 +75,50 @@ export default async function SectionPage({ params }: SectionPageProps) {
   const questions = await getTrackQuestions(track.slug);
   const allTracks = await getAllTracks();
 
-  return <SectionClient track={track} questions={questions} allTracks={allTracks} />;
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://learn-interview-questions.vercel.app',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: track.shortTitle,
+        item: `https://learn-interview-questions.vercel.app/sections/${track.slug}`,
+      },
+    ],
+  };
+
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: track.title,
+    description: track.description,
+    numberOfItems: questions.length,
+    itemListElement: questions.slice(0, 30).map((q, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: q.title,
+      url: `https://learn-interview-questions.vercel.app/sections/${track.slug}/${q.number}`,
+    })),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+      <SectionClient track={track} questions={questions} allTracks={allTracks} />
+    </>
+  );
 }

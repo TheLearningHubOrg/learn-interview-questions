@@ -193,9 +193,9 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
       <div className="hidden print:block mb-3 pb-2 border-b-2 border-slate-900 text-black">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-black tracking-tight text-black">
+            <div role="heading" aria-level={2} className="text-xl font-black tracking-tight text-black">
               InterviewHub PRO — Rapid Technical Revision Cheatsheet
-            </h1>
+            </div>
             <p className="text-[10px] text-slate-700 mt-0.5">
               {selectedTechSlugs.length > 0
                 ? `Personalized Stack (${selectedTechSlugs.map(s => trackMap.get(s)?.shortTitle || s).join(', ')}) • https://learn-interview-questions.vercel.app`

@@ -79,7 +79,7 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
     notFound();
   }
 
-  // Schema.org QAPage Structured Data for Google Rich Snippets
+  // Schema.org QAPage & BreadcrumbList Structured Data for Google Rich Snippets
   const qaJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'QAPage',
@@ -90,10 +90,35 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
       answerCount: 1,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: data.question.content.slice(0, 250).replace(/[#*`]/g, '') + '...',
+        text: data.question.summary || (data.question.content.slice(0, 300).replace(/[#*`]/g, '') + '...'),
         url: `https://learn-interview-questions.vercel.app/sections/${params.slug}/${qNum}`,
       },
     },
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://learn-interview-questions.vercel.app',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: data.track.shortTitle,
+        item: `https://learn-interview-questions.vercel.app/sections/${params.slug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: `Q${data.question.number}: ${data.question.title}`,
+        item: `https://learn-interview-questions.vercel.app/sections/${params.slug}/${qNum}`,
+      },
+    ],
   };
 
   return (
@@ -101,6 +126,10 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(qaJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <QuestionViewer data={data} />
     </>

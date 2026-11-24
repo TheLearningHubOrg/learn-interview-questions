@@ -32,4 +32,7 @@ build/
 *.tsbuildinfo
 next-env.d.ts
 
+# Generated assets
+public/search-index.json
+
 .vercel

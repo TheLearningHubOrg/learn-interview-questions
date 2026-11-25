@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { withBasePath } from '@/lib/site-config';
+import { SITE_URL, withBasePath } from '@/lib/site-config';
 import { 
   Printer, 
   Copy, 
@@ -214,8 +214,8 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
             </div>
             <p className="text-[10px] text-slate-700 mt-0.5">
               {selectedTechSlugs.length > 0
-                ? `Personalized Stack (${selectedTechSlugs.map(s => trackMap.get(s)?.shortTitle || s).join(', ')}) • https://learn-interview-questions.vercel.app`
-                : 'https://learn-interview-questions.vercel.app/cheatsheet • 4,300+ Technical Interview Bank'}
+                ? `Personalized Stack (${selectedTechSlugs.map(s => trackMap.get(s)?.shortTitle || s).join(', ')}) • ${SITE_URL}`
+                : `${SITE_URL}/cheatsheet • 4,300+ Technical Interview Bank`}
             </p>
           </div>
           <div className="text-right text-[10px] text-slate-700 font-mono">

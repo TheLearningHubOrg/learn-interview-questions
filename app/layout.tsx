@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ClientShell } from '@/components/ClientShell';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { IS_GITHUB_PAGES, SITE_URL, withBasePath } from '@/lib/site-config';
+import { SITE_URL, withBasePath } from '@/lib/site-config';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -128,12 +126,6 @@ export default function RootLayout({
       </head>
       <body className="bg-background text-foreground min-h-screen">
         <ClientShell>{children}</ClientShell>
-        {!IS_GITHUB_PAGES && (
-          <>
-            <Analytics />
-            <SpeedInsights />
-          </>
-        )}
       </body>
     </html>
   );

@@ -1,3 +1,5 @@
+import { SITE_URL } from '@/lib/site-config';
+
 export interface NoteItem {
   trackSlug: string;
   trackTitle: string;
@@ -107,7 +109,7 @@ export function exportNotesAsMarkdown(): string {
   for (const [trackTitle, items] of Object.entries(byTrack)) {
     md += `## 📚 ${trackTitle} (${items.length} notes)\n\n`;
     for (const item of items) {
-      const url = `https://learn-interview-questions.vercel.app/sections/${item.trackSlug}/${item.questionNumber}`;
+      const url = `${SITE_URL}/sections/${item.trackSlug}/${item.questionNumber}`;
       const lastEdited = new Date(item.updatedAt).toLocaleDateString('en-US');
 
       md += `### [Q${item.questionNumber}: ${item.questionTitle}](${url})\n`;

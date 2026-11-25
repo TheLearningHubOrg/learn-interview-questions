@@ -5,11 +5,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![The Learning Hub](https://img.shields.io/badge/Org-TheLearningHubOrg-orange.svg)](https://github.com/TheLearningHubOrg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TheLearningHubOrg/learn-interview-questions/pulls)
-[![Live App](https://img.shields.io/badge/Live_App-learn--interview--questions.vercel.app-000000.svg?logo=vercel)](https://learn-interview-questions.vercel.app)
+[![Live App](https://img.shields.io/badge/Live_App-GitHub_Pages-222222.svg?logo=github)](https://thelearninghuborg.github.io/learn-interview-questions/)
 [![Curriculum: 64 Tracks](https://img.shields.io/badge/Tracks-64%20Specialized%20Tracks-purple.svg)](#-master-navigation--tracks)
 [![Questions: 4300+](https://img.shields.io/badge/Questions-3600%2B%20Master%20Bank-success.svg)](#-master-navigation--tracks)
 
-🌐 **Interactive Web Portal**: [https://learn-interview-questions.vercel.app](https://learn-interview-questions.vercel.app)
+🌐 **Interactive Web Portal**: [https://thelearninghuborg.github.io/learn-interview-questions/](https://thelearninghuborg.github.io/learn-interview-questions/)
 
 ---
 

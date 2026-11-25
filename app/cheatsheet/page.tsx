@@ -1,22 +1,23 @@
 import type { Metadata } from 'next';
 import { getAllTracks, getGlobalSearchIndex } from '@/lib/tracks';
+import { SITE_URL } from '@/lib/site-config';
 import { CheatsheetClient } from './CheatsheetClient';
 
 export const metadata: Metadata = {
   title: 'Last-Minute Interview Revision Cheatsheet — 4,300+ 1-Line Summaries',
   description: 'Instant 1-line technical interview takeaways for rapid pre-interview recall. Filter by Track, Most Asked, or Bookmarks, and export a clean printable PDF.',
   alternates: {
-    canonical: 'https://learn-interview-questions.vercel.app/cheatsheet',
+    canonical: `${SITE_URL}/cheatsheet`,
   },
   openGraph: {
     title: 'Last-Minute Interview Revision Cheatsheet & Printable PDF',
     description: 'Instant 1-line technical interview takeaways across JavaScript, React, System Design, Angular, Databases, and AI Engineering.',
-    url: 'https://learn-interview-questions.vercel.app/cheatsheet',
+    url: `${SITE_URL}/cheatsheet`,
     type: 'website',
     siteName: 'InterviewHub PRO',
     images: [
       {
-        url: 'https://learn-interview-questions.vercel.app/opengraph-image',
+        url: `${SITE_URL}/opengraph-image.png`,
         width: 1200,
         height: 630,
         alt: 'InterviewHub PRO Cheatsheet',
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Last-Minute Interview Revision Cheatsheet & Printable PDF',
     description: 'Instant 1-line technical interview takeaways across JavaScript, React, System Design, Angular, Databases, and AI Engineering.',
-    images: ['https://learn-interview-questions.vercel.app/opengraph-image'],
+    images: [`${SITE_URL}/opengraph-image.png`],
   },
 };
 

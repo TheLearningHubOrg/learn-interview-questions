@@ -298,6 +298,7 @@ export function StudyPlanModal({ plan, isOpen, onClose, initialDayNumber }: Stud
 
                       <Link
                         href={`/sections/${q.trackSlug}/${q.questionNumber}?sprint=${plan.id}`}
+                        prefetch={false}
                         onClick={() => {
                           setActiveStudyPlanId(plan.id);
                           onClose();
@@ -312,6 +313,7 @@ export function StudyPlanModal({ plan, isOpen, onClose, initialDayNumber }: Stud
                   {/* Open Question Link */}
                   <Link
                     href={`/sections/${q.trackSlug}/${q.questionNumber}?sprint=${plan.id}`}
+                    prefetch={false}
                     onClick={() => {
                       setActiveStudyPlanId(plan.id);
                       onClose();

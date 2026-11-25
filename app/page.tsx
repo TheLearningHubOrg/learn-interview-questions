@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { GithubIcon } from '@/components/GithubIcon';
 import { getAllTracks } from '@/lib/tracks';
+import { SITE_URL } from '@/lib/site-config';
 import { TrackCard } from '@/components/TrackCard';
 import { ContinueReadingBanner } from '@/components/ContinueReadingBanner';
 import { StudyProgressCard } from '@/components/StudyProgressCard';
@@ -30,7 +31,7 @@ export default async function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
     name: 'InterviewHub - The Learning Hub Org',
-    url: 'https://learn-interview-questions.vercel.app',
+    url: SITE_URL,
     description: 'Comprehensive, production-tested interview question bank with 4,300+ questions across 64 specialized, fully separated tracks covering React, Next.js, Angular, Vue, Svelte, Astro, JavaScript, TypeScript, HTML, CSS, Web Vitals, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Python, Node.js, PostgreSQL, MySQL, Relational SQL, MongoDB, Redis, DynamoDB, AWS, GCP, Azure, Docker, Kubernetes, Terraform, CI/CD, Linux OS, Bash Scripting, RabbitMQ, Kafka, Elasticsearch, Vector Databases, Spark, Snowflake, BigQuery, React Native, Flutter, Swift, iOS, Kotlin, Android, Playwright Testing, SRE Observability, Networking, SOLID Principles, Design Patterns, DDD, System Design, OWASP Security, AI/LLMs, and DSA.',
     knowsAbout: [
       'JavaScript',
@@ -100,12 +101,12 @@ export default async function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'InterviewHub PRO',
-    url: 'https://learn-interview-questions.vercel.app',
+    url: SITE_URL,
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://learn-interview-questions.vercel.app/questions?q={search_term_string}',
+        urlTemplate: `${SITE_URL}/questions?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -151,6 +152,7 @@ export default async function HomePage() {
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16">
           <Link
             href="/#tracks"
+            prefetch={false}
             className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/25 transition-all active:scale-95"
           >
             <BookOpen className="h-4 w-4" />
@@ -160,6 +162,7 @@ export default async function HomePage() {
 
           <Link
             href="/questions"
+            prefetch={false}
             className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:border-purple-500 transition-all shadow-sm active:scale-95"
           >
             <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
@@ -168,6 +171,7 @@ export default async function HomePage() {
 
           <Link
             href="/cheatsheet"
+            prefetch={false}
             className="flex items-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30 transition-all shadow-sm active:scale-95"
             title="Rapid 1-Line Revision Cheatsheet & Printable PDF"
           >

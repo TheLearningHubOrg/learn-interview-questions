@@ -31,6 +31,7 @@ import {
   Tag
 } from 'lucide-react';
 import { QuestionViewData } from '@/lib/tracks-meta';
+import { withBasePath } from '@/lib/site-config';
 import { classifyQuestion } from '@/lib/question-classifier';
 import { CodeBlock } from '@/components/CodeBlock';
 import { MermaidBlock } from '@/components/MermaidBlock';
@@ -96,9 +97,11 @@ const renderMarkdownImage = ({ src, alt, ...props }: any) => {
   if (!src) return null;
   let resolvedSrc = src;
   if (resolvedSrc.startsWith('images/')) {
-    resolvedSrc = '/' + resolvedSrc;
+    resolvedSrc = withBasePath('/' + resolvedSrc);
   } else if (resolvedSrc.startsWith('./images/')) {
-    resolvedSrc = resolvedSrc.replace(/^\.\//, '/');
+    resolvedSrc = withBasePath(resolvedSrc.replace(/^\.\//, '/'));
+  } else if (resolvedSrc.startsWith('/images/')) {
+    resolvedSrc = withBasePath(resolvedSrc);
   }
   return (
     <figure className="my-6 flex flex-col items-center">
@@ -391,6 +394,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href={`/sections/${track.slug}`}
+              prefetch={false}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-purple-400 text-foreground transition-all group font-semibold text-xs shadow-sm dark:shadow-none shrink-0"
             >
               <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
@@ -581,6 +585,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             {sprintPlanId && (
               <Link
                 href={`/sections/${track.slug}/${question.number}`}
+                prefetch={false}
                 className="px-2.5 py-1.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all"
                 title="Exit sprint mode and browse track sequentially"
               >
@@ -948,6 +953,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             {sprintNav.prevQuestion && (
               <Link
                 href={`/sections/${sprintNav.prevQuestion.trackSlug}/${sprintNav.prevQuestion.questionNumber}?sprint=${sprintNav.plan.id}`}
+                prefetch={false}
                 className="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-card border border-border hover:bg-card-hover text-muted-foreground hover:text-foreground transition-all shrink-0"
               >
                 ← Prev in Sprint
@@ -957,6 +963,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
             {sprintNav.nextQuestion ? (
               <Link
                 href={`/sections/${sprintNav.nextQuestion.trackSlug}/${sprintNav.nextQuestion.questionNumber}?sprint=${sprintNav.plan.id}`}
+                prefetch={false}
                 className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-md shadow-amber-500/25 transition-all shrink-0 active:scale-95 cursor-pointer"
               >
                 <span>{sprintNav.isLastInDay ? `Start Day ${sprintNav.nextQuestion.day} →` : 'Next Sprint Question →'}</span>
@@ -983,6 +990,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         {prevQuestion ? (
           <Link
             href={`/sections/${track.slug}/${prevQuestion.number}`}
+            prefetch={false}
             className="p-4 sm:p-5 rounded-xl bg-card border border-border hover:border-purple-400 hover:bg-card-hover transition-all group flex items-start gap-3.5 shadow-sm dark:shadow-none"
           >
             <div className="p-2 rounded-lg bg-muted border border-border group-hover:border-purple-300 dark:group-hover:border-purple-500/30 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5">
@@ -1006,6 +1014,7 @@ export function QuestionViewer({ data }: QuestionViewerProps) {
         {nextQuestion ? (
           <Link
             href={`/sections/${track.slug}/${nextQuestion.number}`}
+            prefetch={false}
             className="p-4 sm:p-5 rounded-xl bg-card border border-border hover:border-purple-400 hover:bg-card-hover transition-all group flex items-start justify-between gap-3.5 text-right shadow-sm dark:shadow-none"
           >
             <div className="overflow-hidden flex-1 min-w-0">

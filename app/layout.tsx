@@ -3,9 +3,10 @@ import './globals.css';
 import { ClientShell } from '@/components/ClientShell';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { IS_GITHUB_PAGES, SITE_URL, withBasePath } from '@/lib/site-config';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://learn-interview-questions.vercel.app'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (4,300+ Questions across 64 Separated Tracks)',
     template: '%s | InterviewHub PRO',
@@ -71,23 +72,32 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   icons: {
-    icon: '/icon',
-    shortcut: '/icon',
-    apple: '/icon',
+    icon: withBasePath('/icon.svg'),
+    shortcut: withBasePath('/icon.svg'),
+    apple: withBasePath('/icon.svg'),
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://learn-interview-questions.vercel.app',
+    url: SITE_URL,
     siteName: 'InterviewHub PRO - The Learning Hub Org',
     title: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank (4,300+ Qs across 64 Tracks)',
     description: '4,300+ production-tested questions with 100% code coverage across 64 tracks: TypeScript, Angular, React, Vue, Nuxt, Svelte, Astro, Go, Rust, Java, Spring Boot, C#, ASP.NET Core, PHP, Laravel, Swift, iOS, Kotlin, Android, Mobile, Testing/SRE, Networking, Linux, SOLID, Design Patterns, Snowflake, BigQuery, dbt, Cloud, and more.',
+    images: [
+      {
+        url: `${SITE_URL}/opengraph-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'InterviewHub PRO - 4,300+ Master Technical Interview Questions',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Master Full-Stack, Cloud, System Design, AI, Mobile & SRE Interview Bank',
     description: '4,300+ production-tested engineering interview questions across 64 tracks with 100% code examples.',
     creator: '@TheLearningHub',
+    images: [`${SITE_URL}/opengraph-image.png`],
   },
 };
 
@@ -118,8 +128,12 @@ export default function RootLayout({
       </head>
       <body className="bg-background text-foreground min-h-screen">
         <ClientShell>{children}</ClientShell>
-        <Analytics />
-        <SpeedInsights />
+        {!IS_GITHUB_PAGES && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   );

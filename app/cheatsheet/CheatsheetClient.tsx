@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { withBasePath } from '@/lib/site-config';
 import { 
   Printer, 
   Copy, 
@@ -98,7 +99,7 @@ export function CheatsheetClient({ initialItems, tracks }: CheatsheetClientProps
   useEffect(() => {
     // If initialItems was an initial preview slice for fast First Paint, load full index from static asset
     if (initialItems.length < 100) {
-      fetch('/search-index.json')
+      fetch(withBasePath('/search-index.json'))
         .then((res) => (res.ok ? res.json() : []))
         .then((data: QuestionIndexItem[]) => {
           if (Array.isArray(data) && data.length > 0) {

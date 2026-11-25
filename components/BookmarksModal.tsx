@@ -155,6 +155,7 @@ export function BookmarksModal({ isOpen, onClose }: BookmarksModalProps) {
                     >
                       <Link
                         href={`/sections/${b.trackSlug}/${b.questionNumber}`}
+                        prefetch={false}
                         onClick={onClose}
                         className="flex items-center gap-3 min-w-0 flex-1"
                       >
@@ -174,6 +175,7 @@ export function BookmarksModal({ isOpen, onClose }: BookmarksModalProps) {
                       <div className="flex items-center gap-1 shrink-0">
                         <Link
                           href={`/sections/${b.trackSlug}/${b.questionNumber}`}
+                          prefetch={false}
                           onClick={onClose}
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
                           title="Open question"

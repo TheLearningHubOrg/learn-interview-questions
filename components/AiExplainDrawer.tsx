@@ -20,7 +20,9 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-export type AiExplainMode = 'simple' | 'key_points' | 'followups' | 'custom';
+import { generateAiExplanation, AiExplainMode } from '@/lib/ai-explain';
+
+export type { AiExplainMode };
 
 interface AiExplainDrawerProps {
   questionTitle: string;
@@ -125,35 +127,29 @@ export function AiExplainDrawer({
     setNeedsApiKey(false);
 
     try {
-      const res = await fetch('/api/ai-explain', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          questionTitle,
-          questionContent,
-          mode: modeToUse,
-          customPrompt: promptText,
-          userApiKey: keyToUse,
-        }),
+      const result = await generateAiExplanation({
+        questionTitle,
+        questionContent,
+        mode: modeToUse,
+        customPrompt: promptText,
+        userApiKey: keyToUse,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.error === 'MISSING_API_KEY') {
+      if (!result.ok) {
+        if (result.needsApiKey) {
           setNeedsApiKey(true);
           setLoading(false);
           return;
         }
-        throw new Error(data.message || 'Failed to generate explanation');
+        throw new Error(result.message || 'Failed to generate explanation');
       }
 
       setCache((prev) => ({
         ...prev,
-        [modeToUse === 'custom' ? `custom_${Date.now()}` : modeToUse]: data.text,
+        [modeToUse === 'custom' ? `custom_${Date.now()}` : modeToUse]: result.text,
       }));
       if (modeToUse === 'custom') {
-        setCache((prev) => ({ ...prev, active_custom: data.text }));
+        setCache((prev) => ({ ...prev, active_custom: result.text }));
       }
     } catch (err: any) {
       setError(err?.message || 'Something went wrong while contacting Gemini AI.');

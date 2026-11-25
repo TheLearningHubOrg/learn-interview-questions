@@ -248,6 +248,7 @@ export function StudyProgressCard({ tracks, onOpenBookmarks }: StudyProgressCard
                 <Link
                   key={t.trackSlug}
                   href={`/sections/${t.trackSlug}`}
+                  prefetch={false}
                   className="p-3.5 rounded-2xl bg-muted/40 border border-border hover:border-purple-400/50 hover:bg-card-hover transition-all flex flex-col justify-between group"
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">

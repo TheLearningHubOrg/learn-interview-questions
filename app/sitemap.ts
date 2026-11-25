@@ -1,8 +1,11 @@
 import { MetadataRoute } from 'next';
 import { TRACKS, getTrackQuestions } from '@/lib/tracks';
+import { SITE_URL } from '@/lib/site-config';
+
+export const dynamic = 'force-static';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://learn-interview-questions.vercel.app';
+  const baseUrl = SITE_URL;
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

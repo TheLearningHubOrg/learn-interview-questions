@@ -39,6 +39,7 @@ export function Footer() {
           <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap justify-center sm:justify-end">
             <Link
               href="/cheatsheet"
+              prefetch={false}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-purple-500/25 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition-all font-medium"
             >
               <FileText className="h-3.5 w-3.5" />

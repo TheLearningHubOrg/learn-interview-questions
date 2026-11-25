@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getAllTracks, getTrackQuestions, getQuestionData } from '@/lib/tracks';
+import { SITE_URL } from '@/lib/site-config';
 import { QuestionViewer } from './QuestionViewer';
 
 interface QuestionPageProps {
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
   const data = await getQuestionData(params.slug, qNum);
   if (!data) return { title: 'Question Not Found' };
 
-  const pageUrl = `https://learn-interview-questions.vercel.app/sections/${params.slug}/${qNum}`;
+  const pageUrl = `${SITE_URL}/sections/${params.slug}/${qNum}`;
   const title = `Q${data.question.number}: ${data.question.title} - ${data.track.shortTitle}`;
   const description = `In-depth technical answer & code example for: ${data.question.title}. Part of the ${data.track.title} interview question bank.`;
 
@@ -61,7 +62,7 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
       siteName: 'InterviewHub PRO',
       images: [
         {
-          url: 'https://learn-interview-questions.vercel.app/opengraph-image',
+          url: `${SITE_URL}/opengraph-image.png`,
           width: 1200,
           height: 630,
           alt: `${title} - InterviewHub PRO`,
@@ -72,7 +73,7 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://learn-interview-questions.vercel.app/opengraph-image'],
+      images: [`${SITE_URL}/opengraph-image.png`],
     },
   };
 }
@@ -105,7 +106,7 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
       acceptedAnswer: {
         '@type': 'Answer',
         text: data.question.summary || (data.question.content.slice(0, 300).replace(/[#*`]/g, '') + '...'),
-        url: `https://learn-interview-questions.vercel.app/sections/${params.slug}/${qNum}`,
+        url: `${SITE_URL}/sections/${params.slug}/${qNum}`,
         upvoteCount: 1,
         author: {
           '@type': 'Organization',
@@ -123,19 +124,19 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://learn-interview-questions.vercel.app',
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: data.track.shortTitle,
-        item: `https://learn-interview-questions.vercel.app/sections/${params.slug}`,
+        item: `${SITE_URL}/sections/${params.slug}`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: `Q${data.question.number}: ${data.question.title}`,
-        item: `https://learn-interview-questions.vercel.app/sections/${params.slug}/${qNum}`,
+        item: `${SITE_URL}/sections/${params.slug}/${qNum}`,
       },
     ],
   };

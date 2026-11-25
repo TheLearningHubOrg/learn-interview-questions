@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getAllTracks, getTrackBySlug, getTrackQuestions } from '@/lib/tracks';
+import { SITE_URL } from '@/lib/site-config';
 import { SectionClient } from './SectionClient';
 
 interface SectionPageProps {
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: SectionPageProps): Promise<Me
   const track = await getTrackBySlug(params.slug);
   if (!track) return { title: 'Section Not Found' };
 
-  const pageUrl = `https://learn-interview-questions.vercel.app/sections/${track.slug}`;
+  const pageUrl = `${SITE_URL}/sections/${track.slug}`;
   const title = `Section ${track.sectionNumber}: ${track.shortTitle} (${track.questionCount} Questions)`;
   const description = `${track.title}. Complete master track with ${track.questionCount} questions, 1-per-page routing, and code examples.`;
 
@@ -59,7 +60,7 @@ export async function generateMetadata({ params }: SectionPageProps): Promise<Me
       siteName: 'InterviewHub PRO',
       images: [
         {
-          url: 'https://learn-interview-questions.vercel.app/opengraph-image',
+          url: `${SITE_URL}/opengraph-image.png`,
           width: 1200,
           height: 630,
           alt: `${title} - InterviewHub PRO`,
@@ -70,7 +71,7 @@ export async function generateMetadata({ params }: SectionPageProps): Promise<Me
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://learn-interview-questions.vercel.app/opengraph-image'],
+      images: [`${SITE_URL}/opengraph-image.png`],
     },
   };
 }
@@ -92,13 +93,13 @@ export default async function SectionPage({ params }: SectionPageProps) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://learn-interview-questions.vercel.app',
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: track.shortTitle,
-        item: `https://learn-interview-questions.vercel.app/sections/${track.slug}`,
+        item: `${SITE_URL}/sections/${track.slug}`,
       },
     ],
   };
@@ -113,7 +114,7 @@ export default async function SectionPage({ params }: SectionPageProps) {
       '@type': 'ListItem',
       position: idx + 1,
       name: q.title,
-      url: `https://learn-interview-questions.vercel.app/sections/${track.slug}/${q.number}`,
+      url: `${SITE_URL}/sections/${track.slug}/${q.number}`,
     })),
   };
 

@@ -122,7 +122,7 @@ export function TrackCard({ track }: TrackCardProps) {
         </div>
 
         {/* Title */}
-        <Link href={`/sections/${track.slug}/1`} className="block">
+        <Link href={`/sections/${track.slug}/1`} prefetch={false} className="block">
           <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors mb-2 line-clamp-2">
             {track.title}
           </h3>
@@ -178,6 +178,7 @@ export function TrackCard({ track }: TrackCardProps) {
       <div className="pt-4 border-t border-border flex items-center justify-between gap-3">
         <Link
           href={`/sections/${track.slug}`}
+          prefetch={false}
           className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors py-1.5 px-2.5 rounded-lg hover:bg-muted"
         >
           <List className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
@@ -187,6 +188,7 @@ export function TrackCard({ track }: TrackCardProps) {
         {lastReadNum && lastReadNum > 1 ? (
           <Link
             href={`/sections/${track.slug}/${lastReadNum}`}
+            prefetch={false}
             className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-md shadow-purple-600/25 py-1.5 px-3 rounded-lg transition-all active:scale-95 animate-in fade-in"
           >
             <BookmarkCheck className="h-3.5 w-3.5" />
@@ -196,6 +198,7 @@ export function TrackCard({ track }: TrackCardProps) {
         ) : (
           <Link
             href={`/sections/${track.slug}/1`}
+            prefetch={false}
             className="flex items-center gap-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-md shadow-purple-600/20 py-1.5 px-3 rounded-lg transition-all active:scale-95"
           >
             <Play className="h-3 w-3 fill-current" />

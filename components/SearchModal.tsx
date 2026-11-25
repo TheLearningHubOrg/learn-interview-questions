@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, X, ArrowRight, BookOpen, Hash, Loader2, Flame } from 'lucide-react';
 import { QuestionIndexItem } from '@/lib/tracks-meta';
+import { withBasePath } from '@/lib/site-config';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ export function preloadSearchIndex(): Promise<QuestionIndexItem[]> {
 function fetchSearchIndex(): Promise<QuestionIndexItem[]> {
   if (globalSearchCache) return Promise.resolve(globalSearchCache);
   if (!fetchPromise) {
-    fetchPromise = fetch('/search-index.json')
+    fetchPromise = fetch(withBasePath('/search-index.json'))
       .then((res) => {
         if (!res.ok) throw new Error('Search index fetch failed');
         return res.json();

@@ -362,6 +362,7 @@ export function Header({ onOpenSearch, onOpenBookmarks }: HeaderProps) {
                   <Link
                     key={t.slug}
                     href={`/sections/${t.slug}`}
+                    prefetch={false}
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-card border border-transparent hover:border-border text-xs font-semibold text-foreground transition-all group"
                   >

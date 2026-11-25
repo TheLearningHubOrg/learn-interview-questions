@@ -1,12 +1,10 @@
-name: Continuous Integration & Deployment
+name: Continuous Integration & Manual Vercel Deploy
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-verify:
@@ -35,9 +33,9 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://learn-interview-questions.vercel.app
 
   deploy-to-vercel:
-    name: Deploy to Vercel Production
+    name: Deploy to Vercel Production (Manual)
     needs: build-and-verify
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
